@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/hashicorp/terraform/plugin"
-	"github.com/terraform-providers/terraform-provider-template/template"
+	"wouter_gridscale@bitbucket.org/wouter_gridscale/terraform-provider-gridscale/gridscale"
 )
 
 func main() {
