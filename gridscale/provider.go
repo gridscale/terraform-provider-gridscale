@@ -1,4 +1,4 @@
-package template
+package gridscale
 
 import (
 	"github.com/hashicorp/terraform/helper/schema"
@@ -7,20 +7,32 @@ import (
 
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
+		Schema: map[string]*schema.Schema{
+			"uuid": {
+				Type:		schema.TypeString,
+				Required:	true,
+			},
+			"token": {
+				Type:		schema.TypeString,
+				Required:	true,
+			},
+		},
 		DataSourcesMap: map[string]*schema.Resource{
-			"template_file":             dataSourceFile(),
-			"template_cloudinit_config": dataSourceCloudinitConfig(),
+			//"gridscale_server":	dataSourceGridscaleServer(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"template_file": schema.DataSourceResourceShim(
-				"template_file",
-				dataSourceFile(),
-			),
-			"template_cloudinit_config": schema.DataSourceResourceShim(
-				"template_cloudinit_config",
-				dataSourceCloudinitConfig(),
-			),
-			"template_dir": resourceDir(),
+			"gridscale_server":	resourceGridscaleServer(),
 		},
+
+		ConfigureFunc: providerConfigure,
 	}
+}
+
+func providerConfigure(d *schema.ResourceData) (interface{}, error) {
+	config := Config{
+		UserUUID: d.Get("uuid").(string),
+		APIToken: d.Get("token").(string),
+	}
+
+	return config.Client()
 }
