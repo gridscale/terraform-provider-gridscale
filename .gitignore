@@ -5,6 +5,7 @@ example.tf
 terraform.tfplan
 terraform.tfstate
 terraform-provider-gridscale
+template/
 bin/
 modules-dev/
 /pkg/
