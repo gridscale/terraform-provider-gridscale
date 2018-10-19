@@ -6,16 +6,13 @@ import (
 type Server struct {
 	Body struct {
 		ObjectUuid string `json:"object_uuid"`
-		Name       string `json:"name"`
-		Memory     int    `json:"memory"`
-		Cores      int    `json:"cores"`
-		HardwareProfile	string	`json:"hardware_prfile"`
+		Name			string `json:"name"`
+		Memory			int    `json:"memory"`
+		Cores			int    `json:"cores"`
+		HardwareProfile	string	`json:"hardware_profile"`
+		Status			string	`json:"status"`
+		LocationUuid	string	`json:"location_uuid"`
 	} `json:"server"`
-}
-
-type CreateResponse struct {
-	ObjectUuid  string `json:"object_uuid"`
-	RequestUuid string `json:"request_uuid"`
 }
 
 func (c *Client) ReadServer(id string) (*Server, error) {
@@ -31,7 +28,7 @@ func (c *Client) ReadServer(id string) (*Server, error) {
 	return response, err
 }
 
-func (c *Client) CreateServer(body map[string]interface{}) (string, error) {
+func (c *Client) CreateServer(body map[string]interface{}) (*CreateResponse, error) {
 	r := Request{
 		uri: 			"/objects/servers",
 		method: 		"POST",
@@ -41,7 +38,7 @@ func (c *Client) CreateServer(body map[string]interface{}) (string, error) {
 	response := new(CreateResponse)
 	err := r.execute(*c, &response)
 
-	return response.ObjectUuid, err
+	return response, err
 }
 
 func (c *Client) DestroyServer(id string) error {
