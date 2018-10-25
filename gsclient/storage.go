@@ -4,15 +4,18 @@ import (
 	"log"
 )
 type Storage struct {
-	Body struct {
-		ObjectUuid		string	`json:"object_uuid"`
-		Name			string	`json:"name"`
-		Capacity		string	`json:"capacity"`
-		LocationUuid	string	`json:"location_uuid"`
-	} `json:"storage"`
+	Properties		StorageProperties	`json:"storage"`
 }
 
-func (c *Client) ReadStorage(id string) (*Storage, error) {
+type StorageProperties struct {
+	ObjectUuid		string	`json:"object_uuid"`
+	Name			string	`json:"name"`
+	Capacity		string	`json:"capacity"`
+	LocationUuid	string	`json:"location_uuid"`
+	Status			string	`json:"status"`
+}
+
+func (c *Client) GetStorage(id string) (*Storage, error) {
 	r := Request{
 		uri: 			"/objects/storages/" + id,
 		method: 		"GET",
@@ -35,14 +38,24 @@ func (c *Client) CreateStorage(body map[string]interface{}) (*CreateResponse, er
 	response := new(CreateResponse)
 	err := r.execute(*c, &response)
 
+	c.WaitForState(response.ObjectUuid, c.storageIsProvisioned)
+
 	return response, err
 }
 
-func (c *Client) DestroyStorage(id string) error {
+func (c *Client) DeleteStorage(id string) error {
 	r := Request{
 		uri: 			"/objects/storages/" + id,
 		method: 		"DELETE",
 	}
 
 	return r.execute(*c, nil)
+}
+
+func (c *Client) storageIsProvisioned(id string, inProgress chan bool) {
+	storage, _ := c.GetStorage(id)
+
+	if storage.Properties.Status != "active" {
+		inProgress <- false
+	}
 }

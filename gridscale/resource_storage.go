@@ -39,11 +39,11 @@ func resourceGridscaleStorage() *schema.Resource {
 
 func resourceGridscaleStorageRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	storage, err := client.ReadStorage(d.Id())
+	storage, err := client.GetStorage(d.Id())
 
-	d.Set("name", storage.Body.Name)
-	d.Set("capacity", storage.Body.Capacity)
-	d.Set("location_uuid", storage.Body.LocationUuid)
+	d.Set("name", storage.Properties.Name)
+	d.Set("capacity", storage.Properties.Capacity)
+	d.Set("location_uuid", storage.Properties.LocationUuid)
 
 
 	log.Printf("Read the following: %v", storage)
@@ -73,7 +73,7 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 
 func resourceGridscaleStorageDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	err := client.DestroyStorage(d.Id())
+	err := client.DeleteStorage(d.Id())
 
 	return err
 }
