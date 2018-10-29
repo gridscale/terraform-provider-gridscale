@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 )
 
 type Request struct {
@@ -16,9 +17,17 @@ type Request struct {
 }
 
 type CreateResponse struct {
-	ObjectUuid  string `json:"object_uuid"`
-	RequestUuid string `json:"request_uuid"`
+	ObjectUuid  string	`json:"object_uuid"`
+	RequestUuid string	`json:"request_uuid"`
 	ServerUuid	string	`json:"server_uuid"`
+}
+
+type RequestStatus map[string]RequestStatusProperties
+
+type RequestStatusProperties struct {
+	Status 		string	`json:"status"`
+	Message		string	`json:"message"`
+	CreateTime	string	`json:"create_time"`
 }
 
 //This function takes the client and a struct and then adds the result to the given struct if possible
@@ -65,4 +74,30 @@ func (r *Request) execute(c Client, output interface{}) (error) {
 	}
 
 	return nil
+}
+
+//This function allows use to wait for a request to complete. Timeouts are currently hardcoded
+func (c *Client) WaitForRequestCompletion(cr CreateResponse) error {
+	r := Request{
+		uri: 			"/requests/" + cr.RequestUuid,
+		method: 		"GET",
+	}
+
+	timer := time.After(30 * time.Second)
+
+	for {
+		select {
+			case <-timer:
+				return fmt.Errorf("Timeout reached when waiting for request %v to complete", cr.RequestUuid)
+			default:
+				time.Sleep(500 * time.Millisecond) //delay the request, so we don't do too many requests to the server
+				response := new(RequestStatus)
+				r.execute(*c, &response)
+				output := *response //Without this cast reading indexes doesn't work
+				if output[cr.RequestUuid].Status == "done" {
+					log.Print("Done with creating")
+					return nil
+				}
+		}
+	}
 }

@@ -68,8 +68,11 @@ func (c *Client) CreateServer(s ServerCreateRequest) (*CreateResponse, error) {
 
 	response := new(CreateResponse)
 	err := r.execute(*c, &response)
+	if err != nil {
+		return nil, err
+	}
 
-	c.WaitForState(response.ServerUuid, c.serverIsProvisioned)
+	err = c.WaitForRequestCompletion(*response)
 
 	return response, err
 }
@@ -128,20 +131,4 @@ func (c *Client) StartServer(s Server) error {
 	}
 
 	return r.execute(*c, nil)
-}
-
-func (c *Client) serverIsProvisioned(id string, inProgress chan bool) {
-	server, _ := c.GetServer(id)
-
-	if server.Properties.Status != "active" {
-		inProgress <- false
-	}
-}
-
-func (c *Client) serverIsDeletable(id string, inProgress chan bool) {
-	server, _ := c.GetServer(id)
-
-	if server.Properties.Power == false {
-		inProgress <- false
-	}
 }

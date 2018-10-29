@@ -37,8 +37,11 @@ func (c *Client) CreateStorage(body map[string]interface{}) (*CreateResponse, er
 
 	response := new(CreateResponse)
 	err := r.execute(*c, &response)
+	if err != nil {
+		return nil, err
+	}
 
-	c.WaitForState(response.ObjectUuid, c.storageIsProvisioned)
+	err = c.WaitForRequestCompletion(*response)
 
 	return response, err
 }
@@ -50,12 +53,4 @@ func (c *Client) DeleteStorage(id string) error {
 	}
 
 	return r.execute(*c, nil)
-}
-
-func (c *Client) storageIsProvisioned(id string, inProgress chan bool) {
-	storage, _ := c.GetStorage(id)
-
-	if storage.Properties.Status != "active" {
-		inProgress <- false
-	}
 }
