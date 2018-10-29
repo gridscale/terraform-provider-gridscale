@@ -101,3 +101,24 @@ func (c *Client) WaitForRequestCompletion(cr CreateResponse) error {
 		}
 	}
 }
+
+func (c *Client) WaitForServerPowerStatus(id string, status bool) error {
+	timer := time.After(30 * time.Second)
+
+	for {
+		select {
+		case <-timer:
+			return fmt.Errorf("Timeout reached when trying to shut down system with id %v", id)
+		default:
+			time.Sleep(500 * time.Millisecond) //delay the request, so we don't do too many requests to the server
+			server, err := c.GetServer(id)
+			if err != nil {
+				return err
+			}
+			if server.Properties.Power == status {
+				log.Print("The power status of the server with id %v has changed to %s", id, status)
+				return nil
+			}
+		}
+	}
+}

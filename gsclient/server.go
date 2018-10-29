@@ -99,8 +99,13 @@ func (c *Client) UpdateServer(s *Server) (*Server, error) {
 	return s, r.execute(*c, s)
 }
 
-func (c *Client) StopServer(s Server) error {
-	if !s.Properties.Power{
+func (c *Client) StopServer(id string) error {
+	//Make sure the server exists and that it isn't already in the state we need it to be
+	server, err := c.GetServer(id)
+	if err != nil {
+		return err
+	}
+	if !server.Properties.Power{
 		return nil
 	}
 
@@ -108,12 +113,17 @@ func (c *Client) StopServer(s Server) error {
 		"power":	false,
 	}
 	r := Request{
-		uri:			"/objects/servers/" + s.Properties.ObjectUuid + "/power",
+		uri:			"/objects/servers/" + id + "/power",
 		method:			"PATCH",
 		body:			body,
 	}
 
-	return r.execute(*c, nil)
+	 err = r.execute(*c, nil)
+	if err != nil {
+		return err
+	}
+
+	return c.WaitForServerPowerStatus(id, false)
 }
 
 func (c *Client) StartServer(s Server) error {

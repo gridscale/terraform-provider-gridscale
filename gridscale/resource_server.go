@@ -136,7 +136,12 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 
 func resourceGridscaleServerDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	err := client.DeleteServer(d.Id())
+	id := d.Id()
+	err := client.StopServer(id)
+	if err != nil {
+		return err
+	}
+	err = client.DeleteServer(id)
 
 	return err
 }
