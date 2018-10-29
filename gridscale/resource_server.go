@@ -124,12 +124,12 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 
 	if err != nil {
 		return fmt.Errorf(
-			"Error waiting for server (%s) to be created: %s", d.Get("name").(string), err)
+			"Error waiting for server (%s) to be created: %s", createRequest.Name, err)
 	}
 
 	d.SetId(response.ServerUuid)
 
-	log.Printf("The id for blah has been set to %v", response)
+	log.Printf("[DEBUG] The id for %s has been set to: %v", createRequest.Name, response.ServerUuid)
 
 	return resourceGridscaleServerRead(d, meta)
 }
