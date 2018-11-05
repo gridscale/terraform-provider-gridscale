@@ -41,6 +41,7 @@ func resourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) erro
 
 	d.Set("name", network.Properties.Name)
 	d.Set("location_uuid", network.Properties.LocationUuid)
+	d.Set("l2security", network.Properties.L2Security)
 
 	log.Printf("Read the following: %v", network)
 	return err
@@ -69,6 +70,7 @@ func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) er
 	body := make(map[string]interface{})
 	body["name"] = d.Get("name").(string)
 	body["location_uuid"] = d.Get("location_uuid").(string)
+	body["l2security"] = d.Get("l2security").(string)
 
 	response, err := client.CreateNetwork(body)
 
