@@ -34,6 +34,11 @@ type ServerStorage struct {
 	BootDevice  bool   `json:"bootdevice"`
 }
 
+type ServerNetwork struct {
+	NetworkUuid string `json:"network_uuid"`
+	BootDevice  bool   `json:"bootdevice"`
+}
+
 type ServerCreateRequest struct {
 	Name         string          `json:"name"`
 	Memory       int             `json:"memory"`

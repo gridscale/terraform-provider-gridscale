@@ -110,8 +110,8 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	if attr, ok := d.GetOk("network"); ok {
-		network := gsclient.ServerStorage{
-			StorageUuid: attr.(string),
+		network := gsclient.ServerNetwork{
+			NetworkUuid: attr.(string),
 			BootDevice:  true,
 		}
 		createRequest.Relations.Networks = []interface{}{network}

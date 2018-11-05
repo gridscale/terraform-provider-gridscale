@@ -31,10 +31,10 @@ func resourceGridscaleNetwork() *schema.Resource {
 
 func resourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	network, err := client.ReadNetwork(d.Id())
+	network, err := client.GetNetwork(d.Id())
 
-	d.Set("name", network.Body.Name)
-	d.Set("location_uuid", network.Body.LocationUuid)
+	d.Set("name", network.Properties.Name)
+	d.Set("location_uuid", network.Properties.LocationUuid)
 
 	log.Printf("Read the following: %v", network)
 	return err
@@ -62,7 +62,7 @@ func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) er
 
 func resourceGridscaleNetworkDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	err := client.DestroyNetwork(d.Id())
+	err := client.DeleteNetwork(d.Id())
 
 	return err
 }

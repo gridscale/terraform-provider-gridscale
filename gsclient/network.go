@@ -5,14 +5,16 @@ import (
 )
 
 type Network struct {
-	Body struct {
-		ObjectUuid   string `json:"object_uuid"`
-		Name         string `json:"name"`
-		LocationUuid string `json:"location_uuid"`
-	} `json:"network"`
+	Properties NetworkProperties `json:"network"`
 }
 
-func (c *Client) ReadNetwork(id string) (*Network, error) {
+type NetworkProperties struct {
+	ObjectUuid   string `json:"object_uuid"`
+	Name         string `json:"name"`
+	LocationUuid string `json:"location_uuid"`
+}
+
+func (c *Client) GetNetwork(id string) (*Network, error) {
 	r := Request{
 		uri:    "/objects/networks/" + id,
 		method: "GET",
@@ -38,7 +40,7 @@ func (c *Client) CreateNetwork(body map[string]interface{}) (*CreateResponse, er
 	return response, err
 }
 
-func (c *Client) DestroyNetwork(id string) error {
+func (c *Client) DeleteNetwork(id string) error {
 	r := Request{
 		uri:    "/objects/networks/" + id,
 		method: "DELETE",
