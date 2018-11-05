@@ -126,6 +126,29 @@ func (c *Client) StopServer(id string) error {
 	return c.WaitForServerPowerStatus(id, false)
 }
 
+func (c *Client) ShutdownServer(id string) error {
+	//Make sure the server exists and that it isn't already in the state we need it to be
+	server, err := c.GetServer(id)
+	if err != nil {
+		return err
+	}
+	if !server.Properties.Power{
+		return nil
+	}
+
+	r := Request{
+		uri:			"/objects/servers/" + id + "/shutdown",
+		method:			"PATCH",
+	}
+
+	err = r.execute(*c, nil)
+	if err != nil {
+		return err
+	}
+
+	return c.WaitForServerPowerStatus(id, false)
+}
+
 func (c *Client) StartServer(s Server) error {
 	if s.Properties.Power{
 		return nil
