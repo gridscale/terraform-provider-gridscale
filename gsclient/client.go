@@ -1,12 +1,12 @@
 package gsclient
 
 type Client struct {
-	cfg			*Config
+	cfg *Config
 }
 
 func NewClient(c *Config) *Client {
 	client := &Client{
-		cfg:	c,
+		cfg: c,
 	}
 
 	return client

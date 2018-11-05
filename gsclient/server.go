@@ -6,40 +6,40 @@ import (
 )
 
 type Server struct {
-	Properties			ServerProperties	`json:"server"`
+	Properties ServerProperties `json:"server"`
 }
 
 type ServerProperties struct {
-	ObjectUuid		string 				`json:"object_uuid"`
-	Name			string 				`json:"name"`
-	Memory			int    				`json:"memory"`
-	Cores			int    				`json:"cores"`
-	HardwareProfile	string				`json:"hardware_profile"`
-	Status			string				`json:"status"`
-	LocationUuid	string				`json:"location_uuid"`
-	Power			bool				`json:"power"`
-	CurrentPrice	float32				`json:"current_price"`
-	Relations		ServerRelations		`json:"relations"`
+	ObjectUuid      string          `json:"object_uuid"`
+	Name            string          `json:"name"`
+	Memory          int             `json:"memory"`
+	Cores           int             `json:"cores"`
+	HardwareProfile string          `json:"hardware_profile"`
+	Status          string          `json:"status"`
+	LocationUuid    string          `json:"location_uuid"`
+	Power           bool            `json:"power"`
+	CurrentPrice    float32         `json:"current_price"`
+	Relations       ServerRelations `json:"relations"`
 }
 
 type ServerRelations struct {
-	IsoImages	[]interface{}	`json:"isoimages"`
-	Networks	[]interface{}	`json:"networks"`
-	PublicIps	[]interface{}	`json:"public_ips"`
-	Storages	[]ServerStorage	`json:"storages"`
+	IsoImages []interface{}   `json:"isoimages"`
+	Networks  []interface{}   `json:"networks"`
+	PublicIps []interface{}   `json:"public_ips"`
+	Storages  []ServerStorage `json:"storages"`
 }
 
 type ServerStorage struct {
-	StorageUuid	string	`json:"storage_uuid"`
-	BootDevice	bool	`json:"bootdevice"`
+	StorageUuid string `json:"storage_uuid"`
+	BootDevice  bool   `json:"bootdevice"`
 }
 
 type ServerCreateRequest struct {
-	Name			string 				`json:"name"`
-	Memory			int    				`json:"memory"`
-	Cores			int    				`json:"cores"`
-	LocationUuid	string				`json:"location_uuid"`
-	Relations		ServerRelations		`json:"relations"`
+	Name         string          `json:"name"`
+	Memory       int             `json:"memory"`
+	Cores        int             `json:"cores"`
+	LocationUuid string          `json:"location_uuid"`
+	Relations    ServerRelations `json:"relations"`
 }
 
 func (c *Client) GetServer(id string) (*Server, error) {
@@ -48,8 +48,8 @@ func (c *Client) GetServer(id string) (*Server, error) {
 			"Can't read without id", nil)
 	}
 	r := Request{
-		uri: 			"/objects/servers/" + id,
-		method: 		"GET",
+		uri:    "/objects/servers/" + id,
+		method: "GET",
 	}
 	log.Printf("%v", r)
 
@@ -61,9 +61,9 @@ func (c *Client) GetServer(id string) (*Server, error) {
 
 func (c *Client) CreateServer(s ServerCreateRequest) (*CreateResponse, error) {
 	r := Request{
-		uri: 			"/objects/servers",
-		method: 		"POST",
-		body:			s,
+		uri:    "/objects/servers",
+		method: "POST",
+		body:   s,
 	}
 
 	response := new(CreateResponse)
@@ -79,24 +79,21 @@ func (c *Client) CreateServer(s ServerCreateRequest) (*CreateResponse, error) {
 
 func (c *Client) DeleteServer(id string) error {
 	r := Request{
-		uri: 			"/objects/servers/" + id,
-		method: 		"DELETE",
+		uri:    "/objects/servers/" + id,
+		method: "DELETE",
 	}
 
 	return r.execute(*c, nil)
 }
 
-func (c *Client) UpdateServer(s *Server) (*Server, error) {
-	body := map[string]interface{}{}
-
-
+func (c *Client) UpdateServer(id string, body map[string]interface{}) error {
 	r := Request{
-		uri:			"/objects/servers/" + s.Properties.ObjectUuid,
-		method:			"PATCH",
-		body:			body,
+		uri:    "/objects/servers/" + id,
+		method: "PATCH",
+		body:   body,
 	}
 
-	return s, r.execute(*c, s)
+	return r.execute(*c, nil)
 }
 
 func (c *Client) StopServer(id string) error {
@@ -105,20 +102,20 @@ func (c *Client) StopServer(id string) error {
 	if err != nil {
 		return err
 	}
-	if !server.Properties.Power{
+	if !server.Properties.Power {
 		return nil
 	}
 
 	body := map[string]interface{}{
-		"power":	false,
+		"power": false,
 	}
 	r := Request{
-		uri:			"/objects/servers/" + id + "/power",
-		method:			"PATCH",
-		body:			body,
+		uri:    "/objects/servers/" + id + "/power",
+		method: "PATCH",
+		body:   body,
 	}
 
-	 err = r.execute(*c, nil)
+	err = r.execute(*c, nil)
 	if err != nil {
 		return err
 	}
@@ -132,13 +129,13 @@ func (c *Client) ShutdownServer(id string) error {
 	if err != nil {
 		return err
 	}
-	if !server.Properties.Power{
+	if !server.Properties.Power {
 		return nil
 	}
 
 	r := Request{
-		uri:			"/objects/servers/" + id + "/shutdown",
-		method:			"PATCH",
+		uri:    "/objects/servers/" + id + "/shutdown",
+		method: "PATCH",
 	}
 
 	err = r.execute(*c, nil)
@@ -150,18 +147,38 @@ func (c *Client) ShutdownServer(id string) error {
 }
 
 func (c *Client) StartServer(s Server) error {
-	if s.Properties.Power{
+	if s.Properties.Power {
 		return nil
 	}
 
 	body := map[string]interface{}{
-		"power":	true,
+		"power": true,
 	}
 	r := Request{
-		uri:			"/objects/servers/" + s.Properties.ObjectUuid + "/power",
-		method:			"PATCH",
-		body:			body,
+		uri:    "/objects/servers/" + s.Properties.ObjectUuid + "/power",
+		method: "PATCH",
+		body:   body,
 	}
 
-	return r.execute(*c, nil)
+	err := r.execute(*c, nil)
+	if err != nil {
+		return err
+	}
+
+	return c.WaitForServerPowerStatus(s.Properties.ObjectUuid, true)
+}
+
+func (c *Client) GetServerPowerStatus(id string) (bool, error) {
+	r := Request{
+		uri:    "/objects/servers/" + id + "/power",
+		method: "GET",
+	}
+
+	power := struct {
+		power bool
+	}{}
+
+	err := r.execute(*c, power)
+
+	return power.power, err
 }

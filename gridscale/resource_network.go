@@ -13,17 +13,17 @@ func resourceGridscaleNetwork() *schema.Resource {
 		Delete: resourceGridscaleNetworkDelete,
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:        	schema.TypeString,
-				Description: 	"Name of the server",
-				Required:    	true,
-				ForceNew:	 	true,
+				Type:        schema.TypeString,
+				Description: "Name of the server",
+				Required:    true,
+				ForceNew:    true,
 			},
 			"location_uuid": {
-				Type:        	schema.TypeString,
-				Description: 	"Path to the directory where the templated files will be written",
-				Optional:    	true,
-				ForceNew:		true,
-				Default:	 	"45ed677b-3702-4b36-be2a-a2eab9827950",
+				Type:        schema.TypeString,
+				Description: "Path to the directory where the templated files will be written",
+				Optional:    true,
+				ForceNew:    true,
+				Default:     "45ed677b-3702-4b36-be2a-a2eab9827950",
 			},
 		},
 	}
@@ -35,7 +35,6 @@ func resourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) erro
 
 	d.Set("name", network.Body.Name)
 	d.Set("location_uuid", network.Body.LocationUuid)
-
 
 	log.Printf("Read the following: %v", network)
 	return err

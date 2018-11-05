@@ -12,7 +12,7 @@ func resourceGridscaleStorage() *schema.Resource {
 		Create: resourceGridscaleStorageCreate,
 		Read:   resourceGridscaleStorageRead,
 		Delete: resourceGridscaleStorageDelete,
-		Update:	resourceGridscaleStorageUpdate,
+		Update: resourceGridscaleStorageUpdate,
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:        schema.TypeString,

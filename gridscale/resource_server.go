@@ -13,52 +13,56 @@ func resourceGridscaleServer() *schema.Resource {
 		Create: resourceGridscaleServerCreate,
 		Read:   resourceGridscaleServerRead,
 		Delete: resourceGridscaleServerDelete,
-		Update:	resourceGridscaleServerUpdate,
+		Update: resourceGridscaleServerUpdate,
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:        	schema.TypeString,
-				Description: 	"Name of the server",
-				Required:    	true,
+				Type:        schema.TypeString,
+				Description: "Name of the server",
+				Required:    true,
 			},
 			"memory": {
-				Type:         	schema.TypeInt,
-				Description:  	"Memory in gigabytes",
-				Required:    	true,
-				ValidateFunc:	validation.NoZeroValues,
+				Type:         schema.TypeInt,
+				Description:  "Memory in gigabytes",
+				Required:     true,
+				ForceNew:     true,
+				ValidateFunc: validation.NoZeroValues,
 			},
 			"cores": {
-				Type:        	schema.TypeInt,
-				Description: 	"Amount of CPU cores",
-				Required:    	true,
-				ValidateFunc:	validation.NoZeroValues,
+				Type:         schema.TypeInt,
+				Description:  "Amount of CPU cores",
+				Required:     true,
+				ForceNew:     true,
+				ValidateFunc: validation.NoZeroValues,
 			},
 			"location_uuid": {
-				Type:        	schema.TypeString,
-				Description: 	"Path to the directory where the templated files will be written",
-				Optional:    	true,
-				ForceNew:		true,
-				Default:	 	"45ed677b-3702-4b36-be2a-a2eab9827950",
+				Type:        schema.TypeString,
+				Description: "Path to the directory where the templated files will be written",
+				Optional:    true,
+				ForceNew:    true,
+				Default:     "45ed677b-3702-4b36-be2a-a2eab9827950",
 			},
 			"hardware_profile": {
-				Type:        	schema.TypeString,
-				Computed:		true,
+				Type:     schema.TypeString,
+				Computed: true,
 			},
 			"storage": {
-				Type:			schema.TypeString,
-				Optional:		true,
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: true,
 			},
 			"network": {
-				Type:			schema.TypeString,
-				Optional:		true,
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: true,
 			},
 			"power": {
-				Type:			schema.TypeBool,
-				Computed:		true,
+				Type:     schema.TypeBool,
+				Computed: true,
 			},
 			"current_price": {
-				Type:			schema.TypeFloat,
-				Computed:		true,
+				Type:     schema.TypeFloat,
+				Computed: true,
 			},
 		},
 	}
@@ -76,7 +80,6 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("power", server.Properties.Power)
 	d.Set("current_price", server.Properties.CurrentPrice)
 
-
 	log.Printf("Read the following: %v", server)
 
 	return err
@@ -86,10 +89,10 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	client := meta.(*gsclient.Client)
 
 	createRequest := gsclient.ServerCreateRequest{
-		Name:			d.Get("name").(string),
-		Cores:			d.Get("cores").(int),
-		Memory:			d.Get("memory").(int),
-		LocationUuid:	d.Get("location_uuid").(string),
+		Name:         d.Get("name").(string),
+		Cores:        d.Get("cores").(int),
+		Memory:       d.Get("memory").(int),
+		LocationUuid: d.Get("location_uuid").(string),
 	}
 
 	createRequest.Relations.IsoImages = []interface{}{}
@@ -98,8 +101,8 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 
 	if attr, ok := d.GetOk("storage"); ok {
 		storage := gsclient.ServerStorage{
-			StorageUuid:	attr.(string),
-			BootDevice:		true,
+			StorageUuid: attr.(string),
+			BootDevice:  true,
 		}
 		createRequest.Relations.Storages = []gsclient.ServerStorage{storage}
 	} else {
@@ -108,8 +111,8 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 
 	if attr, ok := d.GetOk("network"); ok {
 		network := gsclient.ServerStorage{
-			StorageUuid:	attr.(string),
-			BootDevice:		true,
+			StorageUuid: attr.(string),
+			BootDevice:  true,
 		}
 		createRequest.Relations.Networks = []interface{}{network}
 	} else {
@@ -147,5 +150,14 @@ func resourceGridscaleServerDelete(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) error {
-	return nil
+	client := meta.(*gsclient.Client)
+	requestBody := make(map[string]interface{})
+	id := d.Id()
+
+	if d.HasChange("name") {
+		_, change := d.GetChange("name")
+		requestBody["name"] = change.(string)
+	}
+
+	return client.UpdateServer(id, requestBody)
 }

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/hashicorp/terraform/plugin"
 	"./gridscale"
+	"github.com/hashicorp/terraform/plugin"
 )
 
 func main() {

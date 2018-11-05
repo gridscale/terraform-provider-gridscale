@@ -5,7 +5,7 @@ import (
 	"log"
 )
 
-type Config struct{
+type Config struct {
 	UserUUID string
 	APIToken string
 }

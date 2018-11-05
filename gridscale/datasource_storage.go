@@ -12,12 +12,12 @@ func dataSourceGridscaleStorage() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"id": &schema.Schema{
-				Type:          schema.TypeString,
-				Optional:      true,
+				Type:     schema.TypeString,
+				Optional: true,
 			},
 			"name": &schema.Schema{
-				Type:			schema.TypeString,
-				Optional:		true,
+				Type:     schema.TypeString,
+				Optional: true,
 			},
 		},
 	}
