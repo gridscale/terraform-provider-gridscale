@@ -12,26 +12,25 @@ func resourceGridscaleStorage() *schema.Resource {
 		Create: resourceGridscaleStorageCreate,
 		Read:   resourceGridscaleStorageRead,
 		Delete: resourceGridscaleStorageDelete,
+		Update:	resourceGridscaleStorageUpdate,
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:        	schema.TypeString,
-				Description: 	"Name of the server",
-				Required:    	true,
-				ForceNew:	 	true,
+				Type:        schema.TypeString,
+				Description: "Name of the server",
+				Required:    true,
 			},
 			"capacity": {
-				Type:         	schema.TypeInt,
-				Description:  	"Storage capacity in gigabytes",
-				Required:    	true,
-				ForceNew:	 	true,
-				ValidateFunc:	validation.NoZeroValues,
+				Type:         schema.TypeInt,
+				Description:  "Storage capacity in gigabytes",
+				Required:     true,
+				ValidateFunc: validation.NoZeroValues,
 			},
 			"location_uuid": {
-				Type:        	schema.TypeString,
-				Description: 	"Path to the directory where the templated files will be written",
-				Optional:    	true,
-				ForceNew:		true,
-				Default:	 	"45ed677b-3702-4b36-be2a-a2eab9827950",
+				Type:        schema.TypeString,
+				Description: "Path to the directory where the templated files will be written",
+				Optional:    true,
+				ForceNew:    true,
+				Default:     "45ed677b-3702-4b36-be2a-a2eab9827950",
 			},
 		},
 	}
@@ -45,13 +44,26 @@ func resourceGridscaleStorageRead(d *schema.ResourceData, meta interface{}) erro
 	d.Set("capacity", storage.Properties.Capacity)
 	d.Set("location_uuid", storage.Properties.LocationUuid)
 
-
 	log.Printf("Read the following: %v", storage)
 	return err
 }
 
 func resourceGridscaleStorageUpdate(d *schema.ResourceData, meta interface{}) error {
-	return nil
+	client := meta.(*gsclient.Client)
+	requestBody := make(map[string]interface{})
+	id := d.Id()
+
+	if d.HasChange("name") {
+		_, change := d.GetChange("name")
+		requestBody["name"] = change.(string)
+	}
+
+	if d.HasChange("capacity") {
+		_, change := d.GetChange("capacity")
+		requestBody["capacity"] = change.(int)
+	}
+
+	return client.UpdateStorage(id, requestBody)
 }
 
 func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) error {
