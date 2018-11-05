@@ -48,3 +48,13 @@ func (c *Client) DeleteNetwork(id string) error {
 
 	return r.execute(*c, nil)
 }
+
+func (c *Client) UpdateNetwork(id string, body map[string]interface{}) error {
+	r := Request{
+		uri:    "/objects/networks/" + id,
+		method: "PATCH",
+		body:   body,
+	}
+
+	return r.execute(*c, nil)
+}

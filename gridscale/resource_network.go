@@ -11,12 +11,12 @@ func resourceGridscaleNetwork() *schema.Resource {
 		Create: resourceGridscaleNetworkCreate,
 		Read:   resourceGridscaleNetworkRead,
 		Delete: resourceGridscaleNetworkDelete,
+		Update: resourceGridscaleNetworkUpdate,
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:        schema.TypeString,
 				Description: "Name of the server",
 				Required:    true,
-				ForceNew:    true,
 			},
 			"location_uuid": {
 				Type:        schema.TypeString,
@@ -41,7 +41,18 @@ func resourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceGridscaleNetworkUpdate(d *schema.ResourceData, meta interface{}) error {
-	return nil
+	client := meta.(*gsclient.Client)
+	requestBody := make(map[string]interface{})
+	id := d.Id()
+
+	if d.HasChange("name") {
+		_, change := d.GetChange("name")
+		requestBody["name"] = change.(string)
+	} else {
+		return nil
+	}
+
+	return client.UpdateNetwork(id, requestBody)
 }
 
 func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) error {
