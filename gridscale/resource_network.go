@@ -76,7 +76,7 @@ func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) er
 
 	d.SetId(response.ObjectUuid)
 
-	log.Printf("The id for blah has been set to %v", response)
+	log.Printf("The id for network %v has been set to %v", d.Get("name").(string), response.ObjectUuid)
 
 	return err
 }
