@@ -12,6 +12,7 @@ type NetworkProperties struct {
 	ObjectUuid   string `json:"object_uuid"`
 	Name         string `json:"name"`
 	LocationUuid string `json:"location_uuid"`
+	L2Security   bool   `json:"l2security"`
 }
 
 func (c *Client) GetNetwork(id string) (*Network, error) {

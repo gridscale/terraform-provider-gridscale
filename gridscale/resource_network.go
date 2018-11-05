@@ -25,6 +25,12 @@ func resourceGridscaleNetwork() *schema.Resource {
 				ForceNew:    true,
 				Default:     "45ed677b-3702-4b36-be2a-a2eab9827950",
 			},
+			"l2security": {
+				Type:        schema.TypeBool,
+				Description: "Protects a network from MAC- and ARP-spoofing",
+				Optional:    true,
+				Default:     false,
+			},
 		},
 	}
 }
@@ -48,8 +54,10 @@ func resourceGridscaleNetworkUpdate(d *schema.ResourceData, meta interface{}) er
 	if d.HasChange("name") {
 		_, change := d.GetChange("name")
 		requestBody["name"] = change.(string)
-	} else {
-		return nil
+	}
+	if d.HasChange("l2security") {
+		_, change := d.GetChange("l2security")
+		requestBody["l2security"] = change.(bool)
 	}
 
 	return client.UpdateNetwork(id, requestBody)
