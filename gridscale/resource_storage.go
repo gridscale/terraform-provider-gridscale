@@ -66,7 +66,7 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 
 	d.SetId(response.ObjectUuid)
 
-	log.Printf("The id for blah has been set to %v", response)
+	log.Printf("The id for storage %s has been set to %v", body["name"], response)
 
 	return err
 }
