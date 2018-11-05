@@ -37,6 +37,11 @@ func (c *Client) CreateNetwork(body map[string]interface{}) (*CreateResponse, er
 
 	response := new(CreateResponse)
 	err := r.execute(*c, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	err = c.WaitForRequestCompletion(*response)
 
 	return response, err
 }
