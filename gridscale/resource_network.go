@@ -18,6 +18,22 @@ func resourceGridscaleNetwork() *schema.Resource {
 				Description: "Name of the server",
 				Required:    true,
 			},
+			"l2security": {
+				Type:        schema.TypeBool,
+				Description: "Protects a network from MAC- and ARP-spoofing",
+				Optional:    true,
+				Default:     false,
+			},
+			"status": {
+				Type:        schema.TypeString,
+				Description: "status indicates the status of the object",
+				Computed:    true,
+			},
+			"network_type": {
+				Type:        schema.TypeString,
+				Description: "one of network, network_high, network_insane",
+				Computed:    true,
+			},
 			"location_uuid": {
 				Type:        schema.TypeString,
 				Description: "Path to the directory where the templated files will be written",
@@ -25,11 +41,34 @@ func resourceGridscaleNetwork() *schema.Resource {
 				ForceNew:    true,
 				Default:     "45ed677b-3702-4b36-be2a-a2eab9827950",
 			},
-			"l2security": {
-				Type:        schema.TypeBool,
-				Description: "Protects a network from MAC- and ARP-spoofing",
-				Optional:    true,
-				Default:     false,
+			"location_country": {
+				Type:        schema.TypeString,
+				Description: "Formatted by the 2 digit country code (ISO 3166-2) of the host country",
+				Computed:    true,
+			},
+			"location_iata": {
+				Type:        schema.TypeString,
+				Description: "Uses IATA airport code, which works as a location identifier",
+				Computed:    true,
+			},
+			"location_name": {
+				Type:        schema.TypeString,
+				Description: "The human-readable name of the location. It supports the full UTF-8 charset, with a maximum of 64 characters",
+				Computed:    true,
+			},
+			"public_net": {
+				Type:     schema.TypeBool,
+				Computed: true,
+			},
+			"create_time": {
+				Type:        schema.TypeString,
+				Description: "The date and time the object was initially created",
+				Computed:    true,
+			},
+			"change_time": {
+				Type:        schema.TypeString,
+				Description: "The date and time of the last object change",
+				Computed:    true,
 			},
 		},
 	}
@@ -42,6 +81,14 @@ func resourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) erro
 	d.Set("name", network.Properties.Name)
 	d.Set("location_uuid", network.Properties.LocationUuid)
 	d.Set("l2security", network.Properties.L2Security)
+	d.Set("status", network.Properties.Status)
+	d.Set("network_type", network.Properties.NetworkType)
+	d.Set("location_country", network.Properties.LocationCountry)
+	d.Set("location_iata", network.Properties.LocationIata)
+	d.Set("location_name", network.Properties.LocationName)
+	d.Set("public_net", network.Properties.PublicNet)
+	d.Set("create_time", network.Properties.CreateTime)
+	d.Set("change_time", network.Properties.ChangeTime)
 
 	log.Printf("Read the following: %v", network)
 	return err
@@ -70,15 +117,18 @@ func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) er
 	body := make(map[string]interface{})
 	body["name"] = d.Get("name").(string)
 	body["location_uuid"] = d.Get("location_uuid").(string)
-	body["l2security"] = d.Get("l2security").(string)
+	body["l2security"] = d.Get("l2security").(bool)
 
 	response, err := client.CreateNetwork(body)
+	if err != nil {
+		return err
+	}
 
 	d.SetId(response.ObjectUuid)
 
 	log.Printf("The id for network %v has been set to %v", d.Get("name").(string), response.ObjectUuid)
 
-	return err
+	return resourceGridscaleNetworkRead(d, meta)
 }
 
 func resourceGridscaleNetworkDelete(d *schema.ResourceData, meta interface{}) error {
