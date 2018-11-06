@@ -24,8 +24,8 @@ type ServerProperties struct {
 
 type ServerRelations struct {
 	IsoImages []interface{}   `json:"isoimages"`
-	Networks  []interface{}   `json:"networks"`
-	PublicIps []interface{}   `json:"public_ips"`
+	Networks  []ServerNetwork `json:"networks"`
+	PublicIps []ServerIp      `json:"public_ips"`
 	Storages  []ServerStorage `json:"storages"`
 }
 
@@ -37,6 +37,10 @@ type ServerStorage struct {
 type ServerNetwork struct {
 	NetworkUuid string `json:"network_uuid"`
 	BootDevice  bool   `json:"bootdevice"`
+}
+
+type ServerIp struct {
+	IpaddrUuid string `json:"ipaddr_uuid"`
 }
 
 type ServerCreateRequest struct {

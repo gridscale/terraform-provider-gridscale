@@ -52,6 +52,7 @@ func resourceGridscaleIp() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "Defines the reverse DNS entry for the IP Address (PTR Resource Record).",
 				Optional:    true,
+				Computed:    true,
 			},
 			"location_country": {
 				Type:        schema.TypeString,

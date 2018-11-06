@@ -59,6 +59,11 @@ func resourceGridscaleServer() *schema.Resource {
 				Optional: true,
 				ForceNew: true,
 			},
+			"ip": {
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: true,
+			},
 			"power": {
 				Type:        schema.TypeBool,
 				Description: "The number of server cores.",
@@ -102,8 +107,8 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	createRequest.Relations.IsoImages = []interface{}{}
-	createRequest.Relations.Networks = []interface{}{}
-	createRequest.Relations.PublicIps = []interface{}{}
+	createRequest.Relations.Networks = []gsclient.ServerNetwork{}
+	createRequest.Relations.PublicIps = []gsclient.ServerIp{}
 
 	if attr, ok := d.GetOk("storage"); ok {
 		storage := gsclient.ServerStorage{
@@ -115,14 +120,23 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		createRequest.Relations.Storages = []gsclient.ServerStorage{}
 	}
 
+	if attr, ok := d.GetOk("ip"); ok {
+		ip := gsclient.ServerIp{
+			IpaddrUuid: attr.(string),
+		}
+		createRequest.Relations.PublicIps = []gsclient.ServerIp{ip}
+	} else {
+		createRequest.Relations.PublicIps = []gsclient.ServerIp{}
+	}
+
 	if attr, ok := d.GetOk("network"); ok {
 		network := gsclient.ServerNetwork{
 			NetworkUuid: attr.(string),
 			BootDevice:  true,
 		}
-		createRequest.Relations.Networks = []interface{}{network}
+		createRequest.Relations.Networks = []gsclient.ServerNetwork{network}
 	} else {
-		createRequest.Relations.Networks = []interface{}{}
+		createRequest.Relations.Networks = []gsclient.ServerNetwork{}
 	}
 
 	response, err := client.CreateServer(createRequest)
