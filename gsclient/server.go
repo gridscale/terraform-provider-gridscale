@@ -18,7 +18,7 @@ type ServerProperties struct {
 	Status          string          `json:"status"`
 	LocationUuid    string          `json:"location_uuid"`
 	Power           bool            `json:"power"`
-	CurrentPrice    float32         `json:"current_price"`
+	CurrentPrice    float64         `json:"current_price"`
 	Relations       ServerRelations `json:"relations"`
 }
 
