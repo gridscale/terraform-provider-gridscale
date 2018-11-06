@@ -108,7 +108,12 @@ func resourceGridscaleNetworkUpdate(d *schema.ResourceData, meta interface{}) er
 		requestBody["l2security"] = change.(bool)
 	}
 
-	return client.UpdateNetwork(id, requestBody)
+	err := client.UpdateNetwork(id, requestBody)
+	if err != nil {
+		return err
+	}
+
+	return resourceGridscaleNetworkRead(d, meta)
 }
 
 func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) error {

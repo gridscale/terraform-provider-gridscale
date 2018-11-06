@@ -159,5 +159,11 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 		requestBody["name"] = change.(string)
 	}
 
-	return client.UpdateServer(id, requestBody)
+	err := client.UpdateServer(id, requestBody)
+	if err != nil {
+		return err
+	}
+
+	return resourceGridscaleServerRead(d, meta)
+
 }

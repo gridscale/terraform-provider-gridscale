@@ -63,7 +63,12 @@ func resourceGridscaleStorageUpdate(d *schema.ResourceData, meta interface{}) er
 		requestBody["capacity"] = change.(int)
 	}
 
-	return client.UpdateStorage(id, requestBody)
+	err := client.UpdateStorage(id, requestBody)
+	if err != nil {
+		return err
+	}
+
+	return resourceGridscaleStorageRead(d, meta)
 }
 
 func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) error {
@@ -75,12 +80,15 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 	body["location_uuid"] = d.Get("location_uuid").(string)
 
 	response, err := client.CreateStorage(body)
+	if err != nil {
+		return err
+	}
 
 	d.SetId(response.ObjectUuid)
 
 	log.Printf("The id for storage %s has been set to %v", body["name"], response)
 
-	return err
+	return resourceGridscaleStorageRead(d, meta)
 }
 
 func resourceGridscaleStorageDelete(d *schema.ResourceData, meta interface{}) error {
