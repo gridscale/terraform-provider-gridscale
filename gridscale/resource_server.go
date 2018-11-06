@@ -49,16 +49,17 @@ func resourceGridscaleServer() *schema.Resource {
 				ForceNew:    true,
 				Default:     "default",
 			},
-			"storage": {
+			"storages": {
 				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
-			"network": {
-				Type:     schema.TypeString,
+			"networks": {
+				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"ip": {
 				Type:     schema.TypeString,
@@ -90,6 +91,7 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("location_uuid", server.Properties.LocationUuid)
 	d.Set("power", server.Properties.Power)
 	d.Set("current_price", server.Properties.CurrentPrice)
+	d.Set("storages", server.Properties.Relations.Networks) //No clue if this one does anything
 
 	log.Printf("Read the following: %v", server)
 
@@ -108,34 +110,39 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	createRequest.Relations.IsoImages = []interface{}{}
-	createRequest.Relations.Networks = []gsclient.ServerNetwork{}
-	createRequest.Relations.PublicIps = []gsclient.ServerIp{}
 
 	createRequest.Relations.Storages = []gsclient.ServerStorage{}
-	if attr, ok := d.GetOk("storage"); ok {
-		for	_, value := range attr.([]interface{}) {
+	if attr, ok := d.GetOk("storages"); ok {
+		for index, value := range attr.([]interface{}) {
 			storage := gsclient.ServerStorage{
 				StorageUuid: value.(string),
+			}
+			if index == 0 {
+				storage.BootDevice = true
 			}
 			createRequest.Relations.Storages = append(createRequest.Relations.Storages, storage)
 		}
 	}
 
-	createRequest.Relations.PublicIps= []gsclient.ServerIp{}
+	createRequest.Relations.PublicIps = []gsclient.ServerIp{}
 	if attr, ok := d.GetOk("ip"); ok {
-			ip := gsclient.ServerIp{
-				IpaddrUuid: attr.(string),
-			}
-			createRequest.Relations.PublicIps = append(createRequest.Relations.PublicIps, ip)
+		ip := gsclient.ServerIp{
+			IpaddrUuid: attr.(string),
+		}
+		createRequest.Relations.PublicIps = append(createRequest.Relations.PublicIps, ip)
 	}
 
 	createRequest.Relations.Networks = []gsclient.ServerNetwork{}
-	if attr, ok := d.GetOk("network"); ok {
+	if attr, ok := d.GetOk("networks"); ok {
+		for index, value := range attr.([]interface{}) {
 			network := gsclient.ServerNetwork{
-				NetworkUuid: attr.(string),
-				BootDevice:  true,
+				NetworkUuid: value.(string),
+			}
+			if index == 0 {
+				network.BootDevice = true
 			}
 			createRequest.Relations.Networks = []gsclient.ServerNetwork{network}
+		}
 	}
 
 	response, err := client.CreateServer(createRequest)
