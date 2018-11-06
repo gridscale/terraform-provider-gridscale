@@ -60,6 +60,10 @@ func resourceGridscaleNetwork() *schema.Resource {
 				Type:     schema.TypeBool,
 				Computed: true,
 			},
+			"delete_block": {
+				Type:     schema.TypeBool,
+				Computed: true,
+			},
 			"create_time": {
 				Type:        schema.TypeString,
 				Description: "The date and time the object was initially created",
@@ -87,6 +91,7 @@ func resourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) erro
 	d.Set("location_iata", network.Properties.LocationIata)
 	d.Set("location_name", network.Properties.LocationName)
 	d.Set("public_net", network.Properties.PublicNet)
+	d.Set("public_net", network.Properties.DeleteBlock)
 	d.Set("create_time", network.Properties.CreateTime)
 	d.Set("change_time", network.Properties.ChangeTime)
 

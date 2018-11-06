@@ -21,6 +21,7 @@ type NetworkProperties struct {
 	ChangeTime      string `json:"change_time"`
 	LocationIata    string `json:"location_iata"`
 	LocationName    string `json:"location_name"`
+	DeleteBlock     bool   `json:"delete_block"`
 }
 
 func (c *Client) GetNetwork(id string) (*Network, error) {
