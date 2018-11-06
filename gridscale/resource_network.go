@@ -93,7 +93,7 @@ func resourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) erro
 	d.Set("location_iata", network.Properties.LocationIata)
 	d.Set("location_name", network.Properties.LocationName)
 	d.Set("public_net", network.Properties.PublicNet)
-	d.Set("public_net", network.Properties.DeleteBlock)
+	d.Set("delete_block", network.Properties.DeleteBlock)
 	d.Set("create_time", network.Properties.CreateTime)
 	d.Set("change_time", network.Properties.ChangeTime)
 
