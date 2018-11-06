@@ -70,7 +70,7 @@ func (r *Request) execute(c Client, output interface{}) error {
 	log.Printf("[DEBUG] Response body: %v", response)
 
 	if result.StatusCode >= 300 {
-		return fmt.Errorf("[Error] statuscode %v returned", result.StatusCode)
+		return fmt.Errorf("[Error] statuscode %v returned: %v", result.StatusCode, result.Body)
 	}
 
 	return nil
