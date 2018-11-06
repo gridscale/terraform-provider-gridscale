@@ -25,6 +25,7 @@ func Provider() terraform.ResourceProvider {
 			"gridscale_server":  resourceGridscaleServer(),
 			"gridscale_storage": resourceGridscaleStorage(),
 			"gridscale_network": resourceGridscaleNetwork(),
+			"gridscale_ip":      resourceGridscaleIp(),
 		},
 
 		ConfigureFunc: providerConfigure,
