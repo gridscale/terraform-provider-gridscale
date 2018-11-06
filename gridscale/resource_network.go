@@ -15,12 +15,12 @@ func resourceGridscaleNetwork() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:        schema.TypeString,
-				Description: "Name of the server",
+				Description: "The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.",
 				Required:    true,
 			},
 			"l2security": {
 				Type:        schema.TypeBool,
-				Description: "Protects a network from MAC- and ARP-spoofing",
+				Description: "MAC spoofing protection - filters layer2 and ARP traffic based on source MAC",
 				Optional:    true,
 				Default:     false,
 			},
@@ -31,7 +31,7 @@ func resourceGridscaleNetwork() *schema.Resource {
 			},
 			"network_type": {
 				Type:        schema.TypeString,
-				Description: "one of network, network_high, network_insane",
+				Description: "The type of this network, can be mpls, breakout or network.",
 				Computed:    true,
 			},
 			"location_uuid": {
@@ -57,12 +57,14 @@ func resourceGridscaleNetwork() *schema.Resource {
 				Computed:    true,
 			},
 			"public_net": {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Type:        schema.TypeBool,
+				Description: "Is the network public or not",
+				Computed:    true,
 			},
 			"delete_block": {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Type:        schema.TypeBool,
+				Description: "If deleting this network is allowed",
+				Computed:    true,
 			},
 			"create_time": {
 				Type:        schema.TypeString,
