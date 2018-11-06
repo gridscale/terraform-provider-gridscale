@@ -50,9 +50,10 @@ func resourceGridscaleServer() *schema.Resource {
 				Default:     "default",
 			},
 			"storage": {
-				Type:     schema.TypeString,
+				Type:     schema.TypeList,
 				Optional: true,
 				ForceNew: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"network": {
 				Type:     schema.TypeString,
@@ -110,33 +111,31 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	createRequest.Relations.Networks = []gsclient.ServerNetwork{}
 	createRequest.Relations.PublicIps = []gsclient.ServerIp{}
 
+	createRequest.Relations.Storages = []gsclient.ServerStorage{}
 	if attr, ok := d.GetOk("storage"); ok {
-		storage := gsclient.ServerStorage{
-			StorageUuid: attr.(string),
-			BootDevice:  true,
+		for	_, value := range attr.([]interface{}) {
+			storage := gsclient.ServerStorage{
+				StorageUuid: value.(string),
+			}
+			createRequest.Relations.Storages = append(createRequest.Relations.Storages, storage)
 		}
-		createRequest.Relations.Storages = []gsclient.ServerStorage{storage}
-	} else {
-		createRequest.Relations.Storages = []gsclient.ServerStorage{}
 	}
 
+	createRequest.Relations.PublicIps= []gsclient.ServerIp{}
 	if attr, ok := d.GetOk("ip"); ok {
-		ip := gsclient.ServerIp{
-			IpaddrUuid: attr.(string),
-		}
-		createRequest.Relations.PublicIps = []gsclient.ServerIp{ip}
-	} else {
-		createRequest.Relations.PublicIps = []gsclient.ServerIp{}
+			ip := gsclient.ServerIp{
+				IpaddrUuid: attr.(string),
+			}
+			createRequest.Relations.PublicIps = append(createRequest.Relations.PublicIps, ip)
 	}
 
+	createRequest.Relations.Networks = []gsclient.ServerNetwork{}
 	if attr, ok := d.GetOk("network"); ok {
-		network := gsclient.ServerNetwork{
-			NetworkUuid: attr.(string),
-			BootDevice:  true,
-		}
-		createRequest.Relations.Networks = []gsclient.ServerNetwork{network}
-	} else {
-		createRequest.Relations.Networks = []gsclient.ServerNetwork{}
+			network := gsclient.ServerNetwork{
+				NetworkUuid: attr.(string),
+				BootDevice:  true,
+			}
+			createRequest.Relations.Networks = []gsclient.ServerNetwork{network}
 	}
 
 	response, err := client.CreateServer(createRequest)
