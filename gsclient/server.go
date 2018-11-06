@@ -40,11 +40,12 @@ type ServerNetwork struct {
 }
 
 type ServerCreateRequest struct {
-	Name         string          `json:"name"`
-	Memory       int             `json:"memory"`
-	Cores        int             `json:"cores"`
-	LocationUuid string          `json:"location_uuid"`
-	Relations    ServerRelations `json:"relations"`
+	Name            string          `json:"name"`
+	Memory          int             `json:"memory"`
+	Cores           int             `json:"cores"`
+	LocationUuid    string          `json:"location_uuid"`
+	HardwareProfile string          `json:"hardware_profile"`
+	Relations       ServerRelations `json:"relations"`
 }
 
 func (c *Client) GetServer(id string) (*Server, error) {

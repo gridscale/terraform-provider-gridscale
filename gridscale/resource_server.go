@@ -23,28 +23,31 @@ func resourceGridscaleServer() *schema.Resource {
 			},
 			"memory": {
 				Type:         schema.TypeInt,
-				Description:  "Memory in gigabytes",
+				Description:  "The amount of server memory in GB.",
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validation.NoZeroValues,
 			},
 			"cores": {
 				Type:         schema.TypeInt,
-				Description:  "Amount of CPU cores",
+				Description:  "The number of server cores.",
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validation.NoZeroValues,
 			},
 			"location_uuid": {
 				Type:        schema.TypeString,
-				Description: "Path to the directory where the templated files will be written",
+				Description: "Helps to identify which datacenter an object belongs to.",
 				Optional:    true,
 				ForceNew:    true,
 				Default:     "45ed677b-3702-4b36-be2a-a2eab9827950",
 			},
 			"hardware_profile": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Description: "The number of server cores.",
+				Optional:    true,
+				ForceNew:    true,
+				Default:     "default",
 			},
 			"storage": {
 				Type:     schema.TypeString,
@@ -57,9 +60,10 @@ func resourceGridscaleServer() *schema.Resource {
 				ForceNew: true,
 			},
 			"power": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  false,
+				Type:        schema.TypeBool,
+				Description: "The number of server cores.",
+				Optional:    true,
+				Default:     false,
 			},
 			"current_price": {
 				Type:     schema.TypeFloat,
@@ -90,10 +94,11 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	client := meta.(*gsclient.Client)
 
 	createRequest := gsclient.ServerCreateRequest{
-		Name:         d.Get("name").(string),
-		Cores:        d.Get("cores").(int),
-		Memory:       d.Get("memory").(int),
-		LocationUuid: d.Get("location_uuid").(string),
+		Name:            d.Get("name").(string),
+		Cores:           d.Get("cores").(int),
+		Memory:          d.Get("memory").(int),
+		LocationUuid:    d.Get("location_uuid").(string),
+		HardwareProfile: d.Get("hardware_profile").(string),
 	}
 
 	createRequest.Relations.IsoImages = []interface{}{}
