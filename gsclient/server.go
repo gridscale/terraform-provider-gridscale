@@ -103,14 +103,6 @@ func (c *Client) UpdateServer(id string, body map[string]interface{}) error {
 
 func (c *Client) StopServer(id string) error {
 	//Make sure the server exists and that it isn't already in the state we need it to be
-	server, err := c.GetServer(id)
-	if err != nil {
-		return err
-	}
-	if !server.Properties.Power {
-		return nil
-	}
-
 	body := map[string]interface{}{
 		"power": false,
 	}
@@ -120,7 +112,7 @@ func (c *Client) StopServer(id string) error {
 		body:   body,
 	}
 
-	err = r.execute(*c, nil)
+	err := r.execute(*c, nil)
 	if err != nil {
 		return err
 	}
@@ -148,19 +140,21 @@ func (c *Client) ShutdownServer(id string) error {
 		return err
 	}
 
-	return c.WaitForServerPowerStatus(id, false)
-}
-
-func (c *Client) StartServer(s Server) error {
-	if s.Properties.Power {
-		return nil
+	//If we get an error, which includes a timeout, power off the server instead
+	err = c.WaitForServerPowerStatus(id, false)
+	if err != nil {
+		c.StopServer(id)
 	}
 
+	return nil
+}
+
+func (c *Client) StartServer(id string) error {
 	body := map[string]interface{}{
 		"power": true,
 	}
 	r := Request{
-		uri:    "/objects/servers/" + s.Properties.ObjectUuid + "/power",
+		uri:    "/objects/servers/" + id + "/power",
 		method: "PATCH",
 		body:   body,
 	}
@@ -170,20 +164,5 @@ func (c *Client) StartServer(s Server) error {
 		return err
 	}
 
-	return c.WaitForServerPowerStatus(s.Properties.ObjectUuid, true)
-}
-
-func (c *Client) GetServerPowerStatus(id string) (bool, error) {
-	r := Request{
-		uri:    "/objects/servers/" + id + "/power",
-		method: "GET",
-	}
-
-	power := struct {
-		power bool
-	}{}
-
-	err := r.execute(*c, power)
-
-	return power.power, err
+	return c.WaitForServerPowerStatus(id, true)
 }

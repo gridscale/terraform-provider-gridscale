@@ -58,7 +58,8 @@ func resourceGridscaleServer() *schema.Resource {
 			},
 			"power": {
 				Type:     schema.TypeBool,
-				Computed: true,
+				Optional: true,
+				Default:  false,
 			},
 			"current_price": {
 				Type:     schema.TypeFloat,
@@ -119,10 +120,6 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		createRequest.Relations.Networks = []interface{}{}
 	}
 
-	//if attr, ok := d.GetOk("storage"); ok {
-	//	test := attr.(string)
-	//}
-
 	response, err := client.CreateServer(createRequest)
 
 	if err != nil {
@@ -133,6 +130,11 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	d.SetId(response.ServerUuid)
 
 	log.Printf("[DEBUG] The id for %s has been set to: %v", createRequest.Name, response.ServerUuid)
+
+	power := d.Get("power").(bool)
+	if power {
+		client.StartServer(d.Id())
+	}
 
 	return resourceGridscaleServerRead(d, meta)
 }
@@ -162,6 +164,14 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 	err := client.UpdateServer(id, requestBody)
 	if err != nil {
 		return err
+	}
+
+	if d.HasChange("power") {
+		_, change := d.GetChange("power")
+		power := change.(bool)
+		if power {
+			client.StartServer(id)
+		}
 	}
 
 	return resourceGridscaleServerRead(d, meta)

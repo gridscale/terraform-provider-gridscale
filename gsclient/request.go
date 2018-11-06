@@ -111,11 +111,11 @@ func (c *Client) WaitForServerPowerStatus(id string, status bool) error {
 			return fmt.Errorf("Timeout reached when trying to shut down system with id %v", id)
 		default:
 			time.Sleep(500 * time.Millisecond) //delay the request, so we don't do too many requests to the server
-			power, err := c.GetServerPowerStatus(id)
+			server, err := c.GetServer(id)
 			if err != nil {
 				return err
 			}
-			if power == status {
+			if server.Properties.Power == status {
 				log.Print("The power status of the server with id %v has changed to %s", id, status)
 				return nil
 			}
