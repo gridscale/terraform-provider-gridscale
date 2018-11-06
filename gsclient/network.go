@@ -11,7 +11,7 @@ type Network struct {
 type NetworkProperties struct {
 	LocationCountry string `json:"location_country"`
 	LocationUuid    string `json:"location_uuid"`
-	PublicNet       string `json:"public_net"`
+	PublicNet       bool   `json:"public_net"`
 	ObjectUuid      string `json:"object_uuid"`
 	NetworkType     string `json:"network_type"`
 	Name            string `json:"name"`
