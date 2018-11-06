@@ -9,11 +9,17 @@ type Storage struct {
 }
 
 type StorageProperties struct {
-	ObjectUuid   string `json:"object_uuid"`
-	Name         string `json:"name"`
-	Capacity     string `json:"capacity"`
-	LocationUuid string `json:"location_uuid"`
-	Status       string `json:"status"`
+	ObjectUuid      string  `json:"object_uuid"`
+	Name            string  `json:"name"`
+	Capacity        string  `json:"capacity"`
+	LocationUuid    string  `json:"location_uuid"`
+	Status          string  `json:"status"`
+	CreateTime      string  `json:"create_time"`
+	ChangeTime      string  `json:"change_time"`
+	CurrentPrice    float32 `json:"current_price"`
+	LocationName    string  `json:"location_name"`
+	LocationCountry string  `json:"location_country"`
+	LocationIata    string  `json:"location_iata"`
 }
 
 func (c *Client) GetStorage(id string) (*Storage, error) {
