@@ -161,9 +161,9 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 	body["location_uuid"] = d.Get("location_uuid").(string)
 	body["storage_type"] = d.Get("storage_type").(string)
 
+	//since only one template can be used, we can just look at index 0
 	if _, ok := d.GetOk("template"); ok {
 		template := gsclient.StorageTemplate{}
-		template.Sshkeys = make([]string, 0)
 		if attr, ok := d.GetOk("template.0.sshkeys"); ok {
 			for _, value := range attr.([]interface{}) {
 				template.Sshkeys = append(template.Sshkeys, value.(string))
