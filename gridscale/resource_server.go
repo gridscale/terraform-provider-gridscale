@@ -141,7 +141,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 			if index == 0 {
 				network.BootDevice = true
 			}
-			createRequest.Relations.Networks = append(createRequest.Relations.Networks,network)
+			createRequest.Relations.Networks = append(createRequest.Relations.Networks, network)
 		}
 	}
 

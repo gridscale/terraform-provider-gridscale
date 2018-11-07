@@ -8,14 +8,9 @@ import (
 
 func dataSourceGridscaleIp() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceGridscaleStorageRead,
+		Read: dataSourceGridscaleIpRead,
 
-		Schema: map[string]*schema.Schema{
-			"id": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-		},
+		Schema: map[string]*schema.Schema{},
 	}
 }
 

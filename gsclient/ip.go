@@ -45,14 +45,14 @@ func (c *Client) GetIp(id string) (*Ip, error) {
 	return response, err
 }
 
-func (c *Client) CreateIp(body map[string]interface{}) (*CreateResponse, error) {
+func (c *Client) CreateIp(body map[string]interface{}) (*IpCreateResponse, error) {
 	r := Request{
 		uri:    "/objects/ips",
 		method: "POST",
 		body:   body,
 	}
 
-	response := new(CreateResponse)
+	response := new(IpCreateResponse)
 	err := r.execute(*c, &response)
 	if err != nil {
 		return nil, err

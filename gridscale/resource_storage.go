@@ -82,9 +82,29 @@ func resourceGridscaleStorage() *schema.Resource {
 				Computed:    true,
 			},
 			"current_price": {
-				Type:        schema.TypeFloat,
-				Description: "The price for the current period since the last bill.",
-				Computed:    true,
+				Type:     schema.TypeFloat,
+				Computed: true,
+			},
+			"template": {
+				Type:     schema.TypeList,
+				Optional: true,
+				MaxItems: 1,
+				ForceNew: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"sshkeys": {
+							Type:     schema.TypeList,
+							Required: true,
+							ForceNew: true,
+							Elem:     &schema.Schema{Type: schema.TypeString},
+						},
+						"template_uuid": {
+							Type:     schema.TypeString,
+							ForceNew: true,
+							Required: true,
+						},
+					},
+				},
 			},
 		},
 	}
@@ -141,6 +161,20 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 	body["location_uuid"] = d.Get("location_uuid").(string)
 	body["storage_type"] = d.Get("storage_type").(string)
 
+	if _, ok := d.GetOk("template"); ok {
+		template := gsclient.StorageTemplate{}
+		template.Sshkeys = make([]string, 0)
+		if attr, ok := d.GetOk("template.0.sshkeys"); ok {
+			for _, value := range attr.([]interface{}) {
+				template.Sshkeys = append(template.Sshkeys, value.(string))
+			}
+		}
+		if v, ok := d.GetOk("template.0.template_uuid"); ok {
+			template.TemplateUuid = v.(string)
+		}
+		body["template"] = template
+	}
+
 	response, err := client.CreateStorage(body)
 	if err != nil {
 		return err
@@ -148,7 +182,7 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 
 	d.SetId(response.ObjectUuid)
 
-	log.Printf("The id for storage %s has been set to %v", body["name"], response)
+	log.Printf("The id for storage %s has been set to %v", body, response)
 
 	return resourceGridscaleStorageRead(d, meta)
 }

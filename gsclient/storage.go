@@ -22,6 +22,19 @@ type StorageProperties struct {
 	LocationIata    string  `json:"location_iata"`
 }
 
+type StorageCreateRequest struct {
+	Capacity     int             `json:"capacity"`
+	LocationUuid string          `json:"location_uuid"`
+	Name         string          `json:"name"`
+	StorageType  string          `json:"storage_type"`
+	Template     StorageTemplate `json:"template"`
+}
+
+type StorageTemplate struct {
+	Sshkeys      []string `json:"sshkeys"`
+	TemplateUuid string   `json:"template_uuid"`
+}
+
 func (c *Client) GetStorage(id string) (*Storage, error) {
 	r := Request{
 		uri:    "/objects/storages/" + id,

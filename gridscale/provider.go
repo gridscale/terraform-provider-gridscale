@@ -21,12 +21,14 @@ func Provider() terraform.ResourceProvider {
 			"gridscale_storage": dataSourceGridscaleStorage(),
 			"gridscale_network": dataSourceGridscaleNetwork(),
 			"gridscale_ip":      dataSourceGridscaleIp(),
+			"gridscale_sshkey":  dataSourceGridscaleSshkey(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"gridscale_server":  resourceGridscaleServer(),
 			"gridscale_storage": resourceGridscaleStorage(),
 			"gridscale_network": resourceGridscaleNetwork(),
 			"gridscale_ip":      resourceGridscaleIp(),
+			"gridscale_sshkey":  resourceGridscaleSshkey(),
 		},
 
 		ConfigureFunc: providerConfigure,

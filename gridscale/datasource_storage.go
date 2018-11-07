@@ -10,16 +10,7 @@ func dataSourceGridscaleStorage() *schema.Resource {
 	return &schema.Resource{
 		Read: dataSourceGridscaleStorageRead,
 
-		Schema: map[string]*schema.Schema{
-			"id": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"name": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-		},
+		Schema: map[string]*schema.Schema{},
 	}
 }
 
