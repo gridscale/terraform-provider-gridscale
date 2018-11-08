@@ -65,6 +65,17 @@ func resourceGridscaleServer() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
+				ConflictsWith: []string{"ipv4"},
+			},
+			"ipv4": {
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: true,
+			},
+			"ipv6": {
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: true,
 			},
 			"power": {
 				Type:        schema.TypeBool,
@@ -126,13 +137,46 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 
 	createRequest.Relations.PublicIps = []gsclient.ServerIp{}
 	if attr, ok := d.GetOk("ip"); ok {
+		if client.GetIpVersion(attr.(string)) != 4 {
+			return fmt.Errorf("The IP address with UUID %v is not version 4",attr.(string))
+		}
+		ip := gsclient.ServerIp{
+			IpaddrUuid: attr.(string),
+		}
+		createRequest.Relations.PublicIps = append(createRequest.Relations.PublicIps, ip)
+	}
+	if attr, ok := d.GetOk("ipv4"); ok {
+		if client.GetIpVersion(attr.(string)) != 4 {
+			return fmt.Errorf("The IP address with UUID %v is not version 4",attr.(string))
+		}
+		ip := gsclient.ServerIp{
+			IpaddrUuid: attr.(string),
+		}
+		createRequest.Relations.PublicIps = append(createRequest.Relations.PublicIps, ip)
+	}
+	if attr, ok := d.GetOk("ipv6"); ok {
+		if client.GetIpVersion(attr.(string)) != 6 {
+			return fmt.Errorf("The IP address with UUID %v is not version 6",attr.(string))
+		}
 		ip := gsclient.ServerIp{
 			IpaddrUuid: attr.(string),
 		}
 		createRequest.Relations.PublicIps = append(createRequest.Relations.PublicIps, ip)
 	}
 
+	//Add public network if we have an IP
 	createRequest.Relations.Networks = []gsclient.ServerNetwork{}
+	if len(createRequest.Relations.PublicIps) > 0 {
+		networkId, err := client.GetNetworkPublic()
+		if err != nil {
+			return err
+		}
+		network := gsclient.ServerNetwork{
+			NetworkUuid: networkId,
+		}
+		createRequest.Relations.Networks = append(createRequest.Relations.Networks, network)
+	}
+
 	if attr, ok := d.GetOk("networks"); ok {
 		for index, value := range attr.([]interface{}) {
 			network := gsclient.ServerNetwork{

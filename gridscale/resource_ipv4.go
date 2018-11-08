@@ -2,38 +2,25 @@ package gridscale
 
 import (
 	"../gsclient"
-	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
 	"log"
 )
 
-func resourceGridscaleIp() *schema.Resource {
+func resourceGridscaleIpv4() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceGridscaleIpCreate,
+		Create: resourceGridscaleIpv4Create,
 		Read:   resourceGridscaleIpRead,
 		Delete: resourceGridscaleIpDelete,
 		Update: resourceGridscaleIpUpdate,
 		Schema: map[string]*schema.Schema{
 			"ip": {
 				Type:        schema.TypeString,
-				Description: "Defines the IP Address (v4 or v6).",
+				Description: "Defines the IP Address.",
 				Computed:    true,
 			},
 			"prefix": {
 				Type:     schema.TypeString,
 				Computed: true,
-			},
-			"family": {
-				Type:        schema.TypeInt,
-				Description: "Defines the IP Address family (v4 or v6).",
-				Required:    true,
-				ForceNew:    true,
-				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
-					if v.(int) != 4 && v.(int) != 6 {
-						errors = append(errors, fmt.Errorf("An IP's family must be either 4 or 6"))
-					}
-					return
-				},
 			},
 			"location_uuid": {
 				Type:        schema.TypeString,
@@ -130,11 +117,11 @@ func resourceGridscaleIpUpdate(d *schema.ResourceData, meta interface{}) error {
 	return resourceGridscaleIpRead(d, meta)
 }
 
-func resourceGridscaleIpCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGridscaleIpv4Create(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 
 	body := make(map[string]interface{})
-	body["family"] = d.Get("family").(int)
+	body["family"] = 4
 	body["location_uuid"] = d.Get("location_uuid").(string)
 	body["failover"] = d.Get("failover").(bool)
 	reversedns := d.Get("reverse_dns").(string)
@@ -149,7 +136,7 @@ func resourceGridscaleIpCreate(d *schema.ResourceData, meta interface{}) error {
 
 	d.SetId(response.ObjectUuid)
 
-	log.Printf("The id for the new Ipv%v has been set to %v", d.Get("family").(int), response.ObjectUuid)
+	log.Printf("The id for the new Ipv%v has been set to %v", body["family"], response.ObjectUuid)
 
 	return resourceGridscaleIpRead(d, meta)
 }

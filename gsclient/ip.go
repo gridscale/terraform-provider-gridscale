@@ -79,3 +79,11 @@ func (c *Client) UpdateIp(id string, body map[string]interface{}) error {
 
 	return r.execute(*c, nil)
 }
+
+func (c *Client) GetIpVersion(id string) int {
+	ip, err := c.GetIp(id)
+	if err != nil {
+		return 0
+	}
+	return ip.Properties.Family
+}

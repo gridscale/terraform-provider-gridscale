@@ -1,8 +1,13 @@
 package gsclient
 
 import (
+	"fmt"
 	"log"
 )
+
+type Networks struct {
+		List map[string]NetworkProperties `json:"networks"`
+}
 
 type Network struct {
 	Properties NetworkProperties `json:"network"`
@@ -74,4 +79,33 @@ func (c *Client) UpdateNetwork(id string, body map[string]interface{}) error {
 	}
 
 	return r.execute(*c, nil)
+}
+
+func (c *Client) GetNetworkList() (*Networks, error) {
+	r := Request{
+		uri:    "/objects/networks/",
+		method: "GET",
+	}
+	log.Printf("%v", r)
+
+	response := new(Networks)
+	err := r.execute(*c, &response)
+
+	log.Printf("Received networks: %v", response)
+
+	return response, err
+}
+
+func (c *Client) GetNetworkPublic() (string, error) {
+	networks, err := c.GetNetworkList()
+	if err != nil {
+		return "", err
+	}
+	for _, value := range networks.List {
+		if value.Name == "Public Network" {
+			return value.ObjectUuid, nil
+		}
+	}
+
+	return "", fmt.Errorf("Public Network not found")
 }
