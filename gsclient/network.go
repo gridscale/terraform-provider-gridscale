@@ -102,7 +102,7 @@ func (c *Client) GetNetworkPublic() (string, error) {
 		return "", err
 	}
 	for _, value := range networks.List {
-		if value.Name == "Public Network" {
+		if value.PublicNet {
 			return value.ObjectUuid, nil
 		}
 	}
