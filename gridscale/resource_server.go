@@ -62,9 +62,9 @@ func resourceGridscaleServer() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"ip": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
+				Type:          schema.TypeString,
+				Optional:      true,
+				ForceNew:      true,
 				ConflictsWith: []string{"ipv4"},
 			},
 			"ipv4": {
@@ -138,7 +138,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	createRequest.Relations.PublicIps = []gsclient.ServerIp{}
 	if attr, ok := d.GetOk("ip"); ok {
 		if client.GetIpVersion(attr.(string)) != 4 {
-			return fmt.Errorf("The IP address with UUID %v is not version 4",attr.(string))
+			return fmt.Errorf("The IP address with UUID %v is not version 4", attr.(string))
 		}
 		ip := gsclient.ServerIp{
 			IpaddrUuid: attr.(string),
@@ -147,7 +147,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	}
 	if attr, ok := d.GetOk("ipv4"); ok {
 		if client.GetIpVersion(attr.(string)) != 4 {
-			return fmt.Errorf("The IP address with UUID %v is not version 4",attr.(string))
+			return fmt.Errorf("The IP address with UUID %v is not version 4", attr.(string))
 		}
 		ip := gsclient.ServerIp{
 			IpaddrUuid: attr.(string),
@@ -156,7 +156,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	}
 	if attr, ok := d.GetOk("ipv6"); ok {
 		if client.GetIpVersion(attr.(string)) != 6 {
-			return fmt.Errorf("The IP address with UUID %v is not version 6",attr.(string))
+			return fmt.Errorf("The IP address with UUID %v is not version 6", attr.(string))
 		}
 		ip := gsclient.ServerIp{
 			IpaddrUuid: attr.(string),

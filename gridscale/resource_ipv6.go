@@ -74,7 +74,6 @@ func resourceGridscaleIpv6() *schema.Resource {
 	}
 }
 
-
 func resourceGridscaleIpv6Create(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 

@@ -6,7 +6,7 @@ import (
 )
 
 type Networks struct {
-		List map[string]NetworkProperties `json:"networks"`
+	List map[string]NetworkProperties `json:"networks"`
 }
 
 type Network struct {
