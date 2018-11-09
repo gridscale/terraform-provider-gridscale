@@ -4,6 +4,10 @@ import (
 	"log"
 )
 
+type Sshkeys struct {
+	List map[string]SshkeyProperties `json:"sshkeys"`
+}
+
 type Sshkey struct {
 	Properties SshkeyProperties `json:"sshkey"`
 }
@@ -22,12 +26,25 @@ func (c *Client) GetSshkey(id string) (*Sshkey, error) {
 		uri:    "/objects/sshkeys/" + id,
 		method: "GET",
 	}
-	log.Printf("%v", r)
 
 	response := new(Sshkey)
 	err := r.execute(*c, &response)
 
 	log.Printf("Received sshkey: %v", response)
+
+	return response, err
+}
+
+func (c *Client) GetSshkeyList() (*Sshkeys, error) {
+	r := Request{
+		uri:    "/objects/sshkeys/",
+		method: "GET",
+	}
+
+	response := new(Sshkeys)
+	err := r.execute(*c, &response)
+
+	log.Printf("Received sshkeys: %v", response)
 
 	return response, err
 }
@@ -44,6 +61,8 @@ func (c *Client) CreateSshkey(body map[string]interface{}) (*CreateResponse, err
 	if err != nil {
 		return nil, err
 	}
+
+	err = c.WaitForRequestCompletion(response.RequestUuid)
 
 	return response, err
 }

@@ -4,6 +4,10 @@ import (
 	"log"
 )
 
+type Ips struct {
+	List map[string]IpProperties `json:"ips"`
+}
+
 type Ip struct {
 	Properties IpProperties `json:"ip"`
 }
@@ -25,9 +29,10 @@ type IpProperties struct {
 }
 
 type IpCreateResponse struct {
-	ObjectUuid string `json:"object_uuid"`
-	Prefix     string `json:"prefix"`
-	Ip         string `json:"ip"`
+	RequestUuid string `json:"request_uuid"`
+	ObjectUuid  string `json:"object_uuid"`
+	Prefix      string `json:"prefix"`
+	Ip          string `json:"ip"`
 }
 
 func (c *Client) GetIp(id string) (*Ip, error) {
@@ -35,12 +40,25 @@ func (c *Client) GetIp(id string) (*Ip, error) {
 		uri:    "/objects/ips/" + id,
 		method: "GET",
 	}
-	log.Printf("%v", r)
 
 	response := new(Ip)
 	err := r.execute(*c, &response)
 
-	log.Printf("Received network: %v", response)
+	log.Printf("Received ip: %v", response)
+
+	return response, err
+}
+
+func (c *Client) GetIpList() (*Ips, error) {
+	r := Request{
+		uri:    "/objects/ips/",
+		method: "GET",
+	}
+
+	response := new(Ips)
+	err := r.execute(*c, &response)
+
+	log.Printf("Received ips: %v", response)
 
 	return response, err
 }
@@ -57,6 +75,8 @@ func (c *Client) CreateIp(body map[string]interface{}) (*IpCreateResponse, error
 	if err != nil {
 		return nil, err
 	}
+
+	err = c.WaitForRequestCompletion(response.RequestUuid)
 
 	return response, err
 }

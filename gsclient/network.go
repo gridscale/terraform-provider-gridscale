@@ -57,7 +57,7 @@ func (c *Client) CreateNetwork(body map[string]interface{}) (*CreateResponse, er
 		return nil, err
 	}
 
-	err = c.WaitForRequestCompletion(*response)
+	err = c.WaitForRequestCompletion(response.RequestUuid)
 
 	return response, err
 }

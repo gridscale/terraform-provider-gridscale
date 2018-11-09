@@ -5,6 +5,10 @@ import (
 	"log"
 )
 
+type Servers struct {
+	List map[string]ServerProperties `json:"servers"`
+}
+
 type Server struct {
 	Properties ServerProperties `json:"server"`
 }
@@ -23,24 +27,28 @@ type ServerProperties struct {
 }
 
 type ServerRelations struct {
-	IsoImages []interface{}   `json:"isoimages"`
-	Networks  []ServerNetwork `json:"networks"`
-	PublicIps []ServerIp      `json:"public_ips"`
-	Storages  []ServerStorage `json:"storages"`
+	IsoImages []ServerIsoImage `json:"isoimages"`
+	Networks  []ServerNetwork  `json:"networks"`
+	PublicIps []ServerIp       `json:"public_ips"`
+	Storages  []ServerStorage  `json:"storages"`
 }
 
 type ServerStorage struct {
-	StorageUuid string `json:"storage_uuid"`
-	BootDevice  bool   `json:"bootdevice"`
+	StorageUuid string `json:"storage_uuid,omitempty"`
+	BootDevice  bool   `json:"bootdevice,omitempty"`
+}
+
+type ServerIsoImage struct {
+	IsoImageUuid string `json:"isoimage_uuid,omitempty"`
 }
 
 type ServerNetwork struct {
-	NetworkUuid string `json:"network_uuid"`
-	BootDevice  bool   `json:"bootdevice"`
+	NetworkUuid string `json:"network_uuid,omitempty"`
+	BootDevice  bool   `json:"bootdevice,omitempty"`
 }
 
 type ServerIp struct {
-	IpaddrUuid string `json:"ipaddr_uuid"`
+	IpaddrUuid string `json:"ipaddr_uuid,omitempty"`
 }
 
 type ServerCreateRequest struct {
@@ -49,7 +57,7 @@ type ServerCreateRequest struct {
 	Cores           int             `json:"cores"`
 	LocationUuid    string          `json:"location_uuid"`
 	HardwareProfile string          `json:"hardware_profile"`
-	Relations       ServerRelations `json:"relations"`
+	Relations       ServerRelations `json:"relations,omitempty"`
 }
 
 func (c *Client) GetServer(id string) (*Server, error) {
@@ -69,6 +77,19 @@ func (c *Client) GetServer(id string) (*Server, error) {
 	return response, err
 }
 
+func (c *Client) GetServerList() (*Servers, error) {
+	r := Request{
+		uri:    "/objects/servers/",
+		method: "GET",
+	}
+	log.Printf("%v", r)
+
+	response := new(Servers)
+	err := r.execute(*c, &response)
+
+	return response, err
+}
+
 func (c *Client) CreateServer(s ServerCreateRequest) (*CreateResponse, error) {
 	r := Request{
 		uri:    "/objects/servers",
@@ -82,7 +103,7 @@ func (c *Client) CreateServer(s ServerCreateRequest) (*CreateResponse, error) {
 		return nil, err
 	}
 
-	err = c.WaitForRequestCompletion(*response)
+	err = c.WaitForRequestCompletion(response.RequestUuid)
 
 	return response, err
 }

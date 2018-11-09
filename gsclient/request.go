@@ -77,9 +77,9 @@ func (r *Request) execute(c Client, output interface{}) error {
 }
 
 //This function allows use to wait for a request to complete. Timeouts are currently hardcoded
-func (c *Client) WaitForRequestCompletion(cr CreateResponse) error {
+func (c *Client) WaitForRequestCompletion(id string) error {
 	r := Request{
-		uri:    "/requests/" + cr.RequestUuid,
+		uri:    "/requests/" + id,
 		method: "GET",
 	}
 
@@ -88,13 +88,13 @@ func (c *Client) WaitForRequestCompletion(cr CreateResponse) error {
 	for {
 		select {
 		case <-timer:
-			return fmt.Errorf("Timeout reached when waiting for request %v to complete", cr.RequestUuid)
+			return fmt.Errorf("Timeout reached when waiting for request %v to complete", id)
 		default:
 			time.Sleep(500 * time.Millisecond) //delay the request, so we don't do too many requests to the server
 			response := new(RequestStatus)
 			r.execute(*c, &response)
 			output := *response //Without this cast reading indexes doesn't work
-			if output[cr.RequestUuid].Status == "done" {
+			if output[id].Status == "done" {
 				log.Print("Done with creating")
 				return nil
 			}

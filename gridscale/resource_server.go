@@ -120,9 +120,11 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		HardwareProfile: d.Get("hardware_profile").(string),
 	}
 
-	createRequest.Relations.IsoImages = []interface{}{}
-
+	createRequest.Relations.IsoImages = []gsclient.ServerIsoImage{}
 	createRequest.Relations.Storages = []gsclient.ServerStorage{}
+	createRequest.Relations.Networks = []gsclient.ServerNetwork{}
+	createRequest.Relations.PublicIps = []gsclient.ServerIp{}
+
 	if attr, ok := d.GetOk("storages"); ok {
 		for index, value := range attr.([]interface{}) {
 			storage := gsclient.ServerStorage{
@@ -135,7 +137,6 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		}
 	}
 
-	createRequest.Relations.PublicIps = []gsclient.ServerIp{}
 	if attr, ok := d.GetOk("ip"); ok {
 		if client.GetIpVersion(attr.(string)) != 4 {
 			return fmt.Errorf("The IP address with UUID %v is not version 4", attr.(string))
@@ -165,7 +166,6 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	//Add public network if we have an IP
-	createRequest.Relations.Networks = []gsclient.ServerNetwork{}
 	if len(createRequest.Relations.PublicIps) > 0 {
 		networkId, err := client.GetNetworkPublic()
 		if err != nil {

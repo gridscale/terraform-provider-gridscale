@@ -1,8 +1,8 @@
 package gsclient
 
-import (
-	"log"
-)
+type Storages struct {
+	List map[string]StorageProperties `json:"storages"`
+}
 
 type Storage struct {
 	Properties StorageProperties `json:"storage"`
@@ -27,7 +27,7 @@ type StorageCreateRequest struct {
 	LocationUuid string          `json:"location_uuid"`
 	Name         string          `json:"name"`
 	StorageType  string          `json:"storage_type"`
-	Template     StorageTemplate `json:"template"`
+	Template     StorageTemplate `json:"template,omitempty"`
 }
 
 type StorageTemplate struct {
@@ -40,9 +40,20 @@ func (c *Client) GetStorage(id string) (*Storage, error) {
 		uri:    "/objects/storages/" + id,
 		method: "GET",
 	}
-	log.Printf("%v", r)
 
 	response := new(Storage)
+	err := r.execute(*c, &response)
+
+	return response, err
+}
+
+func (c *Client) GetStorageList() (*Storages, error) {
+	r := Request{
+		uri:    "/objects/storages/",
+		method: "GET",
+	}
+
+	response := new(Storages)
 	err := r.execute(*c, &response)
 
 	return response, err
@@ -61,7 +72,7 @@ func (c *Client) CreateStorage(body map[string]interface{}) (*CreateResponse, er
 		return nil, err
 	}
 
-	err = c.WaitForRequestCompletion(*response)
+	err = c.WaitForRequestCompletion(response.RequestUuid)
 
 	return response, err
 }
