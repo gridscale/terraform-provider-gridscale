@@ -31,7 +31,7 @@ type RequestStatusProperties struct {
 }
 
 type RequestError struct {
-	Status string `json:"status"`
+	Status  string `json:"status"`
 	Message string `json:"message"`
 }
 
