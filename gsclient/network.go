@@ -101,9 +101,9 @@ func (c *Client) GetNetworkPublic() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	for _, value := range networks.List {
-		if value.PublicNet {
-			return value.ObjectUuid, nil
+	for _, network := range networks.List {
+		if network.PublicNet {
+			return network.ObjectUuid, nil
 		}
 	}
 
