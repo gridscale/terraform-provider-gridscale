@@ -30,6 +30,11 @@ type RequestStatusProperties struct {
 	CreateTime string `json:"create_time"`
 }
 
+type RequestError struct {
+	Status string `json:"status"`
+	Message string `json:"message"`
+}
+
 //This function takes the client and a struct and then adds the result to the given struct if possible
 func (r *Request) execute(c Client, output interface{}) error {
 	url := c.cfg.APIUrl + r.uri
@@ -64,16 +69,16 @@ func (r *Request) execute(c Client, output interface{}) error {
 	if err != nil {
 		return err
 	}
-	json.Unmarshal(iostream, output) //Edit the given struct
-	response := string(iostream)
-
-	log.Printf("[DEBUG] Response body: %v", response)
 
 	if result.StatusCode >= 300 {
-		return fmt.Errorf("[Error] statuscode %v returned: %v", result.StatusCode, result.Body)
+		errorMessage := new(RequestError) //error messages have a different structure, so they are read with a different struct
+		json.Unmarshal(iostream, &errorMessage)
+		return fmt.Errorf("[Error] statuscode %v returned: %v", errorMessage.Status, errorMessage.Message)
+	} else {
+		json.Unmarshal(iostream, output) //Edit the given struct
+		log.Printf("[DEBUG] Response body: %v", string(iostream))
+		return nil
 	}
-
-	return nil
 }
 
 //This function allows use to wait for a request to complete. Timeouts are currently hardcoded
