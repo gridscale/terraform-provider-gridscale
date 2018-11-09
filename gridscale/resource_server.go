@@ -167,12 +167,12 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 
 	//Add public network if we have an IP
 	if len(createRequest.Relations.PublicIps) > 0 {
-		networkId, err := client.GetNetworkPublic()
+		publicNetwork, err := client.GetNetworkPublic()
 		if err != nil {
 			return err
 		}
 		network := gsclient.ServerNetwork{
-			NetworkUuid: networkId,
+			NetworkUuid: publicNetwork.Properties.ObjectUuid,
 		}
 		createRequest.Relations.Networks = append(createRequest.Relations.Networks, network)
 	}

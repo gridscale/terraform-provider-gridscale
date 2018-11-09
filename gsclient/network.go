@@ -97,16 +97,16 @@ func (c *Client) GetNetworkList() (*Networks, error) {
 	return response, err
 }
 
-func (c *Client) GetNetworkPublic() (string, error) {
+func (c *Client) GetNetworkPublic() (*Network, error) {
 	networks, err := c.GetNetworkList()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	for _, network := range networks.List {
 		if network.PublicNet {
-			return network.ObjectUuid, nil
+			return c.GetNetwork(network.ObjectUuid)
 		}
 	}
 
-	return "", fmt.Errorf("Public Network not found")
+	return nil, fmt.Errorf("Public Network not found")
 }
