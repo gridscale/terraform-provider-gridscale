@@ -6,11 +6,11 @@ import (
 )
 
 type Templates struct {
-	List map[string]TemplateProperties `json:"sshkeys"`
+	List map[string]TemplateProperties `json:"templates"`
 }
 
 type Template struct {
-	Properties TemplateProperties `json:"sshkey"`
+	Properties TemplateProperties `json:"template"`
 }
 
 type TemplateProperties struct {
