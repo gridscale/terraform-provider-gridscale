@@ -77,10 +77,10 @@ func resourceGridscaleNetwork() *schema.Resource {
 				Computed:    true,
 			},
 			"labels": {
-				Type: schema.TypeList,
+				Type:        schema.TypeList,
 				Description: "List of labels.",
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Optional:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 		},
 	}
@@ -142,7 +142,6 @@ func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) er
 	body["location_uuid"] = d.Get("location_uuid").(string)
 	body["l2security"] = d.Get("l2security").(bool)
 	body["labels"] = d.Get("labels").([]interface{})
-
 
 	response, err := client.CreateNetwork(body)
 	if err != nil {

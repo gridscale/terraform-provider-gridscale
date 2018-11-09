@@ -1,6 +1,7 @@
 package gsclient
 
 import (
+	"fmt"
 	"log"
 )
 
@@ -90,4 +91,18 @@ func (c *Client) UpdateTemplate(id string, body map[string]interface{}) error {
 	}
 
 	return r.execute(*c, nil)
+}
+
+func (c *Client) GetTemplateByName(name string) (*Template, error) {
+	templates, err := c.GetTemplateList()
+	if err != nil {
+		return nil, err
+	}
+	for _, template := range templates.List {
+		if template.Name == name {
+			return c.GetTemplate(template.ObjectUuid)
+		}
+	}
+
+	return nil, fmt.Errorf("Template %v not found", name)
 }
