@@ -14,19 +14,20 @@ type Network struct {
 }
 
 type NetworkProperties struct {
-	LocationCountry string `json:"location_country"`
-	LocationUuid    string `json:"location_uuid"`
-	PublicNet       bool   `json:"public_net"`
-	ObjectUuid      string `json:"object_uuid"`
-	NetworkType     string `json:"network_type"`
-	Name            string `json:"name"`
-	Status          string `json:"status"`
-	CreateTime      string `json:"create_time"`
-	L2Security      bool   `json:"l2security"`
-	ChangeTime      string `json:"change_time"`
-	LocationIata    string `json:"location_iata"`
-	LocationName    string `json:"location_name"`
-	DeleteBlock     bool   `json:"delete_block"`
+	LocationCountry string   `json:"location_country"`
+	LocationUuid    string   `json:"location_uuid"`
+	PublicNet       bool     `json:"public_net"`
+	ObjectUuid      string   `json:"object_uuid"`
+	NetworkType     string   `json:"network_type"`
+	Name            string   `json:"name"`
+	Status          string   `json:"status"`
+	CreateTime      string   `json:"create_time"`
+	L2Security      bool     `json:"l2security"`
+	ChangeTime      string   `json:"change_time"`
+	LocationIata    string   `json:"location_iata"`
+	LocationName    string   `json:"location_name"`
+	DeleteBlock     bool     `json:"delete_block"`
+	Labels          []string `json:"labels"`
 }
 
 func (c *Client) GetNetwork(id string) (*Network, error) {

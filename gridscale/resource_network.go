@@ -76,6 +76,12 @@ func resourceGridscaleNetwork() *schema.Resource {
 				Description: "The date and time of the last object change",
 				Computed:    true,
 			},
+			"labels": {
+				Type: schema.TypeList,
+				Description: "List of labels.",
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
 		},
 	}
 }
@@ -96,6 +102,7 @@ func resourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) erro
 	d.Set("delete_block", network.Properties.DeleteBlock)
 	d.Set("create_time", network.Properties.CreateTime)
 	d.Set("change_time", network.Properties.ChangeTime)
+	d.Set("labels", network.Properties.Labels)
 
 	log.Printf("Read the following: %v", network)
 	return err
@@ -114,6 +121,10 @@ func resourceGridscaleNetworkUpdate(d *schema.ResourceData, meta interface{}) er
 		_, change := d.GetChange("l2security")
 		requestBody["l2security"] = change.(bool)
 	}
+	if d.HasChange("labels") {
+		_, change := d.GetChange("labels")
+		requestBody["labels"] = change.([]interface{})
+	}
 
 	err := client.UpdateNetwork(id, requestBody)
 	if err != nil {
@@ -130,6 +141,8 @@ func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) er
 	body["name"] = d.Get("name").(string)
 	body["location_uuid"] = d.Get("location_uuid").(string)
 	body["l2security"] = d.Get("l2security").(bool)
+	body["labels"] = d.Get("labels").([]interface{})
+
 
 	response, err := client.CreateNetwork(body)
 	if err != nil {
