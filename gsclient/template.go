@@ -42,7 +42,7 @@ func (c *Client) GetTemplate(id string) (*Template, error) {
 	return response, err
 }
 
-func (c *Client) GetTemplateList() (*Templates, error) {
+func (c *Client) GetTemplateList() ([]Template, error) {
 	r := Request{
 		uri:    "/objects/templates/",
 		method: "GET",
@@ -51,9 +51,15 @@ func (c *Client) GetTemplateList() (*Templates, error) {
 	response := new(Templates)
 	err := r.execute(*c, &response)
 
-	log.Printf("Received template: %v", response)
+	list := []Template{}
+	for _, properties := range response.List {
+		template := Template{
+			Properties: properties,
+		}
+		list = append(list, template)
+	}
 
-	return response, err
+	return list, err
 }
 
 func (c *Client) CreateTemplate(body TemplateCreateRequest) (*CreateResponse, error) {
@@ -98,9 +104,9 @@ func (c *Client) GetTemplateByName(name string) (*Template, error) {
 	if err != nil {
 		return nil, err
 	}
-	for _, template := range templates.List {
-		if template.Name == name {
-			return c.GetTemplate(template.ObjectUuid)
+	for _, template := range templates {
+		if template.Properties.Name == name {
+			return c.GetTemplate(template.Properties.ObjectUuid)
 		}
 	}
 
