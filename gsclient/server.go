@@ -77,7 +77,7 @@ func (c *Client) GetServer(id string) (*Server, error) {
 	return response, err
 }
 
-func (c *Client) GetServerList() (*Servers, error) {
+func (c *Client) GetServerList() ([]Server, error) {
 	r := Request{
 		uri:    "/objects/servers/",
 		method: "GET",
@@ -87,7 +87,15 @@ func (c *Client) GetServerList() (*Servers, error) {
 	response := new(Servers)
 	err := r.execute(*c, &response)
 
-	return response, err
+	list := []Server{}
+	for _, properties := range response.List {
+		server := Server{
+			Properties: properties,
+		}
+		list = append(list, server)
+	}
+
+	return list, err
 }
 
 func (c *Client) CreateServer(s ServerCreateRequest) (*CreateResponse, error) {
@@ -191,4 +199,50 @@ func (c *Client) StartServer(id string) error {
 	}
 
 	return c.WaitForServerPowerStatus(id, true)
+}
+
+func (c *Client) linkStorage(serverid string, storageid string, bootdevice string) error {
+	body := map[string]interface{}{
+		"object_uuid": storageid,
+		"bootdevice":  bootdevice,
+	}
+	r := Request{
+		uri:    "/objects/servers/" + serverid + "/storages",
+		method: "POST",
+		body:   body,
+	}
+
+	return r.execute(*c, nil)
+}
+
+func (c *Client) UnlinkStorage(serverid string, storageid string) error {
+	r := Request{
+		uri:    "/objects/servers/" + serverid + "/storages/" + storageid,
+		method: "DELETE",
+	}
+
+	return r.execute(*c, nil)
+}
+
+func (c *Client) linkNetwork(serverid string, networkid string, bootdevice string) error {
+	body := map[string]interface{}{
+		"object_uuid": networkid,
+		"bootdevice":  bootdevice,
+	}
+	r := Request{
+		uri:    "/objects/servers/" + serverid + "/networks",
+		method: "POST",
+		body:   body,
+	}
+
+	return r.execute(*c, nil)
+}
+
+func (c *Client) UnlinkNetwork(serverid string, networkid string) error {
+	r := Request{
+		uri:    "/objects/servers/" + serverid + "/networks/" + networkid,
+		method: "DELETE",
+	}
+
+	return r.execute(*c, nil)
 }
