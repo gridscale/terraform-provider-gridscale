@@ -23,6 +23,7 @@ type ServerProperties struct {
 	LocationUuid    string          `json:"location_uuid"`
 	Power           bool            `json:"power"`
 	CurrentPrice    float64         `json:"current_price"`
+	Labels          []string        `json:"labels"`
 	Relations       ServerRelations `json:"relations"`
 }
 
@@ -56,7 +57,8 @@ type ServerCreateRequest struct {
 	Memory          int             `json:"memory"`
 	Cores           int             `json:"cores"`
 	LocationUuid    string          `json:"location_uuid"`
-	HardwareProfile string          `json:"hardware_profile"`
+	HardwareProfile string          `json:"hardware_profile,omitempty"`
+	Labels          []interface{}   `json:"labels,omitempty"`
 	Relations       ServerRelations `json:"relations,omitempty"`
 }
 
@@ -136,7 +138,6 @@ func (c *Client) UpdateServer(id string, body map[string]interface{}) error {
 }
 
 func (c *Client) StopServer(id string) error {
-	//Make sure the server exists and that it isn't already in the state we need it to be
 	body := map[string]interface{}{
 		"power": false,
 	}

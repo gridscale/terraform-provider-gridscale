@@ -87,6 +87,12 @@ func resourceGridscaleServer() *schema.Resource {
 				Type:     schema.TypeFloat,
 				Computed: true,
 			},
+			"labels": {
+				Type:        schema.TypeList,
+				Description: "List of labels.",
+				Optional:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+			},
 		},
 	}
 }
@@ -102,6 +108,7 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("location_uuid", server.Properties.LocationUuid)
 	d.Set("power", server.Properties.Power)
 	d.Set("current_price", server.Properties.CurrentPrice)
+	d.Set("labels", server.Properties.Labels)
 	d.Set("storages", server.Properties.Relations.Networks) //No clue if this one does anything
 
 	log.Printf("Read the following: %v", server)
@@ -118,6 +125,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		Memory:          d.Get("memory").(int),
 		LocationUuid:    d.Get("location_uuid").(string),
 		HardwareProfile: d.Get("hardware_profile").(string),
+		Labels:          d.Get("labels").([]interface{}),
 	}
 
 	createRequest.Relations.IsoImages = []gsclient.ServerIsoImage{}
@@ -228,6 +236,11 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 	if d.HasChange("name") {
 		_, change := d.GetChange("name")
 		requestBody["name"] = change.(string)
+	}
+
+	if d.HasChange("labels") {
+		_, change := d.GetChange("labels")
+		requestBody["labels"] = change.([]interface{})
 	}
 
 	err := client.UpdateServer(id, requestBody)
