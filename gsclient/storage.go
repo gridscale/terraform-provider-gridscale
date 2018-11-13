@@ -47,7 +47,7 @@ func (c *Client) GetStorage(id string) (*Storage, error) {
 	return response, err
 }
 
-func (c *Client) GetStorageList() (*Storages, error) {
+func (c *Client) GetStorageList() ([]Storage, error) {
 	r := Request{
 		uri:    "/objects/storages/",
 		method: "GET",
@@ -56,7 +56,15 @@ func (c *Client) GetStorageList() (*Storages, error) {
 	response := new(Storages)
 	err := r.execute(*c, &response)
 
-	return response, err
+	list := []Storage{}
+	for _, properties := range response.List {
+		storage := Storage{
+			Properties: properties,
+		}
+		list = append(list, storage)
+	}
+
+	return list, err
 }
 
 func (c *Client) CreateStorage(body map[string]interface{}) (*CreateResponse, error) {
