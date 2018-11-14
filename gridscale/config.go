@@ -16,5 +16,7 @@ func (c *Config) Client() (*gsclient.Client, error) {
 
 	log.Print("[INFO] gridscale client configured")
 
-	return client, nil
+	err := client.ValidateToken()
+
+	return client, err
 }
