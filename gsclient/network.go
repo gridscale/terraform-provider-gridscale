@@ -82,7 +82,7 @@ func (c *Client) UpdateNetwork(id string, body map[string]interface{}) error {
 	return r.execute(*c, nil)
 }
 
-func (c *Client) GetNetworkList() (*Networks, error) {
+func (c *Client) GetNetworkList() ([]Network, error) {
 	r := Request{
 		uri:    "/objects/networks/",
 		method: "GET",
@@ -92,9 +92,15 @@ func (c *Client) GetNetworkList() (*Networks, error) {
 	response := new(Networks)
 	err := r.execute(*c, &response)
 
-	log.Printf("Received networks: %v", response)
+	list := []Network{}
+	for _, properties := range response.List {
+		network := Network{
+			Properties: properties,
+		}
+		list = append(list, network)
+	}
 
-	return response, err
+	return list, err
 }
 
 func (c *Client) GetNetworkPublic() (*Network, error) {
@@ -102,9 +108,9 @@ func (c *Client) GetNetworkPublic() (*Network, error) {
 	if err != nil {
 		return nil, err
 	}
-	for _, network := range networks.List {
-		if network.PublicNet {
-			return c.GetNetwork(network.ObjectUuid)
+	for _, network := range networks {
+		if network.Properties.PublicNet {
+			return c.GetNetwork(network.Properties.ObjectUuid)
 		}
 	}
 
