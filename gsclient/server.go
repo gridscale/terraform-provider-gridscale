@@ -68,7 +68,7 @@ func (c *Client) GetServer(id string) (*Server, error) {
 			"Can't read without id", nil)
 	}
 	r := Request{
-		uri:    "/objects/servers/" + id,
+		uri:    apiServerBase + "/" + id,
 		method: "GET",
 	}
 	log.Printf("%v", r)
@@ -81,7 +81,7 @@ func (c *Client) GetServer(id string) (*Server, error) {
 
 func (c *Client) GetServerList() ([]Server, error) {
 	r := Request{
-		uri:    "/objects/servers/",
+		uri:    apiServerBase,
 		method: "GET",
 	}
 	log.Printf("%v", r)
@@ -102,7 +102,7 @@ func (c *Client) GetServerList() ([]Server, error) {
 
 func (c *Client) CreateServer(s ServerCreateRequest) (*CreateResponse, error) {
 	r := Request{
-		uri:    "/objects/servers",
+		uri:    apiServerBase,
 		method: "POST",
 		body:   s,
 	}
@@ -120,7 +120,7 @@ func (c *Client) CreateServer(s ServerCreateRequest) (*CreateResponse, error) {
 
 func (c *Client) DeleteServer(id string) error {
 	r := Request{
-		uri:    "/objects/servers/" + id,
+		uri:    apiServerBase + "/" + id,
 		method: "DELETE",
 	}
 
@@ -129,7 +129,7 @@ func (c *Client) DeleteServer(id string) error {
 
 func (c *Client) UpdateServer(id string, body map[string]interface{}) error {
 	r := Request{
-		uri:    "/objects/servers/" + id,
+		uri:    apiServerBase + "/" + id,
 		method: "PATCH",
 		body:   body,
 	}
@@ -138,16 +138,24 @@ func (c *Client) UpdateServer(id string, body map[string]interface{}) error {
 }
 
 func (c *Client) StopServer(id string) error {
+	server, err := c.GetServer(id)
+	if err != nil {
+		return err
+	}
+	if !server.Properties.Power {
+		return nil
+	}
+
 	body := map[string]interface{}{
 		"power": false,
 	}
 	r := Request{
-		uri:    "/objects/servers/" + id + "/power",
+		uri:    apiServerBase + "/" + id + "/power",
 		method: "PATCH",
 		body:   body,
 	}
 
-	err := r.execute(*c, nil)
+	err = r.execute(*c, nil)
 	if err != nil {
 		return err
 	}
@@ -166,7 +174,7 @@ func (c *Client) ShutdownServer(id string) error {
 	}
 
 	r := Request{
-		uri:    "/objects/servers/" + id + "/shutdown",
+		uri:    apiServerBase + "/" + id + "/shutdown",
 		method: "PATCH",
 	}
 
@@ -185,16 +193,24 @@ func (c *Client) ShutdownServer(id string) error {
 }
 
 func (c *Client) StartServer(id string) error {
+	server, err := c.GetServer(id)
+	if err != nil {
+		return err
+	}
+	if server.Properties.Power {
+		return nil
+	}
+
 	body := map[string]interface{}{
 		"power": true,
 	}
 	r := Request{
-		uri:    "/objects/servers/" + id + "/power",
+		uri:    apiServerBase + "/" + id + "/power",
 		method: "PATCH",
 		body:   body,
 	}
 
-	err := r.execute(*c, nil)
+	err = r.execute(*c, nil)
 	if err != nil {
 		return err
 	}
@@ -208,7 +224,7 @@ func (c *Client) linkStorage(serverid string, storageid string, bootdevice strin
 		"bootdevice":  bootdevice,
 	}
 	r := Request{
-		uri:    "/objects/servers/" + serverid + "/storages",
+		uri:    apiServerBase + "/" + serverid + "/storages",
 		method: "POST",
 		body:   body,
 	}
@@ -218,7 +234,7 @@ func (c *Client) linkStorage(serverid string, storageid string, bootdevice strin
 
 func (c *Client) UnlinkStorage(serverid string, storageid string) error {
 	r := Request{
-		uri:    "/objects/servers/" + serverid + "/storages/" + storageid,
+		uri:    apiServerBase + "/" + serverid + "/storages/" + storageid,
 		method: "DELETE",
 	}
 
@@ -231,7 +247,7 @@ func (c *Client) linkNetwork(serverid string, networkid string, bootdevice strin
 		"bootdevice":  bootdevice,
 	}
 	r := Request{
-		uri:    "/objects/servers/" + serverid + "/networks",
+		uri:    apiServerBase + "/" + serverid + "/networks",
 		method: "POST",
 		body:   body,
 	}
@@ -241,7 +257,7 @@ func (c *Client) linkNetwork(serverid string, networkid string, bootdevice strin
 
 func (c *Client) UnlinkNetwork(serverid string, networkid string) error {
 	r := Request{
-		uri:    "/objects/servers/" + serverid + "/networks/" + networkid,
+		uri:    apiServerBase + "/" + serverid + "/networks/" + networkid,
 		method: "DELETE",
 	}
 
