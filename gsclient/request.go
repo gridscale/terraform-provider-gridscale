@@ -31,13 +31,13 @@ type RequestStatusProperties struct {
 }
 
 type RequestError struct {
-	statusMessage string `json:"status"`
-	errorMessage  string `json:"message"`
+	StatusMessage string `json:"status"`
+	ErrorMessage  string `json:"message"`
 	StatusCode    int
 }
 
 func (r RequestError) Error() string {
-	return "[Error] statuscode " + r.statusMessage + " returned: " + r.errorMessage
+	return "[Error] statuscode " + r.StatusMessage + " returned: " + r.ErrorMessage
 }
 
 //This function takes the client and a struct and then adds the result to the given struct if possible
