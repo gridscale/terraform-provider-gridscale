@@ -1,5 +1,15 @@
 package gsclient
 
+const (
+	apiServerBase    = "/objects/servers"
+	apiStorageBase   = "/objects/storages"
+	apiNetworkBase   = "/objects/networks"
+	apiIpBase        = "/objects/ips"
+	apiSshkeyBase    = "/objects/sshkeys"
+	apiTemplateBase  = "/objects/templates"
+	apiValidateToken = "/validate_token"
+)
+
 type Client struct {
 	cfg *Config
 }
@@ -14,7 +24,7 @@ func NewClient(c *Config) *Client {
 
 func (c *Client) ValidateToken() error {
 	r := Request{
-		uri:    "/validate_token/",
+		uri:    apiValidateToken,
 		method: "GET",
 	}
 
