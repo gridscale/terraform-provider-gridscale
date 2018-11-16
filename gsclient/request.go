@@ -31,8 +31,13 @@ type RequestStatusProperties struct {
 }
 
 type RequestError struct {
-	Status  string `json:"status"`
-	Message string `json:"message"`
+	statusMessage string `json:"status"`
+	errorMessage  string `json:"message"`
+	StatusCode    int
+}
+
+func (r RequestError) Error() string {
+	return "[Error] statuscode " + r.statusMessage + " returned: " + r.errorMessage
 }
 
 //This function takes the client and a struct and then adds the result to the given struct if possible
@@ -72,8 +77,9 @@ func (r *Request) execute(c Client, output interface{}) error {
 
 	if result.StatusCode >= 300 {
 		errorMessage := new(RequestError) //error messages have a different structure, so they are read with a different struct
+		errorMessage.StatusCode = result.StatusCode
 		json.Unmarshal(iostream, &errorMessage)
-		return fmt.Errorf("[Error] statuscode %v returned: %v", errorMessage.Status, errorMessage.Message)
+		return errorMessage
 	} else {
 		json.Unmarshal(iostream, output) //Edit the given struct
 		log.Printf("[DEBUG] Response body: %v", string(iostream))
