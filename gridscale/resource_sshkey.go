@@ -44,6 +44,14 @@ func resourceGridscaleSshkey() *schema.Resource {
 func resourceGridscaleSshkeyRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	sshkey, err := client.GetSshkey(d.Id())
+	if requestError, ok := err.(*gsclient.RequestError); ok {
+		if requestError.StatusCode == 404 {
+			d.SetId("")
+			return nil
+		} else {
+			return err
+		}
+	}
 
 	d.Set("name", sshkey.Properties.Name)
 	d.Set("sshkey", sshkey.Properties.Sshkey)
@@ -52,7 +60,7 @@ func resourceGridscaleSshkeyRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("change_time", sshkey.Properties.ChangeTime)
 
 	log.Printf("Read the following: %v", sshkey)
-	return err
+	return nil
 }
 
 func resourceGridscaleSshkeyUpdate(d *schema.ResourceData, meta interface{}) error {

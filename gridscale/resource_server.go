@@ -100,6 +100,14 @@ func resourceGridscaleServer() *schema.Resource {
 func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	server, err := client.GetServer(d.Id())
+	if requestError, ok := err.(*gsclient.RequestError); ok {
+		if requestError.StatusCode == 404 {
+			d.SetId("")
+			return nil
+		} else {
+			return err
+		}
+	}
 
 	d.Set("name", server.Properties.Name)
 	d.Set("memory", server.Properties.Memory)
@@ -112,8 +120,7 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("storages", server.Properties.Relations.Networks) //No clue if this one does anything
 
 	log.Printf("Read the following: %v", server)
-
-	return err
+	return nil
 }
 
 func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) error {
