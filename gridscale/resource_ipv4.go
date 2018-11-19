@@ -77,10 +77,17 @@ func resourceGridscaleIpv4() *schema.Resource {
 func resourceGridscaleIpRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	ip, err := client.GetIp(d.Id())
+	if requestError, ok := err.(*gsclient.RequestError); ok {
+		if requestError.StatusCode == 404 {
+			d.SetId("")
+			return nil
+		} else {
+			return err
+		}
+	}
 
 	d.Set("ip", ip.Properties.Ip)
 	d.Set("prefix", ip.Properties.Prefix)
-	d.Set("family", ip.Properties.Family)
 	d.Set("location_uuid", ip.Properties.LocationUuid)
 	d.Set("failover", ip.Properties.Failover)
 	d.Set("status", ip.Properties.Status)
@@ -92,7 +99,7 @@ func resourceGridscaleIpRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("change_time", ip.Properties.ChangeTime)
 
 	log.Printf("Read the following: %v", ip)
-	return err
+	return nil
 }
 
 func resourceGridscaleIpUpdate(d *schema.ResourceData, meta interface{}) error {
