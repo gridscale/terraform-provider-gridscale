@@ -75,6 +75,8 @@ func (r *Request) execute(c Client, output interface{}) error {
 		return err
 	}
 
+	log.Printf("Status code returned: %v", result.StatusCode)
+
 	if result.StatusCode >= 300 {
 		errorMessage := new(RequestError) //error messages have a different structure, so they are read with a different struct
 		errorMessage.StatusCode = result.StatusCode
