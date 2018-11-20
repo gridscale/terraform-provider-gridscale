@@ -100,13 +100,14 @@ func resourceGridscaleServer() *schema.Resource {
 func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	server, err := client.GetServer(d.Id())
-	if requestError, ok := err.(*gsclient.RequestError); ok {
-		if requestError.StatusCode == 404 {
-			d.SetId("")
-			return nil
-		} else {
-			return err
+	if err != nil {
+		if requestError, ok := err.(*gsclient.RequestError); ok {
+			if requestError.StatusCode == 404 {
+				d.SetId("")
+				return nil
+			}
 		}
+		return err
 	}
 
 	d.Set("name", server.Properties.Name)

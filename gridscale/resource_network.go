@@ -89,13 +89,14 @@ func resourceGridscaleNetwork() *schema.Resource {
 func resourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	network, err := client.GetNetwork(d.Id())
-	if requestError, ok := err.(*gsclient.RequestError); ok {
-		if requestError.StatusCode == 404 {
-			d.SetId("")
-			return nil
-		} else {
-			return err
+	if err != nil {
+		if requestError, ok := err.(*gsclient.RequestError); ok {
+			if requestError.StatusCode == 404 {
+				d.SetId("")
+				return nil
+			}
 		}
+		return err
 	}
 
 	d.Set("name", network.Properties.Name)
