@@ -16,7 +16,8 @@ func (c *Config) Client() (*gsclient.Client, error) {
 
 	log.Print("[INFO] gridscale client configured")
 
-	err := client.ValidateToken()
+	//Make sure the credentials are correct by getting the server list
+	_, err := client.GetServerList()
 
 	return client, err
 }

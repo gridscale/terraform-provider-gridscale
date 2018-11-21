@@ -21,12 +21,3 @@ func NewClient(c *Config) *Client {
 
 	return client
 }
-
-func (c *Client) ValidateToken() error {
-	r := Request{
-		uri:    apiValidateToken,
-		method: "GET",
-	}
-
-	return r.execute(*c, nil)
-}
