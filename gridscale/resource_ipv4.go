@@ -71,6 +71,12 @@ func resourceGridscaleIpv4() *schema.Resource {
 				Description: "The date and time of the last object change",
 				Computed:    true,
 			},
+			"labels": {
+				Type:        schema.TypeList,
+				Description: "List of labels.",
+				Optional:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+			},
 		},
 	}
 }
@@ -99,6 +105,7 @@ func resourceGridscaleIpRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("location_name", ip.Properties.LocationName)
 	d.Set("create_time", ip.Properties.CreateTime)
 	d.Set("change_time", ip.Properties.ChangeTime)
+	d.Set("labels", ip.Properties.Labels)
 
 	log.Printf("Read the following: %v", ip)
 	return nil
@@ -117,6 +124,10 @@ func resourceGridscaleIpUpdate(d *schema.ResourceData, meta interface{}) error {
 		_, change := d.GetChange("reverse_dns")
 		requestBody["reverse_dns"] = change.(string)
 	}
+	if d.HasChange("labels") {
+		_, change := d.GetChange("labels")
+		requestBody["labels"] = change.([]interface{})
+	}
 
 	err := client.UpdateIp(id, requestBody)
 	if err != nil {
@@ -133,6 +144,7 @@ func resourceGridscaleIpv4Create(d *schema.ResourceData, meta interface{}) error
 	body["family"] = 4
 	body["location_uuid"] = d.Get("location_uuid").(string)
 	body["failover"] = d.Get("failover").(bool)
+	body["labels"] = d.Get("labels").([]interface{})
 	reversedns := d.Get("reverse_dns").(string)
 	if reversedns != "" {
 		body["reverse_dns"] = reversedns

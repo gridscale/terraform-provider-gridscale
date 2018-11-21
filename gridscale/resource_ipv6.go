@@ -70,6 +70,12 @@ func resourceGridscaleIpv6() *schema.Resource {
 				Description: "The date and time of the last object change",
 				Computed:    true,
 			},
+			"labels": {
+				Type:        schema.TypeList,
+				Description: "List of labels.",
+				Optional:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+			},
 		},
 	}
 }
@@ -81,6 +87,7 @@ func resourceGridscaleIpv6Create(d *schema.ResourceData, meta interface{}) error
 	body["family"] = 6
 	body["location_uuid"] = d.Get("location_uuid").(string)
 	body["failover"] = d.Get("failover").(bool)
+	body["labels"] = d.Get("labels").([]interface{})
 	reversedns := d.Get("reverse_dns").(string)
 	if reversedns != "" {
 		body["reverse_dns"] = reversedns

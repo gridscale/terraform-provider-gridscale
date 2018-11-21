@@ -13,19 +13,20 @@ type Ip struct {
 }
 
 type IpProperties struct {
-	LocationCountry string `json:"location_country"`
-	LocationUuid    string `json:"location_uuid"`
-	ObjectUuid      string `json:"object_uuid"`
-	ReverseDns      string `json:"reverse_dns"`
-	Family          int    `json:"family"`
-	Status          string `json:"status"`
-	CreateTime      string `json:"create_time"`
-	Failover        bool   `json:"failover"`
-	ChangeTime      string `json:"change_time"`
-	LocationIata    string `json:"location_iata"`
-	LocationName    string `json:"location_name"`
-	Prefix          string `json:"prefix"`
-	Ip              string `json:"ip"`
+	LocationCountry string   `json:"location_country"`
+	LocationUuid    string   `json:"location_uuid"`
+	ObjectUuid      string   `json:"object_uuid"`
+	ReverseDns      string   `json:"reverse_dns"`
+	Family          int      `json:"family"`
+	Status          string   `json:"status"`
+	CreateTime      string   `json:"create_time"`
+	Failover        bool     `json:"failover"`
+	ChangeTime      string   `json:"change_time"`
+	LocationIata    string   `json:"location_iata"`
+	LocationName    string   `json:"location_name"`
+	Prefix          string   `json:"prefix"`
+	Ip              string   `json:"ip"`
+	Labels          []string `json:"labels"`
 }
 
 type IpCreateResponse struct {
