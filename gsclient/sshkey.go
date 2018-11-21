@@ -13,12 +13,13 @@ type Sshkey struct {
 }
 
 type SshkeyProperties struct {
-	Name       string `json:"name"`
-	ObjectUuid string `json:"object_uuid"`
-	Status     string `json:"status"`
-	CreateTime string `json:"create_time"`
-	ChangeTime string `json:"change_time"`
-	Sshkey     string `json:"sshkey"`
+	Name       string   `json:"name"`
+	ObjectUuid string   `json:"object_uuid"`
+	Status     string   `json:"status"`
+	CreateTime string   `json:"create_time"`
+	ChangeTime string   `json:"change_time"`
+	Sshkey     string   `json:"sshkey"`
+	Labels     []string `json:"labels"`
 }
 
 func (c *Client) GetSshkey(id string) (*Sshkey, error) {

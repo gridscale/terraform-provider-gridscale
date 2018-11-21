@@ -37,6 +37,12 @@ func resourceGridscaleSshkey() *schema.Resource {
 				Description: "The date and time of the last object change",
 				Computed:    true,
 			},
+			"labels": {
+				Type:        schema.TypeList,
+				Description: "List of labels.",
+				Optional:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+			},
 		},
 	}
 }
@@ -59,6 +65,7 @@ func resourceGridscaleSshkeyRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("status", sshkey.Properties.Status)
 	d.Set("create_time", sshkey.Properties.CreateTime)
 	d.Set("change_time", sshkey.Properties.ChangeTime)
+	d.Set("labels", sshkey.Properties.Labels)
 
 	log.Printf("Read the following: %v", sshkey)
 	return nil
@@ -77,6 +84,10 @@ func resourceGridscaleSshkeyUpdate(d *schema.ResourceData, meta interface{}) err
 		_, change := d.GetChange("sshkey")
 		requestBody["sshkey"] = change.(string)
 	}
+	if d.HasChange("labels") {
+		_, change := d.GetChange("labels")
+		requestBody["labels"] = change.([]interface{})
+	}
 
 	err := client.UpdateSshkey(id, requestBody)
 	if err != nil {
@@ -92,6 +103,7 @@ func resourceGridscaleSshkeyCreate(d *schema.ResourceData, meta interface{}) err
 	body := make(map[string]interface{})
 	body["name"] = d.Get("name").(string)
 	body["sshkey"] = d.Get("sshkey").(string)
+	body["labels"] = d.Get("labels").([]interface{})
 
 	response, err := client.CreateSshkey(body)
 	if err != nil {
