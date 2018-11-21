@@ -127,7 +127,7 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 
-	createRequest := gsclient.ServerCreateRequest{
+	requestBody := gsclient.ServerCreateRequest{
 		Name:            d.Get("name").(string),
 		Cores:           d.Get("cores").(int),
 		Memory:          d.Get("memory").(int),
@@ -136,10 +136,10 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		Labels:          d.Get("labels").([]interface{}),
 	}
 
-	createRequest.Relations.IsoImages = []gsclient.ServerIsoImage{}
-	createRequest.Relations.Storages = []gsclient.ServerStorage{}
-	createRequest.Relations.Networks = []gsclient.ServerNetwork{}
-	createRequest.Relations.PublicIps = []gsclient.ServerIp{}
+	requestBody.Relations.IsoImages = []gsclient.ServerIsoImage{}
+	requestBody.Relations.Storages = []gsclient.ServerStorage{}
+	requestBody.Relations.Networks = []gsclient.ServerNetwork{}
+	requestBody.Relations.PublicIps = []gsclient.ServerIp{}
 
 	if attr, ok := d.GetOk("storages"); ok {
 		for index, value := range attr.([]interface{}) {
@@ -149,7 +149,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 			if index == 0 {
 				storage.BootDevice = true
 			}
-			createRequest.Relations.Storages = append(createRequest.Relations.Storages, storage)
+			requestBody.Relations.Storages = append(requestBody.Relations.Storages, storage)
 		}
 	}
 
@@ -160,7 +160,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		ip := gsclient.ServerIp{
 			IpaddrUuid: attr.(string),
 		}
-		createRequest.Relations.PublicIps = append(createRequest.Relations.PublicIps, ip)
+		requestBody.Relations.PublicIps = append(requestBody.Relations.PublicIps, ip)
 	}
 	if attr, ok := d.GetOk("ipv4"); ok {
 		if client.GetIpVersion(attr.(string)) != 4 {
@@ -169,7 +169,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		ip := gsclient.ServerIp{
 			IpaddrUuid: attr.(string),
 		}
-		createRequest.Relations.PublicIps = append(createRequest.Relations.PublicIps, ip)
+		requestBody.Relations.PublicIps = append(requestBody.Relations.PublicIps, ip)
 	}
 	if attr, ok := d.GetOk("ipv6"); ok {
 		if client.GetIpVersion(attr.(string)) != 6 {
@@ -178,11 +178,11 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		ip := gsclient.ServerIp{
 			IpaddrUuid: attr.(string),
 		}
-		createRequest.Relations.PublicIps = append(createRequest.Relations.PublicIps, ip)
+		requestBody.Relations.PublicIps = append(requestBody.Relations.PublicIps, ip)
 	}
 
 	//Add public network if we have an IP
-	if len(createRequest.Relations.PublicIps) > 0 {
+	if len(requestBody.Relations.PublicIps) > 0 {
 		publicNetwork, err := client.GetNetworkPublic()
 		if err != nil {
 			return err
@@ -190,7 +190,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		network := gsclient.ServerNetwork{
 			NetworkUuid: publicNetwork.Properties.ObjectUuid,
 		}
-		createRequest.Relations.Networks = append(createRequest.Relations.Networks, network)
+		requestBody.Relations.Networks = append(requestBody.Relations.Networks, network)
 	}
 
 	if attr, ok := d.GetOk("networks"); ok {
@@ -201,20 +201,20 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 			if index == 0 {
 				network.BootDevice = true
 			}
-			createRequest.Relations.Networks = append(createRequest.Relations.Networks, network)
+			requestBody.Relations.Networks = append(requestBody.Relations.Networks, network)
 		}
 	}
 
-	response, err := client.CreateServer(createRequest)
+	response, err := client.CreateServer(requestBody)
 
 	if err != nil {
 		return fmt.Errorf(
-			"Error waiting for server (%s) to be created: %s", createRequest.Name, err)
+			"Error waiting for server (%s) to be created: %s", requestBody.Name, err)
 	}
 
 	d.SetId(response.ServerUuid)
 
-	log.Printf("[DEBUG] The id for %s has been set to: %v", createRequest.Name, response.ServerUuid)
+	log.Printf("[DEBUG] The id for %s has been set to: %v", requestBody.Name, response.ServerUuid)
 
 	power := d.Get("power").(bool)
 	if power {

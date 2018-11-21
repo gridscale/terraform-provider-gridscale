@@ -100,11 +100,11 @@ func (c *Client) GetServerList() ([]Server, error) {
 	return list, err
 }
 
-func (c *Client) CreateServer(s ServerCreateRequest) (*CreateResponse, error) {
+func (c *Client) CreateServer(body ServerCreateRequest) (*CreateResponse, error) {
 	r := Request{
 		uri:    apiServerBase,
 		method: "POST",
-		body:   s,
+		body:   body,
 	}
 
 	response := new(CreateResponse)
