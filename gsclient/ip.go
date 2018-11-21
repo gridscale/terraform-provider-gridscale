@@ -45,14 +45,14 @@ type IpCreateRequest struct {
 }
 
 type IpUpdateRequest struct {
-	Failover     bool          `json:"failover,omitempty"`
-	ReverseDns   string        `json:"reverse_dns,omitempty"`
-	Labels       []interface{} `json:"labels,omitempty"`
+	Failover   bool          `json:"failover"`
+	ReverseDns string        `json:"reverse_dns,omitempty"`
+	Labels     []interface{} `json:"labels,omitempty"`
 }
 
 func (c *Client) GetIp(id string) (*Ip, error) {
 	r := Request{
-		uri:    "/objects/ips/" + id,
+		uri:    apiIpBase + id,
 		method: "GET",
 	}
 
@@ -66,7 +66,7 @@ func (c *Client) GetIp(id string) (*Ip, error) {
 
 func (c *Client) GetIpList() (*Ips, error) {
 	r := Request{
-		uri:    "/objects/ips/",
+		uri:    apiIpBase,
 		method: "GET",
 	}
 
@@ -80,7 +80,7 @@ func (c *Client) GetIpList() (*Ips, error) {
 
 func (c *Client) CreateIp(body IpCreateRequest) (*IpCreateResponse, error) {
 	r := Request{
-		uri:    "/objects/ips",
+		uri:    apiIpBase,
 		method: "POST",
 		body:   body,
 	}
@@ -98,7 +98,7 @@ func (c *Client) CreateIp(body IpCreateRequest) (*IpCreateResponse, error) {
 
 func (c *Client) DeleteIp(id string) error {
 	r := Request{
-		uri:    "/objects/ips/" + id,
+		uri:    apiIpBase + id,
 		method: "DELETE",
 	}
 
@@ -107,7 +107,7 @@ func (c *Client) DeleteIp(id string) error {
 
 func (c *Client) UpdateIp(id string, body IpUpdateRequest) error {
 	r := Request{
-		uri:    "/objects/ips/" + id,
+		uri:    apiIpBase + id,
 		method: "PATCH",
 		body:   body,
 	}
