@@ -36,6 +36,14 @@ type IpCreateResponse struct {
 	Ip          string `json:"ip"`
 }
 
+type IpCreateRequest struct {
+	Family       int           `json:"family"`
+	LocationUuid string        `json:"location_uuid"`
+	Failover     bool          `json:"failover,omitempty"`
+	ReverseDns   string        `json:"reverse_dns,omitempty"`
+	Labels       []interface{} `json:"labels"`
+}
+
 func (c *Client) GetIp(id string) (*Ip, error) {
 	r := Request{
 		uri:    "/objects/ips/" + id,
@@ -64,7 +72,7 @@ func (c *Client) GetIpList() (*Ips, error) {
 	return response, err
 }
 
-func (c *Client) CreateIp(body map[string]interface{}) (*IpCreateResponse, error) {
+func (c *Client) CreateIp(body IpCreateRequest) (*IpCreateResponse, error) {
 	r := Request{
 		uri:    "/objects/ips",
 		method: "POST",
