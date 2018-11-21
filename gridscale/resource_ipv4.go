@@ -113,23 +113,22 @@ func resourceGridscaleIpRead(d *schema.ResourceData, meta interface{}) error {
 
 func resourceGridscaleIpUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	requestBody := make(map[string]interface{})
-	id := d.Id()
+	requestBody := gsclient.IpUpdateRequest{}
 
 	if d.HasChange("failover") {
 		_, change := d.GetChange("failover")
-		requestBody["failover"] = change.(bool)
+		requestBody.Failover = change.(bool)
 	}
 	if d.HasChange("reverse_dns") {
 		_, change := d.GetChange("reverse_dns")
-		requestBody["reverse_dns"] = change.(string)
+		requestBody.ReverseDns = change.(string)
 	}
 	if d.HasChange("labels") {
 		_, change := d.GetChange("labels")
-		requestBody["labels"] = change.([]interface{})
+		requestBody.Labels = change.([]interface{})
 	}
 
-	err := client.UpdateIp(id, requestBody)
+	err := client.UpdateIp(d.Id(), requestBody)
 	if err != nil {
 		return err
 	}

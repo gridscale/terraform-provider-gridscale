@@ -41,7 +41,13 @@ type IpCreateRequest struct {
 	LocationUuid string        `json:"location_uuid"`
 	Failover     bool          `json:"failover,omitempty"`
 	ReverseDns   string        `json:"reverse_dns,omitempty"`
-	Labels       []interface{} `json:"labels"`
+	Labels       []interface{} `json:"labels,omitempty"`
+}
+
+type IpUpdateRequest struct {
+	Failover     bool          `json:"failover,omitempty"`
+	ReverseDns   string        `json:"reverse_dns,omitempty"`
+	Labels       []interface{} `json:"labels,omitempty"`
 }
 
 func (c *Client) GetIp(id string) (*Ip, error) {
@@ -99,7 +105,7 @@ func (c *Client) DeleteIp(id string) error {
 	return r.execute(*c, nil)
 }
 
-func (c *Client) UpdateIp(id string, body map[string]interface{}) error {
+func (c *Client) UpdateIp(id string, body IpUpdateRequest) error {
 	r := Request{
 		uri:    "/objects/ips/" + id,
 		method: "PATCH",
