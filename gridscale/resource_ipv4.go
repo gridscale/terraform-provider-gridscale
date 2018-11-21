@@ -2,6 +2,7 @@ package gridscale
 
 import (
 	"../gsclient"
+	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
 	"log"
 )
@@ -151,7 +152,7 @@ func resourceGridscaleIpv4Create(d *schema.ResourceData, meta interface{}) error
 
 func resourceGridscaleIpDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	err := client.DeleteIp(d.Id())
-
-	return err
+	return resource.Retry(d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
+		return resource.RetryableError(client.DeleteIp(d.Id()))
+	})
 }
