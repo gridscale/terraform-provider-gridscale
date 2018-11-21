@@ -52,7 +52,7 @@ type IpUpdateRequest struct {
 
 func (c *Client) GetIp(id string) (*Ip, error) {
 	r := Request{
-		uri:    apiIpBase + id,
+		uri:    apiIpBase + "/" + id,
 		method: "GET",
 	}
 
@@ -98,7 +98,7 @@ func (c *Client) CreateIp(body IpCreateRequest) (*IpCreateResponse, error) {
 
 func (c *Client) DeleteIp(id string) error {
 	r := Request{
-		uri:    apiIpBase + id,
+		uri:    apiIpBase + "/" + id,
 		method: "DELETE",
 	}
 
@@ -107,7 +107,7 @@ func (c *Client) DeleteIp(id string) error {
 
 func (c *Client) UpdateIp(id string, body IpUpdateRequest) error {
 	r := Request{
-		uri:    apiIpBase + id,
+		uri:    apiIpBase + "/" + id,
 		method: "PATCH",
 		body:   body,
 	}
