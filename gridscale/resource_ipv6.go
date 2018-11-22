@@ -4,6 +4,7 @@ import (
 	"../gsclient"
 	"github.com/hashicorp/terraform/helper/schema"
 	"log"
+	"time"
 )
 
 func resourceGridscaleIpv6() *schema.Resource {
@@ -95,6 +96,9 @@ func resourceGridscaleIpv6() *schema.Resource {
 				Description: "Defines the price for the current period since the last bill.",
 				Computed:    true,
 			},
+		},
+		Timeouts: &schema.ResourceTimeout{
+			Delete: schema.DefaultTimeout(time.Minute),
 		},
 	}
 }

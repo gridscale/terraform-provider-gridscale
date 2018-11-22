@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
 	"log"
+	"time"
 )
 
 func resourceGridscaleStorage() *schema.Resource {
@@ -136,6 +137,9 @@ func resourceGridscaleStorage() *schema.Resource {
 					},
 				},
 			},
+		},
+		Timeouts: &schema.ResourceTimeout{
+			Delete: schema.DefaultTimeout(time.Minute),
 		},
 	}
 }
