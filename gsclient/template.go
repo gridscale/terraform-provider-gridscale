@@ -30,7 +30,7 @@ type TemplateCreateRequest struct {
 
 func (c *Client) GetTemplate(id string) (*Template, error) {
 	r := Request{
-		uri:    "/objects/templates/" + id,
+		uri:    apiTemplateBase + "/" + id,
 		method: "GET",
 	}
 
@@ -44,7 +44,7 @@ func (c *Client) GetTemplate(id string) (*Template, error) {
 
 func (c *Client) GetTemplateList() ([]Template, error) {
 	r := Request{
-		uri:    "/objects/templates/",
+		uri:    apiTemplateBase,
 		method: "GET",
 	}
 
@@ -60,43 +60,6 @@ func (c *Client) GetTemplateList() ([]Template, error) {
 	}
 
 	return list, err
-}
-
-func (c *Client) CreateTemplate(body TemplateCreateRequest) (*CreateResponse, error) {
-	r := Request{
-		uri:    "/objects/templates",
-		method: "POST",
-		body:   body,
-	}
-
-	response := new(CreateResponse)
-	err := r.execute(*c, &response)
-	if err != nil {
-		return nil, err
-	}
-
-	err = c.WaitForRequestCompletion(response.RequestUuid)
-
-	return response, err
-}
-
-func (c *Client) DeleteTemplate(id string) error {
-	r := Request{
-		uri:    "/objects/template/" + id,
-		method: "DELETE",
-	}
-
-	return r.execute(*c, nil)
-}
-
-func (c *Client) UpdateTemplate(id string, body map[string]interface{}) error {
-	r := Request{
-		uri:    "/objects/sshkeys/" + id,
-		method: "PATCH",
-		body:   body,
-	}
-
-	return r.execute(*c, nil)
 }
 
 func (c *Client) GetTemplateByName(name string) (*Template, error) {
