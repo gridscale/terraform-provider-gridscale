@@ -43,6 +43,8 @@ func (r RequestError) Error() string {
 //This function takes the client and a struct and then adds the result to the given struct if possible
 func (r *Request) execute(c Client, output interface{}) error {
 	url := c.cfg.APIUrl + r.uri
+	log.Printf("Url: %v", url)
+
 
 	//Convert the body of the request to json
 	jsonBody := new(bytes.Buffer)
