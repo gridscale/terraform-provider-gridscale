@@ -84,7 +84,7 @@ type StorageTemplate struct {
 
 func (c *Client) GetStorage(id string) (*Storage, error) {
 	r := Request{
-		uri:    "/objects/storages/" + id,
+		uri:    apiStorageBase + "/" + id,
 		method: "GET",
 	}
 
@@ -96,7 +96,7 @@ func (c *Client) GetStorage(id string) (*Storage, error) {
 
 func (c *Client) GetStorageList() ([]Storage, error) {
 	r := Request{
-		uri:    "/objects/storages/",
+		uri:    apiStorageBase,
 		method: "GET",
 	}
 
@@ -116,7 +116,7 @@ func (c *Client) GetStorageList() ([]Storage, error) {
 
 func (c *Client) CreateStorage(body map[string]interface{}) (*CreateResponse, error) {
 	r := Request{
-		uri:    "/objects/storages",
+		uri:    apiStorageBase,
 		method: "POST",
 		body:   body,
 	}
@@ -134,7 +134,7 @@ func (c *Client) CreateStorage(body map[string]interface{}) (*CreateResponse, er
 
 func (c *Client) DeleteStorage(id string) error {
 	r := Request{
-		uri:    "/objects/storages/" + id,
+		uri:    apiStorageBase + "/" + id,
 		method: "DELETE",
 	}
 
@@ -143,7 +143,7 @@ func (c *Client) DeleteStorage(id string) error {
 
 func (c *Client) UpdateStorage(id string, body map[string]interface{}) error {
 	r := Request{
-		uri:    "/objects/storages/" + id,
+		uri:    apiStorageBase + "/" + id,
 		method: "PATCH",
 		body:   body,
 	}

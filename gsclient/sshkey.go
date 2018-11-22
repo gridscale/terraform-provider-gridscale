@@ -36,7 +36,7 @@ type SshkeyUpdateRequest struct {
 
 func (c *Client) GetSshkey(id string) (*Sshkey, error) {
 	r := Request{
-		uri:    "/objects/sshkeys/" + id,
+		uri:    apiSshkeyBase + "/" + id,
 		method: "GET",
 	}
 
@@ -50,7 +50,7 @@ func (c *Client) GetSshkey(id string) (*Sshkey, error) {
 
 func (c *Client) GetSshkeyList() (*Sshkeys, error) {
 	r := Request{
-		uri:    "/objects/sshkeys/",
+		uri:    apiSshkeyBase,
 		method: "GET",
 	}
 
@@ -64,7 +64,7 @@ func (c *Client) GetSshkeyList() (*Sshkeys, error) {
 
 func (c *Client) CreateSshkey(body SshkeyCreateRequest) (*CreateResponse, error) {
 	r := Request{
-		uri:    "/objects/sshkeys",
+		uri:    apiSshkeyBase,
 		method: "POST",
 		body:   body,
 	}
@@ -82,7 +82,7 @@ func (c *Client) CreateSshkey(body SshkeyCreateRequest) (*CreateResponse, error)
 
 func (c *Client) DeleteSshkey(id string) error {
 	r := Request{
-		uri:    "/objects/sshkeys/" + id,
+		uri:    apiSshkeyBase + "/" + id,
 		method: "DELETE",
 	}
 
@@ -91,7 +91,7 @@ func (c *Client) DeleteSshkey(id string) error {
 
 func (c *Client) UpdateSshkey(id string, body SshkeyUpdateRequest) error {
 	r := Request{
-		uri:    "/objects/sshkeys/" + id,
+		uri:    apiSshkeyBase + "/" + id,
 		method: "PATCH",
 		body:   body,
 	}

@@ -7,8 +7,7 @@ const (
 	apiIpBase        = "/objects/ips"
 	apiSshkeyBase    = "/objects/sshkeys"
 	apiTemplateBase  = "/objects/templates"
-	apiValidateToken = "/validate_token"
-)
+	)
 
 type Client struct {
 	cfg *Config

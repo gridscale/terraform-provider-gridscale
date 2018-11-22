@@ -68,7 +68,7 @@ type NetworkUpdateRequest struct {
 
 func (c *Client) GetNetwork(id string) (*Network, error) {
 	r := Request{
-		uri:    "/objects/networks/" + id,
+		uri:    apiNetworkBase + "/" + id,
 		method: "GET",
 	}
 	log.Printf("%v", r)
@@ -83,7 +83,7 @@ func (c *Client) GetNetwork(id string) (*Network, error) {
 
 func (c *Client) CreateNetwork(body NetworkCreateRequest) (*CreateResponse, error) {
 	r := Request{
-		uri:    "/objects/networks",
+		uri:    apiNetworkBase,
 		method: "POST",
 		body:   body,
 	}
@@ -101,7 +101,7 @@ func (c *Client) CreateNetwork(body NetworkCreateRequest) (*CreateResponse, erro
 
 func (c *Client) DeleteNetwork(id string) error {
 	r := Request{
-		uri:    "/objects/networks/" + id,
+		uri:    apiNetworkBase + "/" + id,
 		method: "DELETE",
 	}
 
@@ -110,7 +110,7 @@ func (c *Client) DeleteNetwork(id string) error {
 
 func (c *Client) UpdateNetwork(id string, body NetworkUpdateRequest) error {
 	r := Request{
-		uri:    "/objects/networks/" + id,
+		uri:    apiNetworkBase + "/" + id,
 		method: "PATCH",
 		body:   body,
 	}
@@ -120,7 +120,7 @@ func (c *Client) UpdateNetwork(id string, body NetworkUpdateRequest) error {
 
 func (c *Client) GetNetworkList() ([]Network, error) {
 	r := Request{
-		uri:    "/objects/networks/",
+		uri:    apiNetworkBase,
 		method: "GET",
 	}
 	log.Printf("%v", r)
