@@ -13,21 +13,44 @@ type Ip struct {
 }
 
 type IpProperties struct {
-	Name            string   `json:"name"`
-	LocationCountry string   `json:"location_country"`
-	LocationUuid    string   `json:"location_uuid"`
-	ObjectUuid      string   `json:"object_uuid"`
-	ReverseDns      string   `json:"reverse_dns"`
-	Family          int      `json:"family"`
-	Status          string   `json:"status"`
-	CreateTime      string   `json:"create_time"`
-	Failover        bool     `json:"failover"`
-	ChangeTime      string   `json:"change_time"`
-	LocationIata    string   `json:"location_iata"`
-	LocationName    string   `json:"location_name"`
-	Prefix          string   `json:"prefix"`
-	Ip              string   `json:"ip"`
-	Labels          []string `json:"labels"`
+	Name            string      `json:"name"`
+	LocationCountry string      `json:"location_country"`
+	LocationUuid    string      `json:"location_uuid"`
+	ObjectUuid      string      `json:"object_uuid"`
+	ReverseDns      string      `json:"reverse_dns"`
+	Family          int         `json:"family"`
+	Status          string      `json:"status"`
+	CreateTime      string      `json:"create_time"`
+	Failover        bool        `json:"failover"`
+	ChangeTime      string      `json:"change_time"`
+	LocationIata    string      `json:"location_iata"`
+	LocationName    string      `json:"location_name"`
+	Prefix          string      `json:"prefix"`
+	Ip              string      `json:"ip"`
+	DeleteBlock     string      `json:"delete_block"`
+	UsagesInMinutes float64     `json:"usage_in_minutes"`
+	CurrentPrice    float64     `json:"current_price"`
+	Labels          []string    `json:"labels"`
+	Relations       IpRelations `json:"relations"`
+}
+
+type IpRelations struct {
+	Loadbalancers []IpLoadbalancer `json:"loadbalancers"`
+	Servers       []IpServer       `json:"servers"`
+	PublicIps     []ServerIp       `json:"public_ips"`
+	Storages      []ServerStorage  `json:"storages"`
+}
+
+type IpLoadbalancer struct {
+	CreateTime       string `json:"create_time"`
+	LoadbalancerName string `json:"loadbalancer_name"`
+	LoadbalancerUuid string `json:"loadbalancer_uuid"`
+}
+
+type IpServer struct {
+	CreateTime string `json:"create_time"`
+	ServerName string `json:"server_name"`
+	ServerUuid string `json:"server_uuid"`
 }
 
 type IpCreateResponse struct {

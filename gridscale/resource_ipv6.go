@@ -81,6 +81,20 @@ func resourceGridscaleIpv6() *schema.Resource {
 				Optional:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
+			"delete_block": {
+				Type:        schema.TypeBool,
+				Description: "Defines if the object is administratively blocked. If true, it can not be deleted by the user.",
+				Computed:    true,
+			},
+			"usage_in_minutes": {
+				Type:     schema.TypeFloat,
+				Computed: true,
+			},
+			"current_price": {
+				Type:        schema.TypeFloat,
+				Description: "Defines the price for the current period since the last bill.",
+				Computed:    true,
+			},
 		},
 	}
 }

@@ -68,12 +68,12 @@ func resourceGridscaleIpv4() *schema.Resource {
 			},
 			"create_time": {
 				Type:        schema.TypeString,
-				Description: "The date and time the object was initially created",
+				Description: "The date and time the object was initially created.",
 				Computed:    true,
 			},
 			"change_time": {
 				Type:        schema.TypeString,
-				Description: "The date and time of the last object change",
+				Description: "The date and time of the last object change.",
 				Computed:    true,
 			},
 			"labels": {
@@ -81,6 +81,20 @@ func resourceGridscaleIpv4() *schema.Resource {
 				Description: "List of labels.",
 				Optional:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
+			},
+			"delete_block": {
+				Type:        schema.TypeBool,
+				Description: "Defines if the object is administratively blocked. If true, it can not be deleted by the user.",
+				Computed:    true,
+			},
+			"usage_in_minutes": {
+				Type:     schema.TypeFloat,
+				Computed: true,
+			},
+			"current_price": {
+				Type:        schema.TypeFloat,
+				Description: "Defines the price for the current period since the last bill.",
+				Computed:    true,
 			},
 		},
 	}
@@ -111,6 +125,9 @@ func resourceGridscaleIpRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("create_time", ip.Properties.CreateTime)
 	d.Set("change_time", ip.Properties.ChangeTime)
 	d.Set("labels", ip.Properties.Labels)
+	d.Set("delete_block", ip.Properties.DeleteBlock)
+	d.Set("usage_in_minutes", ip.Properties.UsagesInMinutes)
+	d.Set("current_price", ip.Properties.CurrentPrice)
 
 	log.Printf("Read the following: %v", ip)
 	return nil
