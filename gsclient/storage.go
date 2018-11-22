@@ -9,30 +9,77 @@ type Storage struct {
 }
 
 type StorageProperties struct {
-	ObjectUuid      string  `json:"object_uuid"`
-	Name            string  `json:"name"`
-	Capacity        string  `json:"capacity"`
-	LocationUuid    string  `json:"location_uuid"`
-	Status          string  `json:"status"`
-	CreateTime      string  `json:"create_time"`
-	ChangeTime      string  `json:"change_time"`
-	CurrentPrice    float64 `json:"current_price"`
-	LocationName    string  `json:"location_name"`
-	LocationCountry string  `json:"location_country"`
-	LocationIata    string  `json:"location_iata"`
+	ChangeTime       string            `json:"change_time"`
+	LocationIata     string            `json:"location_iata"`
+	Status           string            `json:"status"`
+	LicenseProductNo int               `json:"license_product_no"`
+	LocationCountry  string            `json:"location_country"`
+	UsageInMinutes   int               `json:"usage_in_minutes"`
+	LastUsedTemplate string            `json:"last_used_template"`
+	CurrentPrice     float64           `json:"current_price"`
+	Capacity         int               `json:"capacity"`
+	LocationUuid     string            `json:"location_uuid"`
+	StorageType      string            `json:"storage_type"`
+	ParentUuid       string            `json:"parent_uuid"`
+	Name             string            `json:"name"`
+	LocationName     string            `json:"location_name"`
+	ObjectUuid       string            `json:"object_uuid"`
+	Snapshots        []StorageSnapshot `json:"snapshots"`
+	Relations        StorageRelations  `json:"relations"`
+	Labels           []string          `json:"labels"`
+	CreateTime       string            `json:"create_time"`
+}
+
+type StorageRelations struct {
+	Servers           []StorageServer            `json:"servers"`
+	SnapshotSchedules []StorageSnapshotSchedules `json:"snapshot_schedules"`
+}
+
+type StorageServer struct {
+	Bootdevice bool   `json:"bootdevice"`
+	Target     int    `json:"target"`
+	Controller int    `json:"controller"`
+	Bus        int    `json:"bus"`
+	ObjectUuid string `json:"object_uuid"`
+	Lun        int    `json:"lun"`
+	CreateTime string `json:"create_time"`
+	ObjectName string `json:"object_name"`
+}
+
+type StorageSnapshot struct {
+	LastUsedTemplate      string `json:"last_used_template"`
+	ObjectUuid            string `json:"object_uuid"`
+	SchedulesSnapshotName string `json:"schedules_snapshot_name"`
+	SchedulesSnapshotUuid string `json:"schedules_snapshot_uuid"`
+	ObjectCapacity        int    `json:"object_capacity"`
+	CreateTime            string `json:"create_time"`
+	ObjectName            string `json:"object_name"`
+}
+
+type StorageSnapshotSchedules struct {
+	RunInterval   int    `json:"run_interval"`
+	KeepSnapshots int    `json:"keep_snapshots"`
+	ObjectName    string `json:"object_name"`
+	NextRuntime   string `json:"next_runtime"`
+	ObjectUuid    int    `json:"object_uuid"`
+	Name          string `json:"name"`
+	CreateTime    string `json:"create_time"`
 }
 
 type StorageCreateRequest struct {
 	Capacity     int             `json:"capacity"`
 	LocationUuid string          `json:"location_uuid"`
 	Name         string          `json:"name"`
-	StorageType  string          `json:"storage_type"`
+	StorageType  string          `json:"storage_type,omitempty"`
 	Template     StorageTemplate `json:"template,omitempty"`
 }
 
 type StorageTemplate struct {
-	Sshkeys      []string `json:"sshkeys"`
+	Sshkeys      []string `json:"sshkeys,omitempty"`
 	TemplateUuid string   `json:"template_uuid"`
+	Password     string   `json:"password,omitempty"`
+	PasswordType string   `json:"password_type,omitempty"`
+	Hostname     string   `json:"hostname,omitempty"`
 }
 
 func (c *Client) GetStorage(id string) (*Storage, error) {

@@ -3,6 +3,7 @@ package gridscale
 import (
 	"../gsclient"
 	"fmt"
+	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
 	"log"
@@ -51,6 +52,14 @@ func resourceGridscaleStorage() *schema.Resource {
 				Description: "If a template has been used that requires a license key (e.g. Windows Servers) this shows the product_no of the license (see the /prices endpoint for more details).",
 				Computed:    true,
 			},
+			"last_used_template": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"parent_uuid": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 			"status": {
 				Type:        schema.TypeString,
 				Description: "status indicates the status of the object.",
@@ -85,6 +94,12 @@ func resourceGridscaleStorage() *schema.Resource {
 				Type:     schema.TypeFloat,
 				Computed: true,
 			},
+			"labels": {
+				Type:        schema.TypeList,
+				Description: "List of labels.",
+				Optional:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+			},
 			"template": {
 				Type:     schema.TypeList,
 				Optional: true,
@@ -94,9 +109,24 @@ func resourceGridscaleStorage() *schema.Resource {
 					Schema: map[string]*schema.Schema{
 						"sshkeys": {
 							Type:     schema.TypeList,
-							Required: true,
+							Optional: true,
 							ForceNew: true,
 							Elem:     &schema.Schema{Type: schema.TypeString},
+						},
+						"password": {
+							Type:     schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+						},
+						"password_type": {
+							Type:     schema.TypeString,
+							Optional: true,
+							ForceNew: true,
+						},
+						"hostname": {
+							Type:     schema.TypeString,
+							Optional: true,
+							ForceNew: true,
 						},
 						"template_uuid": {
 							Type:     schema.TypeString,
@@ -113,20 +143,36 @@ func resourceGridscaleStorage() *schema.Resource {
 func resourceGridscaleStorageRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	storage, err := client.GetStorage(d.Id())
+	if err != nil {
+		if requestError, ok := err.(*gsclient.RequestError); ok {
+			log.Printf("Status code returned: %v", requestError.StatusCode)
+			if requestError.StatusCode == 404 {
+				d.SetId("")
+				return nil
+			}
+		}
+		return err
+	}
 
-	d.Set("name", storage.Properties.Name)
+	d.Set("change_time", storage.Properties.ChangeTime)
+	d.Set("location_iata", storage.Properties.LocationIata)
+	d.Set("status", storage.Properties.Status)
+	d.Set("license_product_no", storage.Properties.LicenseProductNo)
+	d.Set("location_country", storage.Properties.LocationCountry)
+	d.Set("usage_in_minutes", storage.Properties.UsageInMinutes)
+	d.Set("last_used_template", storage.Properties.LastUsedTemplate)
+	d.Set("current_price", storage.Properties.CurrentPrice)
 	d.Set("capacity", storage.Properties.Capacity)
 	d.Set("location_uuid", storage.Properties.LocationUuid)
-	d.Set("status", storage.Properties.Status)
-	d.Set("create_time", storage.Properties.CreateTime)
-	d.Set("change_time", storage.Properties.ChangeTime)
+	d.Set("storage_type", storage.Properties.StorageType)
+	d.Set("parent_uuid", storage.Properties.ParentUuid)
+	d.Set("name", storage.Properties.Name)
 	d.Set("location_name", storage.Properties.LocationName)
-	d.Set("location_country", storage.Properties.LocationCountry)
-	d.Set("location_iata", storage.Properties.LocationIata)
-	d.Set("current_price", storage.Properties.CurrentPrice)
+	d.Set("labels", storage.Properties.Labels)
+	d.Set("create_time", storage.Properties.CreateTime)
 
 	log.Printf("Read the following: %v", storage)
-	return err
+	return nil
 }
 
 func resourceGridscaleStorageUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -142,6 +188,11 @@ func resourceGridscaleStorageUpdate(d *schema.ResourceData, meta interface{}) er
 	if d.HasChange("capacity") {
 		_, change := d.GetChange("capacity")
 		requestBody["capacity"] = change.(int)
+	}
+
+	if d.HasChange("labels") {
+		_, change := d.GetChange("labels")
+		requestBody["labels"] = change.([]interface{})
 	}
 
 	err := client.UpdateStorage(id, requestBody)
@@ -160,6 +211,7 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 	body["capacity"] = d.Get("capacity").(int)
 	body["location_uuid"] = d.Get("location_uuid").(string)
 	body["storage_type"] = d.Get("storage_type").(string)
+	body["labels"] = d.Get("labels").([]interface{})
 
 	//since only one template can be used, we can just look at index 0
 	if _, ok := d.GetOk("template"); ok {
@@ -189,7 +241,7 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 
 func resourceGridscaleStorageDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	err := client.DeleteStorage(d.Id())
-
-	return err
+	return resource.Retry(d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
+		return resource.RetryableError(client.DeleteStorage(d.Id()))
+	})
 }
