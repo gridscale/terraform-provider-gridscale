@@ -181,25 +181,13 @@ func resourceGridscaleStorageRead(d *schema.ResourceData, meta interface{}) erro
 
 func resourceGridscaleStorageUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	requestBody := make(map[string]interface{})
-	id := d.Id()
-
-	if d.HasChange("name") {
-		_, change := d.GetChange("name")
-		requestBody["name"] = change.(string)
+	requestBody := gsclient.StorageUpdateRequest{
+		Name:     d.Get("name").(string),
+		Capacity: d.Get("capacity").(int),
+		Labels:   d.Get("labels").([]interface{}),
 	}
 
-	if d.HasChange("capacity") {
-		_, change := d.GetChange("capacity")
-		requestBody["capacity"] = change.(int)
-	}
-
-	if d.HasChange("labels") {
-		_, change := d.GetChange("labels")
-		requestBody["labels"] = change.([]interface{})
-	}
-
-	err := client.UpdateStorage(id, requestBody)
+	err := client.UpdateStorage(d.Id(), requestBody)
 	if err != nil {
 		return err
 	}
@@ -210,12 +198,13 @@ func resourceGridscaleStorageUpdate(d *schema.ResourceData, meta interface{}) er
 func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 
-	body := make(map[string]interface{})
-	body["name"] = d.Get("name").(string)
-	body["capacity"] = d.Get("capacity").(int)
-	body["location_uuid"] = d.Get("location_uuid").(string)
-	body["storage_type"] = d.Get("storage_type").(string)
-	body["labels"] = d.Get("labels").([]interface{})
+	requestBody := gsclient.StorageCreateRequest{
+		Name:         d.Get("name").(string),
+		Capacity:     d.Get("capacity").(int),
+		LocationUuid: d.Get("location_uuid").(string),
+		StorageType:  d.Get("storage_type").(string),
+		Labels:       d.Get("labels").([]interface{}),
+	}
 
 	//since only one template can be used, we can just look at index 0
 	if _, ok := d.GetOk("template"); ok {
@@ -228,17 +217,17 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 		if v, ok := d.GetOk("template.0.template_uuid"); ok {
 			template.TemplateUuid = v.(string)
 		}
-		body["template"] = template
+		requestBody.Template = template
 	}
 
-	response, err := client.CreateStorage(body)
+	response, err := client.CreateStorage(requestBody)
 	if err != nil {
 		return err
 	}
 
 	d.SetId(response.ObjectUuid)
 
-	log.Printf("The id for storage %s has been set to %v", body, response)
+	log.Printf("The id for storage %s has been set to %v", requestBody.Name, response.ObjectUuid)
 
 	return resourceGridscaleStorageRead(d, meta)
 }

@@ -65,6 +65,13 @@ type StorageSnapshotSchedules struct {
 	Name          string `json:"name"`
 	CreateTime    string `json:"create_time"`
 }
+type StorageTemplate struct {
+	Sshkeys      []string `json:"sshkeys,omitempty"`
+	TemplateUuid string   `json:"template_uuid"`
+	Password     string   `json:"password,omitempty"`
+	PasswordType string   `json:"password_type,omitempty"`
+	Hostname     string   `json:"hostname,omitempty"`
+}
 
 type StorageCreateRequest struct {
 	Capacity     int             `json:"capacity"`
@@ -72,14 +79,13 @@ type StorageCreateRequest struct {
 	Name         string          `json:"name"`
 	StorageType  string          `json:"storage_type,omitempty"`
 	Template     StorageTemplate `json:"template,omitempty"`
+	Labels       []interface{}   `json:"labels,omitempty"`
 }
 
-type StorageTemplate struct {
-	Sshkeys      []string `json:"sshkeys,omitempty"`
-	TemplateUuid string   `json:"template_uuid"`
-	Password     string   `json:"password,omitempty"`
-	PasswordType string   `json:"password_type,omitempty"`
-	Hostname     string   `json:"hostname,omitempty"`
+type StorageUpdateRequest struct {
+	Name     string        `json:"name,omitempty"`
+	Labels   []interface{} `json:"labels,omitempty"`
+	Capacity int           `json:"capacity"`
 }
 
 func (c *Client) GetStorage(id string) (*Storage, error) {
@@ -114,7 +120,7 @@ func (c *Client) GetStorageList() ([]Storage, error) {
 	return list, err
 }
 
-func (c *Client) CreateStorage(body map[string]interface{}) (*CreateResponse, error) {
+func (c *Client) CreateStorage(body StorageCreateRequest) (*CreateResponse, error) {
 	r := Request{
 		uri:    apiStorageBase,
 		method: "POST",
@@ -141,7 +147,7 @@ func (c *Client) DeleteStorage(id string) error {
 	return r.execute(*c, nil)
 }
 
-func (c *Client) UpdateStorage(id string, body map[string]interface{}) error {
+func (c *Client) UpdateStorage(id string, body StorageUpdateRequest) error {
 	r := Request{
 		uri:    apiStorageBase + "/" + id,
 		method: "PATCH",
