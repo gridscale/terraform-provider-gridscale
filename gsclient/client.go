@@ -1,13 +1,13 @@
 package gsclient
 
 const (
-	apiServerBase    = "/objects/servers"
-	apiStorageBase   = "/objects/storages"
-	apiNetworkBase   = "/objects/networks"
-	apiIpBase        = "/objects/ips"
-	apiSshkeyBase    = "/objects/sshkeys"
-	apiTemplateBase  = "/objects/templates"
-	)
+	apiServerBase   = "/objects/servers"
+	apiStorageBase  = "/objects/storages"
+	apiNetworkBase  = "/objects/networks"
+	apiIpBase       = "/objects/ips"
+	apiSshkeyBase   = "/objects/sshkeys"
+	apiTemplateBase = "/objects/templates"
+)
 
 type Client struct {
 	cfg *Config
