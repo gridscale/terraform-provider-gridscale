@@ -19,6 +19,11 @@ func resourceGridscaleIpv4() *schema.Resource {
 				Description: "Defines the IP Address.",
 				Computed:    true,
 			},
+			"name": {
+				Type:        schema.TypeString,
+				Description: "The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.",
+				Optional:    true,
+			},
 			"prefix": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -115,6 +120,7 @@ func resourceGridscaleIpUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 
 	requestBody := gsclient.IpUpdateRequest{
+		Name:       d.Get("name").(string),
 		Failover:   d.Get("failover").(bool),
 		ReverseDns: d.Get("reverse_dns").(string),
 		Labels:     d.Get("labels").([]interface{}),
@@ -134,6 +140,7 @@ func resourceGridscaleIpv4Create(d *schema.ResourceData, meta interface{}) error
 	requestBody := gsclient.IpCreateRequest{
 		Family:       4,
 		LocationUuid: d.Get("location_uuid").(string),
+		Name:         d.Get("name").(string),
 		Failover:     d.Get("failover").(bool),
 		ReverseDns:   d.Get("reverse_dns").(string),
 		Labels:       d.Get("labels").([]interface{}),

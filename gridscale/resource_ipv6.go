@@ -18,6 +18,11 @@ func resourceGridscaleIpv6() *schema.Resource {
 				Description: "Defines the IP Address.",
 				Computed:    true,
 			},
+			"name": {
+				Type:        schema.TypeString,
+				Description: "The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.",
+				Optional:    true,
+			},
 			"prefix": {
 				Type:     schema.TypeString,
 				Computed: true,

@@ -13,6 +13,7 @@ type Ip struct {
 }
 
 type IpProperties struct {
+	Name            string   `json:"name"`
 	LocationCountry string   `json:"location_country"`
 	LocationUuid    string   `json:"location_uuid"`
 	ObjectUuid      string   `json:"object_uuid"`
@@ -37,6 +38,7 @@ type IpCreateResponse struct {
 }
 
 type IpCreateRequest struct {
+	Name         string        `json:"name,omitempty"`
 	Family       int           `json:"family"`
 	LocationUuid string        `json:"location_uuid"`
 	Failover     bool          `json:"failover,omitempty"`
@@ -45,6 +47,7 @@ type IpCreateRequest struct {
 }
 
 type IpUpdateRequest struct {
+	Name       string        `json:"name,omitempty"`
 	Failover   bool          `json:"failover"`
 	ReverseDns string        `json:"reverse_dns,omitempty"`
 	Labels     []interface{} `json:"labels,omitempty"`
@@ -115,6 +118,7 @@ func (c *Client) UpdateIp(id string, body IpUpdateRequest) error {
 	return r.execute(*c, nil)
 }
 
+//Returns 0 if an error was encountered
 func (c *Client) GetIpVersion(id string) int {
 	ip, err := c.GetIp(id)
 	if err != nil {
