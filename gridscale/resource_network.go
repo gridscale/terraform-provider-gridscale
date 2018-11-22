@@ -120,23 +120,14 @@ func resourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) erro
 
 func resourceGridscaleNetworkUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	requestBody := make(map[string]interface{})
-	id := d.Id()
 
-	if d.HasChange("name") {
-		_, change := d.GetChange("name")
-		requestBody["name"] = change.(string)
-	}
-	if d.HasChange("l2security") {
-		_, change := d.GetChange("l2security")
-		requestBody["l2security"] = change.(bool)
-	}
-	if d.HasChange("labels") {
-		_, change := d.GetChange("labels")
-		requestBody["labels"] = change.([]interface{})
+	requestBody := gsclient.NetworkUpdateRequest{
+		Name:       d.Get("name").(string),
+		L2Security: d.Get("l2security").(bool),
+		Labels:     d.Get("labels").([]interface{}),
 	}
 
-	err := client.UpdateNetwork(id, requestBody)
+	err := client.UpdateNetwork(d.Id(), requestBody)
 	if err != nil {
 		return err
 	}
@@ -147,20 +138,21 @@ func resourceGridscaleNetworkUpdate(d *schema.ResourceData, meta interface{}) er
 func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 
-	body := make(map[string]interface{})
-	body["name"] = d.Get("name").(string)
-	body["location_uuid"] = d.Get("location_uuid").(string)
-	body["l2security"] = d.Get("l2security").(bool)
-	body["labels"] = d.Get("labels").([]interface{})
+	requestBody := gsclient.NetworkCreateRequest{
+		Name:         d.Get("name").(string),
+		LocationUuid: d.Get("location_uuid").(string),
+		L2Security:   d.Get("l2security").(bool),
+		Labels:       d.Get("labels").([]interface{}),
+	}
 
-	response, err := client.CreateNetwork(body)
+	response, err := client.CreateNetwork(requestBody)
 	if err != nil {
 		return err
 	}
 
 	d.SetId(response.ObjectUuid)
 
-	log.Printf("The id for network %v has been set to %v", d.Get("name").(string), response.ObjectUuid)
+	log.Printf("The id for network %v has been set to %v", requestBody.Name, response.ObjectUuid)
 
 	return resourceGridscaleNetworkRead(d, meta)
 }
