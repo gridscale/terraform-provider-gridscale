@@ -73,23 +73,14 @@ func resourceGridscaleSshkeyRead(d *schema.ResourceData, meta interface{}) error
 
 func resourceGridscaleSshkeyUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	requestBody := make(map[string]interface{})
-	id := d.Id()
 
-	if d.HasChange("name") {
-		_, change := d.GetChange("name")
-		requestBody["name"] = change.(string)
-	}
-	if d.HasChange("sshkey") {
-		_, change := d.GetChange("sshkey")
-		requestBody["sshkey"] = change.(string)
-	}
-	if d.HasChange("labels") {
-		_, change := d.GetChange("labels")
-		requestBody["labels"] = change.([]interface{})
+	requestBody := gsclient.SshkeyUpdateRequest{
+		Name:   d.Get("name").(string),
+		Sshkey: d.Get("sshkey").(string),
+		Labels: d.Get("labels").([]interface{}),
 	}
 
-	err := client.UpdateSshkey(id, requestBody)
+	err := client.UpdateSshkey(d.Id(), requestBody)
 	if err != nil {
 		return err
 	}
@@ -100,12 +91,13 @@ func resourceGridscaleSshkeyUpdate(d *schema.ResourceData, meta interface{}) err
 func resourceGridscaleSshkeyCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 
-	body := make(map[string]interface{})
-	body["name"] = d.Get("name").(string)
-	body["sshkey"] = d.Get("sshkey").(string)
-	body["labels"] = d.Get("labels").([]interface{})
+	requestBody := gsclient.SshkeyCreateRequest{
+		Name:   d.Get("name").(string),
+		Sshkey: d.Get("sshkey").(string),
+		Labels: d.Get("labels").([]interface{}),
+	}
 
-	response, err := client.CreateSshkey(body)
+	response, err := client.CreateSshkey(requestBody)
 	if err != nil {
 		return err
 	}

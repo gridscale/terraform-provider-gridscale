@@ -22,6 +22,18 @@ type SshkeyProperties struct {
 	Labels     []string `json:"labels"`
 }
 
+type SshkeyCreateRequest struct {
+	Name   string        `json:"name"`
+	Sshkey string        `json:"sshkey"`
+	Labels []interface{} `json:"labels,omitempty"`
+}
+
+type SshkeyUpdateRequest struct {
+	Name   string        `json:"name,omitempty"`
+	Sshkey string        `json:"sshkey,omitempty"`
+	Labels []interface{} `json:"labels,omitempty"`
+}
+
 func (c *Client) GetSshkey(id string) (*Sshkey, error) {
 	r := Request{
 		uri:    "/objects/sshkeys/" + id,
@@ -50,7 +62,7 @@ func (c *Client) GetSshkeyList() (*Sshkeys, error) {
 	return response, err
 }
 
-func (c *Client) CreateSshkey(body map[string]interface{}) (*CreateResponse, error) {
+func (c *Client) CreateSshkey(body SshkeyCreateRequest) (*CreateResponse, error) {
 	r := Request{
 		uri:    "/objects/sshkeys",
 		method: "POST",
@@ -77,7 +89,7 @@ func (c *Client) DeleteSshkey(id string) error {
 	return r.execute(*c, nil)
 }
 
-func (c *Client) UpdateSshkey(id string, body map[string]interface{}) error {
+func (c *Client) UpdateSshkey(id string, body SshkeyUpdateRequest) error {
 	r := Request{
 		uri:    "/objects/sshkeys/" + id,
 		method: "PATCH",
