@@ -118,7 +118,6 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("power", server.Properties.Power)
 	d.Set("current_price", server.Properties.CurrentPrice)
 	d.Set("labels", server.Properties.Labels)
-	d.Set("storages", server.Properties.Relations.Networks) //No clue if this one does anything
 
 	log.Printf("Read the following: %v", server)
 	return nil
