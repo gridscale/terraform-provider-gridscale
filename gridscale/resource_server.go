@@ -238,20 +238,12 @@ func resourceGridscaleServerDelete(d *schema.ResourceData, meta interface{}) err
 
 func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	requestBody := make(map[string]interface{})
-	id := d.Id()
-
-	if d.HasChange("name") {
-		_, change := d.GetChange("name")
-		requestBody["name"] = change.(string)
+	requestBody := gsclient.ServerUpdateRequest{
+		Name:   d.Get("name").(string),
+		Labels: d.Get("labels").([]interface{}),
 	}
 
-	if d.HasChange("labels") {
-		_, change := d.GetChange("labels")
-		requestBody["labels"] = change.([]interface{})
-	}
-
-	err := client.UpdateServer(id, requestBody)
+	err := client.UpdateServer(d.Id(), requestBody)
 	if err != nil {
 		return err
 	}
@@ -260,7 +252,7 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 		_, change := d.GetChange("power")
 		power := change.(bool)
 		if power {
-			client.StartServer(id)
+			client.StartServer(d.Id())
 		}
 	}
 

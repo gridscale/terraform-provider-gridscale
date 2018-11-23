@@ -62,6 +62,11 @@ type ServerCreateRequest struct {
 	Relations       ServerRelations `json:"relations,omitempty"`
 }
 
+type ServerUpdateRequest struct {
+	Name   string        `json:"name,omitempty"`
+	Labels []interface{} `json:"labels,omitempty"`
+}
+
 func (c *Client) GetServer(id string) (*Server, error) {
 	if id == "" {
 		return nil, fmt.Errorf(
@@ -127,7 +132,7 @@ func (c *Client) DeleteServer(id string) error {
 	return r.execute(*c, nil)
 }
 
-func (c *Client) UpdateServer(id string, body map[string]interface{}) error {
+func (c *Client) UpdateServer(id string, body ServerUpdateRequest) error {
 	r := Request{
 		uri:    apiServerBase + "/" + id,
 		method: "PATCH",
