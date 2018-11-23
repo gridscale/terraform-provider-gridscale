@@ -1,7 +1,7 @@
 ---
-layout: "template"
+layout: "gridscale"
 page_title: "gridscale: template"
-sidebar_current: "docs-template-datasource-template"
+sidebar_current: "docs-gridscale-datasource-template"
 description: |-
   Gets the id of a template by name.
 ---
@@ -22,7 +22,7 @@ Get the template:
    }
 ```
 
-Using the template resource for the creation of a storage:
+Using the template datasource for the creation of a storage:
 
 ```hcl
 resource "gridscale_storage" "storage-test"{

@@ -1,9 +1,9 @@
 ---
-layout: "template"
+layout: "gridscale"
 page_title: "Provider: gridscale"
-sidebar_current: "docs-template-index"
+sidebar_current: "docs-gridscale-index"
 description: |-
-  The Template provider is used to template strings for other Terraform resources.
+  The gridscale provider is used to interact with many resources supported by gridscale.
 ---
 
 # Gridscale Provider

@@ -1,5 +1,5 @@
 ---
-layout: "template"
+layout: "gridscale"
 page_title: "Template: template_dir"
 sidebar_current: "docs-template-resource-dir"
 description: |-
