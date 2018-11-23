@@ -1,58 +1,36 @@
 ---
 layout: "template"
-page_title: "Provider: Template"
+page_title: "Provider: gridscale"
 sidebar_current: "docs-template-index"
 description: |-
   The Template provider is used to template strings for other Terraform resources.
 ---
 
-# Template Provider
+# Gridscale Provider
 
-The template provider exposes data sources to use templates to generate
-strings for other Terraform resources or outputs.
+The gridscale provider is used to interact with many resources supported by gridscale. The provider needs to be configured with the proper credentials before it can be used.
 
 Use the navigation to the left to read about the available data sources.
 
 ## Example Usage
 
 ```hcl
-# Template for initial configuration bash script
-data "template_file" "init" {
-  template = "${file("init.tpl")}"
-
-  vars {
-    consul_address = "${aws_instance.consul.private_ip}"
-  }
+# Configure the gridscale provider
+provider "gridscale" {
+	uuid = "User-UUID"
+	token = "API-Token"
 }
 
-# Create a web server
-resource "aws_instance" "web" {
+# Create a server
+resource "gridscale_server" "servername"{
   # ...
-
-  user_data = "${data.template_file.init.rendered}"
 }
 ```
 
-Or using an inline template:
+## Argument Reference
 
-```hcl
-# Template for initial configuration bash script
-data "template_file" "init" {
-  template = "$${consul_address}:1234"
+The following arguments are supported:
 
-  vars {
-    consul_address = "${aws_instance.consul.private_ip}"
-  }
-}
+* `uuid` - (Required) This is the User-UUID for the gridscale API. It can be created [in the panel](https://my.gridscale.io/APIs/).
+* `token` - (Required) This is the API-Token for the gridscale API. It can also be created [in the panel](https://my.gridscale.io/APIs/).
 
-# Create a web server
-resource "aws_instance" "web" {
-  # ...
-
-  user_data = "${data.template_file.init.rendered}"
-}
-```
-
--> **Note:** Inline templates must escape their interpolations (as seen
-by the double `$` above). Unescaped interpolations will be processed
-_before_ the template.
