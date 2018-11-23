@@ -88,7 +88,7 @@ func resourceGridscaleServer() *schema.Resource {
 				Computed: true,
 			},
 			"labels": {
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Description: "List of labels.",
 				Optional:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
@@ -133,7 +133,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		Memory:          d.Get("memory").(int),
 		LocationUuid:    d.Get("location_uuid").(string),
 		HardwareProfile: d.Get("hardware_profile").(string),
-		Labels:          d.Get("labels").([]interface{}),
+		Labels:          d.Get("labels").(*schema.Set).List(),
 	}
 
 	requestBody.Relations.IsoImages = []gsclient.ServerIsoImage{}
@@ -240,7 +240,7 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 	client := meta.(*gsclient.Client)
 	requestBody := gsclient.ServerUpdateRequest{
 		Name:   d.Get("name").(string),
-		Labels: d.Get("labels").([]interface{}),
+		Labels: d.Get("labels").(*schema.Set).List(),
 	}
 
 	err := client.UpdateServer(d.Id(), requestBody)

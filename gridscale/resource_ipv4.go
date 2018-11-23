@@ -78,7 +78,7 @@ func resourceGridscaleIpv4() *schema.Resource {
 				Computed:    true,
 			},
 			"labels": {
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Description: "List of labels.",
 				Optional:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
@@ -144,7 +144,7 @@ func resourceGridscaleIpUpdate(d *schema.ResourceData, meta interface{}) error {
 		Name:       d.Get("name").(string),
 		Failover:   d.Get("failover").(bool),
 		ReverseDns: d.Get("reverse_dns").(string),
-		Labels:     d.Get("labels").([]interface{}),
+		Labels:     d.Get("labels").(*schema.Set).List(),
 	}
 
 	err := client.UpdateIp(d.Id(), requestBody)
@@ -164,7 +164,7 @@ func resourceGridscaleIpv4Create(d *schema.ResourceData, meta interface{}) error
 		Name:         d.Get("name").(string),
 		Failover:     d.Get("failover").(bool),
 		ReverseDns:   d.Get("reverse_dns").(string),
-		Labels:       d.Get("labels").([]interface{}),
+		Labels:       d.Get("labels").(*schema.Set).List(),
 	}
 
 	response, err := client.CreateIp(requestBody)

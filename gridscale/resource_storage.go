@@ -96,7 +96,7 @@ func resourceGridscaleStorage() *schema.Resource {
 				Computed: true,
 			},
 			"labels": {
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Description: "List of labels.",
 				Optional:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
@@ -181,10 +181,11 @@ func resourceGridscaleStorageRead(d *schema.ResourceData, meta interface{}) erro
 
 func resourceGridscaleStorageUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
+
 	requestBody := gsclient.StorageUpdateRequest{
 		Name:     d.Get("name").(string),
 		Capacity: d.Get("capacity").(int),
-		Labels:   d.Get("labels").([]interface{}),
+		Labels:   d.Get("labels").(*schema.Set).List(),
 	}
 
 	err := client.UpdateStorage(d.Id(), requestBody)
@@ -203,7 +204,7 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 		Capacity:     d.Get("capacity").(int),
 		LocationUuid: d.Get("location_uuid").(string),
 		StorageType:  d.Get("storage_type").(string),
-		Labels:       d.Get("labels").([]interface{}),
+		Labels:       d.Get("labels").(*schema.Set).List(),
 	}
 
 	//since only one template can be used, we can just look at index 0

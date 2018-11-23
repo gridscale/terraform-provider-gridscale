@@ -79,7 +79,7 @@ func resourceGridscaleNetwork() *schema.Resource {
 				Computed:    true,
 			},
 			"labels": {
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Description: "List of labels.",
 				Optional:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
@@ -128,7 +128,7 @@ func resourceGridscaleNetworkUpdate(d *schema.ResourceData, meta interface{}) er
 	requestBody := gsclient.NetworkUpdateRequest{
 		Name:       d.Get("name").(string),
 		L2Security: d.Get("l2security").(bool),
-		Labels:     d.Get("labels").([]interface{}),
+		Labels:     d.Get("labels").(*schema.Set).List(),
 	}
 
 	err := client.UpdateNetwork(d.Id(), requestBody)
@@ -146,7 +146,7 @@ func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) er
 		Name:         d.Get("name").(string),
 		LocationUuid: d.Get("location_uuid").(string),
 		L2Security:   d.Get("l2security").(bool),
-		Labels:       d.Get("labels").([]interface{}),
+		Labels:       d.Get("labels").(*schema.Set).List(),
 	}
 
 	response, err := client.CreateNetwork(requestBody)

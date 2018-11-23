@@ -38,7 +38,7 @@ func resourceGridscaleSshkey() *schema.Resource {
 				Computed:    true,
 			},
 			"labels": {
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Description: "List of labels.",
 				Optional:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
@@ -77,7 +77,7 @@ func resourceGridscaleSshkeyUpdate(d *schema.ResourceData, meta interface{}) err
 	requestBody := gsclient.SshkeyUpdateRequest{
 		Name:   d.Get("name").(string),
 		Sshkey: d.Get("sshkey").(string),
-		Labels: d.Get("labels").([]interface{}),
+		Labels: d.Get("labels").(*schema.Set).List(),
 	}
 
 	err := client.UpdateSshkey(d.Id(), requestBody)
@@ -94,7 +94,7 @@ func resourceGridscaleSshkeyCreate(d *schema.ResourceData, meta interface{}) err
 	requestBody := gsclient.SshkeyCreateRequest{
 		Name:   d.Get("name").(string),
 		Sshkey: d.Get("sshkey").(string),
-		Labels: d.Get("labels").([]interface{}),
+		Labels: d.Get("labels").(*schema.Set).List(),
 	}
 
 	response, err := client.CreateSshkey(requestBody)

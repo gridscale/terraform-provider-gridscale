@@ -77,7 +77,7 @@ func resourceGridscaleIpv6() *schema.Resource {
 				Computed:    true,
 			},
 			"labels": {
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Description: "List of labels.",
 				Optional:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
@@ -111,7 +111,7 @@ func resourceGridscaleIpv6Create(d *schema.ResourceData, meta interface{}) error
 		LocationUuid: d.Get("location_uuid").(string),
 		Failover:     d.Get("failover").(bool),
 		ReverseDns:   d.Get("reverse_dns").(string),
-		Labels:       d.Get("labels").([]interface{}),
+		Labels:       d.Get("labels").(*schema.Set).List(),
 	}
 
 	response, err := client.CreateIp(requestBody)
