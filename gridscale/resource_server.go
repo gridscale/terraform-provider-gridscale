@@ -252,6 +252,8 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 		power := change.(bool)
 		if power {
 			client.StartServer(d.Id())
+		} else {
+			client.StopServer(d.Id())
 		}
 	}
 
