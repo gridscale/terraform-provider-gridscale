@@ -10,7 +10,7 @@ Terraform gridscale Provider
 Maintainers
 -----------
 
-This provider plugin is maintained by the Terraform team at [gridscale](https://www.gridscal.io/).
+This provider plugin is maintained by the Terraform team at [gridscale](https://www.gridscale.io/).
 
 Requirements
 ------------
