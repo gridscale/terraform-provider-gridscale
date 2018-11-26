@@ -1,4 +1,4 @@
-Terraform Provider
+Terraform gridscale Provider
 ==================
 
 - Website: https://www.terraform.io
@@ -10,7 +10,7 @@ Terraform Provider
 Maintainers
 -----------
 
-This provider plugin is maintained by the Terraform team at [HashiCorp](https://www.hashicorp.com/).
+This provider plugin is maintained by the Terraform team at [gridscale](https://www.gridscal.io/).
 
 Requirements
 ------------
@@ -21,27 +21,22 @@ Requirements
 Usage
 ---------------------
 
-```
-# For example, restrict template version in 0.1.x
-provider "template" {
-  version = "~> 0.1"
-}
-```
+See the documentation in the website directory of this repo to get started using the gridscale provider.
 
 Building The Provider
 ---------------------
 
-Clone repository to: `$GOPATH/src/github.com/terraform-providers/terraform-provider-template`
+Clone repository to: `$GOPATH/src/github.com/terraform-providers/terraform-provider-gridscale`
 
 ```sh
 $ mkdir -p $GOPATH/src/github.com/terraform-providers; cd $GOPATH/src/github.com/terraform-providers
-$ git clone git@github.com:terraform-providers/terraform-provider-template
+$ git clone git@github.com:terraform-providers/terraform-provider-gridscale
 ```
 
 Enter the provider directory and build the provider
 
 ```sh
-$ cd $GOPATH/src/github.com/terraform-providers/terraform-provider-template
+$ cd $GOPATH/src/github.com/terraform-providers/terraform-provider-gridscale
 $ make build
 ```
 
@@ -59,7 +54,7 @@ To compile the provider, run `make build`. This will build the provider and put 
 ```sh
 $ make bin
 ...
-$ $GOPATH/bin/terraform-provider-template
+$ $GOPATH/bin/terraform-provider-gridscale
 ...
 ```
 
