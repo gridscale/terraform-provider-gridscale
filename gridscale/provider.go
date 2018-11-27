@@ -9,12 +9,16 @@ func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
 			"uuid": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				DefaultFunc: schema.EnvDefaultFunc("GRIDSCALE_UUID", nil),
+				Description: "User-UUID for the gridscale API.",
 			},
 			"token": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				DefaultFunc: schema.EnvDefaultFunc("GRIDSCALE_TOKEN", nil),
+				Description: "API-token for the gridscale API.",
 			},
 		},
 		DataSourcesMap: map[string]*schema.Resource{
