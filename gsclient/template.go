@@ -22,12 +22,6 @@ type TemplateProperties struct {
 	Template   string `json:"sshkey"`
 }
 
-type TemplateCreateRequest struct {
-	Name         string   `json:"name"`
-	Labels       []string `json:"labels"`
-	SnapshotUuid string   `json:"name"`
-}
-
 func (c *Client) GetTemplate(id string) (*Template, error) {
 	r := Request{
 		uri:    apiTemplateBase + "/" + id,
