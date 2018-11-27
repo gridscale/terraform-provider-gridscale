@@ -71,3 +71,6 @@ This resource exports the following attributes:
 * `location_iata` - Uses IATA airport code, which works as a location identifier.
 * `location_name` - The location name.
 * `license_product_no` - If a template has been used that requires a license key (e.g. Windows Servers) this shows the product_no of the license (see the /prices endpoint for more details).
+* `last_used_template` - Indicates the UUID of the last used template on this storage (inherited from snapshots).
+* `usage_in_minutes` - The amount of minutes the IP address has been in use.
+* `current_price` - The price for the current period since the last bill.
