@@ -31,6 +31,6 @@ resource "gridscale_server" "servername"{
 
 The following arguments are supported:
 
-* `uuid` - (Required) This is the User-UUID for the gridscale API. It can be found [in the panel](https://my.gridscale.io/APIs/).
-* `token` - (Required) This is an API-Token for the gridscale API. It can be created [in the panel](https://my.gridscale.io/APIs/). The created token needs to have full access to be usable by Terraform.
+* `uuid` - (Required) This is the User-UUID for the gridscale API. It can be found [in the panel](https://my.gridscale.io/APIs/). If omitted, the GRIDSCALE_UUID environment variable is used.
+* `token` - (Required) This is an API-Token for the gridscale API. It can be created [in the panel](https://my.gridscale.io/APIs/). The created token needs to have full access to be usable by Terraform. If omitted, the GRIDSCALE_TOKEN environment variable is used.
 
