@@ -53,7 +53,7 @@ The following arguments are supported:
     
     * `hostname` - (Optional) The hostname of the installed server (ignored for private templates and public windows templates).
 
-~> **Note** When using official templates using either a password and password_type or at least one SSH public key is required. This is not the case when using custom templates.
+~> **Note** When using official templates using either a password and password_type or at least one SSH public key is required. This is not the case when using custom templates. For official templates password authentication for SSH is enabled by default, so be sure to pick a strong password.
 
 ## Attributes
 
