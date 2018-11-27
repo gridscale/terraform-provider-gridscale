@@ -31,7 +31,7 @@ type SshkeyCreateRequest struct {
 type SshkeyUpdateRequest struct {
 	Name   string        `json:"name,omitempty"`
 	Sshkey string        `json:"sshkey,omitempty"`
-	Labels []interface{} `json:"labels,omitempty"`
+	Labels []interface{} `json:"labels"`
 }
 
 func (c *Client) GetSshkey(id string) (*Sshkey, error) {

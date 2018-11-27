@@ -62,7 +62,7 @@ type NetworkCreateRequest struct {
 
 type NetworkUpdateRequest struct {
 	Name       string        `json:"name,omitempty"`
-	Labels     []interface{} `json:"labels,omitempty"`
+	Labels     []interface{} `json:"labels"`
 	L2Security bool          `json:"l2security"`
 }
 

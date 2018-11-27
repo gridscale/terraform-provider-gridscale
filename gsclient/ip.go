@@ -73,7 +73,7 @@ type IpUpdateRequest struct {
 	Name       string        `json:"name,omitempty"`
 	Failover   bool          `json:"failover"`
 	ReverseDns string        `json:"reverse_dns,omitempty"`
-	Labels     []interface{} `json:"labels,omitempty"`
+	Labels     []interface{} `json:"labels"`
 }
 
 func (c *Client) GetIp(id string) (*Ip, error) {

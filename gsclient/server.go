@@ -64,7 +64,7 @@ type ServerCreateRequest struct {
 
 type ServerUpdateRequest struct {
 	Name   string        `json:"name,omitempty"`
-	Labels []interface{} `json:"labels,omitempty"`
+	Labels []interface{} `json:"labels"`
 }
 
 func (c *Client) GetServer(id string) (*Server, error) {

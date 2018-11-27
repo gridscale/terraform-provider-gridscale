@@ -84,7 +84,7 @@ type StorageCreateRequest struct {
 
 type StorageUpdateRequest struct {
 	Name     string        `json:"name,omitempty"`
-	Labels   []interface{} `json:"labels,omitempty"`
+	Labels   []interface{} `json:"labels"`
 	Capacity int           `json:"capacity"`
 }
 
