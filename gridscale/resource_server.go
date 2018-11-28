@@ -87,6 +87,34 @@ func resourceGridscaleServer() *schema.Resource {
 				Type:     schema.TypeFloat,
 				Computed: true,
 			},
+			"auto_recovery": {
+				Type:        schema.TypeInt,
+				Description: "If the server should be auto-started in case of a failure (default=true).",
+				Computed:    true,
+			},
+			"availability_zone": {
+				Type:        schema.TypeString,
+				Description: "Defines which Availability-Zone the Server is placed.",
+				Optional:    true,
+			},
+			"console_token": {
+				Type:        schema.TypeString,
+				Description: "If the server should be auto-started in case of a failure (default=true).",
+				Computed:    true,
+			},
+			"legacy": {
+				Type:        schema.TypeBool,
+				Description: "Legacy-Hardware emulation instead of virtio hardware. If enabled, hotplugging cores, memory, storage, network, etc. will not work, but the server will most likely run every x86 compatible operating system. This mode comes with a performance penalty, as emulated hardware does not benefit from the virtio driver infrastructure.",
+				Computed:    true,
+			},
+			"usage_in_minutes_memory": {
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
+			"usage_in_minutes_cores": {
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
 			"labels": {
 				Type:        schema.TypeSet,
 				Description: "List of labels.",
@@ -117,6 +145,12 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("location_uuid", server.Properties.LocationUuid)
 	d.Set("power", server.Properties.Power)
 	d.Set("current_price", server.Properties.CurrentPrice)
+	d.Set("availability_zone", server.Properties.AvailablityZone)
+	d.Set("auto_recovery", server.Properties.AutoRecovery)
+	d.Set("console_token", server.Properties.ConsoleToken)
+	d.Set("legacy", server.Properties.Legacy)
+	d.Set("usage_in_minutes_memory", server.Properties.UsageInMinutesMemory)
+	d.Set("usage_in_minutes_cores", server.Properties.UsageInMinutesCores)
 	d.Set("labels", server.Properties.Labels)
 
 	log.Printf("Read the following: %v", server)
