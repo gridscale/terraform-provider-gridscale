@@ -58,7 +58,7 @@ The following arguments are supported:
 
 * `power` - (Optional) The power state of the server. Set this to true to will boot the server, false will shut it down.
 
-
+* `availability_zone` - (Optional) Defines which Availability-Zone the Server is placed.
 
 ## Attributes
 
@@ -75,6 +75,7 @@ This resource exports the following attributes:
 * `ipv4` - See Argument Reference above.
 * `ipv6` - See Argument Reference above.
 * `power` - See Argument Reference above.
+* `availability_zone` - See Argument Reference above.
 * `status` - status indicates the status of the object.
 * `create_time` - The time the object was created.
 * `change_time` - Defines the date and time of the last object change.
