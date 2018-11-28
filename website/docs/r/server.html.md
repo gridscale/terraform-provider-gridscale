@@ -1,18 +1,18 @@
 ---
 layout: "gridscale"
-page_title: "gridscale: gridscale_network"
-sidebar_current: "docs-gridscale-resource-network"
+page_title: "gridscale: gridscale_server"
+sidebar_current: "docs-gridscale-resource-server"
 description: |-
-  Manages a network in gridscale.
+  Manages a server in gridscale.
 ---
 
-# gridscale_network
+# gridscale_server
 
-Provides a network resource. This can be used to create, modify and delete networks.
+Provides a server resource. This can be used to create, modify and delete servers.
 
 ## Example Usage
 
-The following example shows how one might use this resource to add a network to gridscale:
+The following example shows how one might use this resource to add a server to gridscale:
 
 ```hcl
 resource "gridscale_server" "terra-server-test"{
