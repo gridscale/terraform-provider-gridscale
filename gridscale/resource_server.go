@@ -166,6 +166,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		Memory:          d.Get("memory").(int),
 		LocationUuid:    d.Get("location_uuid").(string),
 		HardwareProfile: d.Get("hardware_profile").(string),
+		AvailablityZone: d.Get("availability_zone").(string),
 		Labels:          d.Get("labels").(*schema.Set).List(),
 	}
 
@@ -272,8 +273,9 @@ func resourceGridscaleServerDelete(d *schema.ResourceData, meta interface{}) err
 func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	requestBody := gsclient.ServerUpdateRequest{
-		Name:   d.Get("name").(string),
-		Labels: d.Get("labels").(*schema.Set).List(),
+		Name:            d.Get("name").(string),
+		AvailablityZone: d.Get("availability_zone").(string),
+		Labels:          d.Get("labels").(*schema.Set).List(),
 	}
 
 	err := client.UpdateServer(d.Id(), requestBody)
