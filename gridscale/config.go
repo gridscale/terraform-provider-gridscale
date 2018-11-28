@@ -1,7 +1,7 @@
 package gridscale
 
 import (
-	"../gsclient"
+	"bitbucket.org/gridscale/gsclient-go"
 	"log"
 )
 

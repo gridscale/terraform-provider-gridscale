@@ -1,7 +1,7 @@
 package gridscale
 
 import (
-	"../gsclient"
+	"bitbucket.org/gridscale/gsclient-go"
 	"fmt"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
