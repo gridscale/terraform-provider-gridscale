@@ -132,7 +132,7 @@ func resourceGridscaleStorage() *schema.Resource {
 						"template_uuid": {
 							Type:     schema.TypeString,
 							ForceNew: true,
-							Required: true,
+							Optional: true,
 						},
 					},
 				},
@@ -218,7 +218,7 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 		if v, ok := d.GetOk("template.0.template_uuid"); ok {
 			template.TemplateUuid = v.(string)
 		}
-		requestBody.Template = template
+		requestBody.Template = &template
 	}
 
 	response, err := client.CreateStorage(requestBody)
