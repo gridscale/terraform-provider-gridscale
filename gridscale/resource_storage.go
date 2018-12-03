@@ -26,6 +26,7 @@ func resourceGridscaleStorage() *schema.Resource {
 				Type:         schema.TypeInt,
 				Description:  "The capacity of a storage in GB.",
 				Required:     true,
+				ForceNew:     true,
 				ValidateFunc: validation.NoZeroValues,
 			},
 			"location_uuid": {
@@ -183,9 +184,8 @@ func resourceGridscaleStorageUpdate(d *schema.ResourceData, meta interface{}) er
 	client := meta.(*gsclient.Client)
 
 	requestBody := gsclient.StorageUpdateRequest{
-		Name:     d.Get("name").(string),
-		Capacity: d.Get("capacity").(int),
-		Labels:   d.Get("labels").(*schema.Set).List(),
+		Name:   d.Get("name").(string),
+		Labels: d.Get("labels").(*schema.Set).List(),
 	}
 
 	err := client.UpdateStorage(d.Id(), requestBody)
