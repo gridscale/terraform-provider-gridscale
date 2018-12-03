@@ -14,6 +14,9 @@ func resourceGridscaleServer() *schema.Resource {
 		Read:   resourceGridscaleServerRead,
 		Delete: resourceGridscaleServerDelete,
 		Update: resourceGridscaleServerUpdate,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -25,14 +28,12 @@ func resourceGridscaleServer() *schema.Resource {
 				Type:         schema.TypeInt,
 				Description:  "The amount of server memory in GB.",
 				Required:     true,
-				ForceNew:     true,
 				ValidateFunc: validation.NoZeroValues,
 			},
 			"cores": {
 				Type:         schema.TypeInt,
 				Description:  "The number of server cores.",
 				Required:     true,
-				ForceNew:     true,
 				ValidateFunc: validation.NoZeroValues,
 			},
 			"location_uuid": {
@@ -50,22 +51,16 @@ func resourceGridscaleServer() *schema.Resource {
 				Default:     "default",
 			},
 			"storages": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"networks": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				ForceNew: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
-			"ip": {
-				Type:          schema.TypeString,
-				Optional:      true,
-				ForceNew:      true,
-				ConflictsWith: []string{"ipv4"},
 			},
 			"ipv4": {
 				Type:     schema.TypeString,
@@ -153,6 +148,35 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("usage_in_minutes_cores", server.Properties.UsageInMinutesCores)
 	d.Set("labels", server.Properties.Labels)
 
+	//Get storages
+	storages := make([]interface{}, 0)
+	for _, storage := range server.Properties.Relations.Storages {
+		storages = append(storages, storage.ObjectUuid)
+	}
+	d.Set("storages", storages)
+
+	//Get Networks
+	networks := make([]interface{}, 0)
+	for _, network := range server.Properties.Relations.Networks {
+		if !network.PublicNet {
+			networks = append(networks, network.NetworkUuid)
+		}
+	}
+	d.Set("networks", networks)
+
+	//Get IP addresses
+	var ipv4, ipv6 string
+	for _, ip := range server.Properties.Relations.PublicIps {
+		if ip.Family == 4 {
+			ipv4 = ip.ObjectUuid
+		}
+		if ip.Family == 6 {
+			ipv6 = ip.ObjectUuid
+		}
+	}
+	d.Set("ipv4", ipv4)
+	d.Set("ipv6", ipv6)
+
 	log.Printf("Read the following: %v", server)
 	return nil
 }
@@ -171,36 +195,28 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	requestBody.Relations.IsoImages = []gsclient.ServerIsoImage{}
-	requestBody.Relations.Storages = []gsclient.ServerStorage{}
-	requestBody.Relations.Networks = []gsclient.ServerNetwork{}
-	requestBody.Relations.PublicIps = []gsclient.ServerIp{}
+	requestBody.Relations.Storages = []gsclient.ServerCreateRequestStorage{}
+	requestBody.Relations.Networks = []gsclient.ServerCreateRequestNetwork{}
+	requestBody.Relations.PublicIps = []gsclient.ServerCreateRequestIp{}
 
 	if attr, ok := d.GetOk("storages"); ok {
-		for index, value := range attr.([]interface{}) {
-			storage := gsclient.ServerStorage{
+		for index, value := range attr.(*schema.Set).List() {
+			storage := gsclient.ServerCreateRequestStorage{
 				StorageUuid: value.(string),
 			}
 			if index == 0 {
 				storage.BootDevice = true
 			}
+
 			requestBody.Relations.Storages = append(requestBody.Relations.Storages, storage)
 		}
 	}
 
-	if attr, ok := d.GetOk("ip"); ok {
-		if client.GetIpVersion(attr.(string)) != 4 {
-			return fmt.Errorf("The IP address with UUID %v is not version 4", attr.(string))
-		}
-		ip := gsclient.ServerIp{
-			IpaddrUuid: attr.(string),
-		}
-		requestBody.Relations.PublicIps = append(requestBody.Relations.PublicIps, ip)
-	}
 	if attr, ok := d.GetOk("ipv4"); ok {
 		if client.GetIpVersion(attr.(string)) != 4 {
 			return fmt.Errorf("The IP address with UUID %v is not version 4", attr.(string))
 		}
-		ip := gsclient.ServerIp{
+		ip := gsclient.ServerCreateRequestIp{
 			IpaddrUuid: attr.(string),
 		}
 		requestBody.Relations.PublicIps = append(requestBody.Relations.PublicIps, ip)
@@ -209,7 +225,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		if client.GetIpVersion(attr.(string)) != 6 {
 			return fmt.Errorf("The IP address with UUID %v is not version 6", attr.(string))
 		}
-		ip := gsclient.ServerIp{
+		ip := gsclient.ServerCreateRequestIp{
 			IpaddrUuid: attr.(string),
 		}
 		requestBody.Relations.PublicIps = append(requestBody.Relations.PublicIps, ip)
@@ -221,15 +237,15 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		if err != nil {
 			return err
 		}
-		network := gsclient.ServerNetwork{
+		network := gsclient.ServerCreateRequestNetwork{
 			NetworkUuid: publicNetwork.Properties.ObjectUuid,
 		}
 		requestBody.Relations.Networks = append(requestBody.Relations.Networks, network)
 	}
 
 	if attr, ok := d.GetOk("networks"); ok {
-		for index, value := range attr.([]interface{}) {
-			network := gsclient.ServerNetwork{
+		for index, value := range attr.(*schema.Set).List() {
+			network := gsclient.ServerCreateRequestNetwork{
 				NetworkUuid: value.(string),
 			}
 			if index == 0 {
@@ -272,25 +288,33 @@ func resourceGridscaleServerDelete(d *schema.ResourceData, meta interface{}) err
 
 func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	requestBody := gsclient.ServerUpdateRequest{
-		Name:            d.Get("name").(string),
-		AvailablityZone: d.Get("availability_zone").(string),
-		Labels:          d.Get("labels").(*schema.Set).List(),
-	}
 
-	err := client.UpdateServer(d.Id(), requestBody)
-	if err != nil {
-		return err
-	}
+	var err error
 
 	if d.HasChange("power") {
 		_, change := d.GetChange("power")
 		power := change.(bool)
 		if power {
-			client.StartServer(d.Id())
+			err = client.StartServer(d.Id())
 		} else {
-			client.StopServer(d.Id())
+			err = client.ShutdownServer(d.Id())
 		}
+		if err != nil {
+			return err
+		}
+	}
+
+	requestBody := gsclient.ServerUpdateRequest{
+		Name:            d.Get("name").(string),
+		AvailablityZone: d.Get("availability_zone").(string),
+		Labels:          d.Get("labels").(*schema.Set).List(),
+		Cores:           d.Get("cores").(int),
+		Memory:          d.Get("memory").(int),
+	}
+
+	err = client.UpdateServer(d.Id(), requestBody)
+	if err != nil {
+		return err
 	}
 
 	return resourceGridscaleServerRead(d, meta)
