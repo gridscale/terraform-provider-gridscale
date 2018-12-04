@@ -21,9 +21,10 @@ func resourceGridscaleServer() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:        schema.TypeString,
-				Description: "The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters",
-				Required:    true,
+				Type:         schema.TypeString,
+				Description:  "The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters",
+				Required:     true,
+				ValidateFunc: validation.NoZeroValues,
 			},
 			"memory": {
 				Type:         schema.TypeInt,
@@ -90,7 +91,7 @@ func resourceGridscaleServer() *schema.Resource {
 				Type:        schema.TypeBool,
 				Description: "The number of server cores.",
 				Optional:    true,
-				Default:     false,
+				Computed:    true,
 			},
 			"current_price": {
 				Type:     schema.TypeFloat,
@@ -302,19 +303,21 @@ func resourceGridscaleServerDelete(d *schema.ResourceData, meta interface{}) err
 
 func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
+	shutdownRequired := false
 
 	var err error
 
-	if d.HasChange("power") {
-		_, change := d.GetChange("power")
-		power := change.(bool)
-		if power {
-			err = client.StartServer(d.Id())
-		} else {
-			err = client.ShutdownServer(d.Id())
+	if d.HasChange("cores") {
+		old, new := d.GetChange("cores")
+		if new.(int) < old.(int) {
+			shutdownRequired = true
 		}
-		if err != nil {
-			return err
+	}
+
+	if d.HasChange("memory") {
+		old, new := d.GetChange("memory")
+		if new.(int) < old.(int) {
+			shutdownRequired = true
 		}
 	}
 
@@ -326,7 +329,23 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 		Memory:          d.Get("memory").(int),
 	}
 
+	if shutdownRequired {
+		err = client.ShutdownServer(d.Id())
+		if err != nil {
+			return err
+		}
+	}
+
 	err = client.UpdateServer(d.Id(), requestBody)
+	if err != nil {
+		return err
+	}
+
+	if d.Get("power").(bool) {
+		err = client.StartServer(d.Id())
+	} else {
+		err = client.ShutdownServer(d.Id())
+	}
 	if err != nil {
 		return err
 	}
