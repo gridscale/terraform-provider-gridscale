@@ -65,12 +65,68 @@ func resourceGridscaleServer() *schema.Resource {
 					return
 				},
 			},
-			"storages": {
+			"storage": {
 				Type:     schema.TypeSet,
-				Optional: true,
 				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Optional: true,
+				MaxItems: 8,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"object_uuid": {
+							Type:     schema.TypeString,
+							Required: true,
+							ForceNew: true,
+						},
+						"bootdevice": {
+							Type:     schema.TypeBool,
+							Optional: true,
+							Default:  false,
+							ForceNew: true,
+						},
+						"object_name": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"capacity": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"controller": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"bus": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"target": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"lun": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"license_product_no": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"create_time": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"storage_type": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"last_used_template": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+					},
+				},
 			},
+
 			"networks": {
 				Type:     schema.TypeSet,
 				Optional: true,
@@ -165,10 +221,25 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 
 	//Get storages
 	storages := make([]interface{}, 0)
-	for _, storage := range server.Properties.Relations.Storages {
-		storages = append(storages, storage.ObjectUuid)
+	for _, value := range server.Properties.Relations.Storages {
+		storage := map[string]interface{}{
+			"object_uuid":        value.ObjectUuid,
+			"bootdevice":         value.BootDevice,
+			"create_time":        value.CreateTime,
+			"controller":         value.Controller,
+			"target":             value.Target,
+			"lun":                value.Lun,
+			"license_product_no": value.LicenseProductNo,
+			"bus":                value.Bus,
+			"object_name":        value.ObjectName,
+			"storage_type":       value.StorageType,
+			"last_used_template": value.LastUsedTemplate,
+			"capacity":           value.Capacity,
+		}
+		storages = append(storages, storage)
 	}
-	d.Set("storages", storages)
+
+	d.Set("storage", storages)
 
 	//Get Networks
 	networks := make([]interface{}, 0)
@@ -214,16 +285,15 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	requestBody.Relations.Networks = []gsclient.ServerCreateRequestNetwork{}
 	requestBody.Relations.PublicIps = []gsclient.ServerCreateRequestIp{}
 
-	if attr, ok := d.GetOk("storages"); ok {
-		for index, value := range attr.(*schema.Set).List() {
-			storage := gsclient.ServerCreateRequestStorage{
-				StorageUuid: value.(string),
-			}
-			if index == 0 {
-				storage.BootDevice = true
+	if attr, ok := d.GetOk("storage"); ok {
+		for _, value := range attr.(*schema.Set).List() {
+			storage := value.(map[string]interface{})
+			createStorageRequest := gsclient.ServerCreateRequestStorage{
+				StorageUuid: storage["object_uuid"].(string),
+				BootDevice:  storage["bootdevice"].(bool),
 			}
 
-			requestBody.Relations.Storages = append(requestBody.Relations.Storages, storage)
+			requestBody.Relations.Storages = append(requestBody.Relations.Storages, createStorageRequest)
 		}
 	}
 
