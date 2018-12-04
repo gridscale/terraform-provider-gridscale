@@ -341,6 +341,8 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 		return err
 	}
 
+	// Make sure the server in is the expected power state.
+	// The StartServer and ShutdownServer functions do a check to see if the server isn't already running, so we don't need to do that here.
 	if d.Get("power").(bool) {
 		err = client.StartServer(d.Id())
 	} else {
