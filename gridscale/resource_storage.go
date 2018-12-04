@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -27,7 +28,7 @@ func resourceGridscaleStorage() *schema.Resource {
 				Description:  "The capacity of a storage in GB.",
 				Required:     true,
 				ForceNew:     true,
-				ValidateFunc: validation.NoZeroValues,
+				ValidateFunc: validation.IntAtLeast(1),
 			},
 			"location_uuid": {
 				Type:        schema.TypeString,
@@ -43,8 +44,15 @@ func resourceGridscaleStorage() *schema.Resource {
 				ForceNew:    true,
 				Default:     "storage",
 				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
-					if v.(string) != "storage" && v.(string) != "storage_high" && v.(string) != "storage_insane" {
-						errors = append(errors, fmt.Errorf("Storage type must be either storage, storage_high or storage_insane"))
+					valid := false
+					for _, stype := range StorageTypes {
+						if v.(string) == stype {
+							valid = true
+							break
+						}
+					}
+					if !valid {
+						errors = append(errors, fmt.Errorf("%v is not a valid storage type. Valid types are: %v", v.(string), strings.Join(StorageTypes, ",")))
 					}
 					return
 				},

@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
 	"log"
+	"strings"
 )
 
 func resourceGridscaleServer() *schema.Resource {
@@ -28,13 +29,13 @@ func resourceGridscaleServer() *schema.Resource {
 				Type:         schema.TypeInt,
 				Description:  "The amount of server memory in GB.",
 				Required:     true,
-				ValidateFunc: validation.NoZeroValues,
+				ValidateFunc: validation.IntAtLeast(1),
 			},
 			"cores": {
 				Type:         schema.TypeInt,
 				Description:  "The number of server cores.",
 				Required:     true,
-				ValidateFunc: validation.NoZeroValues,
+				ValidateFunc: validation.IntAtLeast(1),
 			},
 			"location_uuid": {
 				Type:        schema.TypeString,
@@ -49,6 +50,19 @@ func resourceGridscaleServer() *schema.Resource {
 				Optional:    true,
 				ForceNew:    true,
 				Default:     "default",
+				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
+					valid := false
+					for _, profile := range HardwareProfiles {
+						if v.(string) == profile {
+							valid = true
+							break
+						}
+					}
+					if !valid {
+						errors = append(errors, fmt.Errorf("%v is not a valid hardware profile. Valid hardware profiles are: %v", v.(string), strings.Join(StorageTypes, ",")))
+					}
+					return
+				},
 			},
 			"storages": {
 				Type:     schema.TypeSet,
