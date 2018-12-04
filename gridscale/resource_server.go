@@ -127,6 +127,71 @@ func resourceGridscaleServer() *schema.Resource {
 				},
 			},
 
+			"network": {
+				Type:     schema.TypeSet,
+				ForceNew: true,
+				Optional: true,
+				MaxItems: 7,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"object_uuid": {
+							Type:     schema.TypeString,
+							Required: true,
+							ForceNew: true,
+						},
+						"bootdevice": {
+							Type:     schema.TypeBool,
+							Optional: true,
+							Default:  false,
+							ForceNew: true,
+						},
+						"object_name": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"vlan": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"vxlan": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"mac": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"firewall": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"firewall_template_uuid": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"partner_uuid": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"ordering": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"create_time": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"network_type": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"mcast": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+					},
+				},
+			},
 			"networks": {
 				Type:     schema.TypeSet,
 				Optional: true,
@@ -241,14 +306,29 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 
 	d.Set("storage", storages)
 
-	//Get Networks
+	//Get storages
 	networks := make([]interface{}, 0)
-	for _, network := range server.Properties.Relations.Networks {
-		if !network.PublicNet {
-			networks = append(networks, network.NetworkUuid)
+	for _, value := range server.Properties.Relations.Networks {
+		if !value.PublicNet {
+			network := map[string]interface{}{
+				"object_uuid":            value.ObjectUuid,
+				"bootdevice":             value.BootDevice,
+				"create_time":            value.CreateTime,
+				"vlan":                   value.Vlan,
+				"vxlan":                  value.Vxlan,
+				"mac":                    value.Mac,
+				"firewall":               value.Firewall,
+				"firewall_template_uuid": value.FirewallTemplateUuid,
+				"object_name":            value.ObjectName,
+				"network_type":           value.NetworkType,
+				"ordering":               value.Ordering,
+				"mcast":                  value.Mcast,
+			}
+			networks = append(networks, network)
 		}
 	}
-	d.Set("networks", networks)
+
+	d.Set("network", networks)
 
 	//Get IP addresses
 	var ipv4, ipv6 string
@@ -328,15 +408,14 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		requestBody.Relations.Networks = append(requestBody.Relations.Networks, network)
 	}
 
-	if attr, ok := d.GetOk("networks"); ok {
-		for index, value := range attr.(*schema.Set).List() {
-			network := gsclient.ServerCreateRequestNetwork{
-				NetworkUuid: value.(string),
+	if attr, ok := d.GetOk("network"); ok {
+		for _, value := range attr.(*schema.Set).List() {
+			network := value.(map[string]interface{})
+			createNetworkRequest := gsclient.ServerCreateRequestNetwork{
+				NetworkUuid: network["object_uuid"].(string),
+				BootDevice:  network["bootdevice"].(bool),
 			}
-			if index == 0 {
-				network.BootDevice = true
-			}
-			requestBody.Relations.Networks = append(requestBody.Relations.Networks, network)
+			requestBody.Relations.Networks = append(requestBody.Relations.Networks, createNetworkRequest)
 		}
 	}
 
