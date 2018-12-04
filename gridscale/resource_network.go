@@ -14,6 +14,10 @@ func resourceGridscaleNetwork() *schema.Resource {
 		Read:   resourceGridscaleNetworkRead,
 		Delete: resourceGridscaleNetworkDelete,
 		Update: resourceGridscaleNetworkUpdate,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:        schema.TypeString,

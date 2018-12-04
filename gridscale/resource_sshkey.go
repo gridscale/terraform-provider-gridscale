@@ -12,6 +12,10 @@ func resourceGridscaleSshkey() *schema.Resource {
 		Read:   resourceGridscaleSshkeyRead,
 		Delete: resourceGridscaleSshkeyDelete,
 		Update: resourceGridscaleSshkeyUpdate,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:        schema.TypeString,

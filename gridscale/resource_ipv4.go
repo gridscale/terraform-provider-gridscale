@@ -14,6 +14,10 @@ func resourceGridscaleIpv4() *schema.Resource {
 		Read:   resourceGridscaleIpRead,
 		Delete: resourceGridscaleIpDelete,
 		Update: resourceGridscaleIpUpdate,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
+
 		Schema: map[string]*schema.Schema{
 			"ip": {
 				Type:        schema.TypeString,

@@ -17,6 +17,10 @@ func resourceGridscaleStorage() *schema.Resource {
 		Read:   resourceGridscaleStorageRead,
 		Delete: resourceGridscaleStorageDelete,
 		Update: resourceGridscaleStorageUpdate,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:        schema.TypeString,
