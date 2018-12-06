@@ -149,14 +149,6 @@ func resourceGridscaleServer() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"vlan": {
-							Type:     schema.TypeInt,
-							Computed: true,
-						},
-						"vxlan": {
-							Type:     schema.TypeInt,
-							Computed: true,
-						},
 						"mac": {
 							Type:     schema.TypeString,
 							Computed: true,
@@ -185,10 +177,18 @@ func resourceGridscaleServer() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"mcast": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
+						//"vlan": {
+						//	Type:     schema.TypeInt,
+						//	Computed: true,
+						//},
+						//"vxlan": {
+						//	Type:     schema.TypeInt,
+						//	Computed: true,
+						//},
+						//"mcast": {
+						//	Type:     schema.TypeString,
+						//	Computed: true,
+						//},
 					},
 				},
 			},
@@ -307,15 +307,15 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 				"object_uuid":            value.ObjectUuid,
 				"bootdevice":             value.BootDevice,
 				"create_time":            value.CreateTime,
-				"vlan":                   value.Vlan,
-				"vxlan":                  value.Vxlan,
+				//"vlan":                   value.Vlan,
+				//"vxlan":                  value.Vxlan,
 				"mac":                    value.Mac,
 				"firewall":               value.Firewall,
 				"firewall_template_uuid": value.FirewallTemplateUuid,
 				"object_name":            value.ObjectName,
 				"network_type":           value.NetworkType,
 				"ordering":               value.Ordering,
-				"mcast":                  value.Mcast,
+				//"mcast":                  value.Mcast,
 			}
 			networks = append(networks, network)
 		}
