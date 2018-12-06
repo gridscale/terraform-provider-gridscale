@@ -192,12 +192,6 @@ func resourceGridscaleServer() *schema.Resource {
 					},
 				},
 			},
-			"networks": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-			},
 			"ipv4": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -303,7 +297,6 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 		}
 		storages = append(storages, storage)
 	}
-
 	d.Set("storage", storages)
 
 	//Get storages
@@ -327,7 +320,7 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 			networks = append(networks, network)
 		}
 	}
-
+	log.Printf("Networks: %v", networks)
 	d.Set("network", networks)
 
 	//Get IP addresses
