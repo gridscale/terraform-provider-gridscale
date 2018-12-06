@@ -145,7 +145,7 @@ func resourceGridscaleStorage() *schema.Resource {
 						"template_uuid": {
 							Type:     schema.TypeString,
 							ForceNew: true,
-							Optional: true,
+							Required: true,
 						},
 					},
 				},

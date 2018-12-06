@@ -221,6 +221,20 @@ func resourceGridscaleServer() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "Defines which Availability-Zone the Server is placed.",
 				Optional:    true,
+				Computed:    true,
+				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
+					valid := false
+					for _, profile := range AvailabilityZones {
+						if v.(string) == profile {
+							valid = true
+							break
+						}
+					}
+					if !valid {
+						errors = append(errors, fmt.Errorf("%v is not a valid hardware profile. Valid hardware profiles are: %v", v.(string), strings.Join(AvailabilityZones, ",")))
+					}
+					return
+				},
 			},
 			"console_token": {
 				Type:        schema.TypeString,
