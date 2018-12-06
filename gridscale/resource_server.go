@@ -449,14 +449,14 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 
 	if d.HasChange("cores") {
 		old, new := d.GetChange("cores")
-		if new.(int) < old.(int) {
+		if new.(int) < old.(int) || d.Get("legacy").(bool) { //Legacy systems don't support updating the memory while running
 			shutdownRequired = true
 		}
 	}
 
 	if d.HasChange("memory") {
 		old, new := d.GetChange("memory")
-		if new.(int) < old.(int) {
+		if new.(int) < old.(int) || d.Get("legacy").(bool) { //Legacy systems don't support updating the memory while running
 			shutdownRequired = true
 		}
 	}
