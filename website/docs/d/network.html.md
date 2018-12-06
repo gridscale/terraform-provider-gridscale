@@ -23,9 +23,10 @@ resource "gridscale_server" "servername"{
 	name = "terra-server"
 	cores = 2
 	memory = 4
-	networks = [
-		"${gridscale_network.networkname.id}",
-	]
+	network {
+		object_uuid = "${gridscale_network.networkname.id}"
+		bootdevice = true
+	}
 }
 ```
 

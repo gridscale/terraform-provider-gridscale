@@ -24,9 +24,10 @@ resource "gridscale_server" "servername"{
 	name = "terra-server"
 	cores = 2
 	memory = 4
-	storages = [
-		"${gridscale_storage.storagename.id}",
-	]
+	storage {
+		object_uuid = "${gridscale_storage.storagename.id}"
+		bootdevice = true
+	}
 }
 ```
 
