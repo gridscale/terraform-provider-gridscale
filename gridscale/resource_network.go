@@ -62,11 +62,6 @@ func resourceGridscaleNetwork() *schema.Resource {
 				Description: "The human-readable name of the location. It supports the full UTF-8 charset, with a maximum of 64 characters",
 				Computed:    true,
 			},
-			"public_net": {
-				Type:        schema.TypeBool,
-				Description: "Is the network public or not",
-				Computed:    true,
-			},
 			"delete_block": {
 				Type:        schema.TypeBool,
 				Description: "If deleting this network is allowed",
@@ -116,7 +111,6 @@ func resourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) erro
 	d.Set("location_country", network.Properties.LocationCountry)
 	d.Set("location_iata", network.Properties.LocationIata)
 	d.Set("location_name", network.Properties.LocationName)
-	d.Set("public_net", network.Properties.PublicNet)
 	d.Set("delete_block", network.Properties.DeleteBlock)
 	d.Set("create_time", network.Properties.CreateTime)
 	d.Set("change_time", network.Properties.ChangeTime)
