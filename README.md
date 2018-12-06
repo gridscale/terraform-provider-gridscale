@@ -26,17 +26,17 @@ See the documentation in the website directory of this repo to get started using
 Building The Provider
 ---------------------
 
-Clone repository to: `$GOPATH/src/github.com/terraform-providers/terraform-provider-gridscale`
+Clone repository to: `$GOPATH/src/bitbucket/gridscale/terraform-provider-gridscale`
 
 ```sh
-$ mkdir -p $GOPATH/src/github.com/terraform-providers; cd $GOPATH/src/github.com/terraform-providers
-$ git clone git@github.com:terraform-providers/terraform-provider-gridscale
+$ mkdir -p $GOPATH/src/bitbucket.org/gridscale; cd $GOPATH/src/bitbucket.org/gridscale
+$ git clone git@bitbucket.org:gridscale/terraform-provider-gridscale.git
 ```
 
 Enter the provider directory and build the provider
 
 ```sh
-$ cd $GOPATH/src/github.com/terraform-providers/terraform-provider-gridscale
+$ cd $GOPATH/src/bitbucket.org/gridscale/terraform-provider-gridscale
 $ make build
 ```
 
