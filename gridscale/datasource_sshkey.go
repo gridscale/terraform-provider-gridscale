@@ -3,7 +3,6 @@ package gridscale
 import (
 	"bitbucket.org/gridscale/gsclient-go"
 	"github.com/hashicorp/terraform/helper/schema"
-	"log"
 )
 
 func dataSourceGridscaleSshkey() *schema.Resource {
@@ -23,7 +22,6 @@ func dataSourceGridscaleSshkeyRead(d *schema.ResourceData, meta interface{}) err
 
 	if err == nil {
 		d.SetId(sshkey.Properties.ObjectUuid)
-		log.Printf("Found SSH key: %v", sshkey)
 	}
 
 	return err

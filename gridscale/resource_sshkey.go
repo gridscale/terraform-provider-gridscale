@@ -71,7 +71,6 @@ func resourceGridscaleSshkeyRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("change_time", sshkey.Properties.ChangeTime)
 	d.Set("labels", sshkey.Properties.Labels)
 
-	log.Printf("Read the following: %v", sshkey)
 	return nil
 }
 

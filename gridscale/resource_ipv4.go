@@ -137,7 +137,6 @@ func resourceGridscaleIpRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("usage_in_minutes", ip.Properties.UsagesInMinutes)
 	d.Set("current_price", ip.Properties.CurrentPrice)
 
-	log.Printf("Read the following: %v", ip)
 	return nil
 }
 

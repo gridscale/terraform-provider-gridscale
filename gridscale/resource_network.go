@@ -122,7 +122,6 @@ func resourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) erro
 	d.Set("change_time", network.Properties.ChangeTime)
 	d.Set("labels", network.Properties.Labels)
 
-	log.Printf("Read the following: %v", network)
 	return nil
 }
 

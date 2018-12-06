@@ -162,7 +162,6 @@ func resourceGridscaleStorageRead(d *schema.ResourceData, meta interface{}) erro
 	storage, err := client.GetStorage(d.Id())
 	if err != nil {
 		if requestError, ok := err.(*gsclient.RequestError); ok {
-			log.Printf("Status code returned: %v", requestError.StatusCode)
 			if requestError.StatusCode == 404 {
 				d.SetId("")
 				return nil
@@ -188,7 +187,6 @@ func resourceGridscaleStorageRead(d *schema.ResourceData, meta interface{}) erro
 	d.Set("labels", storage.Properties.Labels)
 	d.Set("create_time", storage.Properties.CreateTime)
 
-	log.Printf("Read the following: %v", storage)
 	return nil
 }
 

@@ -3,7 +3,6 @@ package gridscale
 import (
 	"bitbucket.org/gridscale/gsclient-go"
 	"github.com/hashicorp/terraform/helper/schema"
-	"log"
 )
 
 func dataSourceGridscaleNetwork() *schema.Resource {
@@ -23,7 +22,6 @@ func dataSourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) er
 
 	if err == nil {
 		d.SetId(storage.Properties.ObjectUuid)
-		log.Printf("Found storage: %v", storage)
 	}
 
 	return err

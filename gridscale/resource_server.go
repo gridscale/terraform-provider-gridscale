@@ -320,7 +320,6 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 			networks = append(networks, network)
 		}
 	}
-	log.Printf("Networks: %v", networks)
 	d.Set("network", networks)
 
 	//Get IP addresses
@@ -336,7 +335,6 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("ipv4", ipv4)
 	d.Set("ipv6", ipv6)
 
-	log.Printf("Read the following: %v", server)
 	return nil
 }
 
