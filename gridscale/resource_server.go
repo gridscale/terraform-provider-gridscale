@@ -202,6 +202,11 @@ func resourceGridscaleServer() *schema.Resource {
 				Optional: true,
 				ForceNew: true,
 			},
+			"isoimage": {
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: true,
+			},
 			"power": {
 				Type:        schema.TypeBool,
 				Description: "The number of server cores.",
@@ -349,6 +354,12 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("ipv4", ipv4)
 	d.Set("ipv6", ipv6)
 
+	//Get the ISO image, there can only be one attached to a server but it is in a list anyway
+	d.Set("isoimage", "")
+	for _, isoimage := range server.Properties.Relations.IsoImages {
+		d.Set("isoimage", isoimage.ObjectUuid)
+	}
+
 	return nil
 }
 
@@ -365,7 +376,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		Labels:          d.Get("labels").(*schema.Set).List(),
 	}
 
-	requestBody.Relations.IsoImages = []gsclient.ServerIsoImage{}
+	requestBody.Relations.IsoImages = []gsclient.ServerCreateRequestIsoimage{}
 	requestBody.Relations.Storages = []gsclient.ServerCreateRequestStorage{}
 	requestBody.Relations.Networks = []gsclient.ServerCreateRequestNetwork{}
 	requestBody.Relations.PublicIps = []gsclient.ServerCreateRequestIp{}
@@ -399,6 +410,13 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 			IpaddrUuid: attr.(string),
 		}
 		requestBody.Relations.PublicIps = append(requestBody.Relations.PublicIps, ip)
+	}
+
+	if attr, ok := d.GetOk("isoimage"); ok {
+		createIsoimageRequest := gsclient.ServerCreateRequestIsoimage{
+			IsoimageUuid: attr.(string),
+		}
+		requestBody.Relations.IsoImages = append(requestBody.Relations.IsoImages, createIsoimageRequest)
 	}
 
 	//Add public network if we have an IP
