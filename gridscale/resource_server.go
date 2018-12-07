@@ -203,7 +203,6 @@ func resourceGridscaleServer() *schema.Resource {
 			"isoimage": {
 				Type:     schema.TypeString,
 				Optional: true,
-				ForceNew: true,
 			},
 			"power": {
 				Type:        schema.TypeBool,
@@ -510,9 +509,23 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 		}
 	}
 
+	//Execute the update request
 	err = client.UpdateServer(d.Id(), requestBody)
 	if err != nil {
 		return err
+	}
+
+	//Link/unlink isoimages
+	if d.HasChange("isoimage") {
+		oldIso, newIso := d.GetChange("isoimage")
+		if newIso == "" {
+			err = client.UnlinkIsoimage(d.Id(), oldIso.(string))
+		} else {
+			err = client.LinkIsoimage(d.Id(), newIso.(string))
+		}
+		if err != nil {
+			return err
+		}
 	}
 
 	//Link/Unlink ip addresses
@@ -545,7 +558,7 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 			needsPublicNetwork = false
 		}
 	}
-
+	//Disconnect from the public network if there is no longer and IP
 	if (d.HasChange("ipv6") || d.HasChange("ipv4")) && d.Get("ipv6").(string) == "" && d.Get("ipv4").(string) == "" {
 		publicNetwork, err := client.GetNetworkPublic()
 		if err != nil {
@@ -556,6 +569,7 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 			return err
 		}
 	}
+	//Connect to the public network if an IP was added
 	if (d.HasChange("ipv6") || d.HasChange("ipv4")) && needsPublicNetwork {
 		publicNetwork, err := client.GetNetworkPublic()
 		if err != nil {
