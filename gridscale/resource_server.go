@@ -129,7 +129,6 @@ func resourceGridscaleServer() *schema.Resource {
 
 			"network": {
 				Type:     schema.TypeSet,
-				ForceNew: true,
 				Optional: true,
 				MaxItems: 7,
 				Elem: &schema.Resource{
@@ -137,13 +136,11 @@ func resourceGridscaleServer() *schema.Resource {
 						"object_uuid": {
 							Type:     schema.TypeString,
 							Required: true,
-							ForceNew: true,
 						},
 						"bootdevice": {
 							Type:     schema.TypeBool,
 							Optional: true,
 							Default:  false,
-							ForceNew: true,
 						},
 						"object_name": {
 							Type:     schema.TypeString,
@@ -578,6 +575,31 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 		err = client.LinkNetwork(d.Id(), publicNetwork.Properties.ObjectUuid, false)
 		if err != nil {
 			return err
+		}
+	}
+
+	//Link/unlink networks
+	//It currently unlinks and relinks all networks if any network has changed. This could probably be done better, but this way is easy and works well
+	if d.HasChange("network") {
+		oldNetwork, newNetwork := d.GetChange("network")
+		for _, value := range oldNetwork.(*schema.Set).List() {
+			network := value.(map[string]interface{})
+			if network["object_uuid"].(string) != "" {
+				err = client.UnlinkNetwork(d.Id(), network["object_uuid"].(string))
+				if err != nil {
+					return err
+				}
+			}
+		}
+		for _, value := range newNetwork.(*schema.Set).List() {
+			network := value.(map[string]interface{})
+			if network["object_uuid"].(string) != "" {
+				err = client.LinkNetwork(d.Id(), network["object_uuid"].(string), network["bootdevice"].(bool))
+				if err != nil {
+					return err
+				}
+			}
+
 		}
 	}
 
