@@ -35,6 +35,7 @@ resource "gridscale_server" "terra-server-test"{
     }
 	ipv4 = "${gridscale_ipv4.terra-ipv4-test.id}"
 	ipv6 = "UUID of ipv6 address"
+	isoimage = "9be3e0a3-42ac-4207-8887-3383c405724d"
 }
 ```
 
@@ -57,6 +58,8 @@ The following arguments are supported:
 * `ipv4` - (Optional) The UUID of the IPv4 address of the server. When this option is set, the server will automatically be connected to the public network, giving it access to the internet.
 
 * `ipv6` - (Optional) The UUID of the IPv6 address of the server. When this option is set, the server will automatically be connected to the public network, giving it access to the internet.
+
+* `isoimage` - (Optional) The UUID of an ISO image in gridscale. The server will automatically boot from the ISO if one was added. The UUIDs of ISO images can be found in [the expert panel](https://my.gridscale.io/Expert/ISOImage).
 
 * `power` - (Optional) The power state of the server. Set this to true to will boot the server, false will shut it down.
 
