@@ -195,12 +195,10 @@ func resourceGridscaleServer() *schema.Resource {
 			"ipv4": {
 				Type:     schema.TypeString,
 				Optional: true,
-				ForceNew: true,
 			},
 			"ipv6": {
 				Type:     schema.TypeString,
 				Optional: true,
-				ForceNew: true,
 			},
 			"isoimage": {
 				Type:     schema.TypeString,
@@ -493,6 +491,10 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 		}
 	}
 
+	if d.HasChange("ipv4") || d.HasChange("ipv6") || d.HasChange("storage") || d.HasChange("network") {
+		shutdownRequired = true
+	}
+
 	requestBody := gsclient.ServerUpdateRequest{
 		Name:            d.Get("name").(string),
 		AvailablityZone: d.Get("availability_zone").(string),
@@ -511,6 +513,58 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 	err = client.UpdateServer(d.Id(), requestBody)
 	if err != nil {
 		return err
+	}
+
+	//Link/Unlink ip addresses
+	var needsPublicNetwork = true
+	if d.HasChange("ipv4") {
+		oldIp, newIp := d.GetChange("ipv4")
+		if newIp == "" {
+			err = client.UnlinkIp(d.Id(), oldIp.(string))
+		} else {
+			err = client.LinkIp(d.Id(), newIp.(string))
+		}
+		if err != nil {
+			return err
+		}
+		if oldIp != "" {
+			needsPublicNetwork = false
+		}
+	}
+	if d.HasChange("ipv6") {
+		oldIp, newIp := d.GetChange("ipv6")
+		if newIp == "" {
+			err = client.UnlinkIp(d.Id(), oldIp.(string))
+		} else {
+			err = client.LinkIp(d.Id(), newIp.(string))
+		}
+		if err != nil {
+			return err
+		}
+		if oldIp != "" {
+			needsPublicNetwork = false
+		}
+	}
+
+	if (d.HasChange("ipv6") || d.HasChange("ipv4")) && d.Get("ipv6").(string) == "" && d.Get("ipv4").(string) == "" {
+		publicNetwork, err := client.GetNetworkPublic()
+		if err != nil {
+			return err
+		}
+		err = client.UnlinkNetwork(d.Id(), publicNetwork.Properties.ObjectUuid)
+		if err != nil {
+			return err
+		}
+	}
+	if (d.HasChange("ipv6") || d.HasChange("ipv4")) && needsPublicNetwork {
+		publicNetwork, err := client.GetNetworkPublic()
+		if err != nil {
+			return err
+		}
+		err = client.LinkNetwork(d.Id(), publicNetwork.Properties.ObjectUuid, false)
+		if err != nil {
+			return err
+		}
 	}
 
 	// Make sure the server in is the expected power state.
