@@ -219,14 +219,17 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 
 	//since only one template can be used, we can just look at index 0
 	if _, ok := d.GetOk("template"); ok {
-		template := gsclient.StorageTemplate{}
+		template := gsclient.StorageTemplate{
+			Password:     d.Get("template.0.password").(string),
+			PasswordType: d.Get("template.0.password_type").(string),
+			Hostname:     d.Get("template.0.hostname").(string),
+			TemplateUuid: d.Get("template.0.template_uuid").(string),
+		}
+
 		if attr, ok := d.GetOk("template.0.sshkeys"); ok {
 			for _, value := range attr.([]interface{}) {
 				template.Sshkeys = append(template.Sshkeys, value.(string))
 			}
-		}
-		if v, ok := d.GetOk("template.0.template_uuid"); ok {
-			template.TemplateUuid = v.(string)
 		}
 		requestBody.Template = &template
 	}
@@ -245,6 +248,16 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 
 func resourceGridscaleStorageDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
+
+	//The server which the storage is connected to needs to be shutdown if we want to delete the storage
+	//storage, err := client.GetStorage(d.Id())
+	//if err != nil {
+	//	return err
+	//}
+	//for _, server := range storage.Properties.Relations.Servers {
+	//	client.ShutdownServer(server.ObjectUuid)
+	//}
+
 	return resource.Retry(d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
 		return resource.RetryableError(client.DeleteStorage(d.Id()))
 	})
