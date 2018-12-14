@@ -32,6 +32,30 @@ func TestAccDataSourceGridscaleStorage_Basic(t *testing.T) {
 	})
 }
 
+func TestAccDataSourceGridscaleStorage_Advanced(t *testing.T) {
+	var object gsclient.Storage
+	name := fmt.Sprintf("object-%s", acctest.RandString(10))
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCheckDataSourceGridscaleStorageConfig_advanced(name),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckDataSourceGridscaleStorageExists("gridscale_storage.foo", &object),
+					resource.TestCheckResourceAttr(
+						"gridscale_storage.foo", "name", name),
+					resource.TestCheckResourceAttr(
+						"gridscale_storage.foo", "storage_type", "storage"),
+					resource.TestCheckResourceAttr(
+						"gridscale_storage.foo", "last_used_template", "4db64bfc-9fb2-4976-80b5-94ff43b1233a"),
+				),
+			},
+		},
+	})
+}
+
 func testAccCheckDataSourceGridscaleStorageExists(n string, object *gsclient.Storage) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
@@ -71,4 +95,24 @@ resource "gridscale_storage" "foo" {
   capacity = 1
 }
 `, name)
+}
+
+func testAccCheckDataSourceGridscaleStorageConfig_advanced(name string) string {
+	return fmt.Sprintf(`
+resource "gridscale_sshkey" "sshkey" {
+  name = "%s"
+  sshkey = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQClJCCOAFyBNIWUpzU4/mFqns5G4+nXzf5iFblNZqtAJmPzKnl0m0Gxj9GV27EkaWpqivVSUblmw3KRWMgCAiJUrMoQt4VAUKUzwdlNZ+6cIDSncEg671SLmCGZmWmVdOR5KaHWlkIRnowfB7UIDyubu/B7r+9L5IPdVgqw3KQW4jZRSsaOOG+I6z0J46c0j+/uJBxuqsr0QD0RQYc2n2Q8O9oNvp3U/L0B5ZYkecAZCCTuGpfNnJdpjj4ww+Qgq/qt4WEIWgVIPEU3B5PlqKZDTO+0JjCsAaQIkN6HOSVHP7h9b+grBnTxSc55CPqBGEBP8zlcne29olJttseJgnBT"
+}
+resource "gridscale_storage" "foo" {
+  name   = "%s"
+  capacity = 10
+  storage_type= "storage"
+  labels = [ "test", "label" ]
+  template {
+    template_uuid = "4db64bfc-9fb2-4976-80b5-94ff43b1233a"
+    hostname = "ubuntu"
+    sshkeys = [ "${gridscale_sshkey.sshkey.id}"]
+  }
+}
+`, name, name)
 }
