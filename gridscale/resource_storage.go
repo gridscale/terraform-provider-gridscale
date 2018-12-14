@@ -152,7 +152,7 @@ func resourceGridscaleStorage() *schema.Resource {
 			},
 		},
 		Timeouts: &schema.ResourceTimeout{
-			Delete: schema.DefaultTimeout(time.Minute),
+			Delete: schema.DefaultTimeout(time.Minute * 3),
 		},
 	}
 }
@@ -250,13 +250,13 @@ func resourceGridscaleStorageDelete(d *schema.ResourceData, meta interface{}) er
 	client := meta.(*gsclient.Client)
 
 	//The server which the storage is connected to needs to be shutdown if we want to delete the storage
-	//storage, err := client.GetStorage(d.Id())
-	//if err != nil {
-	//	return err
-	//}
-	//for _, server := range storage.Properties.Relations.Servers {
-	//	client.ShutdownServer(server.ObjectUuid)
-	//}
+	storage, err := client.GetStorage(d.Id())
+	if err != nil {
+		return err
+	}
+	for _, server := range storage.Properties.Relations.Servers {
+		client.ShutdownServer(server.ObjectUuid)
+	}
 
 	return resource.Retry(d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
 		return resource.RetryableError(client.DeleteStorage(d.Id()))
