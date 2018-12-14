@@ -102,7 +102,7 @@ func resourceGridscaleIpv6() *schema.Resource {
 			},
 		},
 		Timeouts: &schema.ResourceTimeout{
-			Delete: schema.DefaultTimeout(time.Minute),
+			Delete: schema.DefaultTimeout(time.Minute * 3),
 		},
 	}
 }
