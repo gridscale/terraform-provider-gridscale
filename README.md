@@ -75,6 +75,7 @@ $ make testacc
 Known Issues
 ---------------------------
 The following issues are known to us:
+
 * Changing the name attribute in a template datasource will not trigger storages using this template to be recreated.
 * If a storage has snapshots, terraform can not delete it.
 * The autorecovery value of a server can't be changed with Terraform.
