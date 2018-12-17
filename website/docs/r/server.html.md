@@ -10,7 +10,7 @@ description: |-
 
 Provides a server resource. This can be used to create, modify and delete servers.
 
-## Example Usage
+## Example
 
 The following example shows how one might use this resource to add a server to gridscale:
 
