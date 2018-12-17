@@ -18,11 +18,6 @@ Requirements
 -	[Terraform](https://www.terraform.io/downloads.html) 0.10.x
 -	[Go](https://golang.org/doc/install) 1.8 (to build the provider plugin)
 
-Usage
----------------------
-
-See the documentation in the website directory of this repo to get started using the gridscale provider.
-
 Building The Provider
 ---------------------
 
