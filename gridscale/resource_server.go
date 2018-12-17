@@ -372,15 +372,19 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	requestBody.Relations.Networks = []gsclient.ServerCreateRequestNetwork{}
 	requestBody.Relations.PublicIps = []gsclient.ServerCreateRequestIp{}
 
+	//Add only the bootable storage during creation
+	//When more than one device is set to bootable, the API is expected to give an error
 	if attr, ok := d.GetOk("storage"); ok {
 		for _, value := range attr.(*schema.Set).List() {
 			storage := value.(map[string]interface{})
-			createStorageRequest := gsclient.ServerCreateRequestStorage{
-				StorageUuid: storage["object_uuid"].(string),
-				BootDevice:  storage["bootdevice"].(bool),
-			}
+			if storage["bootdevice"].(bool) {
+				createStorageRequest := gsclient.ServerCreateRequestStorage{
+					StorageUuid: storage["object_uuid"].(string),
+					BootDevice:  storage["bootdevice"].(bool),
+				}
 
-			requestBody.Relations.Storages = append(requestBody.Relations.Storages, createStorageRequest)
+				requestBody.Relations.Storages = append(requestBody.Relations.Storages, createStorageRequest)
+			}
 		}
 	}
 
@@ -444,6 +448,21 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 
 	log.Printf("[DEBUG] The id for %s has been set to: %v", requestBody.Name, response.ServerUuid)
 
+	//Add the rest of the storages
+	//The server might not boot if more than one storages is attached to a server when it is being created. That is why the rest of the storages are added later. See BUG-191
+	if attr, ok := d.GetOk("storage"); ok {
+		for _, value := range attr.(*schema.Set).List() {
+			storage := value.(map[string]interface{})
+			if !storage["bootdevice"].(bool) {
+				err = client.LinkStorage(d.Id(), storage["object_uuid"].(string), storage["bootdevice"].(bool))
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	//Set the power state if needed
 	power := d.Get("power").(bool)
 	if power {
 		client.StartServer(d.Id())
@@ -496,6 +515,7 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 		Memory:          d.Get("memory").(int),
 	}
 
+	//The ShutdownServer command will check if the server is running and shut it down if it is running, so no extra checks are needed here
 	if shutdownRequired {
 		err = client.ShutdownServer(d.Id())
 		if err != nil {
