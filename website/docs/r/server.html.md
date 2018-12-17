@@ -69,7 +69,7 @@ The following arguments are supported:
 
     * `object_uuid` - (Required) The object UUID or id of the storage.
     
-    * `bootdevice` - (Optional) Make this storage the boot device. This can only be set for one storage.
+    * `bootdevice` - (Optional) Make this storage the boot device. **This can only be set for one storage per server!**
 
 * `storage` - (Optional) Connects a storage to the server.
 
