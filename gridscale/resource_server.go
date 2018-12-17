@@ -621,27 +621,45 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	//Link/unlink storages
-	//It currently unlinks and relinks all storages if any storages has changed. This could probably be done better, but this way is easy and works well
 	if d.HasChange("storage") {
 		oldStorages, newStorages := d.GetChange("storage")
+
+		//unlink old storages if needed
 		for _, value := range oldStorages.(*schema.Set).List() {
-			storage := value.(map[string]interface{})
-			if storage["object_uuid"].(string) != "" {
-				err = client.UnlinkStorage(d.Id(), storage["object_uuid"].(string))
+			oldStorage := value.(map[string]interface{})
+			unlink := true
+			for _, value := range newStorages.(*schema.Set).List() {
+				newStorage := value.(map[string]interface{})
+				if oldStorage["object_uuid"].(string) == newStorage["object_uuid"].(string) {
+					unlink = false
+					break
+				}
+			}
+			if unlink {
+				err = client.UnlinkStorage(d.Id(), oldStorage["object_uuid"].(string))
 				if err != nil {
 					return err
 				}
 			}
 		}
+
+		//link new storages if needed
 		for _, value := range newStorages.(*schema.Set).List() {
-			storage := value.(map[string]interface{})
-			if storage["object_uuid"].(string) != "" {
-				err = client.LinkStorage(d.Id(), storage["object_uuid"].(string), storage["bootdevice"].(bool))
+			newStorage := value.(map[string]interface{})
+			link := true
+			for _, value := range oldStorages.(*schema.Set).List() {
+				oldStorage := value.(map[string]interface{})
+				if oldStorage["object_uuid"].(string) == newStorage["object_uuid"].(string) {
+					link = false
+					break
+				}
+			}
+			if link {
+				err = client.LinkStorage(d.Id(), newStorage["object_uuid"].(string), newStorage["bootdevice"].(bool))
 				if err != nil {
 					return err
 				}
 			}
-
 		}
 	}
 
