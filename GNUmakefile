@@ -8,10 +8,6 @@ default: build
 build: fmtcheck
 	go install
 
-testbuild: fmt
-	@go build
-	@cp -f $(CURDIR)/terraform-provider-gridscale /Users/wouter/.terraform.d/plugins/
-
 test: fmtcheck
 	go test -i $(TEST) || exit 1
 	echo $(TEST) | \
