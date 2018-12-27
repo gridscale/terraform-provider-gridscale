@@ -10,7 +10,7 @@ description: |-
 
 Provides a server resource. This can be used to create, modify and delete servers.
 
-## Example Usage
+## Example
 
 The following example shows how one might use this resource to add a server to gridscale:
 
@@ -19,16 +19,23 @@ resource "gridscale_server" "terra-server-test"{
 	name = "terra-server-test"
 	cores = 2
 	memory = 1
-	storages = [
-		"${gridscale_storage.terra-storage-test.id}",
-		"UUID of storage 2"
-	]
-	networks = [
-		"${gridscale_network.terra-network-test.id}"
-		"UUID of network 2"
-	]
+	storage {
+		object_uuid = "${gridscale_storage.terra-storage-test.id}"
+		bootdevice = true
+	}
+	storage {
+    		object_uuid = "UUID of storage 2",
+    	}
+	network {
+		object_uuid = "${gridscale_network.terra-network-test.id}"
+		bootdevice = true
+	}
+	network {
+    		object_uuid = "UUID of network 2"
+    }
 	ipv4 = "${gridscale_ipv4.terra-ipv4-test.id}"
 	ipv6 = "UUID of ipv6 address"
+	isoimage = "9be3e0a3-42ac-4207-8887-3383c405724d"
 }
 ```
 
@@ -48,17 +55,27 @@ The following arguments are supported:
 
 * `hardware_profile` - (Optional) The hardware profile of the Server. Options are default, legacy, nested, cisco_csr, sophos_utm, f5_bigip and q35 at the moment of writing. Check the 
 
-* `storages` - (Optional) List of the UUIDs of the storages to connect to the server in the format [ "UUID of storage 1" , "UUID of storage 2" ]. The first storage in the list will be set as boot device.
-
-* `networks` - (Optional) List of the UUIDs of the networks to connect to the server in the format [ "UUID of network 1" , "UUID of network 2" ]. The first network in the list will be set as boot device.
-
 * `ipv4` - (Optional) The UUID of the IPv4 address of the server. When this option is set, the server will automatically be connected to the public network, giving it access to the internet.
 
 * `ipv6` - (Optional) The UUID of the IPv6 address of the server. When this option is set, the server will automatically be connected to the public network, giving it access to the internet.
 
+* `isoimage` - (Optional) The UUID of an ISO image in gridscale. The server will automatically boot from the ISO if one was added. The UUIDs of ISO images can be found in [the expert panel](https://my.gridscale.io/Expert/ISOImage).
+
 * `power` - (Optional) The power state of the server. Set this to true to will boot the server, false will shut it down.
 
 * `availability_zone` - (Optional) Defines which Availability-Zone the Server is placed.
+
+* `storage` - (Optional) Connects a storage to the server.
+
+    * `object_uuid` - (Required) The object UUID or id of the storage.
+    
+    * `bootdevice` - (Optional) Make this storage the boot device. **This can only be set for one storage per server!**
+
+* `storage` - (Optional) Connects a storage to the server.
+
+    * `object_uuid` - (Required) The object UUID or id of the network.
+    
+    * `bootdevice` - (Optional) Make this network the boot device. This can only be set for one network.
 
 ## Attributes
 

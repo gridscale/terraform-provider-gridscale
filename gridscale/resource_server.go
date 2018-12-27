@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
 	"log"
+	"strings"
 )
 
 func resourceGridscaleServer() *schema.Resource {
@@ -20,21 +21,22 @@ func resourceGridscaleServer() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:        schema.TypeString,
-				Description: "The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters",
-				Required:    true,
+				Type:         schema.TypeString,
+				Description:  "The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters",
+				Required:     true,
+				ValidateFunc: validation.NoZeroValues,
 			},
 			"memory": {
 				Type:         schema.TypeInt,
 				Description:  "The amount of server memory in GB.",
 				Required:     true,
-				ValidateFunc: validation.NoZeroValues,
+				ValidateFunc: validation.IntAtLeast(1),
 			},
 			"cores": {
 				Type:         schema.TypeInt,
 				Description:  "The number of server cores.",
 				Required:     true,
-				ValidateFunc: validation.NoZeroValues,
+				ValidateFunc: validation.IntAtLeast(1),
 			},
 			"location_uuid": {
 				Type:        schema.TypeString,
@@ -49,34 +51,158 @@ func resourceGridscaleServer() *schema.Resource {
 				Optional:    true,
 				ForceNew:    true,
 				Default:     "default",
+				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
+					valid := false
+					for _, profile := range HardwareProfiles {
+						if v.(string) == profile {
+							valid = true
+							break
+						}
+					}
+					if !valid {
+						errors = append(errors, fmt.Errorf("%v is not a valid hardware profile. Valid hardware profiles are: %v", v.(string), strings.Join(StorageTypes, ",")))
+					}
+					return
+				},
 			},
-			"storages": {
+			"storage": {
 				Type:     schema.TypeSet,
 				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				MaxItems: 8,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"object_uuid": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"bootdevice": {
+							Type:     schema.TypeBool,
+							Optional: true,
+							Default:  false,
+						},
+						"object_name": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"capacity": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"controller": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"bus": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"target": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"lun": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"license_product_no": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"create_time": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"storage_type": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"last_used_template": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+					},
+				},
 			},
-			"networks": {
+
+			"network": {
 				Type:     schema.TypeSet,
 				Optional: true,
-				ForceNew: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				MaxItems: 7,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"object_uuid": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"bootdevice": {
+							Type:     schema.TypeBool,
+							Optional: true,
+							Default:  false,
+						},
+						"object_name": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"mac": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"firewall": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"firewall_template_uuid": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"partner_uuid": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"ordering": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"create_time": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"network_type": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						//"vlan": {
+						//	Type:     schema.TypeInt,
+						//	Computed: true,
+						//},
+						//"vxlan": {
+						//	Type:     schema.TypeInt,
+						//	Computed: true,
+						//},
+						//"mcast": {
+						//	Type:     schema.TypeString,
+						//	Computed: true,
+						//},
+					},
+				},
 			},
 			"ipv4": {
 				Type:     schema.TypeString,
 				Optional: true,
-				ForceNew: true,
 			},
 			"ipv6": {
 				Type:     schema.TypeString,
 				Optional: true,
-				ForceNew: true,
+			},
+			"isoimage": {
+				Type:     schema.TypeString,
+				Optional: true,
 			},
 			"power": {
 				Type:        schema.TypeBool,
 				Description: "The number of server cores.",
 				Optional:    true,
-				Default:     false,
+				Computed:    true,
 			},
 			"current_price": {
 				Type:     schema.TypeFloat,
@@ -91,6 +217,20 @@ func resourceGridscaleServer() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "Defines which Availability-Zone the Server is placed.",
 				Optional:    true,
+				Computed:    true,
+				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
+					valid := false
+					for _, profile := range AvailabilityZones {
+						if v.(string) == profile {
+							valid = true
+							break
+						}
+					}
+					if !valid {
+						errors = append(errors, fmt.Errorf("%v is not a valid hardware profile. Valid hardware profiles are: %v", v.(string), strings.Join(AvailabilityZones, ",")))
+					}
+					return
+				},
 			},
 			"console_token": {
 				Type:        schema.TypeString,
@@ -150,19 +290,47 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 
 	//Get storages
 	storages := make([]interface{}, 0)
-	for _, storage := range server.Properties.Relations.Storages {
-		storages = append(storages, storage.ObjectUuid)
+	for _, value := range server.Properties.Relations.Storages {
+		storage := map[string]interface{}{
+			"object_uuid":        value.ObjectUuid,
+			"bootdevice":         value.BootDevice,
+			"create_time":        value.CreateTime,
+			"controller":         value.Controller,
+			"target":             value.Target,
+			"lun":                value.Lun,
+			"license_product_no": value.LicenseProductNo,
+			"bus":                value.Bus,
+			"object_name":        value.ObjectName,
+			"storage_type":       value.StorageType,
+			"last_used_template": value.LastUsedTemplate,
+			"capacity":           value.Capacity,
+		}
+		storages = append(storages, storage)
 	}
-	d.Set("storages", storages)
+	d.Set("storage", storages)
 
-	//Get Networks
+	//Get storages
 	networks := make([]interface{}, 0)
-	for _, network := range server.Properties.Relations.Networks {
-		if !network.PublicNet {
-			networks = append(networks, network.NetworkUuid)
+	for _, value := range server.Properties.Relations.Networks {
+		if !value.PublicNet {
+			network := map[string]interface{}{
+				"object_uuid":            value.ObjectUuid,
+				"bootdevice":             value.BootDevice,
+				"create_time":            value.CreateTime,
+				"mac":                    value.Mac,
+				"firewall":               value.Firewall,
+				"firewall_template_uuid": value.FirewallTemplateUuid,
+				"object_name":            value.ObjectName,
+				"network_type":           value.NetworkType,
+				"ordering":               value.Ordering,
+				//"vlan":                   value.Vlan,
+				//"vxlan":                  value.Vxlan,
+				//"mcast":                  value.Mcast,
+			}
+			networks = append(networks, network)
 		}
 	}
-	d.Set("networks", networks)
+	d.Set("network", networks)
 
 	//Get IP addresses
 	var ipv4, ipv6 string
@@ -177,7 +345,12 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("ipv4", ipv4)
 	d.Set("ipv6", ipv6)
 
-	log.Printf("Read the following: %v", server)
+	//Get the ISO image, there can only be one attached to a server but it is in a list anyway
+	d.Set("isoimage", "")
+	for _, isoimage := range server.Properties.Relations.IsoImages {
+		d.Set("isoimage", isoimage.ObjectUuid)
+	}
+
 	return nil
 }
 
@@ -194,21 +367,24 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		Labels:          d.Get("labels").(*schema.Set).List(),
 	}
 
-	requestBody.Relations.IsoImages = []gsclient.ServerIsoImage{}
+	requestBody.Relations.IsoImages = []gsclient.ServerCreateRequestIsoimage{}
 	requestBody.Relations.Storages = []gsclient.ServerCreateRequestStorage{}
 	requestBody.Relations.Networks = []gsclient.ServerCreateRequestNetwork{}
 	requestBody.Relations.PublicIps = []gsclient.ServerCreateRequestIp{}
 
-	if attr, ok := d.GetOk("storages"); ok {
-		for index, value := range attr.(*schema.Set).List() {
-			storage := gsclient.ServerCreateRequestStorage{
-				StorageUuid: value.(string),
-			}
-			if index == 0 {
-				storage.BootDevice = true
-			}
+	//Add only the bootable storage during creation
+	//When more than one device is set to bootable, the API is expected to give an error
+	if attr, ok := d.GetOk("storage"); ok {
+		for _, value := range attr.(*schema.Set).List() {
+			storage := value.(map[string]interface{})
+			if storage["bootdevice"].(bool) {
+				createStorageRequest := gsclient.ServerCreateRequestStorage{
+					StorageUuid: storage["object_uuid"].(string),
+					BootDevice:  storage["bootdevice"].(bool),
+				}
 
-			requestBody.Relations.Storages = append(requestBody.Relations.Storages, storage)
+				requestBody.Relations.Storages = append(requestBody.Relations.Storages, createStorageRequest)
+			}
 		}
 	}
 
@@ -231,6 +407,13 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		requestBody.Relations.PublicIps = append(requestBody.Relations.PublicIps, ip)
 	}
 
+	if attr, ok := d.GetOk("isoimage"); ok {
+		createIsoimageRequest := gsclient.ServerCreateRequestIsoimage{
+			IsoimageUuid: attr.(string),
+		}
+		requestBody.Relations.IsoImages = append(requestBody.Relations.IsoImages, createIsoimageRequest)
+	}
+
 	//Add public network if we have an IP
 	if len(requestBody.Relations.PublicIps) > 0 {
 		publicNetwork, err := client.GetNetworkPublic()
@@ -243,15 +426,14 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		requestBody.Relations.Networks = append(requestBody.Relations.Networks, network)
 	}
 
-	if attr, ok := d.GetOk("networks"); ok {
-		for index, value := range attr.(*schema.Set).List() {
-			network := gsclient.ServerCreateRequestNetwork{
-				NetworkUuid: value.(string),
+	if attr, ok := d.GetOk("network"); ok {
+		for _, value := range attr.(*schema.Set).List() {
+			network := value.(map[string]interface{})
+			createNetworkRequest := gsclient.ServerCreateRequestNetwork{
+				NetworkUuid: network["object_uuid"].(string),
+				BootDevice:  network["bootdevice"].(bool),
 			}
-			if index == 0 {
-				network.BootDevice = true
-			}
-			requestBody.Relations.Networks = append(requestBody.Relations.Networks, network)
+			requestBody.Relations.Networks = append(requestBody.Relations.Networks, createNetworkRequest)
 		}
 	}
 
@@ -266,6 +448,21 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 
 	log.Printf("[DEBUG] The id for %s has been set to: %v", requestBody.Name, response.ServerUuid)
 
+	//Add the rest of the storages
+	//The server might not boot if more than one storages is attached to a server when it is being created. That is why the rest of the storages are added later. See BUG-191
+	if attr, ok := d.GetOk("storage"); ok {
+		for _, value := range attr.(*schema.Set).List() {
+			storage := value.(map[string]interface{})
+			if !storage["bootdevice"].(bool) {
+				err = client.LinkStorage(d.Id(), storage["object_uuid"].(string), storage["bootdevice"].(bool))
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	//Set the power state if needed
 	power := d.Get("power").(bool)
 	if power {
 		client.StartServer(d.Id())
@@ -288,20 +485,26 @@ func resourceGridscaleServerDelete(d *schema.ResourceData, meta interface{}) err
 
 func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
+	shutdownRequired := false
 
 	var err error
 
-	if d.HasChange("power") {
-		_, change := d.GetChange("power")
-		power := change.(bool)
-		if power {
-			err = client.StartServer(d.Id())
-		} else {
-			err = client.ShutdownServer(d.Id())
+	if d.HasChange("cores") {
+		old, new := d.GetChange("cores")
+		if new.(int) < old.(int) || d.Get("legacy").(bool) { //Legacy systems don't support updating the memory while running
+			shutdownRequired = true
 		}
-		if err != nil {
-			return err
+	}
+
+	if d.HasChange("memory") {
+		old, new := d.GetChange("memory")
+		if new.(int) < old.(int) || d.Get("legacy").(bool) { //Legacy systems don't support updating the memory while running
+			shutdownRequired = true
 		}
+	}
+
+	if d.HasChange("ipv4") || d.HasChange("ipv6") || d.HasChange("storage") || d.HasChange("network") {
+		shutdownRequired = true
 	}
 
 	requestBody := gsclient.ServerUpdateRequest{
@@ -312,7 +515,161 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 		Memory:          d.Get("memory").(int),
 	}
 
+	//The ShutdownServer command will check if the server is running and shut it down if it is running, so no extra checks are needed here
+	if shutdownRequired {
+		err = client.ShutdownServer(d.Id())
+		if err != nil {
+			return err
+		}
+	}
+
+	//Execute the update request
 	err = client.UpdateServer(d.Id(), requestBody)
+	if err != nil {
+		return err
+	}
+
+	//Link/unlink isoimages
+	if d.HasChange("isoimage") {
+		oldIso, newIso := d.GetChange("isoimage")
+		if newIso == "" {
+			err = client.UnlinkIsoimage(d.Id(), oldIso.(string))
+		} else {
+			err = client.LinkIsoimage(d.Id(), newIso.(string))
+		}
+		if err != nil {
+			return err
+		}
+	}
+
+	//Link/Unlink ip addresses
+	var needsPublicNetwork = true
+	if d.HasChange("ipv4") {
+		oldIp, newIp := d.GetChange("ipv4")
+		if newIp == "" {
+			err = client.UnlinkIp(d.Id(), oldIp.(string))
+		} else {
+			err = client.LinkIp(d.Id(), newIp.(string))
+		}
+		if err != nil {
+			return err
+		}
+		if oldIp != "" {
+			needsPublicNetwork = false
+		}
+	}
+	if d.HasChange("ipv6") {
+		oldIp, newIp := d.GetChange("ipv6")
+		if newIp == "" {
+			err = client.UnlinkIp(d.Id(), oldIp.(string))
+		} else {
+			err = client.LinkIp(d.Id(), newIp.(string))
+		}
+		if err != nil {
+			return err
+		}
+		if oldIp != "" {
+			needsPublicNetwork = false
+		}
+	}
+	//Disconnect from the public network if there is no longer and IP
+	if (d.HasChange("ipv6") || d.HasChange("ipv4")) && d.Get("ipv6").(string) == "" && d.Get("ipv4").(string) == "" {
+		publicNetwork, err := client.GetNetworkPublic()
+		if err != nil {
+			return err
+		}
+		err = client.UnlinkNetwork(d.Id(), publicNetwork.Properties.ObjectUuid)
+		if err != nil {
+			return err
+		}
+	}
+	//Connect to the public network if an IP was added
+	if (d.HasChange("ipv6") || d.HasChange("ipv4")) && needsPublicNetwork {
+		publicNetwork, err := client.GetNetworkPublic()
+		if err != nil {
+			return err
+		}
+		err = client.LinkNetwork(d.Id(), publicNetwork.Properties.ObjectUuid, false)
+		if err != nil {
+			return err
+		}
+	}
+
+	//Link/unlink networks
+	//It currently unlinks and relinks all networks if any network has changed. This could probably be done better, but this way is easy and works well
+	if d.HasChange("network") {
+		oldNetworks, newNetworks := d.GetChange("network")
+		for _, value := range oldNetworks.(*schema.Set).List() {
+			network := value.(map[string]interface{})
+			if network["object_uuid"].(string) != "" {
+				err = client.UnlinkNetwork(d.Id(), network["object_uuid"].(string))
+				if err != nil {
+					return err
+				}
+			}
+		}
+		for _, value := range newNetworks.(*schema.Set).List() {
+			network := value.(map[string]interface{})
+			if network["object_uuid"].(string) != "" {
+				err = client.LinkNetwork(d.Id(), network["object_uuid"].(string), network["bootdevice"].(bool))
+				if err != nil {
+					return err
+				}
+			}
+
+		}
+	}
+
+	//Link/unlink storages
+	if d.HasChange("storage") {
+		oldStorages, newStorages := d.GetChange("storage")
+
+		//unlink old storages if needed
+		for _, value := range oldStorages.(*schema.Set).List() {
+			oldStorage := value.(map[string]interface{})
+			unlink := true
+			for _, value := range newStorages.(*schema.Set).List() {
+				newStorage := value.(map[string]interface{})
+				if oldStorage["object_uuid"].(string) == newStorage["object_uuid"].(string) {
+					unlink = false
+					break
+				}
+			}
+			if unlink {
+				err = client.UnlinkStorage(d.Id(), oldStorage["object_uuid"].(string))
+				if err != nil {
+					return err
+				}
+			}
+		}
+
+		//link new storages if needed
+		for _, value := range newStorages.(*schema.Set).List() {
+			newStorage := value.(map[string]interface{})
+			link := true
+			for _, value := range oldStorages.(*schema.Set).List() {
+				oldStorage := value.(map[string]interface{})
+				if oldStorage["object_uuid"].(string) == newStorage["object_uuid"].(string) {
+					link = false
+					break
+				}
+			}
+			if link {
+				err = client.LinkStorage(d.Id(), newStorage["object_uuid"].(string), newStorage["bootdevice"].(bool))
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	// Make sure the server in is the expected power state.
+	// The StartServer and ShutdownServer functions do a check to see if the server isn't already running, so we don't need to do that here.
+	if d.Get("power").(bool) {
+		err = client.StartServer(d.Id())
+	} else {
+		err = client.ShutdownServer(d.Id())
+	}
 	if err != nil {
 		return err
 	}

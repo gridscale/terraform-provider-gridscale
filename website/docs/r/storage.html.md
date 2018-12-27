@@ -16,11 +16,12 @@ The following example shows how one might use this resource to add a storage to 
 
 ```hcl
 resource "gridscale_storage" "storage-john"{
-	name = "john's computer"
-	storage = "an ssh public key"
+	name = "john's storage"
+	capacity = 10
+	storage = "storage_high"
 	template {
 	    template_uuid = "4db64bfc-9fb2-4976-80b5-94ff43b1233a"
-	    password = "verysecurepassword"
+	    password = "${var.gridscale_password-john}"
 	    password_type = "plain"
 	    hostname = "Ubuntu"
 	}

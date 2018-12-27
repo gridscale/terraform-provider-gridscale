@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -16,6 +17,10 @@ func resourceGridscaleStorage() *schema.Resource {
 		Read:   resourceGridscaleStorageRead,
 		Delete: resourceGridscaleStorageDelete,
 		Update: resourceGridscaleStorageUpdate,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:        schema.TypeString,
@@ -27,7 +32,7 @@ func resourceGridscaleStorage() *schema.Resource {
 				Description:  "The capacity of a storage in GB.",
 				Required:     true,
 				ForceNew:     true,
-				ValidateFunc: validation.NoZeroValues,
+				ValidateFunc: validation.IntAtLeast(1),
 			},
 			"location_uuid": {
 				Type:        schema.TypeString,
@@ -43,8 +48,15 @@ func resourceGridscaleStorage() *schema.Resource {
 				ForceNew:    true,
 				Default:     "storage",
 				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
-					if v.(string) != "storage" && v.(string) != "storage_high" && v.(string) != "storage_insane" {
-						errors = append(errors, fmt.Errorf("Storage type must be either storage, storage_high or storage_insane"))
+					valid := false
+					for _, stype := range StorageTypes {
+						if v.(string) == stype {
+							valid = true
+							break
+						}
+					}
+					if !valid {
+						errors = append(errors, fmt.Errorf("%v is not a valid storage type. Valid types are: %v", v.(string), strings.Join(StorageTypes, ",")))
 					}
 					return
 				},
@@ -133,14 +145,14 @@ func resourceGridscaleStorage() *schema.Resource {
 						"template_uuid": {
 							Type:     schema.TypeString,
 							ForceNew: true,
-							Optional: true,
+							Required: true,
 						},
 					},
 				},
 			},
 		},
 		Timeouts: &schema.ResourceTimeout{
-			Delete: schema.DefaultTimeout(time.Minute),
+			Delete: schema.DefaultTimeout(time.Minute * 3),
 		},
 	}
 }
@@ -150,7 +162,6 @@ func resourceGridscaleStorageRead(d *schema.ResourceData, meta interface{}) erro
 	storage, err := client.GetStorage(d.Id())
 	if err != nil {
 		if requestError, ok := err.(*gsclient.RequestError); ok {
-			log.Printf("Status code returned: %v", requestError.StatusCode)
 			if requestError.StatusCode == 404 {
 				d.SetId("")
 				return nil
@@ -176,7 +187,6 @@ func resourceGridscaleStorageRead(d *schema.ResourceData, meta interface{}) erro
 	d.Set("labels", storage.Properties.Labels)
 	d.Set("create_time", storage.Properties.CreateTime)
 
-	log.Printf("Read the following: %v", storage)
 	return nil
 }
 
@@ -209,14 +219,17 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 
 	//since only one template can be used, we can just look at index 0
 	if _, ok := d.GetOk("template"); ok {
-		template := gsclient.StorageTemplate{}
+		template := gsclient.StorageTemplate{
+			Password:     d.Get("template.0.password").(string),
+			PasswordType: d.Get("template.0.password_type").(string),
+			Hostname:     d.Get("template.0.hostname").(string),
+			TemplateUuid: d.Get("template.0.template_uuid").(string),
+		}
+
 		if attr, ok := d.GetOk("template.0.sshkeys"); ok {
 			for _, value := range attr.([]interface{}) {
 				template.Sshkeys = append(template.Sshkeys, value.(string))
 			}
-		}
-		if v, ok := d.GetOk("template.0.template_uuid"); ok {
-			template.TemplateUuid = v.(string)
 		}
 		requestBody.Template = &template
 	}
@@ -235,6 +248,7 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 
 func resourceGridscaleStorageDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
+
 	return resource.Retry(d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
 		return resource.RetryableError(client.DeleteStorage(d.Id()))
 	})

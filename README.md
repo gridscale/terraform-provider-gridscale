@@ -18,31 +18,26 @@ Requirements
 -	[Terraform](https://www.terraform.io/downloads.html) 0.10.x
 -	[Go](https://golang.org/doc/install) 1.8 (to build the provider plugin)
 
-Usage
----------------------
-
-See the documentation in the website directory of this repo to get started using the gridscale provider.
-
 Building The Provider
 ---------------------
 
-Clone repository to: `$GOPATH/src/github.com/terraform-providers/terraform-provider-gridscale`
+Clone repository to: `$GOPATH/src/bitbucket/gridscale/terraform-provider-gridscale`
 
 ```sh
-$ mkdir -p $GOPATH/src/github.com/terraform-providers; cd $GOPATH/src/github.com/terraform-providers
-$ git clone git@github.com:terraform-providers/terraform-provider-gridscale
+$ mkdir -p $GOPATH/src/bitbucket.org/gridscale; cd $GOPATH/src/bitbucket.org/gridscale
+$ git clone git@bitbucket.org:gridscale/terraform-provider-gridscale.git
 ```
 
 Enter the provider directory and build the provider
 
 ```sh
-$ cd $GOPATH/src/github.com/terraform-providers/terraform-provider-gridscale
+$ cd $GOPATH/src/bitbucket.org/gridscale/terraform-provider-gridscale
 $ make build
 ```
 
 Using the provider
 ----------------------
-## Fill in for each provider
+See the [`website/docs`](website/docs) directory in this repo to get started on using the gridscale provider, be sure to read [`website/docs/index.html.markdown`](website/docs/index.html.markdown) first. Documentation on how to create resources like servers, storages and networks can be found in [`website/docs/r`](website/docs/r). Documentation on how to add resources like storages, networks and IP addresses to servers, check out the documentation on datasources found in [`website/docs/d`](website/docs/d).
 
 Developing the Provider
 ---------------------------
@@ -71,3 +66,12 @@ In order to run the full suite of Acceptance tests, run `make testacc`.
 ```sh
 $ make testacc
 ```
+
+Known Issues
+---------------------------
+The following issues are known to us:
+
+* Changing the name attribute in a template datasource will not trigger storages using this template to be recreated.
+* If a storage has snapshots, terraform can not delete it.
+* The autorecovery value of a server can't be changed with Terraform.
+* Adding a storage as boot device an existing server which already has storages linked to it, will result in a system which is unable to boot.

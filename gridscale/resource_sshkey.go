@@ -12,6 +12,10 @@ func resourceGridscaleSshkey() *schema.Resource {
 		Read:   resourceGridscaleSshkeyRead,
 		Delete: resourceGridscaleSshkeyDelete,
 		Update: resourceGridscaleSshkeyUpdate,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:        schema.TypeString,
@@ -67,7 +71,6 @@ func resourceGridscaleSshkeyRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("change_time", sshkey.Properties.ChangeTime)
 	d.Set("labels", sshkey.Properties.Labels)
 
-	log.Printf("Read the following: %v", sshkey)
 	return nil
 }
 

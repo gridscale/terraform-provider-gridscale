@@ -13,6 +13,10 @@ func resourceGridscaleIpv6() *schema.Resource {
 		Read:   resourceGridscaleIpRead,
 		Delete: resourceGridscaleIpDelete,
 		Update: resourceGridscaleIpUpdate,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
+
 		Schema: map[string]*schema.Schema{
 			"ip": {
 				Type:        schema.TypeString,
@@ -98,7 +102,7 @@ func resourceGridscaleIpv6() *schema.Resource {
 			},
 		},
 		Timeouts: &schema.ResourceTimeout{
-			Delete: schema.DefaultTimeout(time.Minute),
+			Delete: schema.DefaultTimeout(time.Minute * 3),
 		},
 	}
 }

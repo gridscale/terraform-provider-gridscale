@@ -3,14 +3,10 @@ GOFMT_FILES?=$$(find . -name '*.go' |grep -v vendor)
 WEBSITE_REPO=github.com/hashicorp/terraform-website
 PKG_NAME=gridscale
 
-default: testbuild
+default: build
 
 build: fmtcheck
 	go install
-
-testbuild: fmt
-	@go build
-	@cp -f $(CURDIR)/terraform-provider-gridscale /Users/wouter/.terraform.d/plugins/
 
 test: fmtcheck
 	go test -i $(TEST) || exit 1
@@ -53,6 +49,9 @@ website:
 ifeq (,$(wildcard $(GOPATH)/src/$(WEBSITE_REPO)))
 	echo "$(WEBSITE_REPO) not found in your GOPATH (necessary for layouts and assets), get-ting..."
 	git clone https://$(WEBSITE_REPO) $(GOPATH)/src/$(WEBSITE_REPO)
+	echo "Creating required symlinks in $(GOPATH)/src/$(WEBSITE_REPO)"
+	ln -s ../../../../ext/providers/$(PKG_NAME)/website/docs $(GOPATH)/src/$(WEBSITE_REPO)/content/source/docs/providers/$(PKG_NAME)
+	ln -s ../../../ext/providers/$(PKG_NAME)/website/$(PKG_NAME).erb $(GOPATH)/src/$(WEBSITE_REPO)/content/source/layouts/$(PKG_NAME).erb
 endif
 	@$(MAKE) -C $(GOPATH)/src/$(WEBSITE_REPO) website-provider PROVIDER_PATH=$(shell pwd) PROVIDER_NAME=$(PKG_NAME)
 
@@ -60,6 +59,9 @@ website-test:
 ifeq (,$(wildcard $(GOPATH)/src/$(WEBSITE_REPO)))
 	echo "$(WEBSITE_REPO) not found in your GOPATH (necessary for layouts and assets), get-ting..."
 	git clone https://$(WEBSITE_REPO) $(GOPATH)/src/$(WEBSITE_REPO)
+	echo "Creating required symlinks in $(GOPATH)/src/$(WEBSITE_REPO)"
+	ln -s ../../../../ext/providers/$(PKG_NAME)/website/docs $(GOPATH)/src/$(WEBSITE_REPO)/content/source/docs/providers/$(PKG_NAME)
+	ln -s ../../../ext/providers/$(PKG_NAME)/website/$(PKG_NAME).erb $(GOPATH)/src/$(WEBSITE_REPO)/content/source/layouts/$(PKG_NAME).erb
 endif
 	@$(MAKE) -C $(GOPATH)/src/$(WEBSITE_REPO) website-provider-test PROVIDER_PATH=$(shell pwd) PROVIDER_NAME=$(PKG_NAME)
 

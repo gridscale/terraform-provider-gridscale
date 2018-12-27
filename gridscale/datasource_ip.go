@@ -3,7 +3,6 @@ package gridscale
 import (
 	"bitbucket.org/gridscale/gsclient-go"
 	"github.com/hashicorp/terraform/helper/schema"
-	"log"
 )
 
 func dataSourceGridscaleIp() *schema.Resource {
@@ -23,7 +22,6 @@ func dataSourceGridscaleIpRead(d *schema.ResourceData, meta interface{}) error {
 
 	if err == nil {
 		d.SetId(ip.Properties.ObjectUuid)
-		log.Printf("Found IP: %v", ip)
 	}
 
 	return err
