@@ -93,7 +93,7 @@ func testAccCheckDataSourceGridscaleStorageExists(n string, object *gsclient.Sto
 func testAccCheckDataSourceGridscaleStorageDestroyCheck(s *terraform.State) error {
 	client := testAccProvider.Meta().(*gsclient.Client)
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "gridscale_server" {
+		if rs.Type != "gridscale_storage" {
 			continue
 		}
 
