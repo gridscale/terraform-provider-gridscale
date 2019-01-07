@@ -15,8 +15,9 @@ func TestAccDataSourceGridscaleIpv6_Basic(t *testing.T) {
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckDataSourceGridscaleIpDestroyCheck,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCheckDataSourceGridscaleIpv6Config_basic(name),

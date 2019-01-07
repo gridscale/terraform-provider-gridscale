@@ -15,8 +15,9 @@ func TestAccDataSourceGridscaleStorage_Basic(t *testing.T) {
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckDataSourceGridscaleStorageDestroyCheck,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCheckDataSourceGridscaleStorageConfig_basic(name),
@@ -37,8 +38,9 @@ func TestAccDataSourceGridscaleStorage_Advanced(t *testing.T) {
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckDataSourceGridscaleStorageDestroyCheck,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCheckDataSourceGridscaleStorageConfig_advanced(name),
@@ -86,6 +88,30 @@ func testAccCheckDataSourceGridscaleStorageExists(n string, object *gsclient.Sto
 
 		return nil
 	}
+}
+
+func testAccCheckDataSourceGridscaleStorageDestroyCheck(s *terraform.State) error {
+	client := testAccProvider.Meta().(*gsclient.Client)
+	for _, rs := range s.RootModule().Resources {
+		if rs.Type != "gridscale_server" {
+			continue
+		}
+
+		_, err := client.GetStorage(rs.Primary.ID)
+		if err != nil {
+			if requestError, ok := err.(*gsclient.RequestError); ok {
+				if requestError.StatusCode != 404 {
+					return fmt.Errorf("Object %s still exists", rs.Primary.ID)
+				}
+			} else {
+				return fmt.Errorf("Unable to fetching object %s", rs.Primary.ID)
+			}
+		} else {
+			return fmt.Errorf("Object %s still exists", rs.Primary.ID)
+		}
+	}
+
+	return nil
 }
 
 func testAccCheckDataSourceGridscaleStorageConfig_basic(name string) string {
