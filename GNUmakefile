@@ -1,12 +1,20 @@
 TEST?=$$(go list ./... |grep -v 'vendor')
 GOFMT_FILES?=$$(find . -name '*.go' |grep -v vendor)
+PLATFORMS=windows linux darwin
+ARCHES=amd64 386
 WEBSITE_REPO=github.com/hashicorp/terraform-website
 PKG_NAME=gridscale
+VERSION=1.0.0
 
 default: build
 
 build: fmtcheck
 	go install
+
+buildallplatforms:
+	$(foreach platform,$(PLATFORMS), \
+	    $(foreach arch,$(ARCHES), \
+	        GOOS=$(platform) GOARCH=$(arch) go build -o terraform-provider-$(PKG_NAME)-$(VERSION)-$(platform)-$(arch);))
 
 test: fmtcheck
 	go test -i $(TEST) || exit 1
