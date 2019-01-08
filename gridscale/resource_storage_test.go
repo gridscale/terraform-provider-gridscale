@@ -3,6 +3,7 @@ package gridscale
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"bitbucket.org/gridscale/gsclient-go"
 	"github.com/hashicorp/terraform/helper/acctest"
@@ -96,6 +97,9 @@ func testAccCheckDataSourceGridscaleStorageDestroyCheck(s *terraform.State) erro
 		if rs.Type != "gridscale_storage" {
 			continue
 		}
+
+		//We wait a while for the storage to delete, since it is not instant
+		time.Sleep(time.Second * 5)
 
 		_, err := client.GetStorage(rs.Primary.ID)
 		if err != nil {
