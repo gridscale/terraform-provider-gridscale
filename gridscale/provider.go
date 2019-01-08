@@ -20,6 +20,12 @@ func Provider() terraform.ResourceProvider {
 				DefaultFunc: schema.EnvDefaultFunc("GRIDSCALE_TOKEN", nil),
 				Description: "API-token for the gridscale API.",
 			},
+			"api_url": {
+				Type:        schema.TypeString,
+				Required:    true,
+				DefaultFunc: schema.EnvDefaultFunc("GRIDSCALE_URL", "https://api.gridscale.io"),
+				Description: "the url for the gridscale API.",
+			},
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"gridscale_storage":  dataSourceGridscaleStorage(),
@@ -46,6 +52,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	config := Config{
 		UserUUID: d.Get("uuid").(string),
 		APIToken: d.Get("token").(string),
+		APIUrl:   d.Get("api_url").(string),
 	}
 
 	return config.Client()

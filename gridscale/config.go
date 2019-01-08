@@ -3,6 +3,7 @@ package gridscale
 import (
 	"bitbucket.org/gridscale/gsclient-go"
 	"log"
+	"net/http"
 )
 
 //Arrays can't be constants in Go, but these will be used as constants
@@ -13,11 +14,18 @@ var AvailabilityZones = []string{"a", "b"}
 type Config struct {
 	UserUUID string
 	APIToken string
+	APIUrl   string
 }
 
 func (c *Config) Client() (*gsclient.Client, error) {
-	config := gsclient.NewConfiguration(c.UserUUID, c.APIToken)
-	client := gsclient.NewClient(config)
+	//config := gsclient.NewConfiguration(c.UserUUID, c.APIToken)
+	config := gsclient.Config{
+		APIUrl:     c.APIUrl,
+		UserUUID:   c.UserUUID,
+		APIToken:   c.APIToken,
+		HTTPClient: http.DefaultClient,
+	}
+	client := gsclient.NewClient(&config)
 
 	log.Print("[INFO] gridscale client configured")
 
