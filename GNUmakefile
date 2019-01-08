@@ -5,6 +5,7 @@ ARCHES=amd64 386
 WEBSITE_REPO=github.com/hashicorp/terraform-website
 PKG_NAME=gridscale
 VERSION=1.0.0
+EXECUTABLE_NAME=terraform-provider-$(PKG_NAME)-$(VERSION)
 
 default: build
 
@@ -15,6 +16,9 @@ buildallplatforms:
 	$(foreach platform,$(PLATFORMS), \
 	    $(foreach arch,$(ARCHES), \
 	        GOOS=$(platform) GOARCH=$(arch) go build -o terraform-provider-$(PKG_NAME)-$(VERSION)-$(platform)-$(arch);))
+	@echo "Renaming Windows files"
+	@if [ -f $(EXECUTABLE_NAME)-windows-amd64 ]; then mv $(EXECUTABLE_NAME)-windows-amd64 $(EXECUTABLE_NAME)-windows-amd64.exe; fi
+	@if [ -f $(EXECUTABLE_NAME)-windows-386 ]; then mv $(EXECUTABLE_NAME)-windows-386 $(EXECUTABLE_NAME)-windows-386.exe; fi
 
 test: fmtcheck
 	go test -i $(TEST) || exit 1
