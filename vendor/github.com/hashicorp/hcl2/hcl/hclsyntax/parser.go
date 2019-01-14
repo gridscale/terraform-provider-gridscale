@@ -273,10 +273,7 @@ Token:
 			return &Block{
 				Type:   blockType,
 				Labels: labels,
-				Body: &Body{
-					SrcRange: ident.Range,
-					EndRange: ident.Range,
-				},
+				Body:   nil,
 
 				TypeRange:       ident.Range,
 				LabelRanges:     labelRanges,
@@ -462,14 +459,7 @@ func (p *parser) parseBinaryOps(ops []map[TokenType]*Operation) (Expression, hcl
 
 func (p *parser) parseExpressionWithTraversals() (Expression, hcl.Diagnostics) {
 	term, diags := p.parseExpressionTerm()
-	ret, moreDiags := p.parseExpressionTraversals(term)
-	diags = append(diags, moreDiags...)
-	return ret, diags
-}
-
-func (p *parser) parseExpressionTraversals(from Expression) (Expression, hcl.Diagnostics) {
-	var diags hcl.Diagnostics
-	ret := from
+	ret := term
 
 Traversal:
 	for {
@@ -667,81 +657,44 @@ Traversal:
 			// the key value is something constant.
 
 			open := p.Read()
-			switch p.Peek().Type {
-			case TokenStar:
-				// This is a full splat expression, like foo[*], which consumes
-				// the rest of the traversal steps after it using a recursive
-				// call to this function.
-				p.Read() // consume star
-				close := p.Read()
+			// TODO: If we have a TokenStar inside our brackets, parse as
+			// a Splat expression: foo[*].baz[0].
+			var close Token
+			p.PushIncludeNewlines(false) // arbitrary newlines allowed in brackets
+			keyExpr, keyDiags := p.ParseExpression()
+			diags = append(diags, keyDiags...)
+			if p.recovery && keyDiags.HasErrors() {
+				close = p.recover(TokenCBrack)
+			} else {
+				close = p.Read()
 				if close.Type != TokenCBrack && !p.recovery {
 					diags = append(diags, &hcl.Diagnostic{
 						Severity: hcl.DiagError,
-						Summary:  "Missing close bracket on splat index",
-						Detail:   "The star for a full splat operator must be immediately followed by a closing bracket (\"]\").",
+						Summary:  "Missing close bracket on index",
+						Detail:   "The index operator must end with a closing bracket (\"]\").",
 						Subject:  &close.Range,
 					})
 					close = p.recover(TokenCBrack)
 				}
-				// Splat expressions use a special "anonymous symbol"  as a
-				// placeholder in an expression to be evaluated once for each
-				// item in the source expression.
-				itemExpr := &AnonSymbolExpr{
-					SrcRange: hcl.RangeBetween(open.Range, close.Range),
+			}
+			p.PopIncludeNewlines()
+
+			if lit, isLit := keyExpr.(*LiteralValueExpr); isLit {
+				litKey, _ := lit.Value(nil)
+				rng := hcl.RangeBetween(open.Range, close.Range)
+				step := hcl.TraverseIndex{
+					Key:      litKey,
+					SrcRange: rng,
 				}
-				// Now we'll recursively call this same function to eat any
-				// remaining traversal steps against the anonymous symbol.
-				travExpr, nestedDiags := p.parseExpressionTraversals(itemExpr)
-				diags = append(diags, nestedDiags...)
+				ret = makeRelativeTraversal(ret, step, rng)
+			} else {
+				rng := hcl.RangeBetween(open.Range, close.Range)
+				ret = &IndexExpr{
+					Collection: ret,
+					Key:        keyExpr,
 
-				ret = &SplatExpr{
-					Source: ret,
-					Each:   travExpr,
-					Item:   itemExpr,
-
-					SrcRange:    hcl.RangeBetween(open.Range, travExpr.Range()),
-					MarkerRange: hcl.RangeBetween(open.Range, close.Range),
-				}
-
-			default:
-
-				var close Token
-				p.PushIncludeNewlines(false) // arbitrary newlines allowed in brackets
-				keyExpr, keyDiags := p.ParseExpression()
-				diags = append(diags, keyDiags...)
-				if p.recovery && keyDiags.HasErrors() {
-					close = p.recover(TokenCBrack)
-				} else {
-					close = p.Read()
-					if close.Type != TokenCBrack && !p.recovery {
-						diags = append(diags, &hcl.Diagnostic{
-							Severity: hcl.DiagError,
-							Summary:  "Missing close bracket on index",
-							Detail:   "The index operator must end with a closing bracket (\"]\").",
-							Subject:  &close.Range,
-						})
-						close = p.recover(TokenCBrack)
-					}
-				}
-				p.PopIncludeNewlines()
-
-				if lit, isLit := keyExpr.(*LiteralValueExpr); isLit {
-					litKey, _ := lit.Value(nil)
-					rng := hcl.RangeBetween(open.Range, close.Range)
-					step := hcl.TraverseIndex{
-						Key:      litKey,
-						SrcRange: rng,
-					}
-					ret = makeRelativeTraversal(ret, step, rng)
-				} else {
-					rng := hcl.RangeBetween(open.Range, close.Range)
-					ret = &IndexExpr{
-						Collection: ret,
-						Key:        keyExpr,
-
-						SrcRange:  rng,
-						OpenRange: open.Range,
-					}
+					SrcRange:  rng,
+					OpenRange: open.Range,
 				}
 			}
 
@@ -860,7 +813,7 @@ func (p *parser) parseExpressionTerm() (Expression, hcl.Diagnostics) {
 	case TokenOQuote, TokenOHeredoc:
 		open := p.Read() // eat opening marker
 		closer := p.oppositeBracket(open.Type)
-		exprs, passthru, _, diags := p.parseTemplateInner(closer, tokenOpensFlushHeredoc(open))
+		exprs, passthru, _, diags := p.parseTemplateInner(closer)
 
 		closeRange := p.PrevRange()
 
@@ -1134,12 +1087,12 @@ func (p *parser) parseObjectCons() (Expression, hcl.Diagnostics) {
 		panic("parseObjectCons called without peeker pointing to open brace")
 	}
 
+	p.PushIncludeNewlines(true)
+	defer p.PopIncludeNewlines()
+
 	if forKeyword.TokenMatches(p.Peek()) {
 		return p.finishParsingForExpr(open)
 	}
-
-	p.PushIncludeNewlines(true)
-	defer p.PopIncludeNewlines()
 
 	var close Token
 
@@ -1179,8 +1132,7 @@ func (p *parser) parseObjectCons() (Expression, hcl.Diagnostics) {
 		next = p.Peek()
 		if next.Type != TokenEqual && next.Type != TokenColon {
 			if !p.recovery {
-				switch next.Type {
-				case TokenNewline, TokenComma:
+				if next.Type == TokenNewline || next.Type == TokenComma {
 					diags = append(diags, &hcl.Diagnostic{
 						Severity: hcl.DiagError,
 						Summary:  "Missing attribute value",
@@ -1188,23 +1140,7 @@ func (p *parser) parseObjectCons() (Expression, hcl.Diagnostics) {
 						Subject:  &next.Range,
 						Context:  hcl.RangeBetween(open.Range, next.Range).Ptr(),
 					})
-				case TokenIdent:
-					// Although this might just be a plain old missing equals
-					// sign before a reference, one way to get here is to try
-					// to write an attribute name containing a period followed
-					// by a digit, which was valid in HCL1, like this:
-					//     foo1.2_bar = "baz"
-					// We can't know exactly what the user intended here, but
-					// we'll augment our message with an extra hint in this case
-					// in case it is helpful.
-					diags = append(diags, &hcl.Diagnostic{
-						Severity: hcl.DiagError,
-						Summary:  "Missing key/value separator",
-						Detail:   "Expected an equals sign (\"=\") to mark the beginning of the attribute value. If you intended to given an attribute name containing periods or spaces, write the name in quotes to create a string literal.",
-						Subject:  &next.Range,
-						Context:  hcl.RangeBetween(open.Range, next.Range).Ptr(),
-					})
-				default:
+				} else {
 					diags = append(diags, &hcl.Diagnostic{
 						Severity: hcl.DiagError,
 						Summary:  "Missing key/value separator",
