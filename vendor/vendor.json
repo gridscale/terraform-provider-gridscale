@@ -3,6 +3,12 @@
 	"ignore": "appengine test github.com/hashicorp/nomad/ github.com/hashicorp/terraform/backend",
 	"package": [
 		{
+			"checksumSHA1": "rloxwmAuiVZZ5FWcqVrYWkOY1zU=",
+			"path": "bitbucket.org/gridscale/gsclient-go",
+			"revision": "e582c1747dc75452a4186f04b143049d0e42e3ba",
+			"revisionTime": "2019-01-14T13:29:02Z"
+		},
+		{
 			"checksumSHA1": "jQh1fnoKPKMURvKkpdRjN695nAQ=",
 			"path": "github.com/agext/levenshtein",
 			"revision": "5f10fee965225ac1eecdc234c09daf5cd9e7f7b6",
