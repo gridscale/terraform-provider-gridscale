@@ -13,7 +13,7 @@ default: build
 build: fmtcheck
 	go install
 
-buildallplatforms:
+buildallplatforms: fmtcheck
 	$(foreach platform,$(PLATFORMS), \
 	    $(foreach arch,$(ARCHES), \
 	        GOOS=$(platform) GOARCH=$(arch) mkdir -p $(BUILDDIR)/$(platform)_$(arch); go build -o $(BUILDDIR)/$(platform)_$(arch)/$(EXECUTABLE_NAME);))
