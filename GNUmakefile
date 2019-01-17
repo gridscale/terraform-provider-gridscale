@@ -1,12 +1,24 @@
 TEST?=$$(go list ./... |grep -v 'vendor')
 GOFMT_FILES?=$$(find . -name '*.go' |grep -v vendor)
+PLATFORMS=windows linux darwin
+ARCHES=amd64
+BUILDDIR=build
 WEBSITE_REPO=github.com/hashicorp/terraform-website
 PKG_NAME=gridscale
+VERSION=1.0.0
+EXECUTABLE_NAME=terraform-provider-$(PKG_NAME)_v$(VERSION)
 
 default: build
 
 build: fmtcheck
 	go install
+
+buildallplatforms: fmtcheck
+	$(foreach platform,$(PLATFORMS), \
+	    $(foreach arch,$(ARCHES), \
+	        GOOS=$(platform) GOARCH=$(arch) mkdir -p $(BUILDDIR)/$(platform)_$(arch); go build -o $(BUILDDIR)/$(platform)_$(arch)/$(EXECUTABLE_NAME);))
+	@echo "Renaming Windows file"
+	@if [ -f $(BUILDDIR)/windows_amd64/$(EXECUTABLE_NAME) ]; then mv $(BUILDDIR)/windows_amd64/$(EXECUTABLE_NAME) $(BUILDDIR)/windows_amd64/$(EXECUTABLE_NAME).exe; fi
 
 test: fmtcheck
 	go test -i $(TEST) || exit 1

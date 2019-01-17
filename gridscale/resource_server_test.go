@@ -83,6 +83,8 @@ func testAccCheckDataSourceGridscaleServerDestroyCheck(s *terraform.State) error
 			} else {
 				return fmt.Errorf("Unable to fetching object %s", rs.Primary.ID)
 			}
+		} else {
+			return fmt.Errorf("Object %s still exists", rs.Primary.ID)
 		}
 	}
 

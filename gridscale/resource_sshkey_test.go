@@ -15,8 +15,9 @@ func TestAccDataSourceGridscaleSshkey_Basic(t *testing.T) {
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckDataSourceGridscaleSshkeyDestroyCheck,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCheckDataSourceGridscaleSshkeyConfig_basic(name),
@@ -62,6 +63,30 @@ func testAccCheckDataSourceGridscaleSshkeyExists(n string, object *gsclient.Sshk
 
 		return nil
 	}
+}
+
+func testAccCheckDataSourceGridscaleSshkeyDestroyCheck(s *terraform.State) error {
+	client := testAccProvider.Meta().(*gsclient.Client)
+	for _, rs := range s.RootModule().Resources {
+		if rs.Type != "gridscale_sshkey" {
+			continue
+		}
+
+		_, err := client.GetSshkey(rs.Primary.ID)
+		if err != nil {
+			if requestError, ok := err.(*gsclient.RequestError); ok {
+				if requestError.StatusCode != 404 {
+					return fmt.Errorf("Object %s still exists", rs.Primary.ID)
+				}
+			} else {
+				return fmt.Errorf("Unable to fetching object %s", rs.Primary.ID)
+			}
+		} else {
+			return fmt.Errorf("Object %s still exists", rs.Primary.ID)
+		}
+	}
+
+	return nil
 }
 
 func testAccCheckDataSourceGridscaleSshkeyConfig_basic(name string) string {

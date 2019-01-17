@@ -20,7 +20,6 @@ package transport
 
 import (
 	"bytes"
-	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -32,6 +31,7 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
+	"golang.org/x/net/context"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/hpack"
 
@@ -237,7 +237,7 @@ func newHTTP2Server(conn net.Conn, config *ServerConfig) (_ ServerTransport, err
 		t.stats.HandleConn(t.ctx, connBegin)
 	}
 	if channelz.IsOn() {
-		t.channelzID = channelz.RegisterNormalSocket(t, config.ChannelzParentID, fmt.Sprintf("%s -> %s", t.remoteAddr, t.localAddr))
+		t.channelzID = channelz.RegisterNormalSocket(t, config.ChannelzParentID, "")
 	}
 	t.framer.writer.Flush()
 
@@ -284,7 +284,7 @@ func newHTTP2Server(conn net.Conn, config *ServerConfig) (_ ServerTransport, err
 }
 
 // operateHeader takes action on the decoded headers.
-func (t *http2Server) operateHeaders(frame *http2.MetaHeadersFrame, handle func(*Stream), traceCtx func(context.Context, string) context.Context) (fatal bool) {
+func (t *http2Server) operateHeaders(frame *http2.MetaHeadersFrame, handle func(*Stream), traceCtx func(context.Context, string) context.Context) (close bool) {
 	streamID := frame.Header().StreamID
 	state := decodeState{serverSide: true}
 	if err := state.decodeHeader(frame); err != nil {
@@ -296,7 +296,7 @@ func (t *http2Server) operateHeaders(frame *http2.MetaHeadersFrame, handle func(
 				onWrite:  func() {},
 			})
 		}
-		return false
+		return
 	}
 
 	buf := newRecvBuffer()
@@ -350,13 +350,13 @@ func (t *http2Server) operateHeaders(frame *http2.MetaHeadersFrame, handle func(
 				rstCode:  http2.ErrCodeRefusedStream,
 				onWrite:  func() {},
 			})
-			return false
+			return
 		}
 	}
 	t.mu.Lock()
 	if t.state != reachable {
 		t.mu.Unlock()
-		return false
+		return
 	}
 	if uint32(len(t.activeStreams)) >= t.maxStreams {
 		t.mu.Unlock()
@@ -366,7 +366,7 @@ func (t *http2Server) operateHeaders(frame *http2.MetaHeadersFrame, handle func(
 			rstCode:  http2.ErrCodeRefusedStream,
 			onWrite:  func() {},
 		})
-		return false
+		return
 	}
 	if streamID%2 != 1 || streamID <= t.maxStreamID {
 		t.mu.Unlock()
@@ -417,7 +417,7 @@ func (t *http2Server) operateHeaders(frame *http2.MetaHeadersFrame, handle func(
 		wq:       s.wq,
 	})
 	handle(s)
-	return false
+	return
 }
 
 // HandleStreams receives incoming streams using the given handler. This is

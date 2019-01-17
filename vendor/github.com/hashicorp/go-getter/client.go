@@ -248,23 +248,14 @@ func (c *Client) Get() error {
 	// If we're not downloading a directory, then just download the file
 	// and return.
 	if mode == ClientModeFile {
-		getFile := true
-		if checksumHash != nil {
-			if err := checksum(dst, checksumHash, checksumValue); err == nil {
-				// don't get the file if the checksum of dst is correct
-				getFile = false
-			}
+		err := g.GetFile(dst, u)
+		if err != nil {
+			return err
 		}
-		if getFile {
-			err := g.GetFile(dst, u)
-			if err != nil {
-				return err
-			}
 
-			if checksumHash != nil {
-				if err := checksum(dst, checksumHash, checksumValue); err != nil {
-					return err
-				}
+		if checksumHash != nil {
+			if err := checksum(dst, checksumHash, checksumValue); err != nil {
+				return err
 			}
 		}
 

@@ -74,4 +74,3 @@ The following issues are known to us:
 * Changing the name attribute in a template datasource will not trigger storages using this template to be recreated.
 * If a storage has snapshots, terraform can not delete it.
 * The autorecovery value of a server can't be changed with Terraform.
-* Adding a storage as boot device an existing server which already has storages linked to it, will result in a system which is unable to boot.
