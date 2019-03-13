@@ -24,7 +24,7 @@ resource "gridscale_ipv4" "terra-ipv4-test" {
 
 The following arguments are supported:
 
-* `name` - (Required) The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+* `name` - (Optional) The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
 
 * `location_uuid` - (Optional) Helps to identify which datacenter an object belongs to. Frankfurt is the default.
 
