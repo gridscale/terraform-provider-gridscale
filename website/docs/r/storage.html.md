@@ -34,7 +34,7 @@ The following arguments are supported:
 
 * `name` - (Required) The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
 
-* `capacity` - (Optional) required (integer - minimum: 1 - maximum: 4096).
+* `capacity` - (Required) required (integer - minimum: 1 - maximum: 4096).
 
 * `storage_type` - (Optional) (one of storage, storage_high, storage_insane).
 
