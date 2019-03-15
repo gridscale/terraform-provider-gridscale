@@ -16,9 +16,14 @@ build: fmtcheck
 buildallplatforms: fmtcheck
 	$(foreach platform,$(PLATFORMS), \
 	    $(foreach arch,$(ARCHES), \
-	        GOOS=$(platform) GOARCH=$(arch) mkdir -p $(BUILDDIR)/$(platform)_$(arch); go build -o $(BUILDDIR)/$(platform)_$(arch)/$(EXECUTABLE_NAME);))
+	        mkdir -p $(BUILDDIR)/$(platform)_$(arch); GOOS=$(platform) GOARCH=$(arch) go build -o $(BUILDDIR)/$(platform)_$(arch)/$(EXECUTABLE_NAME);))
 	@echo "Renaming Windows file"
 	@if [ -f $(BUILDDIR)/windows_amd64/$(EXECUTABLE_NAME) ]; then mv $(BUILDDIR)/windows_amd64/$(EXECUTABLE_NAME) $(BUILDDIR)/windows_amd64/$(EXECUTABLE_NAME).exe; fi
+
+clean:
+	$(foreach platform,$(PLATFORMS), \
+            $(foreach arch,$(ARCHES), \
+                rm $(BUILDDIR)/$(platform)_$(arch)/$(EXECUTABLE_NAME)*;))
 
 test: fmtcheck
 	go test -i $(TEST) || exit 1
