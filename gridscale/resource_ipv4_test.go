@@ -27,6 +27,18 @@ func TestAccDataSourceGridscaleIpv4_Basic(t *testing.T) {
 						"gridscale_ipv4.foo", "name", name),
 				),
 			},
+			{
+				Config: testAccCheckDataSourceGridscaleIpv4Config_basic_update(),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckDataSourceGridscaleIpv4Exists("gridscale_ipv4.foo", &object),
+					resource.TestCheckResourceAttr(
+						"gridscale_ipv4.foo", "name", "newname"),
+					resource.TestCheckResourceAttr(
+						"gridscale_ipv4.foo", "failover", "true"),
+					resource.TestCheckResourceAttr(
+						"gridscale_ipv4.foo", "reverse_dns", "test.test"),
+				),
+			},
 		},
 	})
 }
@@ -93,4 +105,14 @@ resource "gridscale_ipv4" "foo" {
   name   = "%s"
 }
 `, name)
+}
+
+func testAccCheckDataSourceGridscaleIpv4Config_basic_update() string {
+	return fmt.Sprintf(`
+resource "gridscale_ipv4" "foo" {
+  name   = "newname"
+  failover = true
+  reverse_dns = "test.test"
+}
+`)
 }
