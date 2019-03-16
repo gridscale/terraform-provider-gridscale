@@ -31,6 +31,18 @@ func TestAccDataSourceGridscaleServer_Basic(t *testing.T) {
 						"gridscale_server.foo", "memory", "1"),
 				),
 			},
+			{
+				Config: testAccCheckDataSourceGridscaleServerConfig_basic_update(),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckDataSourceGridscaleServerExists("gridscale_server.foo", &object),
+					resource.TestCheckResourceAttr(
+						"gridscale_server.foo", "name", "newname"),
+					resource.TestCheckResourceAttr(
+						"gridscale_server.foo", "cores", "2"),
+					resource.TestCheckResourceAttr(
+						"gridscale_server.foo", "memory", "2"),
+				),
+			},
 		},
 	})
 }
@@ -99,4 +111,14 @@ resource "gridscale_server" "foo" {
   memory = 1
 }
 `, name)
+}
+
+func testAccCheckDataSourceGridscaleServerConfig_basic_update() string {
+	return fmt.Sprintf(`
+resource "gridscale_server" "foo" {
+  name   = "newname"
+  cores = 2
+  memory = 2
+}
+`)
 }
