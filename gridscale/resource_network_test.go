@@ -27,6 +27,16 @@ func TestAccDataSourceGridscaleNetwork_Basic(t *testing.T) {
 						"gridscale_network.foo", "name", name),
 				),
 			},
+			{
+				Config: testAccCheckDataSourceGridscaleNetworkConfig_basic_update(),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckDataSourceGridscaleNetworkExists("gridscale_network.foo", &object),
+					resource.TestCheckResourceAttr(
+						"gridscale_network.foo", "name", "newname"),
+					resource.TestCheckResourceAttr(
+						"gridscale_network.foo", "l2security", "true"),
+				),
+			},
 		},
 	})
 }
@@ -93,4 +103,13 @@ resource "gridscale_network" "foo" {
   name   = "%s"
 }
 `, name)
+}
+
+func testAccCheckDataSourceGridscaleNetworkConfig_basic_update() string {
+	return fmt.Sprintf(`
+resource "gridscale_network" "foo" {
+  name   = "newname"
+  l2security = true
+}
+`)
 }

@@ -30,6 +30,14 @@ func TestAccDataSourceGridscaleStorage_Basic(t *testing.T) {
 						"gridscale_storage.foo", "capacity", "1"),
 				),
 			},
+			{
+				Config: testAccCheckDataSourceGridscaleStorageConfig_basic_update(),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckDataSourceGridscaleStorageExists("gridscale_storage.foo", &object),
+					resource.TestCheckResourceAttr(
+						"gridscale_storage.foo", "name", "newname"),
+				),
+			},
 		},
 	})
 }
@@ -125,6 +133,15 @@ resource "gridscale_storage" "foo" {
   capacity = 1
 }
 `, name)
+}
+
+func testAccCheckDataSourceGridscaleStorageConfig_basic_update() string {
+	return fmt.Sprintf(`
+resource "gridscale_storage" "foo" {
+  name   = "newname"
+  capacity = 1
+}
+`)
 }
 
 func testAccCheckDataSourceGridscaleStorageConfig_advanced(name string) string {
