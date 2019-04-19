@@ -171,18 +171,6 @@ func resourceGridscaleServer() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						//"vlan": {
-						//	Type:     schema.TypeInt,
-						//	Computed: true,
-						//},
-						//"vxlan": {
-						//	Type:     schema.TypeInt,
-						//	Computed: true,
-						//},
-						//"mcast": {
-						//	Type:     schema.TypeString,
-						//	Computed: true,
-						//},
 					},
 				},
 			},

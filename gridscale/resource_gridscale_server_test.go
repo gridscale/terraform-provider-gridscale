@@ -41,6 +41,8 @@ func TestAccDataSourceGridscaleServer_Basic(t *testing.T) {
 						"gridscale_server.foo", "cores", "2"),
 					resource.TestCheckResourceAttr(
 						"gridscale_server.foo", "memory", "2"),
+					resource.TestCheckResourceAttr(
+						"gridscale_server.foo", "power", "true"),
 				),
 			},
 		},
@@ -119,6 +121,7 @@ resource "gridscale_server" "foo" {
   name   = "newname"
   cores = 2
   memory = 2
+  power = true
 }
 `)
 }
