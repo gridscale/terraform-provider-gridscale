@@ -2,6 +2,7 @@ package gridscale
 
 import (
 	"bitbucket.org/gridscale/gsclient-go"
+	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
 	"log"
 )
@@ -69,7 +70,10 @@ func resourceGridscaleSshkeyRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("status", sshkey.Properties.Status)
 	d.Set("create_time", sshkey.Properties.CreateTime)
 	d.Set("change_time", sshkey.Properties.ChangeTime)
-	d.Set("labels", sshkey.Properties.Labels)
+
+	if err = d.Set("labels", sshkey.Properties.Labels); err != nil {
+		return fmt.Errorf("Error setting labels: %v", err)
+	}
 
 	return nil
 }
