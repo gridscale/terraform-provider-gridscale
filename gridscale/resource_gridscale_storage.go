@@ -184,9 +184,11 @@ func resourceGridscaleStorageRead(d *schema.ResourceData, meta interface{}) erro
 	d.Set("parent_uuid", storage.Properties.ParentUuid)
 	d.Set("name", storage.Properties.Name)
 	d.Set("location_name", storage.Properties.LocationName)
-	d.Set("labels", storage.Properties.Labels)
 	d.Set("create_time", storage.Properties.CreateTime)
 
+	if err = d.Set("labels", storage.Properties.Labels); err != nil {
+		return fmt.Errorf("Error setting labels: %v", err)
+	}
 	return nil
 }
 

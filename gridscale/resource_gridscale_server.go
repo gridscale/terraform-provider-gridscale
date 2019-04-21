@@ -274,7 +274,10 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("legacy", server.Properties.Legacy)
 	d.Set("usage_in_minutes_memory", server.Properties.UsageInMinutesMemory)
 	d.Set("usage_in_minutes_cores", server.Properties.UsageInMinutesCores)
-	d.Set("labels", server.Properties.Labels)
+
+	if err = d.Set("labels", server.Properties.Labels); err != nil {
+		return fmt.Errorf("Error setting labels: %v", err)
+	}
 
 	//Get storages
 	storages := make([]interface{}, 0)
@@ -295,9 +298,11 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 		}
 		storages = append(storages, storage)
 	}
-	d.Set("storage", storages)
+	if err = d.Set("storage", storages); err != nil {
+		return fmt.Errorf("Error setting storage: %v", err)
+	}
 
-	//Get storages
+	//Get networks
 	networks := make([]interface{}, 0)
 	for _, value := range server.Properties.Relations.Networks {
 		if !value.PublicNet {
@@ -318,7 +323,9 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 			networks = append(networks, network)
 		}
 	}
-	d.Set("network", networks)
+	if err = d.Set("network", networks); err != nil {
+		return fmt.Errorf("Error setting network: %v", err)
+	}
 
 	//Get IP addresses
 	var ipv4, ipv6 string
