@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/gridscale/terraform-provider-gridscale/gridscale"
+	"github.com/terraform-providers/terraform-provider-gridscale/gridscale"
 	"github.com/hashicorp/terraform/plugin"
 )
 
