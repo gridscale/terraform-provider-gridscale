@@ -9,7 +9,7 @@ import (
 //Arrays can't be constants in Go, but these will be used as constants
 var HardwareProfiles = []string{"default", "legacy", "nested", "cisco_csr", "sophos_utm", "f5_bigip", "q35"}
 var StorageTypes = []string{"storage", "storage_high", "storage_insane"}
-var AvailabilityZones = []string{"a", "b"}
+var AvailabilityZones = []string{"a", "b", "c"}
 
 type Config struct {
 	UserUUID string
