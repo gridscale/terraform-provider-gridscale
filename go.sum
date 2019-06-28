@@ -1,5 +1,3 @@
-bitbucket.org/gridscale/gsclient-go v0.0.0-20190114132902-e582c1747dc7 h1:KTjoRMuU4xllNQeGKQf/x488V4eg8pWSOxPjTjXsaLI=
-bitbucket.org/gridscale/gsclient-go v0.0.0-20190114132902-e582c1747dc7/go.mod h1:ozwHcL5kCo8ovueDmQZQLe2HEKTCNZrkH5/6l3R5N5c=
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 cloud.google.com/go v0.31.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
@@ -107,6 +105,8 @@ github.com/gopherjs/gopherjs v0.0.0-20181017120253-0766667cb4d1 h1:EGx4pi6eqNxGa
 github.com/gopherjs/gopherjs v0.0.0-20181017120253-0766667cb4d1/go.mod h1:wJfORRmW1u3UXTncJ5qlYoELFm8eSnnEO6hX4iZ3EWY=
 github.com/gorilla/websocket v1.4.0/go.mod h1:E7qHFY5m1UJ88s3WnNqhKjPHQ0heANvMoAMk2YaljkQ=
 github.com/gregjones/httpcache v0.0.0-20180305231024-9cad4c3443a7/go.mod h1:FecbI9+v66THATjSRHfNgh1IVFe/9kFxbXtjV0ctIMA=
+github.com/gridscale/gsclient-go v0.0.0-20190628083139-10855713ba11 h1:s0gaA4pPrq79NOdek/X53rbvPGq/Yrsp3AlmZpD6nzw=
+github.com/gridscale/gsclient-go v0.0.0-20190628083139-10855713ba11/go.mod h1:GqJohyXKzDhL7XBgOz3+sycVXeF8lXVdZSDcK5y8AIM=
 github.com/grpc-ecosystem/go-grpc-middleware v1.0.0/go.mod h1:FiyG127CGDf3tlThmgyCl78X/SZQqEOJBCDaAfeWzPs=
 github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0/go.mod h1:8NvIoxWQoOIhqOTXgfV/d3M/q6VIi02HzZEHgUlZvzk=
 github.com/grpc-ecosystem/grpc-gateway v1.5.0/go.mod h1:RSKVYQBd5MCa4OVpNdGskqpgL2+G+NZTnrVHpWWfpdw=
