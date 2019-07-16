@@ -27,58 +27,17 @@ func TestAccResourceGridscaleLoadBalancerBasic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"gridscale_loadbalancer.foo", "name", name),
 					resource.TestCheckResourceAttr(
-						"gridscale_loadbalancer.foo", "redirect_http_to_https", "false"),
-					resource.TestCheckResourceAttr(
 						"gridscale_loadbalancer.foo", "algorithm", "leastconn"),
 				),
 			},
 			{
-				Config: testAccCheckResourceGridscaleLoadBalancerConfig_update("roundrobin"),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckResourceGridscaleLoadBalancerExists("gridscale_loadbalancer.foo", &object),
-					resource.TestCheckResourceAttr(
-						"gridscale_loadbalancer.foo", "redirect_http_to_https", "false"),
-					resource.TestCheckResourceAttr(
-						"gridscale_loadbalancer.foo", "algorithm", "roundrobin"),
-					resource.TestCheckResourceAttr(
-						"gridscale_loadbalancer.foo", "labels", "test"),
-				),
-			},
-		},
-	})
-}
-
-func TestAccResourceGridscaleLoadBalancerBasic(t *testing.T) {
-	var object gsclient.LoadBalancer
-	name := fmt.Sprintf("object-%s", acctest.RandString(10))
-
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckResourceGridscaleLoadBalancerDestroyCheck,
-		Steps: []resource.TestStep{
-			{
-				Config: testAccCheckResourceGridscaleLoadBalancerConfig_basic(name, "leastconn"),
+				Config: testAccCheckResourceGridscaleLoadBalancerConfig_update("newname", "roundrobin"),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscaleLoadBalancerExists("gridscale_loadbalancer.foo", &object),
 					resource.TestCheckResourceAttr(
 						"gridscale_loadbalancer.foo", "name", name),
 					resource.TestCheckResourceAttr(
-						"gridscale_loadbalancer.foo", "redirect_http_to_https", "false"),
-					resource.TestCheckResourceAttr(
-						"gridscale_loadbalancer.foo", "algorithm", "leastconn"),
-				),
-			},
-			{
-				Config: testAccCheckResourceGridscaleLoadBalancerConfig_update("roundrobin"),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckResourceGridscaleLoadBalancerExists("gridscale_loadbalancer.foo", &object),
-					resource.TestCheckResourceAttr(
-						"gridscale_loadbalancer.foo", "redirect_http_to_https", "false"),
-					resource.TestCheckResourceAttr(
 						"gridscale_loadbalancer.foo", "algorithm", "roundrobin"),
-					resource.TestCheckResourceAttr(
-						"gridscale_loadbalancer.foo", "labels", "test"),
 				),
 			},
 		},
@@ -147,7 +106,7 @@ resource "gridscale_loadbalancer" "foo" {
 }`, name, algorithm)
 }
 
-func testAccCheckResourceGridscaleLoadBalancerConfig_update(algorithm string) string {
+func testAccCheckResourceGridscaleLoadBalancerConfig_update(name string, algorithm string) string {
 	return fmt.Sprintf(`
 	resource "gridscale_ipv4" "lb" {
 		name   = "loadbalancer-ipv4"
@@ -159,7 +118,7 @@ func testAccCheckResourceGridscaleLoadBalancerConfig_update(algorithm string) st
 		name   = "loadbalancer-server"
 	}
 	resource "gridscale_loadbalancer" "foo" {
-		name   = "newname"
+		name   = "%s"
 		algorithm = "%s"
 		redirect_http_to_https = false
 		listen_ipv4_uuid = "${gridscale_ipv4.lb.id}"
@@ -174,7 +133,7 @@ func testAccCheckResourceGridscaleLoadBalancerConfig_update(algorithm string) st
 			mode        =  "http"
 			target_port =  80
 		}
-}`, algorithm)
+}`, name, algorithm)
 }
 
 func testAccCheckResourceGridscaleLoadBalancerDestroyCheck(s *terraform.State) error {
