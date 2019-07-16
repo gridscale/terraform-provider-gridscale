@@ -123,7 +123,9 @@ func resourceGridscaleLoadBalancerCreate(d *schema.ResourceData, meta interface{
 		RedirectHTTPToHTTPS: d.Get("redirect_http_to_https").(bool),
 		ListenIPv4Uuid:      d.Get("listen_ipv4_uuid").(string),
 		ListenIPv6Uuid:      d.Get("listen_ipv6_uuid").(string),
-		Labels:              d.Get("labels").(*schema.Set).List(),
+	}
+	if labels, ok := d.GetOk("labels"); ok {
+		requestBody.Labels = expandLoadbalancerLabels(labels)
 	}
 	if backendServers, ok := d.GetOk("backend_server"); ok {
 		requestBody.BackendServers = expandLoadbalancerBackendServers(backendServers)
@@ -190,7 +192,9 @@ func resourceGridscaleLoadBalancerUpdate(d *schema.ResourceData, meta interface{
 		RedirectHTTPToHTTPS: d.Get("redirect_http_to_https").(bool),
 		ListenIPv4Uuid:      d.Get("listen_ipv4_uuid").(string),
 		ListenIPv6Uuid:      d.Get("listen_ipv6_uuid").(string),
-		Labels:              d.Get("labels").(*schema.Set).List(),
+	}
+	if labels, ok := d.GetOk("labels"); ok {
+		requestBody.Labels = expandLoadbalancerLabels(labels)
 	}
 	if backendServers, ok := d.GetOk("backend_server"); ok {
 		requestBody.BackendServers = expandLoadbalancerBackendServers(backendServers)
@@ -202,7 +206,7 @@ func resourceGridscaleLoadBalancerUpdate(d *schema.ResourceData, meta interface{
 
 	if err != nil {
 		return fmt.Errorf(
-			"Error waiting for server (%s) to be created: %s", requestBody.Name, err)
+			"Error waiting for loadbalancer (%s) to be updated: %s", requestBody.Name, err)
 	}
 	return resourceGridscaleLoadBalancerRead(d, meta)
 }
@@ -239,6 +243,11 @@ func expandLoadbalancerForwardingRules(forwardingRules interface{}) []gsclient.F
 		tempForwardingRules = append(tempForwardingRules, forwardingRule)
 	}
 	return tempForwardingRules
+}
+
+func expandLoadbalancerLabels(Labels interface{}) []interface{} {
+	// discard labels till get fixed in the backend
+	return make([]interface{}, 0)
 }
 
 func flattenLoadbalancerForwardingRules(forwardingRules []gsclient.ForwardingRule) []interface{} {

@@ -155,7 +155,7 @@ resource "gridscale_storage" "foo" {
   name   = "%s"
   capacity = 10
   storage_type= "storage"
-  labels = [ "test", "label" ]
+  labels = []
   template {
     template_uuid = "4db64bfc-9fb2-4976-80b5-94ff43b1233a"
     hostname = "ubuntu"

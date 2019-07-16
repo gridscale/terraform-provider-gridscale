@@ -35,7 +35,7 @@ func TestAccResourceGridscaleLoadBalancerBasic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscaleLoadBalancerExists("gridscale_loadbalancer.foo", &object),
 					resource.TestCheckResourceAttr(
-						"gridscale_loadbalancer.foo", "name", name),
+						"gridscale_loadbalancer.foo", "name", "newname"),
 					resource.TestCheckResourceAttr(
 						"gridscale_loadbalancer.foo", "algorithm", "roundrobin"),
 				),
@@ -93,7 +93,7 @@ resource "gridscale_loadbalancer" "foo" {
 	redirect_http_to_https = false
 	listen_ipv4_uuid = "${gridscale_ipv4.lb.id}"
 	listen_ipv6_uuid = "${gridscale_ipv6.lb.id}"
-	labels = []
+	labels = ["test"]
 	backend_server {
 		weight = 100
 		host   = "${gridscale_ipv4.server.ip}"
@@ -108,31 +108,31 @@ resource "gridscale_loadbalancer" "foo" {
 
 func testAccCheckResourceGridscaleLoadBalancerConfig_update(name string, algorithm string) string {
 	return fmt.Sprintf(`
-	resource "gridscale_ipv4" "lb" {
+resource "gridscale_ipv4" "lb" {
 		name   = "loadbalancer-ipv4"
-	}
-	resource "gridscale_ipv6" "lb" {
+}
+resource "gridscale_ipv6" "lb" {
 		name   = "loadbalancer-ipv6"
-	}
-	resource "gridscale_ipv4" "server" {
+}
+resource "gridscale_ipv4" "server" {
 		name   = "loadbalancer-server"
+}
+resource "gridscale_loadbalancer" "foo" {
+	name   = "%s"
+	algorithm = "%s"
+	redirect_http_to_https = false
+	listen_ipv4_uuid = "${gridscale_ipv4.lb.id}"
+	listen_ipv6_uuid = "${gridscale_ipv6.lb.id}"
+	labels = []
+	backend_server {
+		weight = 100
+		host   = "${gridscale_ipv4.server.ip}"
 	}
-	resource "gridscale_loadbalancer" "foo" {
-		name   = "%s"
-		algorithm = "%s"
-		redirect_http_to_https = false
-		listen_ipv4_uuid = "${gridscale_ipv4.lb.id}"
-		listen_ipv6_uuid = "${gridscale_ipv6.lb.id}"
-		labels = ["test"]
-		backend_server {
-			weight = 100
-			host   = "${gridscale_ipv4.server.ip}"
-		}
-		forwarding_rule {
-			listen_port =  80
-			mode        =  "http"
-			target_port =  80
-		}
+	forwarding_rule {
+		listen_port =  80
+		mode        =  "http"
+		target_port =  80
+	}
 }`, name, algorithm)
 }
 
