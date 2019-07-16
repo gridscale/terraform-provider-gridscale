@@ -8,17 +8,14 @@ import (
 
 func dataSourceGridscaleLoadBalancer() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceGridscaleLoadBalancerRead,
-
+		Read:   dataSourceGridscaleLoadBalancerRead,
 		Schema: map[string]*schema.Schema{},
 	}
 }
 
 func dataSourceGridscaleLoadBalancerRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-
 	id := d.Get("resource_id").(string)
-
 	loadbalancer, err := client.GetLoadBalancer(id)
 
 	if err == nil {

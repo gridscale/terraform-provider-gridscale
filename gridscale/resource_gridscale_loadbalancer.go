@@ -38,7 +38,7 @@ func resourceGridscaleLoadBalancer() *schema.Resource {
 				Description: "The algorithm used to process requests. Accepted values: roundrobin/leastconn.",
 				Required:    true,
 			},
-			"forwarding_rules": {
+			"forwarding_rule": {
 				Type:        schema.TypeSet,
 				Description: "List of forwarding rules for the Load balancer.",
 				Required:    true,
@@ -47,6 +47,7 @@ func resourceGridscaleLoadBalancer() *schema.Resource {
 						"letsencrypt_ssl": {
 							Type:     schema.TypeString,
 							Optional: true,
+							Default:  nil,
 						},
 						"listen_port": {
 							Type:     schema.TypeInt,
@@ -63,7 +64,7 @@ func resourceGridscaleLoadBalancer() *schema.Resource {
 					},
 				},
 			},
-			"backend_servers": {
+			"backend_server": {
 				Type:        schema.TypeSet,
 				Description: "List of backend servers.",
 				Required:    true,
@@ -85,6 +86,7 @@ func resourceGridscaleLoadBalancer() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "Status indicates the status of the object.",
 				Optional:    true,
+				Default:     "active",
 			},
 			"redirect_http_to_https": {
 				Type:        schema.TypeBool,
@@ -111,6 +113,34 @@ func resourceGridscaleLoadBalancer() *schema.Resource {
 	}
 }
 
+func resourceGridscaleLoadBalancerCreate(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*gsclient.Client)
+
+	requestBody := gsclient.LoadBalancerCreateRequest{
+		Name:                d.Get("name").(string),
+		Algorithm:           d.Get("algorithm").(string),
+		Status:              d.Get("status").(string),
+		RedirectHTTPToHTTPS: d.Get("redirect_http_to_https").(bool),
+		ListenIPv4Uuid:      d.Get("listen_ipv4_uuid").(string),
+		ListenIPv6Uuid:      d.Get("listen_ipv6_uuid").(string),
+		Labels:              d.Get("labels").(*schema.Set).List(),
+	}
+	if backendServers, ok := d.GetOk("backend_server"); ok {
+		requestBody.BackendServers = expandLoadbalancerBackendServers(backendServers)
+	}
+	if forwardingRules, ok := d.GetOk("forwarding_rule"); ok {
+		requestBody.ForwardingRules = expandLoadbalancerForwardingRules(forwardingRules)
+	}
+	response, err := client.CreateLoadBalancer(requestBody)
+
+	if err != nil {
+		return fmt.Errorf(
+			"Error waiting for loadbalancer (%s) to be created: %s", requestBody.Name, err)
+	}
+	d.SetId(response.ObjectUuid)
+	return resourceGridscaleLoadBalancerRead(d, meta)
+}
+
 func resourceGridscaleLoadBalancerRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	loadbalancer, err := client.GetLoadBalancer(d.Id())
@@ -126,13 +156,24 @@ func resourceGridscaleLoadBalancerRead(d *schema.ResourceData, meta interface{})
 
 	d.Set("name", loadbalancer.Properties.Name)
 	d.Set("algorithm", loadbalancer.Properties.Algorithm)
-	d.Set("forwarding_rules", loadbalancer.Properties.ForwardingRules)
-	d.Set("backend_servers", loadbalancer.Properties.BackendServers)
 	d.Set("status", loadbalancer.Properties.Status)
 	d.Set("redirect_http_to_https", loadbalancer.Properties.RedirectHTTPToHTTPS)
 	d.Set("listen_ipv4_uuid", loadbalancer.Properties.ListenIPv4Uuid)
 	d.Set("listen_ipv6_uuid", loadbalancer.Properties.ListenIPv6Uuid)
 
+	if loadbalancer.Properties.ForwardingRules != nil {
+		err = d.Set("forwarding_rule", flattenLoadbalancerForwardingRules(loadbalancer.Properties.ForwardingRules))
+		if err != nil {
+			return err
+		}
+	}
+	if loadbalancer.Properties.BackendServers != nil {
+		err = d.Set("backend_server", flattenLoadbalancerBackendServers(loadbalancer.Properties.BackendServers))
+
+		if err != nil {
+			return err
+		}
+	}
 	if err = d.Set("labels", loadbalancer.Properties.Labels); err != nil {
 		return fmt.Errorf("Error setting labels: %v", err)
 	}
@@ -140,59 +181,22 @@ func resourceGridscaleLoadBalancerRead(d *schema.ResourceData, meta interface{})
 	return nil
 }
 
-func resourceGridscaleLoadBalancerCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
-
-	requestBody := gsclient.LoadBalancerCreateRequest{
-		Name:      d.Get("name").(string),
-		Algorithm: d.Get("algorithm").(string),
-		Status:    d.Get("status").(string),
-		//ForwardingRules:     d.Get("forwarding_rules").(*schema.Set),
-		//BackendServers:      d.Get("backend_servers").(*schema.Set),
-		RedirectHTTPToHTTPS: d.Get("redirect_http_to_https").(bool),
-		ListenIPv4Uuid:      d.Get("listen_ipv4_uuid").(string),
-		ListenIPv6Uuid:      d.Get("listen_ipv6_uuid").(string),
-	}
-	if attr, ok := d.GetOk("forwarding_rules"); ok && len(attr.([]interface{})) > 0 {
-		requestBody.ForwardingRules = expandLoadbalancerForwardingRules(attr.(*schema.Set).List())
-	}
-
-	if attr, ok := d.GetOk("backend_servers"); ok && len(attr.([]interface{})) > 0 {
-		requestBody.BackendServers = expandLoadbalancerBackendServers(attr.(*schema.Set).List())
-	}
-	_, err := client.CreateLoadBalancer(requestBody)
-
-	if err != nil {
-		return fmt.Errorf(
-			"Error waiting for loadbalancer (%s) to be created: %s", requestBody.Name, err)
-	}
-
-	return resourceGridscaleLoadBalancerRead(d, meta)
-}
-
-func resourceGridscaleLoadBalancerDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
-	return client.DeleteLoadBalancer(d.Id())
-}
-
 func resourceGridscaleLoadBalancerUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	requestBody := gsclient.LoadBalancerUpdateRequest{
-		Name:      d.Get("name").(string),
-		Algorithm: d.Get("algorithm").(string),
-		//ForwardingRules:     d.Get("forwarding_rules").(*schema.Set),
-		//BackendServers:      d.Get("backend_servers").(*schema.Set),
+		Name:                d.Get("name").(string),
+		Algorithm:           d.Get("algorithm").(string),
 		Status:              d.Get("status").(string),
 		RedirectHTTPToHTTPS: d.Get("redirect_http_to_https").(bool),
 		ListenIPv4Uuid:      d.Get("listen_ipv4_uuid").(string),
 		ListenIPv6Uuid:      d.Get("listen_ipv6_uuid").(string),
+		Labels:              d.Get("labels").(*schema.Set).List(),
 	}
-	if attr, ok := d.GetOk("forwarding_rules"); ok && len(attr.([]interface{})) > 0 {
-		requestBody.ForwardingRules = expandLoadbalancerForwardingRules(attr.(*schema.Set).List())
+	if backendServers, ok := d.GetOk("backend_server"); ok {
+		requestBody.BackendServers = expandLoadbalancerBackendServers(backendServers)
 	}
-
-	if attr, ok := d.GetOk("backend_servers"); ok && len(attr.([]interface{})) > 0 {
-		requestBody.BackendServers = expandLoadbalancerBackendServers(attr.(*schema.Set).List())
+	if forwardingRules, ok := d.GetOk("forwarding_rule"); ok {
+		requestBody.ForwardingRules = expandLoadbalancerForwardingRules(forwardingRules)
 	}
 	err := client.UpdateLoadBalancer(d.Id(), requestBody)
 
@@ -203,46 +207,62 @@ func resourceGridscaleLoadBalancerUpdate(d *schema.ResourceData, meta interface{
 	return resourceGridscaleLoadBalancerRead(d, meta)
 }
 
-func expandLoadbalancerBackendServers(l []interface{}) []gsclient.BackendServer {
-	backendServers := []gsclient.BackendServer{}
-
-	for _, mRaw := range l {
-		if mRaw == nil {
-			continue
-		}
-
-		m := mRaw.(map[string]interface{})
-
-		backendServer := gsclient.BackendServer{
-			Weight: m["weight"].(int),
-			Host:   m["host"].(string),
-		}
-
-		backendServers = append(backendServers, backendServer)
-	}
-
-	return backendServers
+func resourceGridscaleLoadBalancerDelete(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*gsclient.Client)
+	id := d.Id()
+	return client.DeleteLoadBalancer(id)
 }
 
-func expandLoadbalancerForwardingRules(l []interface{}) []gsclient.ForwardingRule {
-	forwardingRules := []gsclient.ForwardingRule{}
-
-	for _, mRaw := range l {
-		if mRaw == nil {
-			continue
+func expandLoadbalancerBackendServers(backendServers interface{}) []gsclient.BackendServer {
+	tempBackendServers := []gsclient.BackendServer{}
+	for _, value := range backendServers.(*schema.Set).List() {
+		server := value.(map[string]interface{})
+		backendServer := gsclient.BackendServer{
+			Weight: server["weight"].(int),
+			Host:   server["host"].(string),
 		}
-
-		m := mRaw.(map[string]interface{})
-
-		forwardingRule := gsclient.ForwardingRule{
-			LetsencryptSSL: m["letsencrypt_ssl"].(*string),
-			ListenPort:     m["listen_port"].(int),
-			Mode:           m["mode"].(string),
-			TargetPort:     m["target_port"].(int),
-		}
-
-		forwardingRules = append(forwardingRules, forwardingRule)
+		tempBackendServers = append(tempBackendServers, backendServer)
 	}
+	return tempBackendServers
+}
 
-	return forwardingRules
+func expandLoadbalancerForwardingRules(forwardingRules interface{}) []gsclient.ForwardingRule {
+	tempForwardingRules := []gsclient.ForwardingRule{}
+	for _, value := range forwardingRules.(*schema.Set).List() {
+		rule := value.(map[string]interface{})
+		forwardingRule := gsclient.ForwardingRule{
+			LetsencryptSSL: nil,
+			ListenPort:     rule["listen_port"].(int),
+			Mode:           rule["mode"].(string),
+			TargetPort:     rule["target_port"].(int),
+		}
+		tempForwardingRules = append(tempForwardingRules, forwardingRule)
+	}
+	return tempForwardingRules
+}
+
+func flattenLoadbalancerForwardingRules(forwardingRules []gsclient.ForwardingRule) []interface{} {
+	tempForwardingRules := make([]interface{}, 0)
+	for _, value := range forwardingRules {
+		forwardingRule := map[string]interface{}{
+			"letsencrypt_ssl": value.LetsencryptSSL,
+			"listen_port":     value.ListenPort,
+			"mode":            value.Mode,
+			"target_port":     value.TargetPort,
+		}
+		tempForwardingRules = append(tempForwardingRules, forwardingRule)
+	}
+	return tempForwardingRules
+}
+
+func flattenLoadbalancerBackendServers(backendServers []gsclient.BackendServer) []interface{} {
+	tempBackendServers := make([]interface{}, 0)
+	for _, value := range backendServers {
+		backendServer := map[string]interface{}{
+			"weight": value.Weight,
+			"host":   value.Host,
+		}
+		tempBackendServers = append(tempBackendServers, backendServer)
+	}
+	return tempBackendServers
 }

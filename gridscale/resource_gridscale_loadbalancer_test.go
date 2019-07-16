@@ -11,28 +11,81 @@ import (
 	"github.com/gridscale/gsclient-go"
 )
 
-func TestAccDataSourceGridscaleLoadBalancerBasic(t *testing.T) {
+func TestAccResourceGridscaleLoadBalancerBasic(t *testing.T) {
 	var object gsclient.LoadBalancer
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckDataSourceGridscaleLoadBalancerDestroyCheck,
+		CheckDestroy: testAccCheckResourceGridscaleLoadBalancerDestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckDataSourceGridscaleLoadBalancerConfigBasic(name),
+				Config: testAccCheckResourceGridscaleLoadBalancerConfig_basic(name, "leastconn"),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckDataSourceGridscaleLoadBalancerExists("gridscale_loadbalancer.foo", &object),
+					testAccCheckResourceGridscaleLoadBalancerExists("gridscale_loadbalancer.foo", &object),
 					resource.TestCheckResourceAttr(
 						"gridscale_loadbalancer.foo", "name", name),
+					resource.TestCheckResourceAttr(
+						"gridscale_loadbalancer.foo", "redirect_http_to_https", "false"),
+					resource.TestCheckResourceAttr(
+						"gridscale_loadbalancer.foo", "algorithm", "leastconn"),
+				),
+			},
+			{
+				Config: testAccCheckResourceGridscaleLoadBalancerConfig_update("roundrobin"),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckResourceGridscaleLoadBalancerExists("gridscale_loadbalancer.foo", &object),
+					resource.TestCheckResourceAttr(
+						"gridscale_loadbalancer.foo", "redirect_http_to_https", "false"),
+					resource.TestCheckResourceAttr(
+						"gridscale_loadbalancer.foo", "algorithm", "roundrobin"),
+					resource.TestCheckResourceAttr(
+						"gridscale_loadbalancer.foo", "labels", "test"),
 				),
 			},
 		},
 	})
 }
 
-func testAccCheckDataSourceGridscaleLoadBalancerExists(n string, object *gsclient.LoadBalancer) resource.TestCheckFunc {
+func TestAccResourceGridscaleLoadBalancerBasic(t *testing.T) {
+	var object gsclient.LoadBalancer
+	name := fmt.Sprintf("object-%s", acctest.RandString(10))
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckResourceGridscaleLoadBalancerDestroyCheck,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCheckResourceGridscaleLoadBalancerConfig_basic(name, "leastconn"),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckResourceGridscaleLoadBalancerExists("gridscale_loadbalancer.foo", &object),
+					resource.TestCheckResourceAttr(
+						"gridscale_loadbalancer.foo", "name", name),
+					resource.TestCheckResourceAttr(
+						"gridscale_loadbalancer.foo", "redirect_http_to_https", "false"),
+					resource.TestCheckResourceAttr(
+						"gridscale_loadbalancer.foo", "algorithm", "leastconn"),
+				),
+			},
+			{
+				Config: testAccCheckResourceGridscaleLoadBalancerConfig_update("roundrobin"),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckResourceGridscaleLoadBalancerExists("gridscale_loadbalancer.foo", &object),
+					resource.TestCheckResourceAttr(
+						"gridscale_loadbalancer.foo", "redirect_http_to_https", "false"),
+					resource.TestCheckResourceAttr(
+						"gridscale_loadbalancer.foo", "algorithm", "roundrobin"),
+					resource.TestCheckResourceAttr(
+						"gridscale_loadbalancer.foo", "labels", "test"),
+				),
+			},
+		},
+	})
+}
+
+func testAccCheckResourceGridscaleLoadBalancerExists(n string, object *gsclient.LoadBalancer) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -64,63 +117,74 @@ func testAccCheckDataSourceGridscaleLoadBalancerExists(n string, object *gsclien
 	}
 }
 
-func testAccCheckDataSourceGridscaleLoadBalancerConfigBasic(name string) string {
+func testAccCheckResourceGridscaleLoadBalancerConfig_basic(name string, algorithm string) string {
 	return fmt.Sprintf(`
-resource "gridscale_ipv4" "foo" {
-	name   = "%s"
+resource "gridscale_ipv4" "lb" {
+	name   = "loadbalancer-ipv4"
+}
+resource "gridscale_ipv6" "lb" {
+	name   = "loadbalancer-ipv6"
 }
 resource "gridscale_ipv4" "server" {
-	name   = "server"
-}
-resource "gridscale_ipv6" "foo" {
-	name   = "%s"
-}
-resource "gridscale_server" "foo" {
-	name   = "%s"
-	cores = 2
-	memory = 2
-	power = true
-	ipv4 = "${gridscale_server.foo.id}"
+	name   = "loadbalancer-server"
 }
 resource "gridscale_loadbalancer" "foo" {
 	name   = "%s"
-	algorithm = "leastconn"
+	algorithm = "%s"
 	redirect_http_to_https = false
-	listen_ipv4_uuid = "${gridscale_ipv4.foo.id}"
-	listen_ipv6_uuid = "${gridscale_ipv6.foo.id}"
-	backend_servers {
+	listen_ipv4_uuid = "${gridscale_ipv4.lb.id}"
+	listen_ipv6_uuid = "${gridscale_ipv6.lb.id}"
+	labels = []
+	backend_server {
+		weight = 100
+		host   = "${gridscale_ipv4.server.ip}"
+	}
+	forwarding_rule {
+		listen_port =  80
+		mode        =  "http"
+		target_port =  80
+	}
+}`, name, algorithm)
+}
+
+func testAccCheckResourceGridscaleLoadBalancerConfig_update(algorithm string) string {
+	return fmt.Sprintf(`
+	resource "gridscale_ipv4" "lb" {
+		name   = "loadbalancer-ipv4"
+	}
+	resource "gridscale_ipv6" "lb" {
+		name   = "loadbalancer-ipv6"
+	}
+	resource "gridscale_ipv4" "server" {
+		name   = "loadbalancer-server"
+	}
+	resource "gridscale_loadbalancer" "foo" {
+		name   = "newname"
+		algorithm = "%s"
+		redirect_http_to_https = false
+		listen_ipv4_uuid = "${gridscale_ipv4.lb.id}"
+		listen_ipv6_uuid = "${gridscale_ipv6.lb.id}"
+		labels = ["test"]
 		backend_server {
 			weight = 100
 			host   = "${gridscale_ipv4.server.ip}"
-		},
-	}
-	forwarding_rules {
+		}
 		forwarding_rule {
-			listen_port=     8080
-			mode       =     "http"
-			target_port=     8000
-		},
-	}
-	
-}`, name, name, name, name)
+			listen_port =  80
+			mode        =  "http"
+			target_port =  80
+		}
+}`, algorithm)
 }
 
-func testAccCheckDataSourceGridscaleLoadBalancerConfigUpdate() string {
-	return fmt.Sprintf(`
-resource "gridscale_loadbalancer" "foo" {
-  name   = "newname"
-}
-`)
-}
-
-func testAccCheckDataSourceGridscaleLoadBalancerDestroyCheck(s *terraform.State) error {
+func testAccCheckResourceGridscaleLoadBalancerDestroyCheck(s *terraform.State) error {
 	client := testAccProvider.Meta().(*gsclient.Client)
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gridscale_loadbalancer" {
 			continue
 		}
 
-		_, err := client.GetIp(rs.Primary.ID)
+		_, err := client.GetLoadBalancer(rs.Primary.ID)
 		if err != nil {
 			if requestError, ok := err.(*gsclient.RequestError); ok {
 				if requestError.StatusCode != 404 {
