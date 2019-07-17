@@ -79,43 +79,13 @@ func testAccCheckResourceGridscaleLoadBalancerExists(n string, object *gsclient.
 func testAccCheckResourceGridscaleLoadBalancerConfig_basic(name string, algorithm string) string {
 	return fmt.Sprintf(`
 resource "gridscale_ipv4" "lb" {
-	name   = "loadbalancer-ipv4"
+	name   = "ipv4-%s"
 }
 resource "gridscale_ipv6" "lb" {
-	name   = "loadbalancer-ipv6"
+	name   = "ipv6-%s"
 }
 resource "gridscale_ipv4" "server" {
-	name   = "loadbalancer-server"
-}
-resource "gridscale_loadbalancer" "foo" {
-	name   = "%s"
-	algorithm = "%s"
-	redirect_http_to_https = false
-	listen_ipv4_uuid = "${gridscale_ipv4.lb.id}"
-	listen_ipv6_uuid = "${gridscale_ipv6.lb.id}"
-	labels = ["test"]
-	backend_server {
-		weight = 100
-		host   = "${gridscale_ipv4.server.ip}"
-	}
-	forwarding_rule {
-		listen_port =  80
-		mode        =  "http"
-		target_port =  80
-	}
-}`, name, algorithm)
-}
-
-func testAccCheckResourceGridscaleLoadBalancerConfig_update(name string, algorithm string) string {
-	return fmt.Sprintf(`
-resource "gridscale_ipv4" "lb" {
-		name   = "loadbalancer-ipv4"
-}
-resource "gridscale_ipv6" "lb" {
-		name   = "loadbalancer-ipv6"
-}
-resource "gridscale_ipv4" "server" {
-		name   = "loadbalancer-server"
+	name   = "server-%s"
 }
 resource "gridscale_loadbalancer" "foo" {
 	name   = "%s"
@@ -133,7 +103,37 @@ resource "gridscale_loadbalancer" "foo" {
 		mode        =  "http"
 		target_port =  80
 	}
-}`, name, algorithm)
+}`, name, name, name, name, algorithm)
+}
+
+func testAccCheckResourceGridscaleLoadBalancerConfig_update(name string, algorithm string) string {
+	return fmt.Sprintf(`
+resource "gridscale_ipv4" "lb" {
+	name   = "ipv4-%s"
+}
+resource "gridscale_ipv6" "lb" {
+	name   = "ipv6-%s"
+}
+resource "gridscale_ipv4" "server" {
+	name   = "server-%s"
+}
+resource "gridscale_loadbalancer" "foo" {
+	name   = "%s"
+	algorithm = "%s"
+	redirect_http_to_https = false
+	listen_ipv4_uuid = "${gridscale_ipv4.lb.id}"
+	listen_ipv6_uuid = "${gridscale_ipv6.lb.id}"
+	labels = []
+	backend_server {
+		weight = 100
+		host   = "${gridscale_ipv4.server.ip}"
+	}
+	forwarding_rule {
+		listen_port =  80
+		mode        =  "http"
+		target_port =  80
+	}
+}`, name, name, name, name, algorithm)
 }
 
 func testAccCheckResourceGridscaleLoadBalancerDestroyCheck(s *terraform.State) error {
