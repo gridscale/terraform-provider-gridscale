@@ -23,7 +23,7 @@ type LoadBalancerProperties struct {
 	Algorithm           string                    `json:"algorithm"`
 	ForwardingRules     []ForwardingRule          `json:"forwarding_rules"`
 	BackendServers      []BackendServer           `json:"backend_servers"`
-	Labels              []string                  `json:"labels"`
+	Labels              []interface{}             `json:"labels"`
 	LocationUuid        string                    `json:"location_uuid"`
 	RedirectHTTPToHTTPS bool                      `json:"redirect_http_to_https"`
 	CreateTime          string                    `json:"create_time"`
@@ -68,7 +68,7 @@ type LoadBalancerUpdateRequest struct {
 	Algorithm           string           `json:"algorithm"`
 	ForwardingRules     []ForwardingRule `json:"forwarding_rules"`
 	BackendServers      []BackendServer  `json:"backend_servers"`
-	Labels              []string         `json:"labels"`
+	Labels              []interface{}    `json:"labels"`
 	LocationUuid        string           `json:"location_uuid"`
 	RedirectHTTPToHTTPS bool             `json:"redirect_http_to_https"`
 	Status              string           `json:"status,omitempty"`
