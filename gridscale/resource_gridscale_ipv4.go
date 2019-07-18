@@ -2,11 +2,13 @@ package gridscale
 
 import (
 	"fmt"
-	"github.com/gridscale/gsclient-go"
-	"github.com/hashicorp/terraform/helper/resource"
-	"github.com/hashicorp/terraform/helper/schema"
 	"log"
 	"time"
+
+	"github.com/hashicorp/terraform/helper/resource"
+	"github.com/hashicorp/terraform/helper/schema"
+
+	"github.com/gridscale/gsclient-go"
 )
 
 func resourceGridscaleIpv4() *schema.Resource {

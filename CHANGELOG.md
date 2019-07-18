@@ -1,4 +1,6 @@
-## 1.1.0 (Unreleased)
+## 1.x.x (Unreleased)
+
+## 1.1.0 (July 10, 2019)
 
 FEATURES:
 

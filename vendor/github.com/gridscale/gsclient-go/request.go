@@ -134,7 +134,7 @@ func (c *Client) WaitForServerPowerStatus(id string, status bool) error {
 				return err
 			}
 			if server.Properties.Power == status {
-				log.Print("The power status of the server with id %v has changed to %s", id, status)
+				log.Printf("The power status of the server with id %v has changed to %t", id, status)
 				return nil
 			}
 		}

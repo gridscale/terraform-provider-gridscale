@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/gridscale/gsclient-go"
 	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
+
+	"github.com/gridscale/gsclient-go"
 )
 
 func TestAccDataSourceGridscaleSshkey_Basic(t *testing.T) {

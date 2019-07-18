@@ -6,23 +6,20 @@ import (
 	"github.com/gridscale/gsclient-go"
 )
 
-func dataSourceGridscaleSshkey() *schema.Resource {
+func dataSourceGridscaleLoadBalancer() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceGridscaleSshkeyRead,
-
+		Read:   dataSourceGridscaleLoadBalancerRead,
 		Schema: map[string]*schema.Schema{},
 	}
 }
 
-func dataSourceGridscaleSshkeyRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceGridscaleLoadBalancerRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-
 	id := d.Get("resource_id").(string)
-
-	sshkey, err := client.GetSshkey(id)
+	loadbalancer, err := client.GetLoadBalancer(id)
 
 	if err == nil {
-		d.SetId(sshkey.Properties.ObjectUuid)
+		d.SetId(loadbalancer.Properties.ObjectUuid)
 	}
 
 	return err

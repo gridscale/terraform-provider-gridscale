@@ -13,7 +13,7 @@ First the Go programming language will need to be installed. This can be done by
 Downloading the gridscale Go client can be done with the following go command:
 
 ```
-go get "bitbucket.org/gridscale/gsclient-go"
+go get "github.com/gridscale/gsclient-go"
 ```
 
 ## Using the gridscale Client
@@ -22,7 +22,7 @@ To be able to use the gridscale Go client in an application it can be imported i
 
 ```go
 import (
-	"bitbucket.org/gridscale/gsclient-go"
+	"github.com/gridscale/gsclient-go"
 )
 ```
 
@@ -56,7 +56,7 @@ client.CreateIp(requestBody)
 
 What options are available for each create and update request can be found in the source code. After installing it should be located in: 
 ```
-~/go/src/bitbucket.org/gridscale/gsclient-go
+~/go/src/github.com/gridscale/gsclient-go
 ```
 
 ## Implemented API Endpoints
@@ -92,6 +92,13 @@ Not all endpoints have been implemented in this client, but new ones will be add
 	* Network Patch (UpdateNetwork)
 	* Network Delete (DeleteNetwork)
 	* (GetNetworkPublic) No official endpoint, but gives the Public Network
+* Loadbalancers
+	* LoadBalancers Get (GetLoadBalancerList)
+	* LoadBalancer Get (GetLoadBalancer)
+	* LoadBalancer Create (CreateLoadBalancer)
+	* LoadBalancer Patch (UpdateLoadBalancer)
+	* LoadBalancer Delete (DeleteLoadBalancer)
+	* LoadBalancerEvents Get (GetLoadBalancerEventList)
 * IPs
 	* IPs Get (GetIpList)
 	* IP Get (GetIp)

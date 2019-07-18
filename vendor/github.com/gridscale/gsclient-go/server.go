@@ -1,9 +1,5 @@
 package gsclient
 
-import (
-	"fmt"
-)
-
 type Servers struct {
 	List map[string]ServerProperties `json:"servers"`
 }
@@ -137,10 +133,6 @@ type ServerUpdateRequest struct {
 }
 
 func (c *Client) GetServer(id string) (*Server, error) {
-	if id == "" {
-		return nil, fmt.Errorf(
-			"Can't read without id", nil)
-	}
 	r := Request{
 		uri:    apiServerBase + "/" + id,
 		method: "GET",

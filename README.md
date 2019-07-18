@@ -67,6 +67,12 @@ In order to run the full suite of Acceptance tests, run `make testacc`.
 $ make testacc
 ```
 
+In order to run a specific Acceptance test.
+
+```sh
+$ make testacc TEST=./gridscale/ TESTARGS='-run=TestAccResourceGridscaleLoadBalancerBasic'
+```
+
 Known Issues
 ---------------------------
 The following issues are known to us:
