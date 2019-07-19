@@ -5,7 +5,7 @@ ARCHES=amd64
 BUILDDIR=build
 WEBSITE_REPO=github.com/hashicorp/terraform-website
 PKG_NAME=gridscale
-VERSION=1.1.0
+VERSION=1.2.0-beta1
 EXECUTABLE_NAME=terraform-provider-$(PKG_NAME)_v$(VERSION)
 
 default: build
