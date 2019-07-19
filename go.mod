@@ -1,4 +1,4 @@
-module github.com/gridscale/terraform-provider-gridscale
+module github.com/terraform-providers/terraform-provider-gridscale
 
 require (
 	github.com/gridscale/gsclient-go v0.0.0-20190628083139-10855713ba11
