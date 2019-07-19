@@ -2,13 +2,15 @@ package gridscale
 
 import (
 	"fmt"
-	"github.com/gridscale/gsclient-go"
-	"github.com/hashicorp/terraform/helper/resource"
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/helper/validation"
 	"log"
 	"strings"
 	"time"
+
+	"github.com/hashicorp/terraform/helper/resource"
+	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
+
+	"github.com/gridscale/gsclient-go"
 )
 
 func resourceGridscaleStorage() *schema.Resource {
