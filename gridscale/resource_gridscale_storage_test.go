@@ -5,10 +5,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gridscale/gsclient-go"
 	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
+
+	"github.com/gridscale/gsclient-go"
 )
 
 func TestAccDataSourceGridscaleStorage_Basic(t *testing.T) {
@@ -154,7 +155,7 @@ resource "gridscale_storage" "foo" {
   name   = "%s"
   capacity = 10
   storage_type= "storage"
-  labels = [ "test", "label" ]
+  labels = []
   template {
     template_uuid = "4db64bfc-9fb2-4976-80b5-94ff43b1233a"
     hostname = "ubuntu"

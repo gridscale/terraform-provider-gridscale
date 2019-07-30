@@ -1,4 +1,8 @@
-## 1.x.x (Unreleased)
+## 1.2.0 (July 30, 2019)
+
+FEATURES:
+
+* Add support for LBaaS (CH-15)
 
 ## 1.1.0 (July 10, 2019)
 
