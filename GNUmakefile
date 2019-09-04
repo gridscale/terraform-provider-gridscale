@@ -5,7 +5,7 @@ ARCHES=amd64
 BUILDDIR=build
 WEBSITE_REPO=github.com/hashicorp/terraform-website
 PKG_NAME=gridscale
-VERSION=1.0.0
+VERSION=1.1.0
 EXECUTABLE_NAME=terraform-provider-$(PKG_NAME)_v$(VERSION)
 
 default: build
@@ -74,8 +74,8 @@ ifeq (,$(wildcard $(GOPATH)/src/$(WEBSITE_REPO)))
 	echo "$(WEBSITE_REPO) not found in your GOPATH (necessary for layouts and assets), get-ting..."
 	git clone https://$(WEBSITE_REPO) $(GOPATH)/src/$(WEBSITE_REPO)
 	echo "Creating required symlinks in $(GOPATH)/src/$(WEBSITE_REPO)"
-	ln -s ../../../../ext/providers/$(PKG_NAME)/website/docs $(GOPATH)/src/$(WEBSITE_REPO)/content/source/docs/providers/$(PKG_NAME)
-	ln -s ../../../ext/providers/$(PKG_NAME)/website/$(PKG_NAME).erb $(GOPATH)/src/$(WEBSITE_REPO)/content/source/layouts/$(PKG_NAME).erb
+	ln -fs ../../../../ext/providers/$(PKG_NAME)/website/docs $(GOPATH)/src/$(WEBSITE_REPO)/content/source/docs/providers/$(PKG_NAME)
+	ln -fs ../../../ext/providers/$(PKG_NAME)/website/$(PKG_NAME).erb $(GOPATH)/src/$(WEBSITE_REPO)/content/source/layouts/$(PKG_NAME).erb
 endif
 	@$(MAKE) -C $(GOPATH)/src/$(WEBSITE_REPO) website-provider-test PROVIDER_PATH=$(shell pwd) PROVIDER_NAME=$(PKG_NAME)
 

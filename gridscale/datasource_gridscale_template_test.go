@@ -2,8 +2,9 @@ package gridscale
 
 import (
 	"fmt"
-	"github.com/hashicorp/terraform/helper/resource"
 	"testing"
+
+	"github.com/hashicorp/terraform/helper/resource"
 )
 
 func TestAccDataSourceTemplate_basic(t *testing.T) {

@@ -1,10 +1,12 @@
 package gridscale
 
 import (
-	"bitbucket.org/gridscale/gsclient-go"
 	"fmt"
-	"github.com/hashicorp/terraform/helper/schema"
 	"log"
+
+	"github.com/hashicorp/terraform/helper/schema"
+
+	"github.com/gridscale/gsclient-go"
 )
 
 func resourceGridscaleSshkey() *schema.Resource {

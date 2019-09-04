@@ -15,7 +15,7 @@ This provider plugin is maintained by the Terraform team at [gridscale](https://
 Requirements
 ------------
 
--	[Terraform](https://www.terraform.io/downloads.html) 0.10.x
+-	[Terraform](https://www.terraform.io/downloads.html) 0.12.x
 -	[Go](https://golang.org/doc/install) 1.11 (to build the provider plugin)
 
 Building The Provider
@@ -65,6 +65,12 @@ In order to run the full suite of Acceptance tests, run `make testacc`.
 
 ```sh
 $ make testacc
+```
+
+In order to run a specific Acceptance test.
+
+```sh
+$ make testacc TEST=./gridscale/ TESTARGS='-run=TestAccResourceGridscaleLoadBalancerBasic'
 ```
 
 Known Issues

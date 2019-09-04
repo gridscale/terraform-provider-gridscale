@@ -1,12 +1,14 @@
 package gridscale
 
 import (
-	"bitbucket.org/gridscale/gsclient-go"
 	"fmt"
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/helper/validation"
 	"log"
 	"strings"
+
+	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
+
+	"github.com/gridscale/gsclient-go"
 )
 
 func resourceGridscaleServer() *schema.Resource {
@@ -215,7 +217,7 @@ func resourceGridscaleServer() *schema.Resource {
 						}
 					}
 					if !valid {
-						errors = append(errors, fmt.Errorf("%v is not a valid hardware profile. Valid hardware profiles are: %v", v.(string), strings.Join(AvailabilityZones, ",")))
+						errors = append(errors, fmt.Errorf("%v is not a valid availability zone. Valid availability zones are: %v", v.(string), strings.Join(AvailabilityZones, ",")))
 					}
 					return
 				},
