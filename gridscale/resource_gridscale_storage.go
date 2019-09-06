@@ -202,6 +202,10 @@ func resourceGridscaleStorageUpdate(d *schema.ResourceData, meta interface{}) er
 	if err != nil {
 		return err
 	}
+	err = pauseWhenProvisoning(client, storageService, d.Id())
+	if err != nil {
+		return err
+	}
 	return resourceGridscaleStorageRead(d, meta)
 }
 

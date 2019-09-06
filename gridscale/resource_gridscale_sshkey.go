@@ -88,6 +88,10 @@ func resourceGridscaleSshkeyUpdate(d *schema.ResourceData, meta interface{}) err
 	if err != nil {
 		return err
 	}
+	err = pauseWhenProvisoning(client, sshKeyService, d.Id())
+	if err != nil {
+		return err
+	}
 	return resourceGridscaleSshkeyRead(d, meta)
 }
 

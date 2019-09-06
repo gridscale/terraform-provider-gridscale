@@ -98,7 +98,7 @@ func testAccCheckDataSourceGridscaleServerDestroyCheck(s *terraform.State) error
 
 func testAccCheckDataSourceGridscaleServerConfig_basic(name string) string {
 	return fmt.Sprintf(`
-resource "gridscale_ipv4" "ip" {
+resource "gridscale_ipv4" "ipserver" {
 	name = "test-ip"
 }
 
@@ -106,17 +106,13 @@ resource "gridscale_server" "foo" {
   name   = "%s"
   cores = 1
   memory = 1
-  ipv4 = "${gridscale_ipv4.ip.id}"
+  ipv4 = "${gridscale_ipv4.ipserver.id}"
 }
 `, name)
 }
 
 func testAccCheckDataSourceGridscaleServerConfig_basic_update() string {
 	return fmt.Sprintf(`
-resource "gridscale_ipv4" "ip" {
-	name = "test-ip"
-}
-
 resource "gridscale_server" "foo" {
   name   = "newname"
   cores = 2

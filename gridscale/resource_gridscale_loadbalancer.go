@@ -2,11 +2,9 @@ package gridscale
 
 import (
 	"fmt"
-
+	"github.com/gridscale/gsclient-go"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
-
-	"github.com/gridscale/gsclient-go"
 )
 
 func resourceGridscaleLoadBalancer() *schema.Resource {
@@ -195,10 +193,13 @@ func resourceGridscaleLoadBalancerUpdate(d *schema.ResourceData, meta interface{
 		requestBody.ForwardingRules = expandLoadbalancerForwardingRules(forwardingRules)
 	}
 	err := client.UpdateLoadBalancer(d.Id(), requestBody)
-
 	if err != nil {
 		return fmt.Errorf(
 			"Error waiting for loadbalancer (%s) to be updated: %s", requestBody.Name, err)
+	}
+	err = pauseWhenProvisoning(client, loadbalancerService, d.Id())
+	if err != nil {
+		return err
 	}
 	return resourceGridscaleLoadBalancerRead(d, meta)
 }

@@ -551,7 +551,15 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 	if d.HasChange("ipv4") {
 		oldIp, newIp := d.GetChange("ipv4")
 		if newIp == "" {
-			err = client.UnlinkIP(d.Id(), oldIp.(string))
+			//if ip is deleted already then no need to unlink
+			//just remove the ip from server data
+			_, err := client.GetIP(oldIp.(string))
+			if err != nil {
+				err = nil
+				d.Set("ipv4", nil)
+			} else {
+				err = client.UnlinkIP(d.Id(), oldIp.(string))
+			}
 		} else {
 			err = client.LinkIP(d.Id(), newIp.(string))
 		}
@@ -565,7 +573,15 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 	if d.HasChange("ipv6") {
 		oldIp, newIp := d.GetChange("ipv6")
 		if newIp == "" {
-			err = client.UnlinkIP(d.Id(), oldIp.(string))
+			//if ip is deleted already then no need to unlink
+			//just remove the ip from server data
+			_, err := client.GetIP(oldIp.(string))
+			if err != nil {
+				err = nil
+				d.Set("ipv6", nil)
+			} else {
+				err = client.UnlinkIP(d.Id(), oldIp.(string))
+			}
 		} else {
 			err = client.LinkIP(d.Id(), newIp.(string))
 		}
@@ -671,6 +687,10 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 	} else {
 		err = client.ShutdownServer(d.Id())
 	}
+	if err != nil {
+		return err
+	}
+	err = pauseWhenProvisoning(client, serverService, d.Id())
 	if err != nil {
 		return err
 	}

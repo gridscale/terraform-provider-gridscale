@@ -157,7 +157,10 @@ func resourceGridscaleIpUpdate(d *schema.ResourceData, meta interface{}) error {
 	if err != nil {
 		return err
 	}
-
+	err = pauseWhenProvisoning(client, ipService, d.Id())
+	if err != nil {
+		return err
+	}
 	return resourceGridscaleIpRead(d, meta)
 }
 
@@ -182,6 +185,7 @@ func resourceGridscaleIpv4Create(d *schema.ResourceData, meta interface{}) error
 
 func resourceGridscaleIpDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
+	d.ConnInfo()
 	return resource.Retry(d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
 		return resource.RetryableError(client.DeleteIP(d.Id()))
 	})

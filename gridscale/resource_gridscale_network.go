@@ -132,6 +132,10 @@ func resourceGridscaleNetworkUpdate(d *schema.ResourceData, meta interface{}) er
 	if err != nil {
 		return err
 	}
+	err = pauseWhenProvisoning(client, networkService, d.Id())
+	if err != nil {
+		return err
+	}
 	return resourceGridscaleNetworkRead(d, meta)
 }
 
