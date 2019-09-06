@@ -5,6 +5,7 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 )
 
+//Provider terraform provider
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
@@ -45,7 +46,6 @@ func Provider() terraform.ResourceProvider {
 			"gridscale_sshkey":       resourceGridscaleSshkey(),
 			"gridscale_loadbalancer": resourceGridscaleLoadBalancer(),
 		},
-
 		ConfigureFunc: providerConfigure,
 	}
 }
@@ -56,6 +56,5 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		APIToken: d.Get("token").(string),
 		APIUrl:   d.Get("api_url").(string),
 	}
-
 	return config.Client()
 }

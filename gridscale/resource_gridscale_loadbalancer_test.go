@@ -16,9 +16,9 @@ func TestAccResourceGridscaleLoadBalancerBasic(t *testing.T) {
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
+		PreCheck:     func() { testAccPreCheck(t) }, //check config before testing
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckResourceGridscaleLoadBalancerDestroyCheck,
+		CheckDestroy: testAccCheckResourceGridscaleLoadBalancerDestroyCheck, //check if the object is destroyed after finishing the test
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCheckResourceGridscaleLoadBalancerConfig_basic(name, "leastconn"),
@@ -66,11 +66,11 @@ func testAccCheckResourceGridscaleLoadBalancerExists(n string, object *gsclient.
 			return err
 		}
 
-		if foundObject.Properties.ObjectUuid != id {
+		if foundObject.Properties.ObjectUUID != id {
 			return fmt.Errorf("Object not found")
 		}
 
-		*object = *foundObject
+		*object = foundObject
 
 		return nil
 	}
@@ -145,7 +145,7 @@ func testAccCheckResourceGridscaleLoadBalancerDestroyCheck(s *terraform.State) e
 
 		_, err := client.GetLoadBalancer(rs.Primary.ID)
 		if err != nil {
-			if requestError, ok := err.(*gsclient.RequestError); ok {
+			if requestError, ok := err.(gsclient.RequestError); ok {
 				if requestError.StatusCode != 404 {
 					return fmt.Errorf("Object %s still exists", rs.Primary.ID)
 				}

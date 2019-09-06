@@ -53,31 +53,22 @@ func TestAccDataSourceGridscaleServer_Basic(t *testing.T) {
 func testAccCheckDataSourceGridscaleServerExists(n string, object *gsclient.Server) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
-
 		if !ok {
 			return fmt.Errorf("Not found: %s", n)
 		}
-
 		if rs.Primary.ID == "" {
 			return fmt.Errorf("No object UUID is set")
 		}
-
 		client := testAccProvider.Meta().(*gsclient.Client)
-
 		id := rs.Primary.ID
-
 		foundObject, err := client.GetServer(id)
-
 		if err != nil {
 			return err
 		}
-
-		if foundObject.Properties.ObjectUuid != id {
+		if foundObject.Properties.ObjectUUID != id {
 			return fmt.Errorf("Object not found")
 		}
-
-		*object = *foundObject
-
+		*object = foundObject
 		return nil
 	}
 }
@@ -88,10 +79,9 @@ func testAccCheckDataSourceGridscaleServerDestroyCheck(s *terraform.State) error
 		if rs.Type != "gridscale_server" {
 			continue
 		}
-
 		_, err := client.GetServer(rs.Primary.ID)
 		if err != nil {
-			if requestError, ok := err.(*gsclient.RequestError); ok {
+			if requestError, ok := err.(gsclient.RequestError); ok {
 				if requestError.StatusCode != 404 {
 					return fmt.Errorf("Object %s still exists", rs.Primary.ID)
 				}
@@ -108,16 +98,25 @@ func testAccCheckDataSourceGridscaleServerDestroyCheck(s *terraform.State) error
 
 func testAccCheckDataSourceGridscaleServerConfig_basic(name string) string {
 	return fmt.Sprintf(`
+resource "gridscale_ipv4" "ip" {
+	name = "test-ip"
+}
+
 resource "gridscale_server" "foo" {
   name   = "%s"
   cores = 1
   memory = 1
+  ipv4 = "${gridscale_ipv4.ip.id}"
 }
 `, name)
 }
 
 func testAccCheckDataSourceGridscaleServerConfig_basic_update() string {
 	return fmt.Sprintf(`
+resource "gridscale_ipv4" "ip" {
+	name = "test-ip"
+}
+
 resource "gridscale_server" "foo" {
   name   = "newname"
   cores = 2

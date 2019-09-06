@@ -18,13 +18,13 @@ func init() {
 	}
 }
 
-func TestProvider(t *testing.T) {
+func testProvider(t *testing.T) {
 	if err := Provider().(*schema.Provider).InternalValidate(); err != nil {
 		t.Fatalf("err: %s", err)
 	}
 }
 
-func TestProvider_impl(t *testing.T) {
+func testProvider_impl(t *testing.T) {
 	var _ terraform.ResourceProvider = Provider()
 }
 
@@ -32,7 +32,6 @@ func testAccPreCheck(t *testing.T) {
 	if v := os.Getenv("GRIDSCALE_UUID"); v == "" {
 		t.Fatal("GRIDSCALE_UUID must be set for acceptance tests")
 	}
-
 	if v := os.Getenv("GRIDSCALE_TOKEN"); v == "" {
 		t.Fatal("GRIDSCALE_TOKEN must be set for acceptance tests")
 	}

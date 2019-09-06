@@ -17,10 +17,8 @@ func dataSourceGridscaleLoadBalancerRead(d *schema.ResourceData, meta interface{
 	client := meta.(*gsclient.Client)
 	id := d.Get("resource_id").(string)
 	loadbalancer, err := client.GetLoadBalancer(id)
-
 	if err == nil {
-		d.SetId(loadbalancer.Properties.ObjectUuid)
+		d.SetId(loadbalancer.Properties.ObjectUUID)
 	}
-
 	return err
 }

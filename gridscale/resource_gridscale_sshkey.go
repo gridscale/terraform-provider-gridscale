@@ -58,7 +58,7 @@ func resourceGridscaleSshkeyRead(d *schema.ResourceData, meta interface{}) error
 	client := meta.(*gsclient.Client)
 	sshkey, err := client.GetSshkey(d.Id())
 	if err != nil {
-		if requestError, ok := err.(*gsclient.RequestError); ok {
+		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
 				d.SetId("")
 				return nil
@@ -66,61 +66,49 @@ func resourceGridscaleSshkeyRead(d *schema.ResourceData, meta interface{}) error
 		}
 		return err
 	}
-
 	d.Set("name", sshkey.Properties.Name)
 	d.Set("sshkey", sshkey.Properties.Sshkey)
 	d.Set("status", sshkey.Properties.Status)
 	d.Set("create_time", sshkey.Properties.CreateTime)
 	d.Set("change_time", sshkey.Properties.ChangeTime)
-
 	if err = d.Set("labels", sshkey.Properties.Labels); err != nil {
 		return fmt.Errorf("Error setting labels: %v", err)
 	}
-
 	return nil
 }
 
 func resourceGridscaleSshkeyUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-
 	requestBody := gsclient.SshkeyUpdateRequest{
 		Name:   d.Get("name").(string),
 		Sshkey: d.Get("sshkey").(string),
-		Labels: d.Get("labels").(*schema.Set).List(),
+		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
-
 	err := client.UpdateSshkey(d.Id(), requestBody)
 	if err != nil {
 		return err
 	}
-
 	return resourceGridscaleSshkeyRead(d, meta)
 }
 
 func resourceGridscaleSshkeyCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-
 	requestBody := gsclient.SshkeyCreateRequest{
 		Name:   d.Get("name").(string),
 		Sshkey: d.Get("sshkey").(string),
-		Labels: d.Get("labels").(*schema.Set).List(),
+		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
-
 	response, err := client.CreateSshkey(requestBody)
 	if err != nil {
 		return err
 	}
-
-	d.SetId(response.ObjectUuid)
-
-	log.Printf("The id for the new SSH Key has been set to %v", response.ObjectUuid)
-
+	d.SetId(response.ObjectUUID)
+	log.Printf("The id for the new SSH Key has been set to %v", response.ObjectUUID)
 	return resourceGridscaleSshkeyRead(d, meta)
 }
 
 func resourceGridscaleSshkeyDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	err := client.DeleteSshkey(d.Id())
-
 	return err
 }

@@ -14,7 +14,6 @@ import (
 func TestAccDataSourceGridscaleNetwork_Basic(t *testing.T) {
 	var object gsclient.Network
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
-
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -45,31 +44,22 @@ func TestAccDataSourceGridscaleNetwork_Basic(t *testing.T) {
 func testAccCheckDataSourceGridscaleNetworkExists(n string, object *gsclient.Network) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
-
 		if !ok {
 			return fmt.Errorf("Not found: %s", n)
 		}
-
 		if rs.Primary.ID == "" {
 			return fmt.Errorf("No object UUID is set")
 		}
-
 		client := testAccProvider.Meta().(*gsclient.Client)
-
 		id := rs.Primary.ID
-
 		foundObject, err := client.GetNetwork(id)
-
 		if err != nil {
 			return err
 		}
-
-		if foundObject.Properties.ObjectUuid != id {
+		if foundObject.Properties.ObjectUUID != id {
 			return fmt.Errorf("Object not found")
 		}
-
-		*object = *foundObject
-
+		*object = foundObject
 		return nil
 	}
 }
@@ -80,10 +70,9 @@ func testAccCheckDataSourceGridscaleNetworkDestroyCheck(s *terraform.State) erro
 		if rs.Type != "gridscale_network" {
 			continue
 		}
-
 		_, err := client.GetNetwork(rs.Primary.ID)
 		if err != nil {
-			if requestError, ok := err.(*gsclient.RequestError); ok {
+			if requestError, ok := err.(gsclient.RequestError); ok {
 				if requestError.StatusCode != 404 {
 					return fmt.Errorf("Object %s still exists", rs.Primary.ID)
 				}

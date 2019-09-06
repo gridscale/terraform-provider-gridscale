@@ -96,7 +96,7 @@ func resourceGridscaleLoadBalancer() *schema.Resource {
 			"labels": {
 				Type:        schema.TypeSet,
 				Description: "List of labels.",
-				Optional:    true,
+				Required:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 			"listen_ipv4_uuid": {
@@ -115,17 +115,15 @@ func resourceGridscaleLoadBalancer() *schema.Resource {
 
 func resourceGridscaleLoadBalancerCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-
 	requestBody := gsclient.LoadBalancerCreateRequest{
 		Name:                d.Get("name").(string),
 		Algorithm:           d.Get("algorithm").(string),
 		Status:              d.Get("status").(string),
 		RedirectHTTPToHTTPS: d.Get("redirect_http_to_https").(bool),
-		ListenIPv4Uuid:      d.Get("listen_ipv4_uuid").(string),
-		ListenIPv6Uuid:      d.Get("listen_ipv6_uuid").(string),
-		Labels:              d.Get("labels").(*schema.Set).List(),
+		ListenIPv4UUID:      d.Get("listen_ipv4_uuid").(string),
+		ListenIPv6UUID:      d.Get("listen_ipv6_uuid").(string),
+		Labels:              convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
-
 	if backendServers, ok := d.GetOk("backend_server"); ok {
 		requestBody.BackendServers = expandLoadbalancerBackendServers(backendServers)
 	}
@@ -138,7 +136,7 @@ func resourceGridscaleLoadBalancerCreate(d *schema.ResourceData, meta interface{
 		return fmt.Errorf(
 			"Error waiting for loadbalancer (%s) to be created: %s", requestBody.Name, err)
 	}
-	d.SetId(response.ObjectUuid)
+	d.SetId(response.ObjectUUID)
 	return resourceGridscaleLoadBalancerRead(d, meta)
 }
 
@@ -146,7 +144,7 @@ func resourceGridscaleLoadBalancerRead(d *schema.ResourceData, meta interface{})
 	client := meta.(*gsclient.Client)
 	loadbalancer, err := client.GetLoadBalancer(d.Id())
 	if err != nil {
-		if requestError, ok := err.(*gsclient.RequestError); ok {
+		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
 				d.SetId("")
 				return nil
@@ -154,14 +152,12 @@ func resourceGridscaleLoadBalancerRead(d *schema.ResourceData, meta interface{})
 		}
 		return err
 	}
-
 	d.Set("name", loadbalancer.Properties.Name)
 	d.Set("algorithm", loadbalancer.Properties.Algorithm)
 	d.Set("status", loadbalancer.Properties.Status)
 	d.Set("redirect_http_to_https", loadbalancer.Properties.RedirectHTTPToHTTPS)
-	d.Set("listen_ipv4_uuid", loadbalancer.Properties.ListenIPv4Uuid)
-	d.Set("listen_ipv6_uuid", loadbalancer.Properties.ListenIPv6Uuid)
-
+	d.Set("listen_ipv4_uuid", loadbalancer.Properties.ListenIPv4UUID)
+	d.Set("listen_ipv6_uuid", loadbalancer.Properties.ListenIPv6UUID)
 	if loadbalancer.Properties.ForwardingRules != nil {
 		err = d.Set("forwarding_rule", flattenLoadbalancerForwardingRules(loadbalancer.Properties.ForwardingRules))
 		if err != nil {
@@ -178,7 +174,6 @@ func resourceGridscaleLoadBalancerRead(d *schema.ResourceData, meta interface{})
 	if err = d.Set("labels", loadbalancer.Properties.Labels); err != nil {
 		return fmt.Errorf("Error setting labels: %v", err)
 	}
-
 	return nil
 }
 
@@ -189,11 +184,10 @@ func resourceGridscaleLoadBalancerUpdate(d *schema.ResourceData, meta interface{
 		Algorithm:           d.Get("algorithm").(string),
 		Status:              d.Get("status").(string),
 		RedirectHTTPToHTTPS: d.Get("redirect_http_to_https").(bool),
-		ListenIPv4Uuid:      d.Get("listen_ipv4_uuid").(string),
-		ListenIPv6Uuid:      d.Get("listen_ipv6_uuid").(string),
-		Labels:              d.Get("labels").(*schema.Set).List(),
+		ListenIPv4UUID:      d.Get("listen_ipv4_uuid").(string),
+		ListenIPv6UUID:      d.Get("listen_ipv6_uuid").(string),
+		Labels:              convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
-
 	if backendServers, ok := d.GetOk("backend_server"); ok {
 		requestBody.BackendServers = expandLoadbalancerBackendServers(backendServers)
 	}

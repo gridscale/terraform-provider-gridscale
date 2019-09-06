@@ -16,7 +16,6 @@ func TestAccDataSourceTemplate_basic(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-
 				Config: testAccCheckDataSourceGridscaleTemplateConfig_basic(name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.gridscale_template.foo", "id"),
@@ -29,8 +28,8 @@ func TestAccDataSourceTemplate_basic(t *testing.T) {
 
 func testAccCheckDataSourceGridscaleTemplateConfig_basic(name string) string {
 	return fmt.Sprintf(`
-data "gridscale_template" "foo" {
-	name   = "%s"
-}
-`, name)
+		data "gridscale_template" "foo" {
+			name   = "%s"
+		}
+	`, name)
 }

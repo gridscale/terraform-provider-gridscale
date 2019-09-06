@@ -113,9 +113,9 @@ func resourceGridscaleIpv4() *schema.Resource {
 
 func resourceGridscaleIpRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	ip, err := client.GetIp(d.Id())
+	ip, err := client.GetIP(d.Id())
 	if err != nil {
-		if requestError, ok := err.(*gsclient.RequestError); ok {
+		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
 				d.SetId("")
 				return nil
@@ -123,13 +123,12 @@ func resourceGridscaleIpRead(d *schema.ResourceData, meta interface{}) error {
 		}
 		return err
 	}
-
-	d.Set("ip", ip.Properties.Ip)
+	d.Set("ip", ip.Properties.IP)
 	d.Set("prefix", ip.Properties.Prefix)
-	d.Set("location_uuid", ip.Properties.LocationUuid)
+	d.Set("location_uuid", ip.Properties.LocationUUID)
 	d.Set("failover", ip.Properties.Failover)
 	d.Set("status", ip.Properties.Status)
-	d.Set("reverse_dns", ip.Properties.ReverseDns)
+	d.Set("reverse_dns", ip.Properties.ReverseDNS)
 	d.Set("location_country", ip.Properties.LocationCountry)
 	d.Set("location_iata", ip.Properties.LocationIata)
 	d.Set("location_name", ip.Properties.LocationName)
@@ -138,25 +137,23 @@ func resourceGridscaleIpRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("delete_block", ip.Properties.DeleteBlock)
 	d.Set("usage_in_minutes", ip.Properties.UsagesInMinutes)
 	d.Set("current_price", ip.Properties.CurrentPrice)
-
 	if err = d.Set("labels", ip.Properties.Labels); err != nil {
 		return fmt.Errorf("Error setting labels: %v", err)
 	}
-
 	return nil
 }
 
 func resourceGridscaleIpUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 
-	requestBody := gsclient.IpUpdateRequest{
+	requestBody := gsclient.IPUpdateRequest{
 		Name:       d.Get("name").(string),
 		Failover:   d.Get("failover").(bool),
-		ReverseDns: d.Get("reverse_dns").(string),
-		Labels:     d.Get("labels").(*schema.Set).List(),
+		ReverseDNS: d.Get("reverse_dns").(string),
+		Labels:     convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
-	err := client.UpdateIp(d.Id(), requestBody)
+	err := client.UpdateIP(d.Id(), requestBody)
 	if err != nil {
 		return err
 	}
@@ -166,31 +163,26 @@ func resourceGridscaleIpUpdate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceGridscaleIpv4Create(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-
-	requestBody := gsclient.IpCreateRequest{
+	requestBody := gsclient.IPCreateRequest{
 		Family:       4,
-		LocationUuid: d.Get("location_uuid").(string),
+		LocationUUID: d.Get("location_uuid").(string),
 		Name:         d.Get("name").(string),
 		Failover:     d.Get("failover").(bool),
-		ReverseDns:   d.Get("reverse_dns").(string),
-		Labels:       d.Get("labels").(*schema.Set).List(),
+		ReverseDNS:   d.Get("reverse_dns").(string),
+		Labels:       convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
-
-	response, err := client.CreateIp(requestBody)
+	response, err := client.CreateIP(requestBody)
 	if err != nil {
 		return err
 	}
-
-	d.SetId(response.ObjectUuid)
-
-	log.Printf("The id for the new Ipv%v has been set to %v", requestBody.Family, response.ObjectUuid)
-
+	d.SetId(response.ObjectUUID)
+	log.Printf("The id for the new Ipv%v has been set to %v", requestBody.Family, response.ObjectUUID)
 	return resourceGridscaleIpRead(d, meta)
 }
 
 func resourceGridscaleIpDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	return resource.Retry(d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
-		return resource.RetryableError(client.DeleteIp(d.Id()))
+		return resource.RetryableError(client.DeleteIP(d.Id()))
 	})
 }

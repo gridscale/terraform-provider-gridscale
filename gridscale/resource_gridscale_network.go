@@ -97,7 +97,7 @@ func resourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) erro
 	client := meta.(*gsclient.Client)
 	network, err := client.GetNetwork(d.Id())
 	if err != nil {
-		if requestError, ok := err.(*gsclient.RequestError); ok {
+		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
 				d.SetId("")
 				return nil
@@ -105,9 +105,8 @@ func resourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) erro
 		}
 		return err
 	}
-
 	d.Set("name", network.Properties.Name)
-	d.Set("location_uuid", network.Properties.LocationUuid)
+	d.Set("location_uuid", network.Properties.LocationUUID)
 	d.Set("l2security", network.Properties.L2Security)
 	d.Set("status", network.Properties.Status)
 	d.Set("network_type", network.Properties.NetworkType)
@@ -117,50 +116,39 @@ func resourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) erro
 	d.Set("delete_block", network.Properties.DeleteBlock)
 	d.Set("create_time", network.Properties.CreateTime)
 	d.Set("change_time", network.Properties.ChangeTime)
-
 	if err = d.Set("labels", network.Properties.Labels); err != nil {
 		return fmt.Errorf("Error setting labels: %v", err)
 	}
-
 	return nil
 }
 
 func resourceGridscaleNetworkUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-
 	requestBody := gsclient.NetworkUpdateRequest{
 		Name:       d.Get("name").(string),
 		L2Security: d.Get("l2security").(bool),
-		Labels:     d.Get("labels").(*schema.Set).List(),
 	}
-
 	err := client.UpdateNetwork(d.Id(), requestBody)
 	if err != nil {
 		return err
 	}
-
 	return resourceGridscaleNetworkRead(d, meta)
 }
 
 func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-
 	requestBody := gsclient.NetworkCreateRequest{
 		Name:         d.Get("name").(string),
-		LocationUuid: d.Get("location_uuid").(string),
+		LocationUUID: d.Get("location_uuid").(string),
 		L2Security:   d.Get("l2security").(bool),
-		Labels:       d.Get("labels").(*schema.Set).List(),
+		Labels:       convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
-
 	response, err := client.CreateNetwork(requestBody)
 	if err != nil {
 		return err
 	}
-
-	d.SetId(response.ObjectUuid)
-
-	log.Printf("The id for network %v has been set to %v", requestBody.Name, response.ObjectUuid)
-
+	d.SetId(response.ObjectUUID)
+	log.Printf("The id for network %v has been set to %v", requestBody.Name, response.ObjectUUID)
 	return resourceGridscaleNetworkRead(d, meta)
 }
 

@@ -47,31 +47,22 @@ func TestAccDataSourceGridscaleSshkey_Basic(t *testing.T) {
 func testAccCheckDataSourceGridscaleSshkeyExists(n string, object *gsclient.Sshkey) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
-
 		if !ok {
 			return fmt.Errorf("Not found: %s", n)
 		}
-
 		if rs.Primary.ID == "" {
 			return fmt.Errorf("No object UUID is set")
 		}
-
 		client := testAccProvider.Meta().(*gsclient.Client)
-
 		id := rs.Primary.ID
-
 		foundObject, err := client.GetSshkey(id)
-
 		if err != nil {
 			return err
 		}
-
-		if foundObject.Properties.ObjectUuid != id {
+		if foundObject.Properties.ObjectUUID != id {
 			return fmt.Errorf("Object not found")
 		}
-
-		*object = *foundObject
-
+		*object = foundObject
 		return nil
 	}
 }
@@ -82,10 +73,9 @@ func testAccCheckDataSourceGridscaleSshkeyDestroyCheck(s *terraform.State) error
 		if rs.Type != "gridscale_sshkey" {
 			continue
 		}
-
 		_, err := client.GetSshkey(rs.Primary.ID)
 		if err != nil {
-			if requestError, ok := err.(*gsclient.RequestError); ok {
+			if requestError, ok := err.(gsclient.RequestError); ok {
 				if requestError.StatusCode != 404 {
 					return fmt.Errorf("Object %s still exists", rs.Primary.ID)
 				}
@@ -96,7 +86,6 @@ func testAccCheckDataSourceGridscaleSshkeyDestroyCheck(s *terraform.State) error
 			return fmt.Errorf("Object %s still exists", rs.Primary.ID)
 		}
 	}
-
 	return nil
 }
 

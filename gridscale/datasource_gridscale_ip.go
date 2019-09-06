@@ -8,22 +8,17 @@ import (
 
 func dataSourceGridscaleIp() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceGridscaleIpRead,
-
+		Read:   dataSourceGridscaleIpRead,
 		Schema: map[string]*schema.Schema{},
 	}
 }
 
 func dataSourceGridscaleIpRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-
 	id := d.Get("resource_id").(string)
-
-	ip, err := client.GetIp(id)
-
+	ip, err := client.GetIP(id)
 	if err == nil {
-		d.SetId(ip.Properties.ObjectUuid)
+		d.SetId(ip.Properties.ObjectUUID)
 	}
-
 	return err
 }

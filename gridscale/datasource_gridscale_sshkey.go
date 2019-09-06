@@ -16,14 +16,10 @@ func dataSourceGridscaleSshkey() *schema.Resource {
 
 func dataSourceGridscaleSshkeyRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-
 	id := d.Get("resource_id").(string)
-
 	sshkey, err := client.GetSshkey(id)
-
 	if err == nil {
-		d.SetId(sshkey.Properties.ObjectUuid)
+		d.SetId(sshkey.Properties.ObjectUUID)
 	}
-
 	return err
 }

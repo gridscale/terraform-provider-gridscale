@@ -71,31 +71,22 @@ func TestAccDataSourceGridscaleStorage_Advanced(t *testing.T) {
 func testAccCheckDataSourceGridscaleStorageExists(n string, object *gsclient.Storage) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
-
 		if !ok {
 			return fmt.Errorf("Not found: %s", n)
 		}
-
 		if rs.Primary.ID == "" {
 			return fmt.Errorf("No object UUID is set")
 		}
-
 		client := testAccProvider.Meta().(*gsclient.Client)
-
 		id := rs.Primary.ID
-
 		foundObject, err := client.GetStorage(id)
-
 		if err != nil {
 			return err
 		}
-
-		if foundObject.Properties.ObjectUuid != id {
+		if foundObject.Properties.ObjectUUID != id {
 			return fmt.Errorf("Object not found")
 		}
-
-		*object = *foundObject
-
+		*object = foundObject
 		return nil
 	}
 }
@@ -106,13 +97,11 @@ func testAccCheckDataSourceGridscaleStorageDestroyCheck(s *terraform.State) erro
 		if rs.Type != "gridscale_storage" {
 			continue
 		}
-
 		//We wait a while for the storage to delete, since it is not instant
 		time.Sleep(time.Second * 5)
-
 		_, err := client.GetStorage(rs.Primary.ID)
 		if err != nil {
-			if requestError, ok := err.(*gsclient.RequestError); ok {
+			if requestError, ok := err.(gsclient.RequestError); ok {
 				if requestError.StatusCode != 404 {
 					return fmt.Errorf("Object %s still exists", rs.Primary.ID)
 				}
@@ -123,7 +112,6 @@ func testAccCheckDataSourceGridscaleStorageDestroyCheck(s *terraform.State) erro
 			return fmt.Errorf("Object %s still exists", rs.Primary.ID)
 		}
 	}
-
 	return nil
 }
 
