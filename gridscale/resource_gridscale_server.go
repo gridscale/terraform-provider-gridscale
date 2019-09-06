@@ -555,8 +555,16 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 			//just remove the ip from server data
 			_, err := client.GetIP(oldIp.(string))
 			if err != nil {
-				err = nil
-				d.Set("ipv4", nil)
+				if requestError, ok := err.(gsclient.RequestError); ok {
+					if requestError.StatusCode != 404 {
+						err = client.UnlinkIP(d.Id(), oldIp.(string))
+					} else {
+						//this is the case where the ip is already deleted
+						err = nil
+					}
+				} else {
+					err = client.UnlinkIP(d.Id(), oldIp.(string))
+				}
 			} else {
 				err = client.UnlinkIP(d.Id(), oldIp.(string))
 			}
@@ -577,8 +585,16 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 			//just remove the ip from server data
 			_, err := client.GetIP(oldIp.(string))
 			if err != nil {
-				err = nil
-				d.Set("ipv6", nil)
+				if requestError, ok := err.(gsclient.RequestError); ok {
+					if requestError.StatusCode != 404 {
+						err = client.UnlinkIP(d.Id(), oldIp.(string))
+					} else {
+						//this is the case where the ip is already deleted
+						err = nil
+					}
+				} else {
+					err = client.UnlinkIP(d.Id(), oldIp.(string))
+				}
 			} else {
 				err = client.UnlinkIP(d.Id(), oldIp.(string))
 			}
@@ -622,9 +638,31 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 		for _, value := range oldNetworks.(*schema.Set).List() {
 			network := value.(map[string]interface{})
 			if network["object_uuid"].(string) != "" {
-				err = client.UnlinkNetwork(d.Id(), network["object_uuid"].(string))
+				//check if network is deleted already.
+				//if so, no need to unlink
+				_, err := client.GetNetwork(network["object_uuid"].(string))
 				if err != nil {
-					return err
+					if requestError, ok := err.(gsclient.RequestError); ok {
+						if requestError.StatusCode != 404 {
+							err = client.UnlinkNetwork(d.Id(), network["object_uuid"].(string))
+							if err != nil {
+								return err
+							}
+						} else {
+							//this is the case where the network is already deleted
+							err = nil
+						}
+					} else {
+						err = client.UnlinkNetwork(d.Id(), network["object_uuid"].(string))
+						if err != nil {
+							return err
+						}
+					}
+				} else {
+					err = client.UnlinkNetwork(d.Id(), network["object_uuid"].(string))
+					if err != nil {
+						return err
+					}
 				}
 			}
 		}
