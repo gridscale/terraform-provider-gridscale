@@ -1,6 +1,8 @@
 package gsclient
 
 import (
+	"errors"
+	"net/http"
 	"path"
 )
 
@@ -16,20 +18,25 @@ type LoadBalancer struct {
 
 //LoadBalancerProperties is the properties of a loadbalancer
 type LoadBalancerProperties struct {
-	ObjectUuid          string                    `json:"object_uuid"`
-	Name                string                    `json:"name"`
-	ListenIPv6Uuid      string                    `json:"listen_ipv6_uuid"`
-	ListenIPv4Uuid      string                    `json:"listen_ipv4_uuid"`
-	Algorithm           string                    `json:"algorithm"`
-	ForwardingRules     []ForwardingRule          `json:"forwarding_rules"`
-	BackendServers      []BackendServer           `json:"backend_servers"`
-	Labels              []interface{}             `json:"labels"`
-	LocationUuid        string                    `json:"location_uuid"`
-	RedirectHTTPToHTTPS bool                      `json:"redirect_http_to_https"`
-	CreateTime          string                    `json:"create_time"`
-	ListenPort          map[string]map[string]int `json:"listen_ports"`
-	ChangeTime          string                    `json:"change_time"`
-	Status              string                    `json:"status"`
+	ObjectUUID          string           `json:"object_uuid"`
+	LocationSite        int              `json:"location_site"`
+	Name                string           `json:"name"`
+	ForwardingRules     []ForwardingRule `json:"forwarding_rules"`
+	LocationIata        string           `json:"location_iata"`
+	LocationUUID        string           `json:"location_uuid"`
+	BackendServers      []BackendServer  `json:"backend_servers"`
+	ChangeTime          string           `json:"change_time"`
+	Status              string           `json:"status"`
+	CurrentPrice        float64          `json:"current_price"`
+	LocationCountry     string           `json:"location_country"`
+	RedirectHTTPToHTTPS bool             `json:"redirect_http_to_https"`
+	Labels              []string         `json:"labels"`
+	LocationName        string           `json:"location_name"`
+	UsageInMinutes      int              `json:"usage_in_minutes"`
+	Algorithm           string           `json:"algorithm"`
+	CreateTime          string           `json:"create_time"`
+	ListenIPv6UUID      string           `json:"listen_ipv6_uuid"`
+	ListenIPv4UUID      string           `json:"listen_ipv4_uuid"`
 }
 
 //BackendServer is the JSON struct of backend server
@@ -40,22 +47,22 @@ type BackendServer struct {
 
 //ForwardingRule is the JSON struct of forwarding rule
 type ForwardingRule struct {
-	LetsencryptSSL *string `json:"letsencrypt_ssl"`
-	ListenPort     int     `json:"listen_port"`
-	Mode           string  `json:"mode"`
-	TargetPort     int     `json:"target_port"`
+	LetsencryptSSL interface{} `json:"letsencrypt_ssl"`
+	ListenPort     int         `json:"listen_port"`
+	Mode           string      `json:"mode"`
+	TargetPort     int         `json:"target_port"`
 }
 
 //LoadBalancerCreateRequest is the JSON struct for creating a loadbalancer request
 type LoadBalancerCreateRequest struct {
 	Name                string           `json:"name"`
-	ListenIPv6Uuid      string           `json:"listen_ipv6_uuid"`
-	ListenIPv4Uuid      string           `json:"listen_ipv4_uuid"`
+	ListenIPv6UUID      string           `json:"listen_ipv6_uuid"`
+	ListenIPv4UUID      string           `json:"listen_ipv4_uuid"`
 	Algorithm           string           `json:"algorithm"`
 	ForwardingRules     []ForwardingRule `json:"forwarding_rules"`
 	BackendServers      []BackendServer  `json:"backend_servers"`
-	Labels              []interface{}    `json:"labels"`
-	LocationUuid        string           `json:"location_uuid"`
+	Labels              []string         `json:"labels"`
+	LocationUUID        string           `json:"location_uuid"`
 	RedirectHTTPToHTTPS bool             `json:"redirect_http_to_https"`
 	Status              string           `json:"status,omitempty"`
 }
@@ -63,119 +70,113 @@ type LoadBalancerCreateRequest struct {
 //LoadBalancerUpdateRequest is the JSON struct for updating a loadbalancer request
 type LoadBalancerUpdateRequest struct {
 	Name                string           `json:"name"`
-	ListenIPv6Uuid      string           `json:"listen_ipv6_uuid"`
-	ListenIPv4Uuid      string           `json:"listen_ipv4_uuid"`
+	ListenIPv6UUID      string           `json:"listen_ipv6_uuid"`
+	ListenIPv4UUID      string           `json:"listen_ipv4_uuid"`
 	Algorithm           string           `json:"algorithm"`
 	ForwardingRules     []ForwardingRule `json:"forwarding_rules"`
 	BackendServers      []BackendServer  `json:"backend_servers"`
-	Labels              []interface{}    `json:"labels"`
-	LocationUuid        string           `json:"location_uuid"`
+	Labels              []string         `json:"labels"`
+	LocationUUID        string           `json:"location_uuid"`
 	RedirectHTTPToHTTPS bool             `json:"redirect_http_to_https"`
 	Status              string           `json:"status,omitempty"`
 }
 
 //LoadBalancerCreateResponse is the JSON struct for a loadbalancer response
 type LoadBalancerCreateResponse struct {
-	RequestUuid string `json:"request_uuid"`
-	ObjectUuid  string `json:"object_uuid"`
+	RequestUUID string `json:"request_uuid"`
+	ObjectUUID  string `json:"object_uuid"`
 }
 
-//LoadBalancerEvents is the JSON struct for a loadbalancer's events
-type LoadBalancerEvents struct {
-	Events []LoadBalancerEventProperties `json:"events"`
-}
-
-//LoadBalancerEventProperties is the properties of a loadbalancer's event
-type LoadBalancerEventProperties struct {
-	ObjectUuid    string `json:"object_uuid"`
-	ObjectType    string `json:"object_type"`
-	RequestUuid   string `json:"request_uuid"`
-	RequestType   string `json:"request_type"`
-	Activity      string `json:"activity"`
-	RequestStatus string `json:"request_status"`
-	Change        string `json:"change"`
-	Timestamp     string `json:"timestamp"`
-	UserUuid      string `json:"user_uuid"`
-}
-
-//GetLoadBalancerList returns a list of load balancers
+//GetLoadBalancerList returns a list of loadbalancers
 func (c *Client) GetLoadBalancerList() ([]LoadBalancer, error) {
 	r := Request{
 		uri:    apiLoadBalancerBase,
-		method: "GET",
+		method: http.MethodGet,
 	}
-
-	response := new(LoadBalancers)
+	var response LoadBalancers
+	var loadBalancers []LoadBalancer
 	err := r.execute(*c, &response)
-
-	list := []LoadBalancer{}
 	for _, properties := range response.List {
-		list = append(list, LoadBalancer{Properties: properties})
+		loadBalancers = append(loadBalancers, LoadBalancer{Properties: properties})
 	}
-
-	return list, err
+	return loadBalancers, err
 }
 
-//GetLoadBalancer returns a load balancer of a given uuid
-func (c *Client) GetLoadBalancer(id string) (*LoadBalancer, error) {
+//GetLoadBalancer returns a loadbalancer of a given uuid
+func (c *Client) GetLoadBalancer(id string) (LoadBalancer, error) {
+	if !isValidUUID(id) {
+		return LoadBalancer{}, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiLoadBalancerBase, id),
-		method: "GET",
+		method: http.MethodGet,
 	}
-
-	response := new(LoadBalancer)
+	var response LoadBalancer
 	err := r.execute(*c, &response)
-
 	return response, err
 }
 
-//CreateLoadBalancer creates a new load balancer
-func (c *Client) CreateLoadBalancer(body LoadBalancerCreateRequest) (*LoadBalancerCreateResponse, error) {
+//CreateLoadBalancer creates a new loadbalancer
+func (c *Client) CreateLoadBalancer(body LoadBalancerCreateRequest) (LoadBalancerCreateResponse, error) {
+	if body.Labels == nil {
+		body.Labels = make([]string, 0)
+	}
 	r := Request{
 		uri:    apiLoadBalancerBase,
-		method: "POST",
+		method: http.MethodPost,
 		body:   body,
 	}
-
-	response := new(LoadBalancerCreateResponse)
+	var response LoadBalancerCreateResponse
 	err := r.execute(*c, &response)
 	if err != nil {
-		return nil, err
+		return LoadBalancerCreateResponse{}, err
 	}
-
-	err = c.WaitForRequestCompletion(response.RequestUuid)
-
+	err = c.WaitForRequestCompletion(response.RequestUUID)
 	return response, err
 }
 
-//UpdateLoadBalancer update configuraton of a load balancer
+//UpdateLoadBalancer update configuration of a loadbalancer
 func (c *Client) UpdateLoadBalancer(id string, body LoadBalancerUpdateRequest) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
+	if body.Labels == nil {
+		body.Labels = make([]string, 0)
+	}
 	r := Request{
 		uri:    path.Join(apiLoadBalancerBase, id),
-		method: "PATCH",
+		method: http.MethodPatch,
 		body:   body,
 	}
-
 	return r.execute(*c, nil)
 }
 
-//GetLoadBalancerEventList retrives events of a given uuid
-func (c *Client) GetLoadBalancerEventList(id string) (*LoadBalancerEvents, error) {
+//GetLoadBalancerEventList retrieves events of a given uuid
+func (c *Client) GetLoadBalancerEventList(id string) ([]Event, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiLoadBalancerBase, id, "events"),
-		method: "GET",
+		method: http.MethodGet,
 	}
-	response := new(LoadBalancerEvents)
+	var response EventList
+	var loadBalancerEvents []Event
 	err := r.execute(*c, &response)
-	return response, err
+	for _, properties := range response.List {
+		loadBalancerEvents = append(loadBalancerEvents, Event{Properties: properties})
+	}
+	return loadBalancerEvents, err
 }
 
-//DeleteLoadBalancer deletes a load balancer
+//DeleteLoadBalancer deletes a loadbalancer
 func (c *Client) DeleteLoadBalancer(id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
 		uri:    path.Join(apiLoadBalancerBase, id),
-		method: "DELETE",
+		method: http.MethodDelete,
 	}
-
 	return r.execute(*c, nil)
 }
