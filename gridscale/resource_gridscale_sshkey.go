@@ -2,8 +2,10 @@ package gridscale
 
 import (
 	"fmt"
+	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/terraform-providers/terraform-provider-gridscale/gridscale/service-query"
 	"log"
+	"time"
 
 	"github.com/hashicorp/terraform/helper/schema"
 
@@ -52,6 +54,10 @@ func resourceGridscaleSshkey() *schema.Resource {
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 		},
+		Timeouts: &schema.ResourceTimeout{
+			Delete: schema.DefaultTimeout(time.Minute * 3),
+			Update: schema.DefaultTimeout(time.Minute * 3),
+		},
 	}
 }
 
@@ -89,7 +95,7 @@ func resourceGridscaleSshkeyUpdate(d *schema.ResourceData, meta interface{}) err
 	if err != nil {
 		return err
 	}
-	err = service_query.BlockProvisoning(client, service_query.SSHKeyService, d.Id())
+	err = service_query.BlockProvisoning(client, service_query.SSHKeyService, d.Id(), d.Timeout(schema.TimeoutUpdate))
 	if err != nil {
 		return err
 	}
@@ -114,6 +120,11 @@ func resourceGridscaleSshkeyCreate(d *schema.ResourceData, meta interface{}) err
 
 func resourceGridscaleSshkeyDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	err := client.DeleteSshkey(d.Id())
-	return err
+	err := resource.Retry(d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
+		return resource.RetryableError(client.DeleteSshkey(d.Id()))
+	})
+	if err != nil {
+		return err
+	}
+	return service_query.BlockDeletion(client, service_query.SSHKeyService, d.Id())
 }

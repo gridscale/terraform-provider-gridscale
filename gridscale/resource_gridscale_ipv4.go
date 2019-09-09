@@ -108,6 +108,7 @@ func resourceGridscaleIpv4() *schema.Resource {
 		},
 		Timeouts: &schema.ResourceTimeout{
 			Delete: schema.DefaultTimeout(time.Minute * 3),
+			Update: schema.DefaultTimeout(time.Minute * 3),
 		},
 	}
 }
@@ -158,7 +159,7 @@ func resourceGridscaleIpUpdate(d *schema.ResourceData, meta interface{}) error {
 	if err != nil {
 		return err
 	}
-	err = service_query.BlockProvisoning(client, service_query.IPService, d.Id())
+	err = service_query.BlockProvisoning(client, service_query.IPService, d.Id(), d.Timeout(schema.TimeoutUpdate))
 	if err != nil {
 		return err
 	}
@@ -187,7 +188,11 @@ func resourceGridscaleIpv4Create(d *schema.ResourceData, meta interface{}) error
 func resourceGridscaleIpDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	d.ConnInfo()
-	return resource.Retry(d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
+	err := resource.Retry(d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
 		return resource.RetryableError(client.DeleteIP(d.Id()))
 	})
+	if err != nil {
+		return err
+	}
+	return service_query.BlockDeletion(client, service_query.IPService, d.Id())
 }

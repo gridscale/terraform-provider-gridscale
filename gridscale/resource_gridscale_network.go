@@ -90,6 +90,7 @@ func resourceGridscaleNetwork() *schema.Resource {
 		},
 		Timeouts: &schema.ResourceTimeout{
 			Delete: schema.DefaultTimeout(time.Minute * 3),
+			Update: schema.DefaultTimeout(time.Minute * 3),
 		},
 	}
 }
@@ -133,7 +134,7 @@ func resourceGridscaleNetworkUpdate(d *schema.ResourceData, meta interface{}) er
 	if err != nil {
 		return err
 	}
-	err = service_query.BlockProvisoning(client, service_query.NetworkService, d.Id())
+	err = service_query.BlockProvisoning(client, service_query.NetworkService, d.Id(), d.Timeout(schema.TimeoutUpdate))
 	if err != nil {
 		return err
 	}
@@ -159,7 +160,11 @@ func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) er
 
 func resourceGridscaleNetworkDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	return resource.Retry(d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
+	err := resource.Retry(d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
 		return resource.RetryableError(client.DeleteNetwork(d.Id()))
 	})
+	if err != nil {
+		return err
+	}
+	return service_query.BlockDeletion(client, service_query.NetworkService, d.Id())
 }

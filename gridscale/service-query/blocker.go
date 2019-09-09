@@ -3,12 +3,13 @@ package service_query
 import (
 	"fmt"
 	"github.com/gridscale/gsclient-go"
+	"github.com/hashicorp/terraform/helper/resource"
 	"time"
 )
 
 const (
 	delayFetchingStatus  = 500 * time.Millisecond
-	timeoutCheckDeletion = 1000 * time.Millisecond
+	timeoutCheckDeletion = 1 * time.Minute
 )
 
 const (
@@ -29,72 +30,74 @@ const (
 )
 
 //BlockProvisoning blocks until the object's state is not in provisioning anymore
-func BlockProvisoning(client *gsclient.Client, service gsService, id string) error {
-	switch service {
-	case LoadbalancerService:
-		lb, err := client.GetLoadBalancer(id)
-		for lb.Properties.Status == provivisoningStatus {
-			lb, err = client.GetLoadBalancer(id)
+func BlockProvisoning(client *gsclient.Client, service gsService, id string, timeout time.Duration) error {
+	return resource.Retry(timeout, func() *resource.RetryError {
+		time.Sleep(delayFetchingStatus)
+		switch service {
+		case LoadbalancerService:
+			lb, err := client.GetLoadBalancer(id)
 			if err != nil {
-				return fmt.Errorf(
-					"Error waiting for loadbalancer (%s) to be fetched: %s", id, err)
+				return resource.NonRetryableError(fmt.Errorf(
+					"Error waiting for loadbalancer (%s) to be fetched: %s", id, err))
 			}
-			time.Sleep(delayFetchingStatus)
-		}
-	case IPService:
-		ip, err := client.GetIP(id)
-		for ip.Properties.Status == provivisoningStatus {
-			ip, err = client.GetIP(id)
+			if lb.Properties.Status != activeStatus {
+				return resource.RetryableError(fmt.Errorf("Status of loadbalancer %s is not active", id))
+			}
+			return nil
+		case IPService:
+			ip, err := client.GetIP(id)
 			if err != nil {
-				return fmt.Errorf(
-					"Error waiting for IP (%s) to be fetched: %s", id, err)
+				return resource.NonRetryableError(fmt.Errorf(
+					"Error waiting for IP (%s) to be fetched: %s", id, err))
 			}
-			time.Sleep(500 * time.Millisecond)
-		}
-	case NetworkService:
-		net, err := client.GetNetwork(id)
-		for net.Properties.Status == provivisoningStatus {
-			net, err = client.GetNetwork(id)
+			if ip.Properties.Status != activeStatus {
+				return resource.RetryableError(fmt.Errorf("Status of IP %s is not active", id))
+			}
+			return nil
+		case NetworkService:
+			net, err := client.GetNetwork(id)
 			if err != nil {
-				return fmt.Errorf(
-					"Error waiting for network (%s) to be fetched: %s", id, err)
+				return resource.NonRetryableError(fmt.Errorf(
+					"Error waiting for network (%s) to be fetched: %s", id, err))
 			}
-			time.Sleep(delayFetchingStatus)
-		}
-	case ServerService:
-		server, err := client.GetServer(id)
-		for server.Properties.Status == provivisoningStatus {
-			server, err = client.GetServer(id)
+			if net.Properties.Status != activeStatus {
+				return resource.RetryableError(fmt.Errorf("Status of network %s is not active", id))
+			}
+			return nil
+		case ServerService:
+			server, err := client.GetServer(id)
 			if err != nil {
-				return fmt.Errorf(
-					"Error waiting for server (%s) to be fetched: %s", id, err)
+				return resource.NonRetryableError(fmt.Errorf(
+					"Error waiting for server (%s) to be fetched: %s", id, err))
 			}
-			time.Sleep(delayFetchingStatus)
-		}
-	case SSHKeyService:
-		sshKey, err := client.GetSshkey(id)
-		for sshKey.Properties.Status == provivisoningStatus {
-			sshKey, err = client.GetSshkey(id)
+			if server.Properties.Status != activeStatus {
+				return resource.RetryableError(fmt.Errorf("Status of server %s is not active", id))
+			}
+			return nil
+		case SSHKeyService:
+			sshKey, err := client.GetSshkey(id)
 			if err != nil {
-				return fmt.Errorf(
-					"Error waiting for ssh-key (%s) to be fetched: %s", id, err)
+				return resource.NonRetryableError(fmt.Errorf(
+					"Error waiting for sshKey (%s) to be fetched: %s", id, err))
 			}
-			time.Sleep(delayFetchingStatus)
-		}
-	case StorageService:
-		storage, err := client.GetStorage(id)
-		for storage.Properties.Status == provivisoningStatus {
-			storage, err = client.GetStorage(id)
+			if sshKey.Properties.Status != activeStatus {
+				return resource.RetryableError(fmt.Errorf("Status of sshKey %s is not active", id))
+			}
+			return nil
+		case StorageService:
+			storage, err := client.GetStorage(id)
 			if err != nil {
-				return fmt.Errorf(
-					"Error waiting for storage (%s) to be fetched: %s", id, err)
+				return resource.NonRetryableError(fmt.Errorf(
+					"Error waiting for storage (%s) to be fetched: %s", id, err))
 			}
-			time.Sleep(delayFetchingStatus)
+			if storage.Properties.Status != activeStatus {
+				return resource.RetryableError(fmt.Errorf("Status of storage %s is not active", id))
+			}
+			return nil
+		default:
+			return resource.NonRetryableError(fmt.Errorf("invalid service"))
 		}
-	default:
-		return fmt.Errorf("invalid service")
-	}
-	return nil
+	})
 }
 
 //BlockDeletion blocks until an object is deleted successfully

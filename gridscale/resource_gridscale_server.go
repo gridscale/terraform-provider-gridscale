@@ -3,12 +3,14 @@ package gridscale
 import (
 	"fmt"
 	"github.com/gridscale/gsclient-go"
+	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
 	resource_dependency_crud "github.com/terraform-providers/terraform-provider-gridscale/gridscale/resource-dependency-crud"
 	"github.com/terraform-providers/terraform-provider-gridscale/gridscale/service-query"
 	"log"
 	"strings"
+	"time"
 )
 
 func resourceGridscaleServer() *schema.Resource {
@@ -247,6 +249,11 @@ func resourceGridscaleServer() *schema.Resource {
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 		},
+		Timeouts: &schema.ResourceTimeout{
+			Delete: schema.DefaultTimeout(time.Minute * 3),
+			Create: schema.DefaultTimeout(time.Minute * 3),
+			Update: schema.DefaultTimeout(time.Minute * 3),
+		},
 	}
 }
 
@@ -398,13 +405,17 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 
 func resourceGridscaleServerDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	id := d.Id()
-	err := client.StopServer(id)
+	err := client.StopServer(d.Id())
 	if err != nil {
 		return err
 	}
-	err = client.DeleteServer(id)
-	return err
+	err = resource.Retry(d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
+		return resource.RetryableError(client.DeleteServer(d.Id()))
+	})
+	if err != nil {
+		return err
+	}
+	return service_query.BlockDeletion(client, service_query.ServerService, d.Id())
 }
 
 func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -482,7 +493,7 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 	if err != nil {
 		return err
 	}
-	err = service_query.BlockProvisoning(gsc, service_query.ServerService, d.Id())
+	err = service_query.BlockProvisoning(gsc, service_query.ServerService, d.Id(), d.Timeout(schema.TimeoutUpdate))
 	if err != nil {
 		return err
 	}

@@ -3,9 +3,11 @@ package gridscale
 import (
 	"fmt"
 	"github.com/gridscale/gsclient-go"
+	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/terraform-providers/terraform-provider-gridscale/gridscale/service-query"
+	"time"
 )
 
 func resourceGridscaleLoadBalancer() *schema.Resource {
@@ -109,6 +111,10 @@ func resourceGridscaleLoadBalancer() *schema.Resource {
 				Required:    true,
 			},
 		},
+		Timeouts: &schema.ResourceTimeout{
+			Delete: schema.DefaultTimeout(time.Minute * 3),
+			Update: schema.DefaultTimeout(time.Minute * 3),
+		},
 	}
 }
 
@@ -198,7 +204,7 @@ func resourceGridscaleLoadBalancerUpdate(d *schema.ResourceData, meta interface{
 		return fmt.Errorf(
 			"Error waiting for loadbalancer (%s) to be updated: %s", requestBody.Name, err)
 	}
-	err = service_query.BlockProvisoning(client, service_query.LoadbalancerService, d.Id())
+	err = service_query.BlockProvisoning(client, service_query.LoadbalancerService, d.Id(), d.Timeout(schema.TimeoutUpdate))
 	if err != nil {
 		return err
 	}
@@ -207,8 +213,13 @@ func resourceGridscaleLoadBalancerUpdate(d *schema.ResourceData, meta interface{
 
 func resourceGridscaleLoadBalancerDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	id := d.Id()
-	return client.DeleteLoadBalancer(id)
+	err := resource.Retry(d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
+		return resource.RetryableError(client.DeleteLoadBalancer(d.Id()))
+	})
+	if err != nil {
+		return err
+	}
+	return service_query.BlockDeletion(client, service_query.LoadbalancerService, d.Id())
 }
 
 func expandLoadbalancerBackendServers(backendServers interface{}) []gsclient.BackendServer {
