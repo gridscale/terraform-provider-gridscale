@@ -32,7 +32,8 @@ func dataSourceGridscaleLoadBalancer() *schema.Resource {
 			"algorithm": {
 				Type:        schema.TypeString,
 				Description: "The algorithm used to process requests. Accepted values: roundrobin/leastconn.",
-				Computed:    true},
+				Computed:    true,
+			},
 			"forwarding_rule": {
 				Type:        schema.TypeSet,
 				Description: "List of forwarding rules for the Load balancer.",
@@ -45,20 +46,24 @@ func dataSourceGridscaleLoadBalancer() *schema.Resource {
 						},
 						"listen_port": {
 							Type:     schema.TypeInt,
-							Computed: true},
+							Computed: true,
+						},
 						"mode": {
 							Type:     schema.TypeString,
-							Computed: true},
+							Computed: true,
+						},
 						"target_port": {
 							Type:     schema.TypeInt,
-							Computed: true},
+							Computed: true,
+						},
 					},
 				},
 			},
 			"backend_server": {
 				Type:        schema.TypeSet,
 				Description: "List of backend servers.",
-				Computed:    true, Elem: &schema.Resource{
+				Computed:    true,
+				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"weight": {
 							Type:     schema.TypeInt,
@@ -79,20 +84,24 @@ func dataSourceGridscaleLoadBalancer() *schema.Resource {
 			"redirect_http_to_https": {
 				Type:        schema.TypeBool,
 				Description: "Whether the Load balancer is forced to redirect requests from HTTP to HTTPS",
-				Computed:    true},
+				Computed:    true,
+			},
 			"labels": {
 				Type:        schema.TypeSet,
 				Description: "List of labels.",
-				Computed:    true, Elem: &schema.Schema{Type: schema.TypeString},
+				Computed:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 			"listen_ipv4_uuid": {
 				Type:        schema.TypeString,
 				Description: "The UUID of the IPv4 address the Load balancer will listen to for incoming requests.",
-				Computed:    true},
+				Computed:    true,
+			},
 			"listen_ipv6_uuid": {
 				Type:        schema.TypeString,
 				Description: "The UUID of the IPv6 address the Load balancer will listen to for incoming requests.",
-				Computed:    true},
+				Computed:    true,
+			},
 		},
 	}
 }
@@ -110,21 +119,17 @@ func dataSourceGridscaleLoadBalancerRead(d *schema.ResourceData, meta interface{
 		d.Set("redirect_http_to_https", loadbalancer.Properties.RedirectHTTPToHTTPS)
 		d.Set("listen_ipv4_uuid", loadbalancer.Properties.ListenIPv4Uuid)
 		d.Set("listen_ipv6_uuid", loadbalancer.Properties.ListenIPv6Uuid)
-		if loadbalancer.Properties.ForwardingRules != nil {
-			err = d.Set("forwarding_rule", flattenLoadbalancerForwardingRules(loadbalancer.Properties.ForwardingRules))
-			if err != nil {
-				return err
-			}
-		}
-		if loadbalancer.Properties.BackendServers != nil {
-			err = d.Set("backend_server", flattenLoadbalancerBackendServers(loadbalancer.Properties.BackendServers))
 
-			if err != nil {
-				return err
-			}
+		if err = d.Set("forwarding_rule", flattenLoadbalancerForwardingRules(loadbalancer.Properties.ForwardingRules)); err != nil {
+			return fmt.Errorf("Error setting ForwardingRules: %v", err)
 		}
+
+		if err = d.Set("backend_server", flattenLoadbalancerBackendServers(loadbalancer.Properties.BackendServers)); err != nil {
+			return fmt.Errorf("Error setting BackendServers: %v", err)
+		}
+
 		if err = d.Set("labels", loadbalancer.Properties.Labels); err != nil {
-			return fmt.Errorf("Error setting labels: %v", err)
+			return fmt.Errorf("Error setting Labels: %v", err)
 		}
 	}
 

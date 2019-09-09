@@ -3,10 +3,9 @@ package gridscale
 import (
 	"fmt"
 
+	"github.com/gridscale/gsclient-go"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
-
-	"github.com/gridscale/gsclient-go"
 )
 
 func resourceGridscaleLoadBalancer() *schema.Resource {
@@ -162,19 +161,14 @@ func resourceGridscaleLoadBalancerRead(d *schema.ResourceData, meta interface{})
 	d.Set("listen_ipv4_uuid", loadbalancer.Properties.ListenIPv4Uuid)
 	d.Set("listen_ipv6_uuid", loadbalancer.Properties.ListenIPv6Uuid)
 
-	if loadbalancer.Properties.ForwardingRules != nil {
-		err = d.Set("forwarding_rule", flattenLoadbalancerForwardingRules(loadbalancer.Properties.ForwardingRules))
-		if err != nil {
-			return err
-		}
+	if err = d.Set("forwarding_rule", flattenLoadbalancerForwardingRules(loadbalancer.Properties.ForwardingRules)); err != nil {
+		return fmt.Errorf("Error setting ForwardingRules: %v", err)
 	}
-	if loadbalancer.Properties.BackendServers != nil {
-		err = d.Set("backend_server", flattenLoadbalancerBackendServers(loadbalancer.Properties.BackendServers))
 
-		if err != nil {
-			return err
-		}
+	if err = d.Set("backend_server", flattenLoadbalancerBackendServers(loadbalancer.Properties.BackendServers)); err != nil {
+		return fmt.Errorf("Error setting BackendServers: %v", err)
 	}
+
 	if err = d.Set("labels", loadbalancer.Properties.Labels); err != nil {
 		return fmt.Errorf("Error setting labels: %v", err)
 	}
@@ -245,26 +239,31 @@ func expandLoadbalancerForwardingRules(forwardingRules interface{}) []gsclient.F
 
 func flattenLoadbalancerForwardingRules(forwardingRules []gsclient.ForwardingRule) []interface{} {
 	tempForwardingRules := make([]interface{}, 0)
-	for _, value := range forwardingRules {
-		forwardingRule := map[string]interface{}{
-			"letsencrypt_ssl": value.LetsencryptSSL,
-			"listen_port":     value.ListenPort,
-			"mode":            value.Mode,
-			"target_port":     value.TargetPort,
+
+	if forwardingRules != nil {
+		for _, value := range forwardingRules {
+			forwardingRule := map[string]interface{}{
+				"letsencrypt_ssl": value.LetsencryptSSL,
+				"listen_port":     value.ListenPort,
+				"mode":            value.Mode,
+				"target_port":     value.TargetPort,
+			}
+			tempForwardingRules = append(tempForwardingRules, forwardingRule)
 		}
-		tempForwardingRules = append(tempForwardingRules, forwardingRule)
 	}
 	return tempForwardingRules
 }
 
 func flattenLoadbalancerBackendServers(backendServers []gsclient.BackendServer) []interface{} {
 	tempBackendServers := make([]interface{}, 0)
-	for _, value := range backendServers {
-		backendServer := map[string]interface{}{
-			"weight": value.Weight,
-			"host":   value.Host,
+	if backendServers != nil {
+		for _, value := range backendServers {
+			backendServer := map[string]interface{}{
+				"weight": value.Weight,
+				"host":   value.Host,
+			}
+			tempBackendServers = append(tempBackendServers, backendServer)
 		}
-		tempBackendServers = append(tempBackendServers, backendServer)
 	}
 	return tempBackendServers
 }

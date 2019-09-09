@@ -1,6 +1,8 @@
 package gridscale
 
 import (
+	"fmt"
+
 	"github.com/gridscale/gsclient-go"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
@@ -102,6 +104,9 @@ func dataSourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) er
 		d.Set("delete_block", network.Properties.DeleteBlock)
 		d.Set("create_time", network.Properties.CreateTime)
 		d.Set("change_time", network.Properties.ChangeTime)
+		if err = d.Set("labels", network.Properties.Labels); err != nil {
+			return fmt.Errorf("Error setting labels: %v", err)
+		}
 	}
 
 	return err
