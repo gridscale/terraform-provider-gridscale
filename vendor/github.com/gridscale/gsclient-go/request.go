@@ -5,49 +5,54 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
+	"path"
 	"time"
 )
 
+//Request gridscale's custom request struct
 type Request struct {
 	uri    string
 	method string
 	body   interface{}
 }
 
+//CreateResponse common struct of a response for creation
 type CreateResponse struct {
-	ObjectUuid  string `json:"object_uuid"`
-	RequestUuid string `json:"request_uuid"`
-	ServerUuid  string `json:"server_uuid"`
+	ObjectUUID  string `json:"object_uuid"`
+	RequestUUID string `json:"request_uuid"`
 }
 
+//RequestStatus status of a request
 type RequestStatus map[string]RequestStatusProperties
 
+//RequestStatusProperties JSON struct of properties of a request's status
 type RequestStatusProperties struct {
 	Status     string `json:"status"`
 	Message    string `json:"message"`
 	CreateTime string `json:"create_time"`
 }
 
+//RequestError error of a request
 type RequestError struct {
 	StatusMessage string `json:"status"`
 	ErrorMessage  string `json:"message"`
 	StatusCode    int
 }
 
+//Error just returns error as string
 func (r RequestError) Error() string {
 	message := r.ErrorMessage
 	if message == "" {
 		message = "no error message received from server"
 	}
-	return fmt.Sprintf("[Error] statuscode %v returned: %s", r.StatusCode, message)
+	return fmt.Sprintf("statuscode %v returned: %s", r.StatusCode, message)
 }
 
 //This function takes the client and a struct and then adds the result to the given struct if possible
 func (r *Request) execute(c Client, output interface{}) error {
 	url := c.cfg.APIUrl + r.uri
-	log.Printf("[DEBUG] %v request sent to URL: %v", r.method, url)
+	c.cfg.logger.Debugf("%v request sent to URL: %v", r.method, url)
 
 	//Convert the body of the request to json
 	jsonBody := new(bytes.Buffer)
@@ -63,11 +68,10 @@ func (r *Request) execute(c Client, output interface{}) error {
 	if err != nil {
 		return err
 	}
-	request.Header.Add("X-Auth-UserId", c.cfg.UserUUID)
+	request.Header.Add("X-Auth-UserID", c.cfg.UserUUID)
 	request.Header.Add("X-Auth-Token", c.cfg.APIToken)
 	request.Header.Add("Content-Type", "application/json")
-
-	log.Printf("[DEBUG] Request body: %v", request.Body)
+	c.cfg.logger.Debugf("Request body: %v", request.Body)
 
 	//execute the request
 	result, err := c.cfg.HTTPClient.Do(request)
@@ -80,52 +84,52 @@ func (r *Request) execute(c Client, output interface{}) error {
 		return err
 	}
 
-	log.Printf("[DEBUG] Status code returned: %v", result.StatusCode)
+	c.cfg.logger.Debugf("Status code returned: %v", result.StatusCode)
 
 	if result.StatusCode >= 300 {
-		errorMessage := new(RequestError) //error messages have a different structure, so they are read with a different struct
+		var errorMessage RequestError //error messages have a different structure, so they are read with a different struct
 		errorMessage.StatusCode = result.StatusCode
 		json.Unmarshal(iostream, &errorMessage)
+		c.cfg.logger.Errorf("Error message: %v. Status: %v. Code: %v.", errorMessage.ErrorMessage, errorMessage.StatusMessage, errorMessage.StatusCode)
 		return errorMessage
-	} else {
-		json.Unmarshal(iostream, output) //Edit the given struct
-		log.Printf("[DEBUG] Response body: %v", string(iostream))
-		return nil
 	}
+	json.Unmarshal(iostream, output) //Edit the given struct
+	c.cfg.logger.Debugf("Response body: %v", string(iostream))
+	return nil
 }
 
-//This function allows use to wait for a request to complete. Timeouts are currently hardcoded
+//WaitForRequestCompletion allows to wait for a request to complete. Timeouts are currently hardcoded
 func (c *Client) WaitForRequestCompletion(id string) error {
 	r := Request{
-		uri:    "/requests/" + id,
+		uri:    path.Join("/requests/", id),
 		method: "GET",
 	}
-
 	timer := time.After(time.Minute)
 
 	for {
 		select {
 		case <-timer:
+			c.cfg.logger.Errorf("Timeout reached when waiting for request %v to complete", id)
 			return fmt.Errorf("Timeout reached when waiting for request %v to complete", id)
 		default:
 			time.Sleep(500 * time.Millisecond) //delay the request, so we don't do too many requests to the server
-			response := new(RequestStatus)
+			var response RequestStatus
 			r.execute(*c, &response)
-			output := *response //Without this cast reading indexes doesn't work
-			if output[id].Status == "done" {
-				log.Print("Done with creating")
+			if response[id].Status == "done" {
+				c.cfg.logger.Info("Done with creating")
 				return nil
 			}
 		}
 	}
 }
 
+//WaitForServerPowerStatus  allows to wait for a server changing its power status. Timeouts are currently hardcoded
 func (c *Client) WaitForServerPowerStatus(id string, status bool) error {
 	timer := time.After(2 * time.Minute)
-
 	for {
 		select {
 		case <-timer:
+			c.cfg.logger.Errorf("Timeout reached when trying to shut down system with id %v", id)
 			return fmt.Errorf("Timeout reached when trying to shut down system with id %v", id)
 		default:
 			time.Sleep(500 * time.Millisecond) //delay the request, so we don't do too many requests to the server
@@ -134,7 +138,7 @@ func (c *Client) WaitForServerPowerStatus(id string, status bool) error {
 				return err
 			}
 			if server.Properties.Power == status {
-				log.Printf("The power status of the server with id %v has changed to %t", id, status)
+				c.cfg.logger.Infof("The power status of the server with id %v has changed to %t", id, status)
 				return nil
 			}
 		}

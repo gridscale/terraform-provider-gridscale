@@ -1,158 +1,235 @@
 package gsclient
 
-type Storages struct {
+import (
+	"errors"
+	"net/http"
+	"path"
+)
+
+//StorageList JSON struct of a list of storages
+type StorageList struct {
 	List map[string]StorageProperties `json:"storages"`
 }
 
+//DeletedStorageList JSON struct of a list of storages
+type DeletedStorageList struct {
+	List map[string]StorageProperties `json:"deleted_storages"`
+}
+
+//Storage JSON struct of a single storage
 type Storage struct {
 	Properties StorageProperties `json:"storage"`
 }
 
+//StorageProperties JSON struct of properties of a storage
 type StorageProperties struct {
-	ChangeTime       string            `json:"change_time"`
-	LocationIata     string            `json:"location_iata"`
-	Status           string            `json:"status"`
-	LicenseProductNo int               `json:"license_product_no"`
-	LocationCountry  string            `json:"location_country"`
-	UsageInMinutes   int               `json:"usage_in_minutes"`
-	LastUsedTemplate string            `json:"last_used_template"`
-	CurrentPrice     float64           `json:"current_price"`
-	Capacity         int               `json:"capacity"`
-	LocationUuid     string            `json:"location_uuid"`
-	StorageType      string            `json:"storage_type"`
-	ParentUuid       string            `json:"parent_uuid"`
-	Name             string            `json:"name"`
-	LocationName     string            `json:"location_name"`
-	ObjectUuid       string            `json:"object_uuid"`
-	Snapshots        []StorageSnapshot `json:"snapshots"`
-	Relations        StorageRelations  `json:"relations"`
-	Labels           []string          `json:"labels"`
-	CreateTime       string            `json:"create_time"`
+	ChangeTime       string                    `json:"change_time"`
+	LocationIata     string                    `json:"location_iata"`
+	Status           string                    `json:"status"`
+	LicenseProductNo int                       `json:"license_product_no"`
+	LocationCountry  string                    `json:"location_country"`
+	UsageInMinutes   int                       `json:"usage_in_minutes"`
+	LastUsedTemplate string                    `json:"last_used_template"`
+	CurrentPrice     float64                   `json:"current_price"`
+	Capacity         int                       `json:"capacity"`
+	LocationUUID     string                    `json:"location_uuid"`
+	StorageType      string                    `json:"storage_type"`
+	ParentUUID       string                    `json:"parent_uuid"`
+	Name             string                    `json:"name"`
+	LocationName     string                    `json:"location_name"`
+	ObjectUUID       string                    `json:"object_uuid"`
+	Snapshots        []StorageSnapshotRelation `json:"snapshots"`
+	Relations        StorageRelations          `json:"relations"`
+	Labels           []string                  `json:"labels"`
+	CreateTime       string                    `json:"create_time"`
 }
 
+//StorageRelations JSON struct of a list of a storage's relations
 type StorageRelations struct {
-	Servers           []StorageServer            `json:"servers"`
-	SnapshotSchedules []StorageSnapshotSchedules `json:"snapshot_schedules"`
+	Servers           []StorageServerRelation              `json:"servers"`
+	SnapshotSchedules []StorageAndSnapshotScheduleRelation `json:"snapshot_schedules"`
 }
 
-type StorageServer struct {
+//StorageServerRelation JSON struct of a relation between a storage and a server
+type StorageServerRelation struct {
 	Bootdevice bool   `json:"bootdevice"`
 	Target     int    `json:"target"`
 	Controller int    `json:"controller"`
 	Bus        int    `json:"bus"`
-	ObjectUuid string `json:"object_uuid"`
+	ObjectUUID string `json:"object_uuid"`
 	Lun        int    `json:"lun"`
 	CreateTime string `json:"create_time"`
 	ObjectName string `json:"object_name"`
 }
 
-type StorageSnapshot struct {
+//StorageSnapshotRelation JSON struct of a relation between a storage and a snapshot
+type StorageSnapshotRelation struct {
 	LastUsedTemplate      string `json:"last_used_template"`
-	ObjectUuid            string `json:"object_uuid"`
+	ObjectUUID            string `json:"object_uuid"`
+	StorageUUID           string `json:"storage_uuid"`
 	SchedulesSnapshotName string `json:"schedules_snapshot_name"`
-	SchedulesSnapshotUuid string `json:"schedules_snapshot_uuid"`
+	SchedulesSnapshotUUID string `json:"schedules_snapshot_uuid"`
 	ObjectCapacity        int    `json:"object_capacity"`
 	CreateTime            string `json:"create_time"`
 	ObjectName            string `json:"object_name"`
 }
 
-type StorageSnapshotSchedules struct {
+//StorageAndSnapshotScheduleRelation JSON struct of a relation between a storage and a snapshot schedule
+type StorageAndSnapshotScheduleRelation struct {
 	RunInterval   int    `json:"run_interval"`
 	KeepSnapshots int    `json:"keep_snapshots"`
 	ObjectName    string `json:"object_name"`
 	NextRuntime   string `json:"next_runtime"`
-	ObjectUuid    int    `json:"object_uuid"`
+	ObjectUUID    int    `json:"object_uuid"`
 	Name          string `json:"name"`
 	CreateTime    string `json:"create_time"`
 }
+
+//StorageTemplate JSON struct of a storage template
 type StorageTemplate struct {
 	Sshkeys      []string `json:"sshkeys,omitempty"`
-	TemplateUuid string   `json:"template_uuid,omitempty"`
+	TemplateUUID string   `json:"template_uuid"`
 	Password     string   `json:"password,omitempty"`
 	PasswordType string   `json:"password_type,omitempty"`
 	Hostname     string   `json:"hostname,omitempty"`
 }
 
+//StorageCreateRequest JSON struct of a request for creating a storage
 type StorageCreateRequest struct {
 	Capacity     int              `json:"capacity"`
-	LocationUuid string           `json:"location_uuid"`
+	LocationUUID string           `json:"location_uuid"`
 	Name         string           `json:"name"`
 	StorageType  string           `json:"storage_type,omitempty"`
 	Template     *StorageTemplate `json:"template,omitempty"`
-	Labels       []interface{}    `json:"labels,omitempty"`
+	Labels       []string         `json:"labels,omitempty"`
 }
 
+//StorageUpdateRequest JSON struct of a request for updating a storage
 type StorageUpdateRequest struct {
-	Name     string        `json:"name,omitempty"`
-	Labels   []interface{} `json:"labels"`
-	Capacity int           `json:"capacity,omitempty"`
+	Name     string   `json:"name,omitempty"`
+	Labels   []string `json:"labels,omitempty"`
+	Capacity int      `json:"capacity,omitempty"`
 }
 
-func (c *Client) GetStorage(id string) (*Storage, error) {
-	r := Request{
-		uri:    apiStorageBase + "/" + id,
-		method: "GET",
+//GetStorage get a storage
+func (c *Client) GetStorage(id string) (Storage, error) {
+	if !isValidUUID(id) {
+		return Storage{}, errors.New("'id' is invalid")
 	}
-
-	response := new(Storage)
+	r := Request{
+		uri:    path.Join(apiStorageBase, id),
+		method: http.MethodGet,
+	}
+	var response Storage
 	err := r.execute(*c, &response)
-
 	return response, err
 }
 
+//GetStorageList gets a list of available storages
 func (c *Client) GetStorageList() ([]Storage, error) {
 	r := Request{
 		uri:    apiStorageBase,
-		method: "GET",
+		method: http.MethodGet,
 	}
-
-	response := new(Storages)
+	var response StorageList
+	var storages []Storage
 	err := r.execute(*c, &response)
-
-	list := []Storage{}
 	for _, properties := range response.List {
-		storage := Storage{
+		storages = append(storages, Storage{
 			Properties: properties,
-		}
-		list = append(list, storage)
+		})
 	}
-
-	return list, err
+	return storages, err
 }
 
-func (c *Client) CreateStorage(body StorageCreateRequest) (*CreateResponse, error) {
+//CreateStorage create a storage
+func (c *Client) CreateStorage(body StorageCreateRequest) (CreateResponse, error) {
 	r := Request{
 		uri:    apiStorageBase,
-		method: "POST",
+		method: http.MethodPost,
 		body:   body,
 	}
-
-	response := new(CreateResponse)
+	var response CreateResponse
 	err := r.execute(*c, &response)
 	if err != nil {
-		return nil, err
+		return CreateResponse{}, err
 	}
-
-	err = c.WaitForRequestCompletion(response.RequestUuid)
-
+	err = c.WaitForRequestCompletion(response.RequestUUID)
 	return response, err
 }
 
+//DeleteStorage delete a storage
 func (c *Client) DeleteStorage(id string) error {
-	r := Request{
-		uri:    apiStorageBase + "/" + id,
-		method: "DELETE",
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
 	}
-
+	r := Request{
+		uri:    path.Join(apiStorageBase, id),
+		method: http.MethodDelete,
+	}
 	return r.execute(*c, nil)
 }
 
+//UpdateStorage update a storage
 func (c *Client) UpdateStorage(id string, body StorageUpdateRequest) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
-		uri:    apiStorageBase + "/" + id,
-		method: "PATCH",
+		uri:    path.Join(apiStorageBase, id),
+		method: http.MethodPatch,
 		body:   body,
 	}
-
 	return r.execute(*c, nil)
+}
+
+//GetStorageEventList get list of a storage's events
+func (c *Client) GetStorageEventList(id string) ([]Event, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
+	r := Request{
+		uri:    path.Join(apiStorageBase, id, "events"),
+		method: http.MethodGet,
+	}
+	var response EventList
+	var storageEvents []Event
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		storageEvents = append(storageEvents, Event{Properties: properties})
+	}
+	return storageEvents, err
+}
+
+//GetStoragesByLocation gets a list of storages by location
+func (c *Client) GetStoragesByLocation(id string) ([]Storage, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
+	r := Request{
+		uri:    path.Join(apiLocationBase, id, "storages"),
+		method: http.MethodGet,
+	}
+	var response StorageList
+	var storages []Storage
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		storages = append(storages, Storage{Properties: properties})
+	}
+	return storages, err
+}
+
+//GetDeletedStorages gets a list of deleted storages
+func (c *Client) GetDeletedStorages() ([]Storage, error) {
+	r := Request{
+		uri:    path.Join(apiDeletedBase, "storages"),
+		method: http.MethodGet,
+	}
+	var response DeletedStorageList
+	var storages []Storage
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		storages = append(storages, Storage{Properties: properties})
+	}
+	return storages, err
 }
