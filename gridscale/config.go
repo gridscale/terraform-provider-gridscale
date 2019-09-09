@@ -23,7 +23,7 @@ func (c Config) Client() (*gsclient.Client, error) {
 		c.APIUrl,
 		c.UserUUID,
 		c.APIToken,
-		true,
+		false,
 	)
 	client := gsclient.NewClient(config)
 	log.Print("[INFO] gridscale client configured")
