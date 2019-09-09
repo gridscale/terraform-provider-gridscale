@@ -1,6 +1,5 @@
 package gridscale
 
-
 //convSOStrings converts slice of interfaces to slice of strings
 func convSOStrings(interfaceList []interface{}) []string {
 	var labels []string
@@ -9,4 +8,3 @@ func convSOStrings(interfaceList []interface{}) []string {
 	}
 	return labels
 }
-

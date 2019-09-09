@@ -361,7 +361,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	}
 	d.SetId(response.ObjectUUID)
 	log.Printf("[DEBUG] The id for %s has been set to: %v", requestBody.Name, response.ObjectUUID)
-	err = client.LinkBootStorage()
+	err = client.LinkStorages()
 	if err != nil {
 		return err
 	}
@@ -374,53 +374,24 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		return err
 	}
 
-
-
 	//Add public network if we have an IP
 	_, hasIPv4 := d.GetOk("ipv4")
 	_, hasIPv6 := d.GetOk("ipv6")
 	if hasIPv4 || hasIPv6 {
+		err = client.LinkNetworks(true)
+		if err != nil {
+			return err
+		}
+	}
+	err = client.LinkNetworks(false)
+	if err != nil {
+		return err
+	}
 
-	}
-	if attr, ok := d.GetOk("network"); ok {
-		for _, value := range attr.(*schema.Set).List() {
-			network := value.(map[string]interface{})
-			err = client.LinkNetwork(
-				response.ObjectUUID,
-				network["object_uuid"].(string),
-				"",
-				network["bootdevice"].(bool),
-				0,
-				nil,
-				gsclient.FirewallRules{},
-			)
-			if err != nil {
-				return fmt.Errorf(
-					"Error waiting for network (%s) to be attached to server (%s): %s",
-					network["object_uuid"],
-					response.ObjectUUID,
-					err,
-				)
-			}
-		}
-	}
-	//Add the rest of the storages
-	//The server might not boot if more than one storages is attached to a server when it is being created. That is why the rest of the storages are added later. See BUG-191
-	if attr, ok := d.GetOk("storage"); ok {
-		for _, value := range attr.(*schema.Set).List() {
-			storage := value.(map[string]interface{})
-			if !storage["bootdevice"].(bool) {
-				err = client.LinkStorage(d.Id(), storage["object_uuid"].(string), storage["bootdevice"].(bool))
-				if err != nil {
-					return err
-				}
-			}
-		}
-	}
 	//Set the power state if needed
 	power := d.Get("power").(bool)
 	if power {
-		client.StartServer(d.Id())
+		gsc.StartServer(d.Id())
 	}
 	return resourceGridscaleServerRead(d, meta)
 }
@@ -437,23 +408,15 @@ func resourceGridscaleServerDelete(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
-	shutdownRequired := false
+	client := resource_dependency_crud.NewServerDepClient(meta.(*gsclient.Client), d)
+	gsc := client.GetGSClient()
 	var err error
-	if d.HasChange("cores") {
-		old, new := d.GetChange("cores")
-		if new.(int) < old.(int) || d.Get("legacy").(bool) { //Legacy systems don't support updating the memory while running
-			shutdownRequired = true
+	//The ShutdownServer command will check if the server is running and shut it down if it is running, so no extra checks are needed here
+	if client.IsShutdownRequired() {
+		err = gsc.ShutdownServer(d.Id())
+		if err != nil {
+			return err
 		}
-	}
-	if d.HasChange("memory") {
-		old, new := d.GetChange("memory")
-		if new.(int) < old.(int) || d.Get("legacy").(bool) { //Legacy systems don't support updating the memory while running
-			shutdownRequired = true
-		}
-	}
-	if d.HasChange("ipv4") || d.HasChange("ipv6") || d.HasChange("storage") || d.HasChange("network") {
-		shutdownRequired = true
 	}
 	requestBody := gsclient.ServerUpdateRequest{
 		Name:            d.Get("name").(string),
@@ -462,216 +425,66 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 		Cores:           d.Get("cores").(int),
 		Memory:          d.Get("memory").(int),
 	}
-	//The ShutdownServer command will check if the server is running and shut it down if it is running, so no extra checks are needed here
-	if shutdownRequired {
-		err = client.ShutdownServer(d.Id())
-		if err != nil {
-			return err
-		}
-	}
 	//Execute the update request
-	err = client.UpdateServer(d.Id(), requestBody)
+	err = gsc.UpdateServer(d.Id(), requestBody)
 	if err != nil {
 		return err
 	}
+
 	//Link/unlink isoimages
-	if d.HasChange("isoimage") {
-		oldIso, newIso := d.GetChange("isoimage")
-		if newIso == "" {
-			err = client.UnlinkIsoImage(d.Id(), oldIso.(string))
-		} else {
-			err = client.LinkIsoImage(d.Id(), newIso.(string))
-		}
-		if err != nil {
-			return err
-		}
+	err = client.UpdateISOImageRel()
+	if err != nil {
+		return err
 	}
 	//Link/Unlink ip addresses
-	var needsPublicNetwork = true
-	if d.HasChange("ipv4") {
-		oldIp, newIp := d.GetChange("ipv4")
-		if newIp == "" {
-			//if ip is deleted already then no need to unlink
-			//just remove the ip from server data
-			_, err := client.GetIP(oldIp.(string))
-			if err != nil {
-				if requestError, ok := err.(gsclient.RequestError); ok {
-					if requestError.StatusCode != 404 {
-						err = client.UnlinkIP(d.Id(), oldIp.(string))
-					} else {
-						//this is the case where the ip is already deleted
-						err = nil
-					}
-				} else {
-					err = client.UnlinkIP(d.Id(), oldIp.(string))
-				}
-			} else {
-				err = client.UnlinkIP(d.Id(), oldIp.(string))
-			}
-		} else {
-			err = client.LinkIP(d.Id(), newIp.(string))
-		}
-		if err != nil {
-			return err
-		}
-		if oldIp != "" {
-			needsPublicNetwork = false
-		}
+	needsPublicNetwork, err := client.UpdateIPv4Rel()
+	if err != nil {
+		return err
 	}
-	if d.HasChange("ipv6") {
-		oldIp, newIp := d.GetChange("ipv6")
-		if newIp == "" {
-			//if ip is deleted already then no need to unlink
-			//just remove the ip from server data
-			_, err := client.GetIP(oldIp.(string))
-			if err != nil {
-				if requestError, ok := err.(gsclient.RequestError); ok {
-					if requestError.StatusCode != 404 {
-						err = client.UnlinkIP(d.Id(), oldIp.(string))
-					} else {
-						//this is the case where the ip is already deleted
-						err = nil
-					}
-				} else {
-					err = client.UnlinkIP(d.Id(), oldIp.(string))
-				}
-			} else {
-				err = client.UnlinkIP(d.Id(), oldIp.(string))
-			}
-		} else {
-			err = client.LinkIP(d.Id(), newIp.(string))
-		}
-		if err != nil {
-			return err
-		}
-		if oldIp != "" {
-			needsPublicNetwork = false
-		}
+	needsPublicNetwork, err = client.UpdateIPv6Rel()
+	if err != nil {
+		return err
 	}
 	//Disconnect from the public network if there is no longer and IP
 	if (d.HasChange("ipv6") || d.HasChange("ipv4")) && d.Get("ipv6").(string) == "" && d.Get("ipv4").(string) == "" {
-		publicNetwork, err := client.GetNetworkPublic()
+		err = client.UpdatePublicNetworkRel(false)
 		if err != nil {
-			return err
-		}
-		err = client.UnlinkNetwork(d.Id(), publicNetwork.Properties.ObjectUUID)
-		if err != nil {
-			return err
+			return nil
 		}
 	}
 	//Connect to the public network if an IP was added
 	if (d.HasChange("ipv6") || d.HasChange("ipv4")) && needsPublicNetwork {
-		publicNetwork, err := client.GetNetworkPublic()
+		err = client.UpdatePublicNetworkRel(true)
 		if err != nil {
-			return err
-		}
-		err = client.LinkNetwork(d.Id(), publicNetwork.Properties.ObjectUUID, "", false, 0, []string{}, gsclient.FirewallRules{})
-		if err != nil {
-			return err
+			return nil
 		}
 	}
 
 	//Link/unlink networks
-	//It currently unlinks and relinks all networks if any network has changed. This could probably be done better, but this way is easy and works well
-	if d.HasChange("network") {
-		oldNetworks, newNetworks := d.GetChange("network")
-		for _, value := range oldNetworks.(*schema.Set).List() {
-			network := value.(map[string]interface{})
-			if network["object_uuid"].(string) != "" {
-				//check if network is deleted already.
-				//if so, no need to unlink
-				_, err := client.GetNetwork(network["object_uuid"].(string))
-				if err != nil {
-					if requestError, ok := err.(gsclient.RequestError); ok {
-						if requestError.StatusCode != 404 {
-							err = client.UnlinkNetwork(d.Id(), network["object_uuid"].(string))
-							if err != nil {
-								return err
-							}
-						} else {
-							//this is the case where the network is already deleted
-							err = nil
-						}
-					} else {
-						err = client.UnlinkNetwork(d.Id(), network["object_uuid"].(string))
-						if err != nil {
-							return err
-						}
-					}
-				} else {
-					err = client.UnlinkNetwork(d.Id(), network["object_uuid"].(string))
-					if err != nil {
-						return err
-					}
-				}
-			}
-		}
-		for _, value := range newNetworks.(*schema.Set).List() {
-			network := value.(map[string]interface{})
-			if network["object_uuid"].(string) != "" {
-				err = client.LinkNetwork(d.Id(), network["object_uuid"].(string), "", network["bootdevice"].(bool), 0, []string{}, gsclient.FirewallRules{})
-				if err != nil {
-					return err
-				}
-			}
-		}
+	err = client.UpdateOtherNetworkRel()
+	if err != nil {
+		return err
 	}
 
 	//Link/unlink storages
-	if d.HasChange("storage") {
-		oldStorages, newStorages := d.GetChange("storage")
-		//unlink old storages if needed
-		for _, value := range oldStorages.(*schema.Set).List() {
-			oldStorage := value.(map[string]interface{})
-			unlink := true
-			for _, value := range newStorages.(*schema.Set).List() {
-				newStorage := value.(map[string]interface{})
-				if oldStorage["object_uuid"].(string) == newStorage["object_uuid"].(string) {
-					unlink = false
-					break
-				}
-			}
-			if unlink {
-				err = client.UnlinkStorage(d.Id(), oldStorage["object_uuid"].(string))
-				if err != nil {
-					return err
-				}
-			}
-		}
-
-		//link new storages if needed
-		for _, value := range newStorages.(*schema.Set).List() {
-			newStorage := value.(map[string]interface{})
-			link := true
-			for _, value := range oldStorages.(*schema.Set).List() {
-				oldStorage := value.(map[string]interface{})
-				if oldStorage["object_uuid"].(string) == newStorage["object_uuid"].(string) {
-					link = false
-					break
-				}
-			}
-			if link {
-				err = client.LinkStorage(d.Id(), newStorage["object_uuid"].(string), newStorage["bootdevice"].(bool))
-				if err != nil {
-					return err
-				}
-			}
-		}
+	err = client.UpdateStorageRel()
+	if err != nil {
+		return nil
 	}
+
 	// Make sure the server in is the expected power state.
 	// The StartServer and ShutdownServer functions do a check to see if the server isn't already running, so we don't need to do that here.
 	if d.Get("power").(bool) {
-		err = client.StartServer(d.Id())
+		err = gsc.StartServer(d.Id())
 	} else {
-		err = client.ShutdownServer(d.Id())
+		err = gsc.ShutdownServer(d.Id())
 	}
 	if err != nil {
 		return err
 	}
-	err = service_query.BlockProvisoning(client, service_query.ServerService, d.Id())
+	err = service_query.BlockProvisoning(gsc, service_query.ServerService, d.Id())
 	if err != nil {
 		return err
 	}
 	return resourceGridscaleServerRead(d, meta)
-
 }

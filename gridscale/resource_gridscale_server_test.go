@@ -102,11 +102,29 @@ resource "gridscale_ipv4" "ipserver" {
 	name = "test-ip"
 }
 
+resource "gridscale_storage" "boot" {
+  name   = "bootstorage"
+  capacity = 1
+}
+
+resource "gridscale_storage" "additional" {
+  name   = "additionalstorage"
+  capacity = 1
+}
+
+
 resource "gridscale_server" "foo" {
   name   = "%s"
   cores = 1
   memory = 1
   ipv4 = "${gridscale_ipv4.ipserver.id}"
+  storage {
+    object_uuid = "${gridscale_storage.boot.id}"
+	bootdevice = true
+  }
+  storage {
+    object_uuid = "${gridscale_storage.additional.id}"
+  }
 }
 `, name)
 }

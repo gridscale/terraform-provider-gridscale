@@ -3,10 +3,7 @@ package service_query
 import (
 	"fmt"
 	"github.com/gridscale/gsclient-go"
-	"time"
 )
-
-const timeoutCheckExistence = 1000 * time.Millisecond
 
 //IsObjectExist checks if object exists
 func IsObjectExist(client *gsclient.Client, service gsService, id string) (bool, error) {
@@ -25,6 +22,8 @@ func IsObjectExist(client *gsclient.Client, service gsService, id string) (bool,
 		_, err = client.GetSshkey(id)
 	case StorageService:
 		_, err = client.GetStorage(id)
+	case ISOImageService:
+		_, err = client.GetISOImage(id)
 	default:
 		return isExist, fmt.Errorf("invalid service")
 	}

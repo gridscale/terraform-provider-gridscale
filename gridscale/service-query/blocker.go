@@ -25,6 +25,7 @@ const (
 	ServerService       gsService = "server"
 	SSHKeyService       gsService = "sshkey"
 	StorageService      gsService = "storage"
+	ISOImageService     gsService = "isoimage"
 )
 
 //BlockProvisoning blocks until the object's state is not in provisioning anymore
