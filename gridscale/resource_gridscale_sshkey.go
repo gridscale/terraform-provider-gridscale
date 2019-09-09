@@ -2,6 +2,7 @@ package gridscale
 
 import (
 	"fmt"
+	"github.com/terraform-providers/terraform-provider-gridscale/gridscale/service-query"
 	"log"
 
 	"github.com/hashicorp/terraform/helper/schema"
@@ -88,7 +89,7 @@ func resourceGridscaleSshkeyUpdate(d *schema.ResourceData, meta interface{}) err
 	if err != nil {
 		return err
 	}
-	err = pauseWhenProvisoning(client, sshKeyService, d.Id())
+	err = service_query.BlockProvisoning(client, service_query.SSHKeyService, d.Id())
 	if err != nil {
 		return err
 	}

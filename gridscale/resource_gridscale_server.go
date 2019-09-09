@@ -5,6 +5,8 @@ import (
 	"github.com/gridscale/gsclient-go"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
+	resource_dependency_crud "github.com/terraform-providers/terraform-provider-gridscale/gridscale/resource-dependency-crud"
+	"github.com/terraform-providers/terraform-provider-gridscale/gridscale/service-query"
 	"log"
 	"strings"
 )
@@ -341,7 +343,8 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	client := resource_dependency_crud.NewServerDepClient(meta.(*gsclient.Client), d)
+	gsc := client.GetGSClient()
 	requestBody := gsclient.ServerCreateRequest{
 		Name:            d.Get("name").(string),
 		Cores:           d.Get("cores").(int),
@@ -351,96 +354,33 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		AvailablityZone: d.Get("availability_zone").(string),
 		Labels:          convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
-	response, err := client.CreateServer(requestBody)
+	response, err := gsc.CreateServer(requestBody)
 	if err != nil {
 		return fmt.Errorf(
 			"Error waiting for server (%s) to be created: %s", requestBody.Name, err)
 	}
 	d.SetId(response.ObjectUUID)
 	log.Printf("[DEBUG] The id for %s has been set to: %v", requestBody.Name, response.ObjectUUID)
-	//Add only the bootable storage after server creation
-	//When more than one device is set to bootable, the API is expected to give an error
-	if attr, ok := d.GetOk("storage"); ok {
-		for _, value := range attr.(*schema.Set).List() {
-			storage := value.(map[string]interface{})
-			if storage["bootdevice"].(bool) {
-				err = client.LinkStorage(response.ObjectUUID, storage["object_uuid"].(string), storage["bootdevice"].(bool))
-				if err != nil {
-					return fmt.Errorf(
-						"Error waiting for storage (%s) to be attached to server (%s): %s",
-						storage["object_uuid"].(string),
-						response.ObjectUUID,
-						err,
-					)
-				}
-			}
-		}
+	err = client.LinkBootStorage()
+	if err != nil {
+		return err
 	}
-	if attr, ok := d.GetOk("ipv4"); ok {
-		if client.GetIPVersion(attr.(string)) != 4 {
-			return fmt.Errorf("The IP address with UUID %v is not version 4", attr.(string))
-		}
-		err = client.LinkIP(response.ObjectUUID, attr.(string))
-		if err != nil {
-			return fmt.Errorf(
-				"Error waiting for IP address (%s) to be attached to server (%s): %s",
-				attr.(string),
-				response.ObjectUUID,
-				err,
-			)
-		}
+	err = client.LinkIPv4()
+	if err != nil {
+		return err
 	}
-	if attr, ok := d.GetOk("ipv6"); ok {
-		if client.GetIPVersion(attr.(string)) != 6 {
-			return fmt.Errorf("The IP address with UUID %v is not version 6", attr.(string))
-		}
-		err = client.LinkIP(response.ObjectUUID, attr.(string))
-		if err != nil {
-			return fmt.Errorf(
-				"Error waiting for IP address (%s) to be attached to server (%s): %s",
-				attr.(string),
-				response.ObjectUUID,
-				err,
-			)
-		}
+	err = client.LinkIPv6()
+	if err != nil {
+		return err
 	}
 
-	if attr, ok := d.GetOk("isoimage"); ok {
-		err = client.LinkIsoImage(response.ObjectUUID, attr.(string))
-		if err != nil {
-			return fmt.Errorf(
-				"Error waiting for iso-image (%s) to be attached to server (%s): %s",
-				attr.(string),
-				response.ObjectUUID,
-				err,
-			)
-		}
-	}
+
+
 	//Add public network if we have an IP
 	_, hasIPv4 := d.GetOk("ipv4")
 	_, hasIPv6 := d.GetOk("ipv6")
 	if hasIPv4 || hasIPv6 {
-		publicNetwork, err := client.GetNetworkPublic()
-		if err != nil {
-			return err
-		}
-		err = client.LinkNetwork(
-			response.ObjectUUID,
-			publicNetwork.Properties.ObjectUUID,
-			"",
-			false,
-			0,
-			nil,
-			gsclient.FirewallRules{},
-		)
-		if err != nil {
-			return fmt.Errorf(
-				"Error waiting for public network (%s) to be attached to server (%s): %s",
-				publicNetwork.Properties.ObjectUUID,
-				response.ObjectUUID,
-				err,
-			)
-		}
+
 	}
 	if attr, ok := d.GetOk("network"); ok {
 		for _, value := range attr.(*schema.Set).List() {
@@ -728,7 +668,7 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 	if err != nil {
 		return err
 	}
-	err = pauseWhenProvisoning(client, serverService, d.Id())
+	err = service_query.BlockProvisoning(client, service_query.ServerService, d.Id())
 	if err != nil {
 		return err
 	}

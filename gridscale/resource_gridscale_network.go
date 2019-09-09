@@ -2,6 +2,7 @@ package gridscale
 
 import (
 	"fmt"
+	"github.com/terraform-providers/terraform-provider-gridscale/gridscale/service-query"
 	"log"
 	"time"
 
@@ -132,7 +133,7 @@ func resourceGridscaleNetworkUpdate(d *schema.ResourceData, meta interface{}) er
 	if err != nil {
 		return err
 	}
-	err = pauseWhenProvisoning(client, networkService, d.Id())
+	err = service_query.BlockProvisoning(client, service_query.NetworkService, d.Id())
 	if err != nil {
 		return err
 	}

@@ -5,6 +5,7 @@ import (
 	"github.com/gridscale/gsclient-go"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
+	"github.com/terraform-providers/terraform-provider-gridscale/gridscale/service-query"
 )
 
 func resourceGridscaleLoadBalancer() *schema.Resource {
@@ -197,7 +198,7 @@ func resourceGridscaleLoadBalancerUpdate(d *schema.ResourceData, meta interface{
 		return fmt.Errorf(
 			"Error waiting for loadbalancer (%s) to be updated: %s", requestBody.Name, err)
 	}
-	err = pauseWhenProvisoning(client, loadbalancerService, d.Id())
+	err = service_query.BlockProvisoning(client, service_query.LoadbalancerService, d.Id())
 	if err != nil {
 		return err
 	}
