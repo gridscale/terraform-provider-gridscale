@@ -1,19 +1,33 @@
 package gsclient
 
-type Ips struct {
-	List map[string]IpProperties `json:"ips"`
+import (
+	"errors"
+	"net/http"
+	"path"
+)
+
+//IPList is JSON struct of a list of IPs
+type IPList struct {
+	List map[string]IPProperties `json:"ips"`
 }
 
-type Ip struct {
-	Properties IpProperties `json:"ip"`
+//DeletedIPList is JSON struct of a list of deleted IPs
+type DeletedIPList struct {
+	List map[string]IPProperties `json:"deleted_ips"`
 }
 
-type IpProperties struct {
+//IP is JSON struct if a single IP
+type IP struct {
+	Properties IPProperties `json:"ip"`
+}
+
+//IPProperties is JSON struct of an IP's properties
+type IPProperties struct {
 	Name            string      `json:"name"`
 	LocationCountry string      `json:"location_country"`
-	LocationUuid    string      `json:"location_uuid"`
-	ObjectUuid      string      `json:"object_uuid"`
-	ReverseDns      string      `json:"reverse_dns"`
+	LocationUUID    string      `json:"location_uuid"`
+	ObjectUUID      string      `json:"object_uuid"`
+	ReverseDNS      string      `json:"reverse_dns"`
 	Family          int         `json:"family"`
 	Status          string      `json:"status"`
 	CreateTime      string      `json:"create_time"`
@@ -22,122 +36,197 @@ type IpProperties struct {
 	LocationIata    string      `json:"location_iata"`
 	LocationName    string      `json:"location_name"`
 	Prefix          string      `json:"prefix"`
-	Ip              string      `json:"ip"`
+	IP              string      `json:"ip"`
 	DeleteBlock     string      `json:"delete_block"`
 	UsagesInMinutes float64     `json:"usage_in_minutes"`
 	CurrentPrice    float64     `json:"current_price"`
 	Labels          []string    `json:"labels"`
-	Relations       IpRelations `json:"relations"`
+	Relations       IPRelations `json:"relations"`
 }
 
-type IpRelations struct {
-	Loadbalancers []IpLoadbalancer `json:"loadbalancers"`
-	Servers       []IpServer       `json:"servers"`
-	PublicIps     []ServerIp       `json:"public_ips"`
-	Storages      []ServerStorage  `json:"storages"`
+//IPRelations is JSON struct of a list of an IP's relations
+type IPRelations struct {
+	Loadbalancers []IPLoadbalancer                  `json:"loadbalancers"`
+	Servers       []IPServer                        `json:"servers"`
+	PublicIPs     []ServerIPRelationProperties      `json:"public_ips"`
+	Storages      []ServerStorageRelationProperties `json:"storages"`
 }
 
-type IpLoadbalancer struct {
+//IPLoadbalancer is JSON struct of the relation between an IP and a Load Balancer
+type IPLoadbalancer struct {
 	CreateTime       string `json:"create_time"`
 	LoadbalancerName string `json:"loadbalancer_name"`
-	LoadbalancerUuid string `json:"loadbalancer_uuid"`
+	LoadbalancerUUID string `json:"loadbalancer_uuid"`
 }
 
-type IpServer struct {
+//IPServer is JSON struct of the relation between an IP and a Server
+type IPServer struct {
 	CreateTime string `json:"create_time"`
 	ServerName string `json:"server_name"`
-	ServerUuid string `json:"server_uuid"`
+	ServerUUID string `json:"server_uuid"`
 }
 
-type IpCreateResponse struct {
-	RequestUuid string `json:"request_uuid"`
-	ObjectUuid  string `json:"object_uuid"`
+//IPCreateResponse is JSON struct of a response for creating an IP
+type IPCreateResponse struct {
+	RequestUUID string `json:"request_uuid"`
+	ObjectUUID  string `json:"object_uuid"`
 	Prefix      string `json:"prefix"`
-	Ip          string `json:"ip"`
+	IP          string `json:"ip"`
 }
 
-type IpCreateRequest struct {
-	Name         string        `json:"name,omitempty"`
-	Family       int           `json:"family"`
-	LocationUuid string        `json:"location_uuid"`
-	Failover     bool          `json:"failover,omitempty"`
-	ReverseDns   string        `json:"reverse_dns,omitempty"`
-	Labels       []interface{} `json:"labels,omitempty"`
+//IPCreateRequest is JSON struct of a request for creating an IP
+type IPCreateRequest struct {
+	Name         string   `json:"name,omitempty"`
+	Family       int      `json:"family"`
+	LocationUUID string   `json:"location_uuid"`
+	Failover     bool     `json:"failover,omitempty"`
+	ReverseDNS   string   `json:"reverse_dns,omitempty"`
+	Labels       []string `json:"labels,omitempty"`
 }
 
-type IpUpdateRequest struct {
-	Name       string        `json:"name,omitempty"`
-	Failover   bool          `json:"failover"`
-	ReverseDns string        `json:"reverse_dns,omitempty"`
-	Labels     []interface{} `json:"labels"`
+//IPUpdateRequest is JSON struct of a request for updating an IP
+type IPUpdateRequest struct {
+	Name       string   `json:"name,omitempty"`
+	Failover   bool     `json:"failover"`
+	ReverseDNS string   `json:"reverse_dns,omitempty"`
+	Labels     []string `json:"labels,omitempty"`
 }
 
-func (c *Client) GetIp(id string) (*Ip, error) {
+//GetIP get a specific IP based on given id
+func (c *Client) GetIP(id string) (IP, error) {
+	if !isValidUUID(id) {
+		return IP{}, errors.New("'id' is invalid")
+	}
 	r := Request{
-		uri:    apiIpBase + "/" + id,
-		method: "GET",
+		uri:    path.Join(apiIPBase, id),
+		method: http.MethodGet,
 	}
 
-	response := new(Ip)
+	var response IP
 	err := r.execute(*c, &response)
 
 	return response, err
 }
 
-func (c *Client) GetIpList() (*Ips, error) {
+//GetIPList gets a list of available IPs
+func (c *Client) GetIPList() ([]IP, error) {
 	r := Request{
-		uri:    apiIpBase,
-		method: "GET",
+		uri:    apiIPBase,
+		method: http.MethodGet,
 	}
 
-	response := new(Ips)
+	var response IPList
+	var IPs []IP
 	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		IPs = append(IPs, IP{Properties: properties})
+	}
 
-	return response, err
+	return IPs, err
 }
 
-func (c *Client) CreateIp(body IpCreateRequest) (*IpCreateResponse, error) {
+//CreateIP creates an IP
+func (c *Client) CreateIP(body IPCreateRequest) (IPCreateResponse, error) {
 	r := Request{
-		uri:    apiIpBase,
-		method: "POST",
+		uri:    apiIPBase,
+		method: http.MethodPost,
 		body:   body,
 	}
 
-	response := new(IpCreateResponse)
+	var response IPCreateResponse
 	err := r.execute(*c, &response)
 	if err != nil {
-		return nil, err
+		return IPCreateResponse{}, err
 	}
 
-	err = c.WaitForRequestCompletion(response.RequestUuid)
+	err = c.WaitForRequestCompletion(response.RequestUUID)
 
 	return response, err
 }
 
-func (c *Client) DeleteIp(id string) error {
+//DeleteIP deletes a specific IP based on given id
+func (c *Client) DeleteIP(id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
-		uri:    apiIpBase + "/" + id,
-		method: "DELETE",
+		uri:    path.Join(apiIPBase, id),
+		method: http.MethodDelete,
 	}
 
 	return r.execute(*c, nil)
 }
 
-func (c *Client) UpdateIp(id string, body IpUpdateRequest) error {
+//UpdateIP updates a specific IP based on given id
+func (c *Client) UpdateIP(id string, body IPUpdateRequest) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
 	r := Request{
-		uri:    apiIpBase + "/" + id,
-		method: "PATCH",
+		uri:    path.Join(apiIPBase, id),
+		method: http.MethodPatch,
 		body:   body,
 	}
 
 	return r.execute(*c, nil)
 }
 
-//Returns 0 if an error was encountered
-func (c *Client) GetIpVersion(id string) int {
-	ip, err := c.GetIp(id)
+//GetIPEventList gets a list of an IP's events
+func (c *Client) GetIPEventList(id string) ([]Event, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
+	r := Request{
+		uri:    path.Join(apiIPBase, id, "events"),
+		method: http.MethodGet,
+	}
+	var response EventList
+	var IPEvents []Event
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		IPEvents = append(IPEvents, Event{Properties: properties})
+	}
+	return IPEvents, err
+}
+
+//GetIPVersion gets IP's version, returns 0 if an error was encountered
+func (c *Client) GetIPVersion(id string) int {
+	ip, err := c.GetIP(id)
 	if err != nil {
 		return 0
 	}
 	return ip.Properties.Family
+}
+
+//GetIPsByLocation gets a list of IPs by location
+func (c *Client) GetIPsByLocation(id string) ([]IP, error) {
+	if !isValidUUID(id) {
+		return nil, errors.New("'id' is invalid")
+	}
+	r := Request{
+		uri:    path.Join(apiLocationBase, id, "ips"),
+		method: http.MethodGet,
+	}
+	var response IPList
+	var IPs []IP
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		IPs = append(IPs, IP{Properties: properties})
+	}
+	return IPs, err
+}
+
+//GetDeletedIPs gets a list of deleted IPs
+func (c *Client) GetDeletedIPs() ([]IP, error) {
+	r := Request{
+		uri:    path.Join(apiDeletedBase, "ips"),
+		method: http.MethodGet,
+	}
+	var response DeletedIPList
+	var IPs []IP
+	err := r.execute(*c, &response)
+	for _, properties := range response.List {
+		IPs = append(IPs, IP{Properties: properties})
+	}
+	return IPs, err
 }

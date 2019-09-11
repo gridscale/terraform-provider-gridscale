@@ -1,0 +1,85 @@
+{
+	"comment": "",
+	"ignore": "",
+	"package": [
+		{
+			"checksumSHA1": "fuGCtI1ZIqx2umKV7OcPt9tDHmY=",
+			"path": "github.com/google/uuid",
+			"revision": "c2e93f3ae59f2904160ceaab466009f965df46d6",
+			"revisionTime": "2019-04-16T17:24:45Z"
+		},
+		{
+			"checksumSHA1": "gOoSbdqTE+LLlbri92bqgKTfjJ0=",
+			"path": "github.com/gridscale/gsclient-go",
+			"revision": "107554edd3722c2244cfc2be0380b25ef96e31e2",
+			"revisionTime": "2019-09-05T13:07:49Z"
+		},
+		{
+			"checksumSHA1": "8sg5F3A9erV8i7SxqTRn9LYKLy0=",
+			"path": "github.com/konsorten/go-windows-terminal-sequences",
+			"revision": "f55edac94c9bbba5d6182a4be46d86a2c9b5b50e",
+			"revisionTime": "2019-02-26T22:47:05Z"
+		},
+		{
+			"checksumSHA1": "jwoPNwN+mUiYFQPjQa/U3Kli7Ak=",
+			"path": "github.com/kr/pretty",
+			"revision": "73f6ac0b30a98e433b289500d779f50c1a6f0712",
+			"revisionTime": "2018-05-06T08:33:45Z"
+		},
+		{
+			"checksumSHA1": "x9dJv+jQhUFN6R6h4fzPjGLvQLg=",
+			"path": "github.com/kr/text",
+			"revision": "e2ffdb16a802fe2bb95e2e35ff34f0e53aeef34f",
+			"revisionTime": "2018-05-06T08:24:08Z"
+		},
+		{
+			"checksumSHA1": "RZOdTSZN/PgcTqko5LzIAzw+UT4=",
+			"path": "github.com/pmezard/go-difflib/difflib",
+			"revision": "5d4384ee4fb2527b0a1256a821ebfc92f91efefc",
+			"revisionTime": "2018-12-26T10:54:42Z"
+		},
+		{
+			"checksumSHA1": "mRwnW2yFxIO6w3BOaeLfYuPzIHc=",
+			"path": "github.com/sirupsen/logrus",
+			"revision": "de736cf91b921d56253b4010270681d33fdf7cb5",
+			"revisionTime": "2019-08-07T10:34:36Z"
+		},
+		{
+			"checksumSHA1": "jDsR9gpxYB6YBduE5qD8FmLiYv0=",
+			"path": "github.com/sirupsen/logrus/hooks/syslog",
+			"revision": "de736cf91b921d56253b4010270681d33fdf7cb5",
+			"revisionTime": "2019-08-07T10:34:36Z"
+		},
+		{
+			"checksumSHA1": "+SEEYlQ3V1UFOYrcM+5xsO9ow0U=",
+			"path": "github.com/sirupsen/logrus/internal/testutils",
+			"revision": "de736cf91b921d56253b4010270681d33fdf7cb5",
+			"revisionTime": "2019-08-07T10:34:36Z"
+		},
+		{
+			"checksumSHA1": "rHWQmJbEdrSjL6tvkYQ8JSG/XCE=",
+			"path": "github.com/stretchr/testify/assert",
+			"revision": "85f2b59c4459e5bf57488796be8c3667cb8246d6",
+			"revisionTime": "2018-07-16T14:42:29Z"
+		},
+		{
+			"checksumSHA1": "dQiBjo008hGWSAL1Jw+6LBjAXSk=",
+			"path": "github.com/stretchr/testify/require",
+			"revision": "85f2b59c4459e5bf57488796be8c3667cb8246d6",
+			"revisionTime": "2018-07-16T14:42:29Z"
+		},
+		{
+			"checksumSHA1": "vgYj71VS5CXqcOn8UkN9hoG68Ic=",
+			"path": "gopkg.in/check.v1",
+			"revision": "41f04d3bba152ddec2103e299fed053415705330",
+			"revisionTime": "2019-09-02T08:05:02Z"
+		},
+		{
+			"checksumSHA1": "xldGnHk44I4mgAwYKfsu7TqBPqM=",
+			"path": "gopkg.in/yaml.v2",
+			"revision": "51d6538a90f86fe93ac480b35f37b2be17fef232",
+			"revisionTime": "2018-11-15T11:05:04Z"
+		}
+	],
+	"rootPath": "github.com/nvthongswansea/terraform-provider-gridscale"
+}
