@@ -106,17 +106,17 @@ func dataSourceGridscaleIpv6Read(d *schema.ResourceData, meta interface{}) error
 
 	id := d.Get("resource_id").(string)
 
-	ip, err := client.GetIp(id)
+	ip, err := client.GetIP(id)
 
 	if err == nil {
-		d.SetId(ip.Properties.ObjectUuid)
-		d.Set("ip", ip.Properties.Ip)
+		d.SetId(ip.Properties.ObjectUUID)
+		d.Set("ip", ip.Properties.IP)
 		d.Set("name", ip.Properties.Name)
 		d.Set("prefix", ip.Properties.Prefix)
-		d.Set("location_uuid", ip.Properties.LocationUuid)
+		d.Set("location_uuid", ip.Properties.LocationUUID)
 		d.Set("failover", ip.Properties.Failover)
 		d.Set("status", ip.Properties.Status)
-		d.Set("reverse_dns", ip.Properties.ReverseDns)
+		d.Set("reverse_dns", ip.Properties.ReverseDNS)
 		d.Set("location_country", ip.Properties.LocationCountry)
 		d.Set("location_iata", ip.Properties.LocationIata)
 		d.Set("location_name", ip.Properties.LocationName)

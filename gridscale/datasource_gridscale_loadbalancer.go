@@ -112,13 +112,13 @@ func dataSourceGridscaleLoadBalancerRead(d *schema.ResourceData, meta interface{
 	loadbalancer, err := client.GetLoadBalancer(id)
 
 	if err == nil {
-		d.SetId(loadbalancer.Properties.ObjectUuid)
+		d.SetId(loadbalancer.Properties.ObjectUUID)
 		d.Set("name", loadbalancer.Properties.Name)
 		d.Set("algorithm", loadbalancer.Properties.Algorithm)
 		d.Set("status", loadbalancer.Properties.Status)
 		d.Set("redirect_http_to_https", loadbalancer.Properties.RedirectHTTPToHTTPS)
-		d.Set("listen_ipv4_uuid", loadbalancer.Properties.ListenIPv4Uuid)
-		d.Set("listen_ipv6_uuid", loadbalancer.Properties.ListenIPv6Uuid)
+		d.Set("listen_ipv4_uuid", loadbalancer.Properties.ListenIPv4UUID)
+		d.Set("listen_ipv6_uuid", loadbalancer.Properties.ListenIPv6UUID)
 
 		if err = d.Set("forwarding_rule", flattenLoadbalancerForwardingRules(loadbalancer.Properties.ForwardingRules)); err != nil {
 			return fmt.Errorf("Error setting ForwardingRules: %v", err)

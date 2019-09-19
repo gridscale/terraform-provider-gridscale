@@ -66,11 +66,11 @@ func testAccCheckResourceGridscaleLoadBalancerExists(n string, object *gsclient.
 			return err
 		}
 
-		if foundObject.Properties.ObjectUuid != id {
+		if foundObject.Properties.ObjectUUID != id {
 			return fmt.Errorf("Object not found")
 		}
 
-		*object = *foundObject
+		*object = foundObject
 
 		return nil
 	}

@@ -103,7 +103,7 @@ func dataSourceGridscaleStorageRead(d *schema.ResourceData, meta interface{}) er
 	storage, err := client.GetStorage(id)
 
 	if err == nil {
-		d.SetId(storage.Properties.ObjectUuid)
+		d.SetId(storage.Properties.ObjectUUID)
 		d.Set("change_time", storage.Properties.ChangeTime)
 		d.Set("location_iata", storage.Properties.LocationIata)
 		d.Set("status", storage.Properties.Status)
@@ -113,9 +113,9 @@ func dataSourceGridscaleStorageRead(d *schema.ResourceData, meta interface{}) er
 		d.Set("last_used_template", storage.Properties.LastUsedTemplate)
 		d.Set("current_price", storage.Properties.CurrentPrice)
 		d.Set("capacity", storage.Properties.Capacity)
-		d.Set("location_uuid", storage.Properties.LocationUuid)
+		d.Set("location_uuid", storage.Properties.LocationUUID)
 		d.Set("storage_type", storage.Properties.StorageType)
-		d.Set("parent_uuid", storage.Properties.ParentUuid)
+		d.Set("parent_uuid", storage.Properties.ParentUUID)
 		d.Set("name", storage.Properties.Name)
 		d.Set("location_name", storage.Properties.LocationName)
 		d.Set("create_time", storage.Properties.CreateTime)

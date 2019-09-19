@@ -12,7 +12,7 @@ import (
 )
 
 func TestAccDataSourceGridscaleIpv4_Basic(t *testing.T) {
-	var object gsclient.Ip
+	var object gsclient.IP
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
 	resource.Test(t, resource.TestCase{
@@ -44,7 +44,7 @@ func TestAccDataSourceGridscaleIpv4_Basic(t *testing.T) {
 	})
 }
 
-func testAccCheckDataSourceGridscaleIpv4Exists(n string, object *gsclient.Ip) resource.TestCheckFunc {
+func testAccCheckDataSourceGridscaleIpv4Exists(n string, object *gsclient.IP) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -60,17 +60,17 @@ func testAccCheckDataSourceGridscaleIpv4Exists(n string, object *gsclient.Ip) re
 
 		id := rs.Primary.ID
 
-		foundObject, err := client.GetIp(id)
+		foundObject, err := client.GetIP(id)
 
 		if err != nil {
 			return err
 		}
 
-		if foundObject.Properties.ObjectUuid != id {
+		if foundObject.Properties.ObjectUUID != id {
 			return fmt.Errorf("Object not found")
 		}
 
-		*object = *foundObject
+		*object = foundObject
 
 		return nil
 	}
@@ -83,7 +83,7 @@ func testAccCheckDataSourceGridscaleIpv4DestroyCheck(s *terraform.State) error {
 			continue
 		}
 
-		_, err := client.GetIp(rs.Primary.ID)
+		_, err := client.GetIP(rs.Primary.ID)
 		if err != nil {
 			if requestError, ok := err.(*gsclient.RequestError); ok {
 				if requestError.StatusCode != 404 {

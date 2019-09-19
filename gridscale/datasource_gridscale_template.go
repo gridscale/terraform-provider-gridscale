@@ -32,8 +32,8 @@ func dataSourceGridscaleTemplateRead(d *schema.ResourceData, meta interface{}) e
 	template, err := client.GetTemplateByName(name)
 
 	if err == nil {
-		d.SetId(template.Properties.ObjectUuid)
-		log.Printf("Found template with key: %v", template.Properties.ObjectUuid)
+		d.SetId(template.Properties.ObjectUUID)
+		log.Printf("Found template with key: %v", template.Properties.ObjectUUID)
 	}
 
 	return err

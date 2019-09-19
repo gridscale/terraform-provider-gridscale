@@ -120,9 +120,9 @@ func resourceGridscaleLoadBalancerCreate(d *schema.ResourceData, meta interface{
 		Algorithm:           d.Get("algorithm").(string),
 		Status:              d.Get("status").(string),
 		RedirectHTTPToHTTPS: d.Get("redirect_http_to_https").(bool),
-		ListenIPv4Uuid:      d.Get("listen_ipv4_uuid").(string),
-		ListenIPv6Uuid:      d.Get("listen_ipv6_uuid").(string),
-		Labels:              d.Get("labels").(*schema.Set).List(),
+		ListenIPv4UUID:      d.Get("listen_ipv4_uuid").(string),
+		ListenIPv6UUID:      d.Get("listen_ipv6_uuid").(string),
+		Labels:              convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
 	if backendServers, ok := d.GetOk("backend_server"); ok {
@@ -137,7 +137,7 @@ func resourceGridscaleLoadBalancerCreate(d *schema.ResourceData, meta interface{
 		return fmt.Errorf(
 			"Error waiting for loadbalancer (%s) to be created: %s", requestBody.Name, err)
 	}
-	d.SetId(response.ObjectUuid)
+	d.SetId(response.ObjectUUID)
 	return resourceGridscaleLoadBalancerRead(d, meta)
 }
 
@@ -158,8 +158,8 @@ func resourceGridscaleLoadBalancerRead(d *schema.ResourceData, meta interface{})
 	d.Set("algorithm", loadbalancer.Properties.Algorithm)
 	d.Set("status", loadbalancer.Properties.Status)
 	d.Set("redirect_http_to_https", loadbalancer.Properties.RedirectHTTPToHTTPS)
-	d.Set("listen_ipv4_uuid", loadbalancer.Properties.ListenIPv4Uuid)
-	d.Set("listen_ipv6_uuid", loadbalancer.Properties.ListenIPv6Uuid)
+	d.Set("listen_ipv4_uuid", loadbalancer.Properties.ListenIPv4UUID)
+	d.Set("listen_ipv6_uuid", loadbalancer.Properties.ListenIPv6UUID)
 
 	if err = d.Set("forwarding_rule", flattenLoadbalancerForwardingRules(loadbalancer.Properties.ForwardingRules)); err != nil {
 		return fmt.Errorf("Error setting ForwardingRules: %v", err)
@@ -183,9 +183,9 @@ func resourceGridscaleLoadBalancerUpdate(d *schema.ResourceData, meta interface{
 		Algorithm:           d.Get("algorithm").(string),
 		Status:              d.Get("status").(string),
 		RedirectHTTPToHTTPS: d.Get("redirect_http_to_https").(bool),
-		ListenIPv4Uuid:      d.Get("listen_ipv4_uuid").(string),
-		ListenIPv6Uuid:      d.Get("listen_ipv6_uuid").(string),
-		Labels:              d.Get("labels").(*schema.Set).List(),
+		ListenIPv4UUID:      d.Get("listen_ipv4_uuid").(string),
+		ListenIPv6UUID:      d.Get("listen_ipv6_uuid").(string),
+		Labels:              convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
 	if backendServers, ok := d.GetOk("backend_server"); ok {

@@ -181,9 +181,9 @@ func resourceGridscaleStorageRead(d *schema.ResourceData, meta interface{}) erro
 	d.Set("last_used_template", storage.Properties.LastUsedTemplate)
 	d.Set("current_price", storage.Properties.CurrentPrice)
 	d.Set("capacity", storage.Properties.Capacity)
-	d.Set("location_uuid", storage.Properties.LocationUuid)
+	d.Set("location_uuid", storage.Properties.LocationUUID)
 	d.Set("storage_type", storage.Properties.StorageType)
-	d.Set("parent_uuid", storage.Properties.ParentUuid)
+	d.Set("parent_uuid", storage.Properties.ParentUUID)
 	d.Set("name", storage.Properties.Name)
 	d.Set("location_name", storage.Properties.LocationName)
 	d.Set("create_time", storage.Properties.CreateTime)
@@ -199,7 +199,7 @@ func resourceGridscaleStorageUpdate(d *schema.ResourceData, meta interface{}) er
 
 	requestBody := gsclient.StorageUpdateRequest{
 		Name:   d.Get("name").(string),
-		Labels: d.Get("labels").(*schema.Set).List(),
+		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
 	err := client.UpdateStorage(d.Id(), requestBody)
@@ -216,9 +216,9 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 	requestBody := gsclient.StorageCreateRequest{
 		Name:         d.Get("name").(string),
 		Capacity:     d.Get("capacity").(int),
-		LocationUuid: d.Get("location_uuid").(string),
+		LocationUUID: d.Get("location_uuid").(string),
 		StorageType:  d.Get("storage_type").(string),
-		Labels:       d.Get("labels").(*schema.Set).List(),
+		Labels:       convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
 	//since only one template can be used, we can just look at index 0
@@ -227,7 +227,7 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 			Password:     d.Get("template.0.password").(string),
 			PasswordType: d.Get("template.0.password_type").(string),
 			Hostname:     d.Get("template.0.hostname").(string),
-			TemplateUuid: d.Get("template.0.template_uuid").(string),
+			TemplateUUID: d.Get("template.0.template_uuid").(string),
 		}
 
 		if attr, ok := d.GetOk("template.0.sshkeys"); ok {
@@ -243,9 +243,9 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 		return err
 	}
 
-	d.SetId(response.ObjectUuid)
+	d.SetId(response.ObjectUUID)
 
-	log.Printf("The id for storage %s has been set to %v", requestBody.Name, response.ObjectUuid)
+	log.Printf("The id for storage %s has been set to %v", requestBody.Name, response.ObjectUUID)
 
 	return resourceGridscaleStorageRead(d, meta)
 }

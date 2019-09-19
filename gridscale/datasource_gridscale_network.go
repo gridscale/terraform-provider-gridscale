@@ -92,9 +92,9 @@ func dataSourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) er
 	network, err := client.GetNetwork(id)
 
 	if err == nil {
-		d.SetId(network.Properties.ObjectUuid)
+		d.SetId(network.Properties.ObjectUUID)
 		d.Set("name", network.Properties.Name)
-		d.Set("location_uuid", network.Properties.LocationUuid)
+		d.Set("location_uuid", network.Properties.LocationUUID)
 		d.Set("l2security", network.Properties.L2Security)
 		d.Set("status", network.Properties.Status)
 		d.Set("network_type", network.Properties.NetworkType)
