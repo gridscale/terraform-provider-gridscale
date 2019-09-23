@@ -1,8 +1,14 @@
-## 1.x.x (Unreleased)
+## 1.2.0 (September 23, 2019)
 
 FEATURES:
 
 * Add support for LBaaS (CH-15)
+* Add tests for all available datasource
+
+IMPROVEMENTS:
+
+* Switch to gsclient-go v1.0.0 from github
+* Fix all datasources missing `Schema`
 
 ## 1.1.0 (July 10, 2019)
 
