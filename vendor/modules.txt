@@ -73,9 +73,11 @@ github.com/google/go-cmp/cmp/internal/diff
 github.com/google/go-cmp/cmp/internal/flags
 github.com/google/go-cmp/cmp/internal/function
 github.com/google/go-cmp/cmp/internal/value
+# github.com/google/uuid v1.1.1
+github.com/google/uuid
 # github.com/googleapis/gax-go/v2 v2.0.3
 github.com/googleapis/gax-go/v2
-# github.com/gridscale/gsclient-go v0.0.0-20190718072001-622dd3686a5b
+# github.com/gridscale/gsclient-go v1.0.0
 github.com/gridscale/gsclient-go
 # github.com/hashicorp/errwrap v1.0.0
 github.com/hashicorp/errwrap
@@ -180,6 +182,8 @@ github.com/hashicorp/terraform-config-inspect/tfconfig
 github.com/hashicorp/yamux
 # github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af
 github.com/jmespath/go-jmespath
+# github.com/konsorten/go-windows-terminal-sequences v0.0.0-20180402223658-b729f2633dfe
+github.com/konsorten/go-windows-terminal-sequences
 # github.com/mattn/go-colorable v0.1.1
 github.com/mattn/go-colorable
 # github.com/mattn/go-isatty v0.0.5
@@ -211,6 +215,8 @@ github.com/posener/complete/cmd
 github.com/posener/complete/match
 # github.com/satori/go.uuid v1.2.0
 github.com/satori/go.uuid
+# github.com/sirupsen/logrus v1.1.1
+github.com/sirupsen/logrus
 # github.com/spf13/afero v1.2.1
 github.com/spf13/afero
 github.com/spf13/afero/mem
@@ -250,6 +256,7 @@ go.opencensus.io/stats/internal
 go.opencensus.io/internal/tagencoding
 # golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4
 golang.org/x/crypto/openpgp
+golang.org/x/crypto/ssh/terminal
 golang.org/x/crypto/bcrypt
 golang.org/x/crypto/ssh
 golang.org/x/crypto/openpgp/armor
@@ -282,6 +289,7 @@ golang.org/x/oauth2/jws
 golang.org/x/oauth2/jwt
 # golang.org/x/sys v0.0.0-20190502175342-a43fa875dd82
 golang.org/x/sys/unix
+golang.org/x/sys/windows
 golang.org/x/sys/cpu
 # golang.org/x/text v0.3.2
 golang.org/x/text/unicode/norm

@@ -59,7 +59,7 @@ func dataSourceGridscaleSshkeyRead(d *schema.ResourceData, meta interface{}) err
 	sshkey, err := client.GetSshkey(id)
 
 	if err == nil {
-		d.SetId(sshkey.Properties.ObjectUuid)
+		d.SetId(sshkey.Properties.ObjectUUID)
 		d.Set("name", sshkey.Properties.Name)
 		d.Set("sshkey", sshkey.Properties.Sshkey)
 		d.Set("status", sshkey.Properties.Status)

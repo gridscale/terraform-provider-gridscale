@@ -107,7 +107,7 @@ func resourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) erro
 	}
 
 	d.Set("name", network.Properties.Name)
-	d.Set("location_uuid", network.Properties.LocationUuid)
+	d.Set("location_uuid", network.Properties.LocationUUID)
 	d.Set("l2security", network.Properties.L2Security)
 	d.Set("status", network.Properties.Status)
 	d.Set("network_type", network.Properties.NetworkType)
@@ -131,7 +131,6 @@ func resourceGridscaleNetworkUpdate(d *schema.ResourceData, meta interface{}) er
 	requestBody := gsclient.NetworkUpdateRequest{
 		Name:       d.Get("name").(string),
 		L2Security: d.Get("l2security").(bool),
-		Labels:     d.Get("labels").(*schema.Set).List(),
 	}
 
 	err := client.UpdateNetwork(d.Id(), requestBody)
@@ -147,9 +146,9 @@ func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) er
 
 	requestBody := gsclient.NetworkCreateRequest{
 		Name:         d.Get("name").(string),
-		LocationUuid: d.Get("location_uuid").(string),
+		LocationUUID: d.Get("location_uuid").(string),
 		L2Security:   d.Get("l2security").(bool),
-		Labels:       d.Get("labels").(*schema.Set).List(),
+		Labels:       convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
 	response, err := client.CreateNetwork(requestBody)
@@ -157,9 +156,9 @@ func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) er
 		return err
 	}
 
-	d.SetId(response.ObjectUuid)
+	d.SetId(response.ObjectUUID)
 
-	log.Printf("The id for network %v has been set to %v", requestBody.Name, response.ObjectUuid)
+	log.Printf("The id for network %v has been set to %v", requestBody.Name, response.ObjectUUID)
 
 	return resourceGridscaleNetworkRead(d, meta)
 }

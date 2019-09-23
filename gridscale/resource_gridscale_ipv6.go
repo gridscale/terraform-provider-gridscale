@@ -111,23 +111,23 @@ func resourceGridscaleIpv6() *schema.Resource {
 func resourceGridscaleIpv6Create(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 
-	requestBody := gsclient.IpCreateRequest{
+	requestBody := gsclient.IPCreateRequest{
 		Family:       6,
-		LocationUuid: d.Get("location_uuid").(string),
+		LocationUUID: d.Get("location_uuid").(string),
 		Name:         d.Get("name").(string),
 		Failover:     d.Get("failover").(bool),
-		ReverseDns:   d.Get("reverse_dns").(string),
-		Labels:       d.Get("labels").(*schema.Set).List(),
+		ReverseDNS:   d.Get("reverse_dns").(string),
+		Labels:       convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
-	response, err := client.CreateIp(requestBody)
+	response, err := client.CreateIP(requestBody)
 	if err != nil {
 		return err
 	}
 
-	d.SetId(response.ObjectUuid)
+	d.SetId(response.ObjectUUID)
 
-	log.Printf("The id for the new Ipv%v has been set to %v", requestBody.Family, response.ObjectUuid)
+	log.Printf("The id for the new Ipv%v has been set to %v", requestBody.Family, response.ObjectUUID)
 
 	return resourceGridscaleIpRead(d, meta)
 }

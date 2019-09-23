@@ -86,7 +86,7 @@ func resourceGridscaleSshkeyUpdate(d *schema.ResourceData, meta interface{}) err
 	requestBody := gsclient.SshkeyUpdateRequest{
 		Name:   d.Get("name").(string),
 		Sshkey: d.Get("sshkey").(string),
-		Labels: d.Get("labels").(*schema.Set).List(),
+		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
 	err := client.UpdateSshkey(d.Id(), requestBody)
@@ -103,7 +103,7 @@ func resourceGridscaleSshkeyCreate(d *schema.ResourceData, meta interface{}) err
 	requestBody := gsclient.SshkeyCreateRequest{
 		Name:   d.Get("name").(string),
 		Sshkey: d.Get("sshkey").(string),
-		Labels: d.Get("labels").(*schema.Set).List(),
+		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
 	response, err := client.CreateSshkey(requestBody)
@@ -111,9 +111,9 @@ func resourceGridscaleSshkeyCreate(d *schema.ResourceData, meta interface{}) err
 		return err
 	}
 
-	d.SetId(response.ObjectUuid)
+	d.SetId(response.ObjectUUID)
 
-	log.Printf("The id for the new SSH Key has been set to %v", response.ObjectUuid)
+	log.Printf("The id for the new SSH Key has been set to %v", response.ObjectUUID)
 
 	return resourceGridscaleSshkeyRead(d, meta)
 }
