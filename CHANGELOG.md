@@ -3,7 +3,7 @@
 FEATURES:
 
 * Add support for LBaaS (CH-15)
-* Add tests for all available datasource
+* Add tests for all available datasources
 
 IMPROVEMENTS:
 
