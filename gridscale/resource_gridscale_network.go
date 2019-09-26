@@ -5,7 +5,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 
 	"github.com/nvthongswansea/gsclient-go"
@@ -165,7 +164,5 @@ func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) er
 
 func resourceGridscaleNetworkDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	return resource.Retry(d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
-		return resource.RetryableError(client.DeleteNetwork(emptyCtx, d.Id()))
-	})
+	return client.DeleteNetwork(emptyCtx, d.Id())
 }
