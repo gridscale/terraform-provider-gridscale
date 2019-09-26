@@ -3,9 +3,9 @@ package gridscale
 import (
 	"fmt"
 
-	"github.com/gridscale/gsclient-go"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/nvthongswansea/gsclient-go"
 )
 
 func dataSourceGridscaleNetwork() *schema.Resource {
@@ -89,7 +89,7 @@ func dataSourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) er
 
 	id := d.Get("resource_id").(string)
 
-	network, err := client.GetNetwork(id)
+	network, err := client.GetNetwork(emptyCtx, id)
 
 	if err == nil {
 		d.SetId(network.Properties.ObjectUUID)

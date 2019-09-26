@@ -10,7 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 
-	"github.com/gridscale/gsclient-go"
+	"github.com/nvthongswansea/gsclient-go"
 )
 
 func resourceGridscaleStorage() *schema.Resource {
@@ -51,14 +51,14 @@ func resourceGridscaleStorage() *schema.Resource {
 				Default:     "storage",
 				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
 					valid := false
-					for _, stype := range StorageTypes {
+					for _, stype := range storageTypes {
 						if v.(string) == stype {
 							valid = true
 							break
 						}
 					}
 					if !valid {
-						errors = append(errors, fmt.Errorf("%v is not a valid storage type. Valid types are: %v", v.(string), strings.Join(StorageTypes, ",")))
+						errors = append(errors, fmt.Errorf("%v is not a valid storage type. Valid types are: %v", v.(string), strings.Join(storageTypes, ",")))
 					}
 					return
 				},
@@ -138,6 +138,19 @@ func resourceGridscaleStorage() *schema.Resource {
 							Type:     schema.TypeString,
 							Optional: true,
 							ForceNew: true,
+							ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
+								valid := false
+								for _, passType := range passwordTypes {
+									if v.(string) == passType {
+										valid = true
+										break
+									}
+								}
+								if !valid {
+									errors = append(errors, fmt.Errorf("%v is not a valid password type. Valid types are: %v", v.(string), strings.Join(passwordTypes, ",")))
+								}
+								return
+							},
 						},
 						"hostname": {
 							Type:     schema.TypeString,
@@ -161,9 +174,9 @@ func resourceGridscaleStorage() *schema.Resource {
 
 func resourceGridscaleStorageRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	storage, err := client.GetStorage(d.Id())
+	storage, err := client.GetStorage(emptyCtx, d.Id())
 	if err != nil {
-		if requestError, ok := err.(*gsclient.RequestError); ok {
+		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
 				d.SetId("")
 				return nil
@@ -202,7 +215,7 @@ func resourceGridscaleStorageUpdate(d *schema.ResourceData, meta interface{}) er
 		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
-	err := client.UpdateStorage(d.Id(), requestBody)
+	err := client.UpdateStorage(emptyCtx, d.Id(), requestBody)
 	if err != nil {
 		return err
 	}
@@ -217,17 +230,30 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 		Name:         d.Get("name").(string),
 		Capacity:     d.Get("capacity").(int),
 		LocationUUID: d.Get("location_uuid").(string),
-		StorageType:  d.Get("storage_type").(string),
 		Labels:       convSOStrings(d.Get("labels").(*schema.Set).List()),
+	}
+
+	storageType := d.Get("storage_type").(string)
+	if storageType == "storage" {
+		requestBody.StorageType = gsclient.DefaultStorageType
+	} else if storageType == "storage_high" {
+		requestBody.StorageType = gsclient.HighStorageType
+	} else if storageType == "storage_insane" {
+		requestBody.StorageType = gsclient.InsaneStorageType
 	}
 
 	//since only one template can be used, we can just look at index 0
 	if _, ok := d.GetOk("template"); ok {
 		template := gsclient.StorageTemplate{
 			Password:     d.Get("template.0.password").(string),
-			PasswordType: d.Get("template.0.password_type").(string),
 			Hostname:     d.Get("template.0.hostname").(string),
 			TemplateUUID: d.Get("template.0.template_uuid").(string),
+		}
+		passType := d.Get("template.0.password_type").(string)
+		if passType == "plain" {
+			template.PasswordType = gsclient.PlainPasswordType
+		} else if passType == "crypt" {
+			template.PasswordType = gsclient.CryptPasswordType
 		}
 
 		if attr, ok := d.GetOk("template.0.sshkeys"); ok {
@@ -238,7 +264,7 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 		requestBody.Template = &template
 	}
 
-	response, err := client.CreateStorage(requestBody)
+	response, err := client.CreateStorage(emptyCtx, requestBody)
 	if err != nil {
 		return err
 	}
@@ -252,8 +278,7 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 
 func resourceGridscaleStorageDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-
 	return resource.Retry(d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
-		return resource.RetryableError(client.DeleteStorage(d.Id()))
+		return resource.RetryableError(client.DeleteStorage(emptyCtx, d.Id()))
 	})
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 
-	"github.com/gridscale/gsclient-go"
+	"github.com/nvthongswansea/gsclient-go"
 )
 
 func resourceGridscaleNetwork() *schema.Resource {
@@ -95,9 +95,9 @@ func resourceGridscaleNetwork() *schema.Resource {
 
 func resourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	network, err := client.GetNetwork(d.Id())
+	network, err := client.GetNetwork(emptyCtx, d.Id())
 	if err != nil {
-		if requestError, ok := err.(*gsclient.RequestError); ok {
+		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
 				d.SetId("")
 				return nil
@@ -133,7 +133,7 @@ func resourceGridscaleNetworkUpdate(d *schema.ResourceData, meta interface{}) er
 		L2Security: d.Get("l2security").(bool),
 	}
 
-	err := client.UpdateNetwork(d.Id(), requestBody)
+	err := client.UpdateNetwork(emptyCtx, d.Id(), requestBody)
 	if err != nil {
 		return err
 	}
@@ -151,7 +151,7 @@ func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) er
 		Labels:       convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
-	response, err := client.CreateNetwork(requestBody)
+	response, err := client.CreateNetwork(emptyCtx, requestBody)
 	if err != nil {
 		return err
 	}
@@ -166,6 +166,6 @@ func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) er
 func resourceGridscaleNetworkDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	return resource.Retry(d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
-		return resource.RetryableError(client.DeleteNetwork(d.Id()))
+		return resource.RetryableError(client.DeleteNetwork(emptyCtx, d.Id()))
 	})
 }

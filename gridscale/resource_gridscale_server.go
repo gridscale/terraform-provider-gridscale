@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 
-	"github.com/gridscale/gsclient-go"
+	"github.com/nvthongswansea/gsclient-go"
 )
 
 func resourceGridscaleServer() *schema.Resource {
@@ -55,14 +55,14 @@ func resourceGridscaleServer() *schema.Resource {
 				Default:     "default",
 				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
 					valid := false
-					for _, profile := range HardwareProfiles {
+					for _, profile := range hardwareProfiles {
 						if v.(string) == profile {
 							valid = true
 							break
 						}
 					}
 					if !valid {
-						errors = append(errors, fmt.Errorf("%v is not a valid hardware profile. Valid hardware profiles are: %v", v.(string), strings.Join(StorageTypes, ",")))
+						errors = append(errors, fmt.Errorf("%v is not a valid hardware profile. Valid hardware profiles are: %v", v.(string), strings.Join(hardwareProfiles, ",")))
 					}
 					return
 				},
@@ -210,14 +210,14 @@ func resourceGridscaleServer() *schema.Resource {
 				Computed:    true,
 				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
 					valid := false
-					for _, profile := range AvailabilityZones {
+					for _, profile := range availabilityZones {
 						if v.(string) == profile {
 							valid = true
 							break
 						}
 					}
 					if !valid {
-						errors = append(errors, fmt.Errorf("%v is not a valid availability zone. Valid availability zones are: %v", v.(string), strings.Join(AvailabilityZones, ",")))
+						errors = append(errors, fmt.Errorf("%v is not a valid availability zone. Valid availability zones are: %v", v.(string), strings.Join(availabilityZones, ",")))
 					}
 					return
 				},
@@ -252,9 +252,9 @@ func resourceGridscaleServer() *schema.Resource {
 
 func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	server, err := client.GetServer(d.Id())
+	server, err := client.GetServer(emptyCtx, d.Id())
 	if err != nil {
-		if requestError, ok := err.(*gsclient.RequestError); ok {
+		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
 				d.SetId("")
 				return nil
@@ -270,7 +270,7 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("location_uuid", server.Properties.LocationUUID)
 	d.Set("power", server.Properties.Power)
 	d.Set("current_price", server.Properties.CurrentPrice)
-	d.Set("availability_zone", server.Properties.AvailablityZone)
+	d.Set("availability_zone", server.Properties.AvailabilityZone)
 	d.Set("auto_recovery", server.Properties.AutoRecovery)
 	d.Set("console_token", server.Properties.ConsoleToken)
 	d.Set("legacy", server.Properties.Legacy)
@@ -318,9 +318,6 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 				"object_name":            value.ObjectName,
 				"network_type":           value.NetworkType,
 				"ordering":               value.Ordering,
-				//"vlan":                   value.Vlan,
-				//"vxlan":                  value.Vxlan,
-				//"mcast":                  value.Mcast,
 			}
 			networks = append(networks, network)
 		}
@@ -359,9 +356,33 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		Cores:           d.Get("cores").(int),
 		Memory:          d.Get("memory").(int),
 		LocationUUID:    d.Get("location_uuid").(string),
-		HardwareProfile: d.Get("hardware_profile").(string),
 		AvailablityZone: d.Get("availability_zone").(string),
 		Labels:          convSOStrings(d.Get("labels").(*schema.Set).List()),
+	}
+
+	profile := d.Get("hardware_profile").(string)
+	if profile == "legacy" {
+		requestBody.HardwareProfile = gsclient.LegacyServerHardware
+	} else if profile == "nested" {
+		requestBody.HardwareProfile = gsclient.NestedServerHardware
+
+	} else if profile == "cisco_csr" {
+		requestBody.HardwareProfile = gsclient.CiscoCSRServerHardware
+
+	} else if profile == "sophos_utm" {
+		requestBody.HardwareProfile = gsclient.SophosUTMServerHardware
+
+	} else if profile == "f5_bigip" {
+		requestBody.HardwareProfile = gsclient.F5BigipServerHardware
+
+	} else if profile == "q35" {
+		requestBody.HardwareProfile = gsclient.Q35ServerHardware
+
+	} else if profile == "q35_nested" {
+		requestBody.HardwareProfile = gsclient.Q35NestedServerHardware
+
+	} else {
+		requestBody.HardwareProfile = gsclient.DefaultServerHardware
 	}
 
 	requestBody.Relations.IsoImages = []gsclient.ServerCreateRequestIsoimage{}
@@ -386,7 +407,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	if attr, ok := d.GetOk("ipv4"); ok {
-		if client.GetIPVersion(attr.(string)) != 4 {
+		if client.GetIPVersion(emptyCtx, attr.(string)) != 4 {
 			return fmt.Errorf("The IP address with UUID %v is not version 4", attr.(string))
 		}
 		ip := gsclient.ServerCreateRequestIP{
@@ -395,7 +416,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		requestBody.Relations.PublicIPs = append(requestBody.Relations.PublicIPs, ip)
 	}
 	if attr, ok := d.GetOk("ipv6"); ok {
-		if client.GetIPVersion(attr.(string)) != 6 {
+		if client.GetIPVersion(emptyCtx, attr.(string)) != 6 {
 			return fmt.Errorf("The IP address with UUID %v is not version 6", attr.(string))
 		}
 		ip := gsclient.ServerCreateRequestIP{
@@ -413,7 +434,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 
 	//Add public network if we have an IP
 	if len(requestBody.Relations.PublicIPs) > 0 {
-		publicNetwork, err := client.GetNetworkPublic()
+		publicNetwork, err := client.GetNetworkPublic(emptyCtx)
 		if err != nil {
 			return err
 		}
@@ -434,7 +455,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		}
 	}
 
-	response, err := client.CreateServer(requestBody)
+	response, err := client.CreateServer(emptyCtx, requestBody)
 
 	if err != nil {
 		return fmt.Errorf(
@@ -451,7 +472,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		for _, value := range attr.(*schema.Set).List() {
 			storage := value.(map[string]interface{})
 			if !storage["bootdevice"].(bool) {
-				err = client.LinkStorage(d.Id(), storage["object_uuid"].(string), storage["bootdevice"].(bool))
+				err = client.LinkStorage(emptyCtx, d.Id(), storage["object_uuid"].(string), storage["bootdevice"].(bool))
 				if err != nil {
 					return err
 				}
@@ -462,7 +483,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	//Set the power state if needed
 	power := d.Get("power").(bool)
 	if power {
-		client.StartServer(d.Id())
+		client.StartServer(emptyCtx, d.Id())
 	}
 
 	return resourceGridscaleServerRead(d, meta)
@@ -471,11 +492,11 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 func resourceGridscaleServerDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	id := d.Id()
-	err := client.StopServer(id)
+	err := client.StopServer(emptyCtx, id)
 	if err != nil {
 		return err
 	}
-	err = client.DeleteServer(id)
+	err = client.DeleteServer(emptyCtx, id)
 
 	return err
 }
@@ -514,14 +535,14 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 
 	//The ShutdownServer command will check if the server is running and shut it down if it is running, so no extra checks are needed here
 	if shutdownRequired {
-		err = client.ShutdownServer(d.Id())
+		err = client.ShutdownServer(emptyCtx, d.Id())
 		if err != nil {
 			return err
 		}
 	}
 
 	//Execute the update request
-	err = client.UpdateServer(d.Id(), requestBody)
+	err = client.UpdateServer(emptyCtx, d.Id(), requestBody)
 	if err != nil {
 		return err
 	}
@@ -530,9 +551,9 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 	if d.HasChange("isoimage") {
 		oldIso, newIso := d.GetChange("isoimage")
 		if newIso == "" {
-			err = client.UnlinkIsoImage(d.Id(), oldIso.(string))
+			err = client.UnlinkIsoImage(emptyCtx, d.Id(), oldIso.(string))
 		} else {
-			err = client.UnlinkIsoImage(d.Id(), newIso.(string))
+			err = client.UnlinkIsoImage(emptyCtx, d.Id(), newIso.(string))
 		}
 		if err != nil {
 			return err
@@ -544,9 +565,9 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 	if d.HasChange("ipv4") {
 		oldIp, newIp := d.GetChange("ipv4")
 		if newIp == "" {
-			err = client.UnlinkIP(d.Id(), oldIp.(string))
+			err = client.UnlinkIP(emptyCtx, d.Id(), oldIp.(string))
 		} else {
-			err = client.LinkIP(d.Id(), newIp.(string))
+			err = client.LinkIP(emptyCtx, d.Id(), newIp.(string))
 		}
 		if err != nil {
 			return err
@@ -558,9 +579,9 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 	if d.HasChange("ipv6") {
 		oldIp, newIp := d.GetChange("ipv6")
 		if newIp == "" {
-			err = client.UnlinkIP(d.Id(), oldIp.(string))
+			err = client.UnlinkIP(emptyCtx, d.Id(), oldIp.(string))
 		} else {
-			err = client.LinkIP(d.Id(), newIp.(string))
+			err = client.LinkIP(emptyCtx, d.Id(), newIp.(string))
 		}
 		if err != nil {
 			return err
@@ -571,22 +592,22 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 	}
 	//Disconnect from the public network if there is no longer and IP
 	if (d.HasChange("ipv6") || d.HasChange("ipv4")) && d.Get("ipv6").(string) == "" && d.Get("ipv4").(string) == "" {
-		publicNetwork, err := client.GetNetworkPublic()
+		publicNetwork, err := client.GetNetworkPublic(emptyCtx)
 		if err != nil {
 			return err
 		}
-		err = client.UnlinkNetwork(d.Id(), publicNetwork.Properties.ObjectUUID)
+		err = client.UnlinkNetwork(emptyCtx, d.Id(), publicNetwork.Properties.ObjectUUID)
 		if err != nil {
 			return err
 		}
 	}
 	//Connect to the public network if an IP was added
 	if (d.HasChange("ipv6") || d.HasChange("ipv4")) && needsPublicNetwork {
-		publicNetwork, err := client.GetNetworkPublic()
+		publicNetwork, err := client.GetNetworkPublic(emptyCtx)
 		if err != nil {
 			return err
 		}
-		err = client.LinkNetwork(d.Id(), publicNetwork.Properties.ObjectUUID, "", false, 0, nil, gsclient.FirewallRules{})
+		err = client.LinkNetwork(emptyCtx, d.Id(), publicNetwork.Properties.ObjectUUID, "", false, 0, nil, nil)
 		if err != nil {
 			return err
 		}
@@ -599,7 +620,7 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 		for _, value := range oldNetworks.(*schema.Set).List() {
 			network := value.(map[string]interface{})
 			if network["object_uuid"].(string) != "" {
-				err = client.UnlinkNetwork(d.Id(), network["object_uuid"].(string))
+				err = client.UnlinkNetwork(emptyCtx, d.Id(), network["object_uuid"].(string))
 				if err != nil {
 					return err
 				}
@@ -608,7 +629,7 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 		for _, value := range newNetworks.(*schema.Set).List() {
 			network := value.(map[string]interface{})
 			if network["object_uuid"].(string) != "" {
-				err = client.LinkNetwork(d.Id(), network["object_uuid"].(string), "", network["bootdevice"].(bool), 0, nil, gsclient.FirewallRules{})
+				err = client.LinkNetwork(emptyCtx, d.Id(), network["object_uuid"].(string), "", network["bootdevice"].(bool), 0, nil, nil)
 				if err != nil {
 					return err
 				}
@@ -633,7 +654,7 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 				}
 			}
 			if unlink {
-				err = client.UnlinkStorage(d.Id(), oldStorage["object_uuid"].(string))
+				err = client.UnlinkStorage(emptyCtx, d.Id(), oldStorage["object_uuid"].(string))
 				if err != nil {
 					return err
 				}
@@ -652,7 +673,7 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 				}
 			}
 			if link {
-				err = client.LinkStorage(d.Id(), newStorage["object_uuid"].(string), newStorage["bootdevice"].(bool))
+				err = client.LinkStorage(emptyCtx, d.Id(), newStorage["object_uuid"].(string), newStorage["bootdevice"].(bool))
 				if err != nil {
 					return err
 				}
@@ -663,9 +684,9 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 	// Make sure the server in is the expected power state.
 	// The StartServer and ShutdownServer functions do a check to see if the server isn't already running, so we don't need to do that here.
 	if d.Get("power").(bool) {
-		err = client.StartServer(d.Id())
+		err = client.StartServer(emptyCtx, d.Id())
 	} else {
-		err = client.ShutdownServer(d.Id())
+		err = client.ShutdownServer(emptyCtx, d.Id())
 	}
 	if err != nil {
 		return err

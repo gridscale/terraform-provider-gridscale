@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 
-	"github.com/gridscale/gsclient-go"
+	"github.com/nvthongswansea/gsclient-go"
 )
 
 func TestAccResourceGridscaleLoadBalancerBasic(t *testing.T) {
@@ -60,7 +60,7 @@ func testAccCheckResourceGridscaleLoadBalancerExists(n string, object *gsclient.
 
 		id := rs.Primary.ID
 
-		foundObject, err := client.GetLoadBalancer(id)
+		foundObject, err := client.GetLoadBalancer(emptyCtx, id)
 
 		if err != nil {
 			return err
@@ -143,9 +143,9 @@ func testAccCheckResourceGridscaleLoadBalancerDestroyCheck(s *terraform.State) e
 			continue
 		}
 
-		_, err := client.GetLoadBalancer(rs.Primary.ID)
+		_, err := client.GetLoadBalancer(emptyCtx, rs.Primary.ID)
 		if err != nil {
-			if requestError, ok := err.(*gsclient.RequestError); ok {
+			if requestError, ok := err.(gsclient.RequestError); ok {
 				if requestError.StatusCode != 404 {
 					return fmt.Errorf("Object %s still exists", rs.Primary.ID)
 				}

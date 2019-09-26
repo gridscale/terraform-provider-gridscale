@@ -2,10 +2,11 @@ package gridscale
 
 import (
 	"fmt"
+	"strings"
 
-	"github.com/gridscale/gsclient-go"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/nvthongswansea/gsclient-go"
 )
 
 func resourceGridscaleLoadBalancer() *schema.Resource {
@@ -36,6 +37,19 @@ func resourceGridscaleLoadBalancer() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "The algorithm used to process requests. Accepted values: roundrobin/leastconn.",
 				Required:    true,
+				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
+					valid := false
+					for _, alg := range loadbalancerAlgs {
+						if v.(string) == alg {
+							valid = true
+							break
+						}
+					}
+					if !valid {
+						errors = append(errors, fmt.Errorf("%v is not a valid loadbalancer algorithm. Valid loadbalancer algorithms are: %v", v.(string), strings.Join(loadbalancerAlgs, ",")))
+					}
+					return
+				},
 			},
 			"forwarding_rule": {
 				Type:        schema.TypeSet,
@@ -117,12 +131,17 @@ func resourceGridscaleLoadBalancerCreate(d *schema.ResourceData, meta interface{
 
 	requestBody := gsclient.LoadBalancerCreateRequest{
 		Name:                d.Get("name").(string),
-		Algorithm:           d.Get("algorithm").(string),
 		Status:              d.Get("status").(string),
 		RedirectHTTPToHTTPS: d.Get("redirect_http_to_https").(bool),
 		ListenIPv4UUID:      d.Get("listen_ipv4_uuid").(string),
 		ListenIPv6UUID:      d.Get("listen_ipv6_uuid").(string),
 		Labels:              convSOStrings(d.Get("labels").(*schema.Set).List()),
+	}
+
+	if d.Get("algorithm").(string) == "roundrobin" {
+		requestBody.Algorithm = gsclient.LoadbalancerRoundrobinAlg
+	} else if d.Get("algorithm").(string) == "leastconn" {
+		requestBody.Algorithm = gsclient.LoadbalancerLeastConnAlg
 	}
 
 	if backendServers, ok := d.GetOk("backend_server"); ok {
@@ -131,7 +150,7 @@ func resourceGridscaleLoadBalancerCreate(d *schema.ResourceData, meta interface{
 	if forwardingRules, ok := d.GetOk("forwarding_rule"); ok {
 		requestBody.ForwardingRules = expandLoadbalancerForwardingRules(forwardingRules)
 	}
-	response, err := client.CreateLoadBalancer(requestBody)
+	response, err := client.CreateLoadBalancer(emptyCtx, requestBody)
 
 	if err != nil {
 		return fmt.Errorf(
@@ -143,9 +162,9 @@ func resourceGridscaleLoadBalancerCreate(d *schema.ResourceData, meta interface{
 
 func resourceGridscaleLoadBalancerRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	loadbalancer, err := client.GetLoadBalancer(d.Id())
+	loadbalancer, err := client.GetLoadBalancer(emptyCtx, d.Id())
 	if err != nil {
-		if requestError, ok := err.(*gsclient.RequestError); ok {
+		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
 				d.SetId("")
 				return nil
@@ -180,12 +199,17 @@ func resourceGridscaleLoadBalancerUpdate(d *schema.ResourceData, meta interface{
 	client := meta.(*gsclient.Client)
 	requestBody := gsclient.LoadBalancerUpdateRequest{
 		Name:                d.Get("name").(string),
-		Algorithm:           d.Get("algorithm").(string),
 		Status:              d.Get("status").(string),
 		RedirectHTTPToHTTPS: d.Get("redirect_http_to_https").(bool),
 		ListenIPv4UUID:      d.Get("listen_ipv4_uuid").(string),
 		ListenIPv6UUID:      d.Get("listen_ipv6_uuid").(string),
 		Labels:              convSOStrings(d.Get("labels").(*schema.Set).List()),
+	}
+
+	if d.Get("algorithm").(string) == "roundrobin" {
+		requestBody.Algorithm = gsclient.LoadbalancerRoundrobinAlg
+	} else if d.Get("algorithm").(string) == "leastconn" {
+		requestBody.Algorithm = gsclient.LoadbalancerLeastConnAlg
 	}
 
 	if backendServers, ok := d.GetOk("backend_server"); ok {
@@ -194,7 +218,7 @@ func resourceGridscaleLoadBalancerUpdate(d *schema.ResourceData, meta interface{
 	if forwardingRules, ok := d.GetOk("forwarding_rule"); ok {
 		requestBody.ForwardingRules = expandLoadbalancerForwardingRules(forwardingRules)
 	}
-	err := client.UpdateLoadBalancer(d.Id(), requestBody)
+	err := client.UpdateLoadBalancer(emptyCtx, d.Id(), requestBody)
 
 	if err != nil {
 		return fmt.Errorf(
@@ -206,7 +230,7 @@ func resourceGridscaleLoadBalancerUpdate(d *schema.ResourceData, meta interface{
 func resourceGridscaleLoadBalancerDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	id := d.Id()
-	return client.DeleteLoadBalancer(id)
+	return client.DeleteLoadBalancer(emptyCtx, id)
 }
 
 func expandLoadbalancerBackendServers(backendServers interface{}) []gsclient.BackendServer {

@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 
-	"github.com/gridscale/gsclient-go"
+	"github.com/nvthongswansea/gsclient-go"
 )
 
 func TestAccDataSourceGridscaleNetwork_Basic(t *testing.T) {
@@ -58,7 +58,7 @@ func testAccCheckDataSourceGridscaleNetworkExists(n string, object *gsclient.Net
 
 		id := rs.Primary.ID
 
-		foundObject, err := client.GetNetwork(id)
+		foundObject, err := client.GetNetwork(emptyCtx, id)
 
 		if err != nil {
 			return err
@@ -81,9 +81,9 @@ func testAccCheckDataSourceGridscaleNetworkDestroyCheck(s *terraform.State) erro
 			continue
 		}
 
-		_, err := client.GetNetwork(rs.Primary.ID)
+		_, err := client.GetNetwork(emptyCtx, rs.Primary.ID)
 		if err != nil {
-			if requestError, ok := err.(*gsclient.RequestError); ok {
+			if requestError, ok := err.(gsclient.RequestError); ok {
 				if requestError.StatusCode != 404 {
 					return fmt.Errorf("Object %s still exists", rs.Primary.ID)
 				}

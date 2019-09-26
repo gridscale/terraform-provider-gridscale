@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 
-	"github.com/gridscale/gsclient-go"
+	"github.com/nvthongswansea/gsclient-go"
 )
 
 func TestAccDataSourceGridscaleServer_Basic(t *testing.T) {
@@ -66,7 +66,7 @@ func testAccCheckDataSourceGridscaleServerExists(n string, object *gsclient.Serv
 
 		id := rs.Primary.ID
 
-		foundObject, err := client.GetServer(id)
+		foundObject, err := client.GetServer(emptyCtx, id)
 
 		if err != nil {
 			return err
@@ -89,9 +89,9 @@ func testAccCheckDataSourceGridscaleServerDestroyCheck(s *terraform.State) error
 			continue
 		}
 
-		_, err := client.GetServer(rs.Primary.ID)
+		_, err := client.GetServer(emptyCtx, rs.Primary.ID)
 		if err != nil {
-			if requestError, ok := err.(*gsclient.RequestError); ok {
+			if requestError, ok := err.(gsclient.RequestError); ok {
 				if requestError.StatusCode != 404 {
 					return fmt.Errorf("Object %s still exists", rs.Primary.ID)
 				}

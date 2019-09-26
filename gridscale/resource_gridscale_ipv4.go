@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 
-	"github.com/gridscale/gsclient-go"
+	"github.com/nvthongswansea/gsclient-go"
 )
 
 func resourceGridscaleIpv4() *schema.Resource {
@@ -113,9 +113,9 @@ func resourceGridscaleIpv4() *schema.Resource {
 
 func resourceGridscaleIpRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	ip, err := client.GetIP(d.Id())
+	ip, err := client.GetIP(emptyCtx, d.Id())
 	if err != nil {
-		if requestError, ok := err.(*gsclient.RequestError); ok {
+		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
 				d.SetId("")
 				return nil
@@ -156,7 +156,7 @@ func resourceGridscaleIpUpdate(d *schema.ResourceData, meta interface{}) error {
 		Labels:     convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
-	err := client.UpdateIP(d.Id(), requestBody)
+	err := client.UpdateIP(emptyCtx, d.Id(), requestBody)
 	if err != nil {
 		return err
 	}
@@ -168,7 +168,7 @@ func resourceGridscaleIpv4Create(d *schema.ResourceData, meta interface{}) error
 	client := meta.(*gsclient.Client)
 
 	requestBody := gsclient.IPCreateRequest{
-		Family:       4,
+		Family:       gsclient.IPv4Type,
 		LocationUUID: d.Get("location_uuid").(string),
 		Name:         d.Get("name").(string),
 		Failover:     d.Get("failover").(bool),
@@ -176,7 +176,7 @@ func resourceGridscaleIpv4Create(d *schema.ResourceData, meta interface{}) error
 		Labels:       convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
-	response, err := client.CreateIP(requestBody)
+	response, err := client.CreateIP(emptyCtx, requestBody)
 	if err != nil {
 		return err
 	}
@@ -191,6 +191,6 @@ func resourceGridscaleIpv4Create(d *schema.ResourceData, meta interface{}) error
 func resourceGridscaleIpDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	return resource.Retry(d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
-		return resource.RetryableError(client.DeleteIP(d.Id()))
+		return resource.RetryableError(client.DeleteIP(emptyCtx, d.Id()))
 	})
 }

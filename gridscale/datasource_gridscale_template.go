@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 
-	"github.com/gridscale/gsclient-go"
+	"github.com/nvthongswansea/gsclient-go"
 )
 
 func dataSourceGridscaleTemplate() *schema.Resource {
@@ -29,7 +29,7 @@ func dataSourceGridscaleTemplateRead(d *schema.ResourceData, meta interface{}) e
 
 	name := d.Get("name").(string)
 
-	template, err := client.GetTemplateByName(name)
+	template, err := client.GetTemplateByName(emptyCtx, name)
 
 	if err == nil {
 		d.SetId(template.Properties.ObjectUUID)

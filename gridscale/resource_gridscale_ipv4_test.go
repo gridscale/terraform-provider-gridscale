@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 
-	"github.com/gridscale/gsclient-go"
+	"github.com/nvthongswansea/gsclient-go"
 )
 
 func TestAccDataSourceGridscaleIpv4_Basic(t *testing.T) {
@@ -60,7 +60,7 @@ func testAccCheckDataSourceGridscaleIpv4Exists(n string, object *gsclient.IP) re
 
 		id := rs.Primary.ID
 
-		foundObject, err := client.GetIP(id)
+		foundObject, err := client.GetIP(emptyCtx, id)
 
 		if err != nil {
 			return err
@@ -83,9 +83,9 @@ func testAccCheckDataSourceGridscaleIpv4DestroyCheck(s *terraform.State) error {
 			continue
 		}
 
-		_, err := client.GetIP(rs.Primary.ID)
+		_, err := client.GetIP(emptyCtx, rs.Primary.ID)
 		if err != nil {
-			if requestError, ok := err.(*gsclient.RequestError); ok {
+			if requestError, ok := err.(gsclient.RequestError); ok {
 				if requestError.StatusCode != 404 {
 					return fmt.Errorf("Object %s still exists", rs.Primary.ID)
 				}

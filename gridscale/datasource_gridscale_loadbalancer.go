@@ -3,9 +3,9 @@ package gridscale
 import (
 	"fmt"
 
-	"github.com/gridscale/gsclient-go"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/nvthongswansea/gsclient-go"
 )
 
 func dataSourceGridscaleLoadBalancer() *schema.Resource {
@@ -109,7 +109,7 @@ func dataSourceGridscaleLoadBalancer() *schema.Resource {
 func dataSourceGridscaleLoadBalancerRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	id := d.Get("resource_id").(string)
-	loadbalancer, err := client.GetLoadBalancer(id)
+	loadbalancer, err := client.GetLoadBalancer(emptyCtx, id)
 
 	if err == nil {
 		d.SetId(loadbalancer.Properties.ObjectUUID)
