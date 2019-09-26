@@ -385,6 +385,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		requestBody.HardwareProfile = gsclient.DefaultServerHardware
 	}
 
+	requestBody.Relations = &gsclient.ServerCreateRequestRelations{}
 	requestBody.Relations.IsoImages = []gsclient.ServerCreateRequestIsoimage{}
 	requestBody.Relations.Storages = []gsclient.ServerCreateRequestStorage{}
 	requestBody.Relations.Networks = []gsclient.ServerCreateRequestNetwork{}
