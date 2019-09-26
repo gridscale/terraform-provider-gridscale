@@ -145,7 +145,7 @@ func resourceGridscaleLoadBalancerRead(d *schema.ResourceData, meta interface{})
 	client := meta.(*gsclient.Client)
 	loadbalancer, err := client.GetLoadBalancer(d.Id())
 	if err != nil {
-		if requestError, ok := err.(*gsclient.RequestError); ok {
+		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
 				d.SetId("")
 				return nil

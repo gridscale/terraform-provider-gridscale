@@ -85,7 +85,7 @@ func testAccCheckDataSourceGridscaleIpv4DestroyCheck(s *terraform.State) error {
 
 		_, err := client.GetIP(rs.Primary.ID)
 		if err != nil {
-			if requestError, ok := err.(*gsclient.RequestError); ok {
+			if requestError, ok := err.(gsclient.RequestError); ok {
 				if requestError.StatusCode != 404 {
 					return fmt.Errorf("Object %s still exists", rs.Primary.ID)
 				}

@@ -58,7 +58,7 @@ func resourceGridscaleSshkeyRead(d *schema.ResourceData, meta interface{}) error
 	client := meta.(*gsclient.Client)
 	sshkey, err := client.GetSshkey(d.Id())
 	if err != nil {
-		if requestError, ok := err.(*gsclient.RequestError); ok {
+		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
 				d.SetId("")
 				return nil

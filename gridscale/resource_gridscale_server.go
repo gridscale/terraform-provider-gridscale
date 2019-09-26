@@ -254,7 +254,7 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 	client := meta.(*gsclient.Client)
 	server, err := client.GetServer(d.Id())
 	if err != nil {
-		if requestError, ok := err.(*gsclient.RequestError); ok {
+		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
 				d.SetId("")
 				return nil
