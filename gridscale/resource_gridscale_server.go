@@ -363,7 +363,8 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		AvailablityZone: d.Get("availability_zone").(string),
 		Labels:          convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
-
+	
+	requestBody.Relations = &gsclient.ServerCreateRequestRelations{}
 	requestBody.Relations.IsoImages = []gsclient.ServerCreateRequestIsoimage{}
 	requestBody.Relations.Storages = []gsclient.ServerCreateRequestStorage{}
 	requestBody.Relations.Networks = []gsclient.ServerCreateRequestNetwork{}
