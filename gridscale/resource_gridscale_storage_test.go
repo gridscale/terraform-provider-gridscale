@@ -112,7 +112,7 @@ func testAccCheckDataSourceGridscaleStorageDestroyCheck(s *terraform.State) erro
 
 		_, err := client.GetStorage(rs.Primary.ID)
 		if err != nil {
-			if requestError, ok := err.(*gsclient.RequestError); ok {
+			if requestError, ok := err.(gsclient.RequestError); ok {
 				if requestError.StatusCode != 404 {
 					return fmt.Errorf("Object %s still exists", rs.Primary.ID)
 				}
