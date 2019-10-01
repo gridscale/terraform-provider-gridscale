@@ -3,10 +3,8 @@ package gsclient
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"path"
-	"time"
 )
 
 //LabelList JSON struct of a list of labels
@@ -108,25 +106,10 @@ func (c *Client) waitForLabelDeleted(ctx context.Context, label string) error {
 	if label == "" {
 		return errors.New("'label' is required")
 	}
-	timer := time.After(c.cfg.requestCheckTimeoutSecs)
-	delayInterval := c.cfg.delayInterval
-	for {
-		select {
-		case <-timer:
-			errorMessage := fmt.Sprintf("Timeout reached when waiting for label %v to be deleted", label)
-			c.cfg.logger.Error(errorMessage)
-			return errors.New(errorMessage)
-		default:
-			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
-			labels, err := c.GetLabelList(ctx)
-			if err != nil {
-				return err
-			}
-			if !isLabelInSlice(label, labels) {
-				return nil
-			}
-		}
-	}
+	return retryWithTimeout(func() (bool, error) {
+		labels, err := c.GetLabelList(ctx)
+		return isLabelInSlice(label, labels), err
+	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
 }
 
 //isLabelInSlice check if a label in a lice of labels

@@ -13,6 +13,8 @@ const (
 	defaultMaxNumberOfRetries      = 100
 	defaultDelayIntervalMilliSecs  = 500
 	version                        = "1.0.0"
+	resourceActiveStatus           = "active"
+	requestDoneStatus              = "done"
 )
 
 //Config config for client

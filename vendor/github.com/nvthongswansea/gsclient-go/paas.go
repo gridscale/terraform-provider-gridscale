@@ -3,10 +3,8 @@ package gsclient
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"path"
-	"time"
 )
 
 //PaaSServices is the JSON struct of a list of PaaS services
@@ -628,25 +626,10 @@ func (c *Client) GetDeletedPaaSServices(ctx context.Context) ([]PaaSService, err
 
 //waitForPaaSServiceActive allows to wait until the PaaS service's status is active
 func (c *Client) waitForPaaSServiceActive(ctx context.Context, id string) error {
-	timer := time.After(c.cfg.requestCheckTimeoutSecs)
-	delayInterval := c.cfg.delayInterval
-	for {
-		select {
-		case <-timer:
-			errorMessage := fmt.Sprintf("Timeout reached when waiting for PaaS %v to be active", id)
-			c.cfg.logger.Error(errorMessage)
-			return errors.New(errorMessage)
-		default:
-			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
-			fw, err := c.GetPaaSService(ctx, id)
-			if err != nil {
-				return err
-			}
-			if fw.Properties.Status == activeStatus {
-				return nil
-			}
-		}
-	}
+	return retryWithTimeout(func() (bool, error) {
+		paas, err := c.GetPaaSService(ctx, id)
+		return paas.Properties.Status != resourceActiveStatus, err
+	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
 }
 
 //waitForPaaSServiceDeleted allows to wait until the PaaS service is deleted
@@ -654,55 +637,17 @@ func (c *Client) waitForPaaSServiceDeleted(ctx context.Context, id string) error
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	timer := time.After(c.cfg.requestCheckTimeoutSecs)
-	delayInterval := c.cfg.delayInterval
-	for {
-		select {
-		case <-timer:
-			errorMessage := fmt.Sprintf("Timeout reached when waiting for PaaS %v to be deleted", id)
-			c.cfg.logger.Error(errorMessage)
-			return errors.New(errorMessage)
-		default:
-			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
-			r := Request{
-				uri:          path.Join(apiPaaSBase, "services", id),
-				method:       http.MethodGet,
-				skipPrint404: true,
-			}
-			err := r.execute(ctx, *c, nil)
-			if err != nil {
-				if requestError, ok := err.(RequestError); ok {
-					if requestError.StatusCode == 404 {
-						return nil
-					}
-				}
-				return err
-			}
-		}
-	}
+	uri := path.Join(apiPaaSBase, "services", id)
+	method := http.MethodGet
+	return c.waitFor404Status(ctx, uri, method)
 }
 
 //waitForSecurityZoneActive allows to wait until the security zone's status is active
 func (c *Client) waitForSecurityZoneActive(ctx context.Context, id string) error {
-	timer := time.After(c.cfg.requestCheckTimeoutSecs)
-	delayInterval := c.cfg.delayInterval
-	for {
-		select {
-		case <-timer:
-			errorMessage := fmt.Sprintf("Timeout reached when waiting for security zone %v to be active", id)
-			c.cfg.logger.Error(errorMessage)
-			return errors.New(errorMessage)
-		default:
-			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
-			fw, err := c.GetPaaSSecurityZone(ctx, id)
-			if err != nil {
-				return err
-			}
-			if fw.Properties.Status == activeStatus {
-				return nil
-			}
-		}
-	}
+	return retryWithTimeout(func() (bool, error) {
+		secZone, err := c.GetPaaSSecurityZone(ctx, id)
+		return secZone.Properties.Status != resourceActiveStatus, err
+	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
 }
 
 //waitForSecurityZoneDeleted allows to wait until the security zone is deleted
@@ -710,30 +655,7 @@ func (c *Client) waitForSecurityZoneDeleted(ctx context.Context, id string) erro
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	timer := time.After(c.cfg.requestCheckTimeoutSecs)
-	delayInterval := c.cfg.delayInterval
-	for {
-		select {
-		case <-timer:
-			errorMessage := fmt.Sprintf("Timeout reached when waiting for security zone %v to be deleted", id)
-			c.cfg.logger.Error(errorMessage)
-			return errors.New(errorMessage)
-		default:
-			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
-			r := Request{
-				uri:          path.Join(apiPaaSBase, "security_zones", id),
-				method:       http.MethodGet,
-				skipPrint404: true,
-			}
-			err := r.execute(ctx, *c, nil)
-			if err != nil {
-				if requestError, ok := err.(RequestError); ok {
-					if requestError.StatusCode == 404 {
-						return nil
-					}
-				}
-				return err
-			}
-		}
-	}
+	uri := path.Join(apiPaaSBase, "security_zones", id)
+	method := http.MethodGet
+	return c.waitFor404Status(ctx, uri, method)
 }

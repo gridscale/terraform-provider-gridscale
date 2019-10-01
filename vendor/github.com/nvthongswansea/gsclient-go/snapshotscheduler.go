@@ -3,10 +3,8 @@ package gsclient
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"path"
-	"time"
 )
 
 //StorageSnapshotScheduleList JSON of a list of storage snapshot schedules
@@ -235,25 +233,10 @@ func (c *Client) DeleteStorageSnapshotSchedule(ctx context.Context, storageID, s
 
 //waitForSnapshotScheduleActive allows to wait until the snapshot schedule's status is active
 func (c *Client) waitForSnapshotScheduleActive(ctx context.Context, storageID, scheduleID string) error {
-	timer := time.After(c.cfg.requestCheckTimeoutSecs)
-	delayInterval := c.cfg.delayInterval
-	for {
-		select {
-		case <-timer:
-			errorMessage := fmt.Sprintf("Timeout reached when waiting for snapshot schedule %v to be active", scheduleID)
-			c.cfg.logger.Error(errorMessage)
-			return errors.New(errorMessage)
-		default:
-			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
-			schedule, err := c.GetStorageSnapshotSchedule(ctx, storageID, scheduleID)
-			if err != nil {
-				return err
-			}
-			if schedule.Properties.Status == activeStatus {
-				return nil
-			}
-		}
-	}
+	return retryWithTimeout(func() (bool, error) {
+		schedule, err := c.GetStorageSnapshotSchedule(ctx, storageID, scheduleID)
+		return schedule.Properties.Status != resourceActiveStatus, err
+	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
 }
 
 //waitForSnapshotScheduleDeleted allows to wait until the snapshot schedule deleted
@@ -261,30 +244,7 @@ func (c *Client) waitForSnapshotScheduleDeleted(ctx context.Context, storageID, 
 	if !isValidUUID(storageID) || !isValidUUID(scheduleID) {
 		return errors.New("'storageID' or 'scheduleID' is invalid")
 	}
-	timer := time.After(c.cfg.requestCheckTimeoutSecs)
-	delayInterval := c.cfg.delayInterval
-	for {
-		select {
-		case <-timer:
-			errorMessage := fmt.Sprintf("Timeout reached when waiting for snapshot schedule %v to be deleted", scheduleID)
-			c.cfg.logger.Error(errorMessage)
-			return errors.New(errorMessage)
-		default:
-			time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
-			r := Request{
-				uri:          path.Join(apiStorageBase, storageID, "snapshot_schedules", scheduleID),
-				method:       http.MethodGet,
-				skipPrint404: true,
-			}
-			err := r.execute(ctx, *c, nil)
-			if err != nil {
-				if requestError, ok := err.(RequestError); ok {
-					if requestError.StatusCode == 404 {
-						return nil
-					}
-				}
-				return err
-			}
-		}
-	}
+	uri := path.Join(apiStorageBase, storageID, "snapshot_schedules", scheduleID)
+	method := http.MethodGet
+	return c.waitFor404Status(ctx, uri, method)
 }

@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"time"
 )
 
 //Request gridscale's custom request struct
@@ -68,33 +67,28 @@ func (r *Request) execute(ctx context.Context, c Client, output interface{}) err
 	}
 
 	//Add authentication headers and content type
-	request, err := http.NewRequestWithContext(ctx, r.method, url, jsonBody)
+	request, err := http.NewRequest(r.method, url, jsonBody)
 	if err != nil {
 		return err
 	}
+	request = request.WithContext(ctx)
 	request.Header.Set("User-Agent", c.cfg.userAgent)
 	request.Header.Add("X-Auth-UserID", c.cfg.userUUID)
 	request.Header.Add("X-Auth-Token", c.cfg.apiToken)
 	request.Header.Add("Content-Type", "application/json")
 	c.cfg.logger.Debugf("Request body: %v", request.Body)
-
-	retryNo := 0
-	maxNumOfRetries := c.cfg.maxNumberOfRetries
-	delayInterval := c.cfg.delayInterval
-	var latestRetryErr error
-RETRY:
-	for retryNo <= maxNumOfRetries {
+	return retryWithLimitedNumOfRetries(func() (bool, error) {
 		//execute the request
 		result, err := c.cfg.httpClient.Do(request)
 		if err != nil {
 			c.cfg.logger.Errorf("Error while executing the request: %v", err)
-			return err
+			return false, err
 		}
 
 		iostream, err := ioutil.ReadAll(result.Body)
 		if err != nil {
 			c.cfg.logger.Errorf("Error while reading the response's body: %v", err)
-			return err
+			return false, err
 		}
 
 		c.cfg.logger.Debugf("Status code returned: %v", result.StatusCode)
@@ -105,18 +99,14 @@ RETRY:
 			json.Unmarshal(iostream, &errorMessage)
 			//If internal server error or object is in status that does not allow the request, retry
 			if result.StatusCode >= 500 || result.StatusCode == 424 {
-				latestRetryErr = errorMessage
-				time.Sleep(delayInterval) //delay the request, so we don't do too many requests to the server
-				retryNo++
-				c.cfg.logger.Errorf("RETRY no %d ! Error message: %v. Title: %v. Code: %v.", retryNo, errorMessage.Description, errorMessage.Title, errorMessage.StatusCode)
-				continue RETRY //continue the RETRY loop
+				return true, errorMessage
 			}
 			if r.skipPrint404 && result.StatusCode == 404 {
 				c.cfg.logger.Debug("Skip 404 error code.")
-				return errorMessage
+				return false, errorMessage
 			}
 			c.cfg.logger.Errorf("Error message: %v. Title: %v. Code: %v.", errorMessage.Description, errorMessage.Title, errorMessage.StatusCode)
-			return errorMessage
+			return false, errorMessage
 		}
 		c.cfg.logger.Debugf("Response body: %v", string(iostream))
 		//if output is set
@@ -124,10 +114,9 @@ RETRY:
 			err = json.Unmarshal(iostream, output) //Edit the given struct
 			if err != nil {
 				c.cfg.logger.Errorf("Error while marshaling JSON: %v", err)
-				return err
+				return false, err
 			}
 		}
-		return nil
-	}
-	return latestRetryErr
+		return false, nil
+	}, c.cfg.maxNumberOfRetries, c.cfg.delayInterval)
 }
