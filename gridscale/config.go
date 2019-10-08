@@ -21,15 +21,9 @@ type Config struct {
 }
 
 func (c *Config) Client() (*gsclient.Client, error) {
-	config := gsclient.NewConfiguration(
-		c.APIUrl,
+	config := gsclient.DefaultConfiguration(
 		c.UserUUID,
 		c.APIToken,
-		true,
-		true,
-		0,
-		0,
-		0,
 	)
 	client := gsclient.NewClient(config)
 
