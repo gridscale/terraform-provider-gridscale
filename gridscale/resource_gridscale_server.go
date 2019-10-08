@@ -536,7 +536,7 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 
 	//The ShutdownServer command will check if the server is running and shut it down if it is running, so no extra checks are needed here
 	if shutdownRequired {
-		err = client.ShutdownServer(emptyCtx, d.Id())
+		err = client.StopServer(emptyCtx, d.Id())
 		if err != nil {
 			return err
 		}
