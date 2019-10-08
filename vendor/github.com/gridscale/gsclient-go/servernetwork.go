@@ -38,7 +38,7 @@ type ServerNetworkRelationProperties struct {
 	PublicNet bool `json:"public_net"`
 
 	//The UUID of firewall template.
-	FirewallTemplateUUID string `json:"firewall_template_uuid,omitempty"`
+	FirewallTemplateUUID string `json:"firewall_template_uuid"`
 
 	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
 	ObjectName string `json:"object_name"`
@@ -58,7 +58,7 @@ type ServerNetworkRelationProperties struct {
 	Ordering int `json:"ordering"`
 
 	//Firewall that is used to this server network relation
-	Firewall interface{} `json:"firewall,omitempty"`
+	Firewall FirewallRules `json:"firewall"`
 
 	//(one of network, network_high, network_insane)
 	NetworkType string `json:"network_type"`

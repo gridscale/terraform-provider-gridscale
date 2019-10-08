@@ -13,6 +13,7 @@ const (
 	defaultMaxNumberOfRetries      = 100
 	defaultDelayIntervalMilliSecs  = 500
 	version                        = "1.0.0"
+	defaultAPIURL                  = "https://api.gridscale.io"
 	resourceActiveStatus           = "active"
 	requestDoneStatus              = "done"
 )
@@ -59,15 +60,6 @@ func NewConfiguration(apiURL string, uuid string, token string, debugMode, sync 
 		},
 	}
 
-	if requestCheckTimeoutSecs == 0 {
-		requestCheckTimeoutSecs = defaultCheckRequestTimeoutSecs
-	}
-	if delayIntervalMilliSecs == 0 {
-		delayIntervalMilliSecs = defaultDelayIntervalMilliSecs
-	}
-	if maxNumberOfRetries == 0 {
-		maxNumberOfRetries = defaultMaxNumberOfRetries
-	}
 	cfg := &Config{
 		apiURL:                  apiURL,
 		userUUID:                uuid,
@@ -79,6 +71,31 @@ func NewConfiguration(apiURL string, uuid string, token string, debugMode, sync 
 		requestCheckTimeoutSecs: time.Duration(requestCheckTimeoutSecs) * time.Second,
 		delayInterval:           time.Duration(delayIntervalMilliSecs) * time.Millisecond,
 		maxNumberOfRetries:      maxNumberOfRetries,
+	}
+	return cfg
+}
+
+//DefaultConfiguration creates a default configuration
+func DefaultConfiguration(uuid string, token string) *Config {
+	logger := logrus.Logger{
+		Out:   os.Stderr,
+		Level: logrus.InfoLevel,
+		Formatter: &logrus.TextFormatter{
+			FullTimestamp: true,
+			DisableColors: false,
+		},
+	}
+	cfg := &Config{
+		apiURL:                  defaultAPIURL,
+		userUUID:                uuid,
+		apiToken:                token,
+		userAgent:               "gsclient-go/" + version + " (" + runtime.GOOS + ")",
+		sync:                    true,
+		httpClient:              http.DefaultClient,
+		logger:                  logger,
+		requestCheckTimeoutSecs: time.Duration(defaultCheckRequestTimeoutSecs) * time.Second,
+		delayInterval:           time.Duration(defaultDelayIntervalMilliSecs) * time.Millisecond,
+		maxNumberOfRetries:      defaultMaxNumberOfRetries,
 	}
 	return cfg
 }

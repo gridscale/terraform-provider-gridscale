@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/gridscale/gsclient-go"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	"github.com/nvthongswansea/gsclient-go"
 )
 
 func resourceGridscaleLoadBalancer() *schema.Resource {

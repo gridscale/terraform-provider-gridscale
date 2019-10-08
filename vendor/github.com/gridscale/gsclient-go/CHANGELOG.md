@@ -1,5 +1,24 @@
 # Changelog
 
+## 2.0.0 (October 07, 2019)
+
+FEATURES:
+* Add `sync` mode
+* The library now can be fully controlled through `context`
+* Auto retry when server returns 5xx and 424 http codes
+* Add a default configuration for the client
+
+IMPROVEMENTS:
+* Server type is now limited to pre-defined values
+* Storage type is now limited to pre-defined values
+* IP address family is now limited to pre-defined values
+* Loadbalancer algorithm is now limited to pre-defined values
+* All time-related properties are now type of GSTime (a custom type of time.Time)
+* Friendly godoc.
+
+BUG FIXES:
+* Fixed bugs when unmarshalling JSON to concrete type (mismatched type)
+
 ## 1.0.0 (September 05, 2019)
 
 FEATURES:
@@ -15,6 +34,7 @@ IMPROVEMENTS:
 * Power-off server if graceful shutdown fails
 * Backward compatibility for server creation API
 
+
 ## 0.2.0 (August 23, 2019)
 
 FEATURES:
@@ -28,7 +48,6 @@ FEATURES:
 
 IMPROVEMENTS:
 
-* Avoid use of fmt.errorf
 * Unit Tests for all functionality
 * Logging support
 * Many examples have been added
