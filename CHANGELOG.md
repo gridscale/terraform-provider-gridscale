@@ -1,4 +1,4 @@
-## 1.2.0 (September 23, 2019)
+## 1.2.0 (Unreleased)
 
 FEATURES:
 
@@ -7,7 +7,7 @@ FEATURES:
 
 IMPROVEMENTS:
 
-* Switch to gsclient-go v1.0.0 from github
+* Switch to gsclient-go v2.0.0 from github
 * Fix all datasources missing `Schema`
 
 ## 1.1.0 (July 10, 2019)
