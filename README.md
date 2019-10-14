@@ -37,7 +37,9 @@ $ make build
 
 Using the provider
 ----------------------
-See the [`website/docs`](website/docs) directory in this repo to get started on using the gridscale provider, be sure to read [`website/docs/index.html.markdown`](website/docs/index.html.markdown) first. Documentation on how to create resources like servers, storages and networks can be found in [`website/docs/r`](website/docs/r). Documentation on how to add resources like storages, networks and IP addresses to servers, check out the documentation on datasources found in [`website/docs/d`](website/docs/d).
+See the [gridscale provider documentation](https://www.terraform.io/docs/providers/gridscale) to get started on using the gridscale provider.
+
+Alternatively, this documentation can also be found within this repository. Check out [`website/docs/index.html.markdown`](website/docs/index.html.markdown) to get started. Documentation on how to create resources like servers, storages and networks can be found in [`website/docs/r`](website/docs/r). Documentation on how to add resources like storages, networks and IP addresses to servers, check out the documentation on datasources found in [`website/docs/d`](website/docs/d).
 
 Developing the Provider
 ---------------------------
