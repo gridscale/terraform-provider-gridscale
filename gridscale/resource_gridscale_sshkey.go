@@ -70,8 +70,8 @@ func resourceGridscaleSshkeyRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("name", sshkey.Properties.Name)
 	d.Set("sshkey", sshkey.Properties.Sshkey)
 	d.Set("status", sshkey.Properties.Status)
-	d.Set("create_time", sshkey.Properties.CreateTime)
-	d.Set("change_time", sshkey.Properties.ChangeTime)
+	d.Set("create_time", sshkey.Properties.CreateTime.String())
+	d.Set("change_time", sshkey.Properties.ChangeTime.String())
 
 	if err = d.Set("labels", sshkey.Properties.Labels); err != nil {
 		return fmt.Errorf("Error setting labels: %v", err)

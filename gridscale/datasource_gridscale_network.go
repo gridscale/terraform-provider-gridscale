@@ -102,8 +102,8 @@ func dataSourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) er
 		d.Set("location_iata", network.Properties.LocationIata)
 		d.Set("location_name", network.Properties.LocationName)
 		d.Set("delete_block", network.Properties.DeleteBlock)
-		d.Set("create_time", network.Properties.CreateTime)
-		d.Set("change_time", network.Properties.ChangeTime)
+		d.Set("create_time", network.Properties.CreateTime.String())
+		d.Set("change_time", network.Properties.ChangeTime.String())
 		if err = d.Set("labels", network.Properties.Labels); err != nil {
 			return fmt.Errorf("Error setting labels: %v", err)
 		}
