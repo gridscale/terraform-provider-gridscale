@@ -31,7 +31,6 @@ The following arguments are supported:
 
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
 
-
 ## Attributes
 
 This resource exports the following attributes:
@@ -42,4 +41,3 @@ This resource exports the following attributes:
 * `status` - status indicates the status of the object.
 * `create_time` - The time the object was created.
 * `change_time` - Defines the date and time of the last object change.
-

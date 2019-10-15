@@ -53,7 +53,7 @@ The following arguments are supported:
 
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
 
-* `hardware_profile` - (Optional) The hardware profile of the Server. Options are default, legacy, nested, cisco_csr, sophos_utm, f5_bigip and q35 at the moment of writing. Check the 
+* `hardware_profile` - (Optional) The hardware profile of the Server. Options are default, legacy, nested, cisco_csr, sophos_utm, f5_bigip and q35 at the moment of writing. Check the
 
 * `ipv4` - (Optional) The UUID of the IPv4 address of the server. When this option is set, the server will automatically be connected to the public network, giving it access to the internet.
 
@@ -68,13 +68,13 @@ The following arguments are supported:
 * `storage` - (Optional) Connects a storage to the server.
 
     * `object_uuid` - (Required) The object UUID or id of the storage.
-    
+
     * `bootdevice` - (Optional) Make this storage the boot device. **This can only be set for one storage per server!**
 
 * `storage` - (Optional) Connects a storage to the server.
 
     * `object_uuid` - (Required) The object UUID or id of the network.
-    
+
     * `bootdevice` - (Optional) Make this network the boot device. This can only be set for one network.
 
 ## Attributes
