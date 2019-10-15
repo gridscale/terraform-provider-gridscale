@@ -14,7 +14,7 @@ Provides a server resource. This can be used to create, modify and delete server
 
 The following example shows how one might use this resource to add a server to gridscale:
 
-```hcl
+```terraform
 resource "gridscale_server" "terra-server-test"{
 	name = "terra-server-test"
 	cores = 2

@@ -8,7 +8,7 @@ The type syntax is processed statically from a hcl.Expression, so it cannot
 use any of the usual language operators. This is similar to type expressions
 in statically-typed programming languages.
 
-```hcl
+```terraform
 variable "example" {
   type = list(string)
 }

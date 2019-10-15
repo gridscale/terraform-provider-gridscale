@@ -14,7 +14,7 @@ Get the id of an sshkey resource. This can be used to link SSH keys to a storage
 
 Using the sshkey datasource for the creation of a storage:
 
-```hcl
+```terraform
 resource "gridscale_sshkey" "sshkey-john"{
 	name = "john's computer"
 	sshkey = "an ssh public key"

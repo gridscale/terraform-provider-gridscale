@@ -14,7 +14,7 @@ Use the navigation to the left to read about the available data sources.
 
 ## Example Usage
 
-```hcl
+```terraform
 # Configure the gridscale provider
 provider "gridscale" {
 	uuid = "${var.gridscale_uuid}"

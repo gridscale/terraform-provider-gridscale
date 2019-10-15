@@ -14,7 +14,7 @@ Provides an SSH public key resource. This can be used to create, modify and dele
 
 The following example shows how one might use this resource to add an SSH public key to gridscale:
 
-```hcl
+```terraform
 resource "gridscale_sshkey" "sshkey-john"{
 	name = "john's computer"
 	sshkey = "an ssh public key"

@@ -14,7 +14,7 @@ Provides a storage resource. This can be used to create, modify and delete stora
 
 The following example shows how one might use this resource to add a storage to gridscale:
 
-```hcl
+```terraform
 resource "gridscale_storage" "storage-john"{
 	name = "john's storage"
 	capacity = 10

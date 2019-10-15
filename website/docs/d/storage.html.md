@@ -14,7 +14,7 @@ Get the id of a storage resource. This can be used to link storages to a server.
 
 Using the storage datasource for the creation of a server:
 
-```hcl
+```terraform
 resource "gridscale_storage" "storagename"{
 	name = "terraform-storage"
 	capacity = 10

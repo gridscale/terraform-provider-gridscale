@@ -14,7 +14,7 @@ Get the id of a network resource. This can be used to link networks to a server.
 
 Using the network datasource for the creation of a server:
 
-```hcl
+```terraform
 resource "gridscale_network" "networkname"{
 	name = "terraform-network"
 }

@@ -14,7 +14,7 @@ Get the id of an ip resource. This can be used to link ip addresses to a server.
 
 Using the ip datasource for the creation of a server:
 
-```hcl
+```terraform
 resource "gridscale_ipv4" "ipv4name"{
 	name = "terraform-ipv4"
 }
