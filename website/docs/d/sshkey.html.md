@@ -8,7 +8,7 @@ description: |-
 
 # gridscale_sshkey
 
-Get the id of an sshkey resource. This can be used to link sshkeys to a storage when an official template is used.
+Get the id of an sshkey resource. This can be used to link SSH keys to a storage when an official template is used.
 
 ## Example Usage
 
