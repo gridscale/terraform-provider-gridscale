@@ -11,27 +11,27 @@ import (
 	"github.com/gridscale/gsclient-go"
 )
 
-func TestAccDataSourceGridscaleNetwork_Basic(t *testing.T) {
+func TestAccResourceGridscaleNetwork_Basic(t *testing.T) {
 	var object gsclient.Network
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckDataSourceGridscaleNetworkDestroyCheck,
+		CheckDestroy: testAccCheckGridscaleNetworkDestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckDataSourceGridscaleNetworkConfig_basic(name),
+				Config: testAccCheckResourceGridscaleNetworkConfig_basic(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckDataSourceGridscaleNetworkExists("gridscale_network.foo", &object),
+					testAccCheckResourceGridscaleNetworkExists("gridscale_network.foo", &object),
 					resource.TestCheckResourceAttr(
 						"gridscale_network.foo", "name", name),
 				),
 			},
 			{
-				Config: testAccCheckDataSourceGridscaleNetworkConfig_basic_update(),
+				Config: testAccCheckResourceGridscaleNetworkConfig_basic_update(),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckDataSourceGridscaleNetworkExists("gridscale_network.foo", &object),
+					testAccCheckResourceGridscaleNetworkExists("gridscale_network.foo", &object),
 					resource.TestCheckResourceAttr(
 						"gridscale_network.foo", "name", "newname"),
 					resource.TestCheckResourceAttr(
@@ -42,7 +42,7 @@ func TestAccDataSourceGridscaleNetwork_Basic(t *testing.T) {
 	})
 }
 
-func testAccCheckDataSourceGridscaleNetworkExists(n string, object *gsclient.Network) resource.TestCheckFunc {
+func testAccCheckResourceGridscaleNetworkExists(n string, object *gsclient.Network) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -74,7 +74,7 @@ func testAccCheckDataSourceGridscaleNetworkExists(n string, object *gsclient.Net
 	}
 }
 
-func testAccCheckDataSourceGridscaleNetworkDestroyCheck(s *terraform.State) error {
+func testAccCheckGridscaleNetworkDestroyCheck(s *terraform.State) error {
 	client := testAccProvider.Meta().(*gsclient.Client)
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gridscale_network" {
@@ -98,7 +98,7 @@ func testAccCheckDataSourceGridscaleNetworkDestroyCheck(s *terraform.State) erro
 	return nil
 }
 
-func testAccCheckDataSourceGridscaleNetworkConfig_basic(name string) string {
+func testAccCheckResourceGridscaleNetworkConfig_basic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_network" "foo" {
   name   = "%s"
@@ -106,7 +106,7 @@ resource "gridscale_network" "foo" {
 `, name)
 }
 
-func testAccCheckDataSourceGridscaleNetworkConfig_basic_update() string {
+func testAccCheckResourceGridscaleNetworkConfig_basic_update() string {
 	return fmt.Sprintf(`
 resource "gridscale_network" "foo" {
   name   = "newname"

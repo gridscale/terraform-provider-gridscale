@@ -14,7 +14,7 @@ func TestAccdataSourceGridscaleIPv4_basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckDataSourceGridscaleIpv4DestroyCheck,
+		CheckDestroy: testAccCheckGridscaleIpv4DestroyCheck,
 		Steps: []resource.TestStep{
 			{
 

@@ -13,7 +13,7 @@ func TestAccdataSourceGridscaleLoadBalancer_basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckResourceGridscaleLoadBalancerDestroyCheck,
+		CheckDestroy: testAccCheckGridscaleLoadBalancerDestroyCheck,
 		Steps: []resource.TestStep{
 			{
 

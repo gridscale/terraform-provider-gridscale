@@ -11,19 +11,19 @@ import (
 	"github.com/gridscale/gsclient-go"
 )
 
-func TestAccDataSourceGridscaleServer_Basic(t *testing.T) {
+func TestAccResourceGridscaleServer_Basic(t *testing.T) {
 	var object gsclient.Server
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckDataSourceGridscaleServerDestroyCheck,
+		CheckDestroy: testAccCheckResourceGridscaleServerDestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckDataSourceGridscaleServerConfig_basic(name),
+				Config: testAccCheckResourceGridscaleServerConfig_basic(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckDataSourceGridscaleServerExists("gridscale_server.foo", &object),
+					testAccCheckResourceGridscaleServerExists("gridscale_server.foo", &object),
 					resource.TestCheckResourceAttr(
 						"gridscale_server.foo", "name", name),
 					resource.TestCheckResourceAttr(
@@ -35,9 +35,9 @@ func TestAccDataSourceGridscaleServer_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckDataSourceGridscaleServerConfig_basic_update(),
+				Config: testAccCheckResourceGridscaleServerConfig_basic_update(),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckDataSourceGridscaleServerExists("gridscale_server.foo", &object),
+					testAccCheckResourceGridscaleServerExists("gridscale_server.foo", &object),
 					resource.TestCheckResourceAttr(
 						"gridscale_server.foo", "name", "newname"),
 					resource.TestCheckResourceAttr(
@@ -52,7 +52,7 @@ func TestAccDataSourceGridscaleServer_Basic(t *testing.T) {
 	})
 }
 
-func testAccCheckDataSourceGridscaleServerExists(n string, object *gsclient.Server) resource.TestCheckFunc {
+func testAccCheckResourceGridscaleServerExists(n string, object *gsclient.Server) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -84,7 +84,7 @@ func testAccCheckDataSourceGridscaleServerExists(n string, object *gsclient.Serv
 	}
 }
 
-func testAccCheckDataSourceGridscaleServerDestroyCheck(s *terraform.State) error {
+func testAccCheckResourceGridscaleServerDestroyCheck(s *terraform.State) error {
 	client := testAccProvider.Meta().(*gsclient.Client)
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gridscale_server" {
@@ -108,7 +108,7 @@ func testAccCheckDataSourceGridscaleServerDestroyCheck(s *terraform.State) error
 	return nil
 }
 
-func testAccCheckDataSourceGridscaleServerConfig_basic(name string) string {
+func testAccCheckResourceGridscaleServerConfig_basic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_server" "foo" {
   name   = "%s"
@@ -119,7 +119,7 @@ resource "gridscale_server" "foo" {
 `, name)
 }
 
-func testAccCheckDataSourceGridscaleServerConfig_basic_update() string {
+func testAccCheckResourceGridscaleServerConfig_basic_update() string {
 	return fmt.Sprintf(`
 resource "gridscale_server" "foo" {
   name   = "newname"

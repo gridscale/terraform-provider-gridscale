@@ -11,19 +11,19 @@ import (
 	"github.com/gridscale/gsclient-go"
 )
 
-func TestAccDataSourceGridscaleSshkey_Basic(t *testing.T) {
+func TestAccResourceGridscaleSshkey_Basic(t *testing.T) {
 	var object gsclient.Sshkey
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckDataSourceGridscaleSshkeyDestroyCheck,
+		CheckDestroy: testAccCheckGridscaleSshkeyDestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckDataSourceGridscaleSshkeyConfig_basic(name),
+				Config: testAccCheckResourceGridscaleSshkeyConfig_basic(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckDataSourceGridscaleSshkeyExists("gridscale_sshkey.foo", &object),
+					testAccCheckResourceGridscaleSshkeyExists("gridscale_sshkey.foo", &object),
 					resource.TestCheckResourceAttr(
 						"gridscale_sshkey.foo", "name", name),
 					resource.TestCheckResourceAttr(
@@ -31,9 +31,9 @@ func TestAccDataSourceGridscaleSshkey_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckDataSourceGridscaleSshkeyConfig_basic_update(),
+				Config: testAccCheckResourceGridscaleSshkeyConfig_basic_update(),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckDataSourceGridscaleSshkeyExists("gridscale_sshkey.foo", &object),
+					testAccCheckResourceGridscaleSshkeyExists("gridscale_sshkey.foo", &object),
 					resource.TestCheckResourceAttr(
 						"gridscale_sshkey.foo", "name", "newname"),
 					resource.TestCheckResourceAttr(
@@ -44,7 +44,7 @@ func TestAccDataSourceGridscaleSshkey_Basic(t *testing.T) {
 	})
 }
 
-func testAccCheckDataSourceGridscaleSshkeyExists(n string, object *gsclient.Sshkey) resource.TestCheckFunc {
+func testAccCheckResourceGridscaleSshkeyExists(n string, object *gsclient.Sshkey) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -76,7 +76,7 @@ func testAccCheckDataSourceGridscaleSshkeyExists(n string, object *gsclient.Sshk
 	}
 }
 
-func testAccCheckDataSourceGridscaleSshkeyDestroyCheck(s *terraform.State) error {
+func testAccCheckGridscaleSshkeyDestroyCheck(s *terraform.State) error {
 	client := testAccProvider.Meta().(*gsclient.Client)
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gridscale_sshkey" {
@@ -100,7 +100,7 @@ func testAccCheckDataSourceGridscaleSshkeyDestroyCheck(s *terraform.State) error
 	return nil
 }
 
-func testAccCheckDataSourceGridscaleSshkeyConfig_basic(name string) string {
+func testAccCheckResourceGridscaleSshkeyConfig_basic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_sshkey" "foo" {
   name   = "%s"
@@ -109,7 +109,7 @@ resource "gridscale_sshkey" "foo" {
 `, name)
 }
 
-func testAccCheckDataSourceGridscaleSshkeyConfig_basic_update() string {
+func testAccCheckResourceGridscaleSshkeyConfig_basic_update() string {
 	return fmt.Sprintf(`
 resource "gridscale_sshkey" "foo" {
   name   = "newname"

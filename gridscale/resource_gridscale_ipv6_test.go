@@ -11,27 +11,27 @@ import (
 	"github.com/gridscale/gsclient-go"
 )
 
-func TestAccDataSourceGridscaleIpv6_Basic(t *testing.T) {
+func TestAccResourceGridscaleIpv6_Basic(t *testing.T) {
 	var object gsclient.IP
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckDataSourceGridscaleIpv6DestroyCheck,
+		CheckDestroy: testAccCheckGridscaleIpv6DestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckDataSourceGridscaleIpv6Config_basic(name),
+				Config: testAccCheckResourceGridscaleIpv6Config_basic(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckDataSourceGridscaleIpv6Exists("gridscale_ipv6.foo", &object),
+					testAccCheckResourceGridscaleIpv6Exists("gridscale_ipv6.foo", &object),
 					resource.TestCheckResourceAttr(
 						"gridscale_ipv6.foo", "name", name),
 				),
 			},
 			{
-				Config: testAccCheckDataSourceGridscaleIpv6Config_basic_update(),
+				Config: testAccCheckResourceGridscaleIpv6Config_basic_update(),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckDataSourceGridscaleIpv6Exists("gridscale_ipv6.foo", &object),
+					testAccCheckResourceGridscaleIpv6Exists("gridscale_ipv6.foo", &object),
 					resource.TestCheckResourceAttr(
 						"gridscale_ipv6.foo", "name", "newname"),
 					resource.TestCheckResourceAttr(
@@ -44,7 +44,7 @@ func TestAccDataSourceGridscaleIpv6_Basic(t *testing.T) {
 	})
 }
 
-func testAccCheckDataSourceGridscaleIpv6Exists(n string, object *gsclient.IP) resource.TestCheckFunc {
+func testAccCheckResourceGridscaleIpv6Exists(n string, object *gsclient.IP) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -76,7 +76,7 @@ func testAccCheckDataSourceGridscaleIpv6Exists(n string, object *gsclient.IP) re
 	}
 }
 
-func testAccCheckDataSourceGridscaleIpv6DestroyCheck(s *terraform.State) error {
+func testAccCheckGridscaleIpv6DestroyCheck(s *terraform.State) error {
 	client := testAccProvider.Meta().(*gsclient.Client)
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gridscale_ipv6" {
@@ -100,7 +100,7 @@ func testAccCheckDataSourceGridscaleIpv6DestroyCheck(s *terraform.State) error {
 	return nil
 }
 
-func testAccCheckDataSourceGridscaleIpv6Config_basic(name string) string {
+func testAccCheckResourceGridscaleIpv6Config_basic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_ipv6" "foo" {
   name   = "%s"
@@ -108,7 +108,7 @@ resource "gridscale_ipv6" "foo" {
 `, name)
 }
 
-func testAccCheckDataSourceGridscaleIpv6Config_basic_update() string {
+func testAccCheckResourceGridscaleIpv6Config_basic_update() string {
 	return fmt.Sprintf(`
 resource "gridscale_ipv6" "foo" {
   name   = "newname"
