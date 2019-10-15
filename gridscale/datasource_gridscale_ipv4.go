@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/gridscale/gsclient-go"
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
 
 func dataSourceGridscaleIpv4() *schema.Resource {
@@ -106,7 +106,7 @@ func dataSourceGridscaleIpv4Read(d *schema.ResourceData, meta interface{}) error
 
 	id := d.Get("resource_id").(string)
 
-	ip, err := client.GetIP(id)
+	ip, err := client.GetIP(emptyCtx, id)
 
 	if err == nil {
 		d.SetId(ip.Properties.ObjectUUID)

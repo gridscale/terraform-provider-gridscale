@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/gridscale/gsclient-go"
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
 
 func dataSourceGridscaleStorage() *schema.Resource {
@@ -100,7 +100,7 @@ func dataSourceGridscaleStorageRead(d *schema.ResourceData, meta interface{}) er
 
 	id := d.Get("resource_id").(string)
 
-	storage, err := client.GetStorage(id)
+	storage, err := client.GetStorage(emptyCtx, id)
 
 	if err == nil {
 		d.SetId(storage.Properties.ObjectUUID)

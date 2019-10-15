@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform/helper/acctest"
-	"github.com/hashicorp/terraform/helper/resource"
-	"github.com/hashicorp/terraform/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 
 	"github.com/gridscale/gsclient-go"
 )
@@ -60,7 +60,7 @@ func testAccCheckDataSourceGridscaleSshkeyExists(n string, object *gsclient.Sshk
 
 		id := rs.Primary.ID
 
-		foundObject, err := client.GetSshkey(id)
+		foundObject, err := client.GetSshkey(emptyCtx, id)
 
 		if err != nil {
 			return err
@@ -83,9 +83,9 @@ func testAccCheckDataSourceGridscaleSshkeyDestroyCheck(s *terraform.State) error
 			continue
 		}
 
-		_, err := client.GetSshkey(rs.Primary.ID)
+		_, err := client.GetSshkey(emptyCtx, rs.Primary.ID)
 		if err != nil {
-			if requestError, ok := err.(*gsclient.RequestError); ok {
+			if requestError, ok := err.(gsclient.RequestError); ok {
 				if requestError.StatusCode != 404 {
 					return fmt.Errorf("Object %s still exists", rs.Primary.ID)
 				}

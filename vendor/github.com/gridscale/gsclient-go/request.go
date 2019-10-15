@@ -2,24 +2,27 @@ package gsclient
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"path"
-	"time"
 )
 
 //Request gridscale's custom request struct
 type Request struct {
-	uri    string
-	method string
-	body   interface{}
+	uri          string
+	method       string
+	skipPrint404 bool
+	body         interface{}
 }
 
 //CreateResponse common struct of a response for creation
 type CreateResponse struct {
-	ObjectUUID  string `json:"object_uuid"`
+	//UUID of the object being created
+	ObjectUUID string `json:"object_uuid"`
+
+	//UUID of the request
 	RequestUUID string `json:"request_uuid"`
 }
 
@@ -30,19 +33,19 @@ type RequestStatus map[string]RequestStatusProperties
 type RequestStatusProperties struct {
 	Status     string `json:"status"`
 	Message    string `json:"message"`
-	CreateTime string `json:"create_time"`
+	CreateTime GSTime `json:"create_time"`
 }
 
 //RequestError error of a request
 type RequestError struct {
-	StatusMessage string `json:"status"`
-	ErrorMessage  string `json:"message"`
-	StatusCode    int
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	StatusCode  int
 }
 
 //Error just returns error as string
 func (r RequestError) Error() string {
-	message := r.ErrorMessage
+	message := r.Description
 	if message == "" {
 		message = "no error message received from server"
 	}
@@ -50,8 +53,8 @@ func (r RequestError) Error() string {
 }
 
 //This function takes the client and a struct and then adds the result to the given struct if possible
-func (r *Request) execute(c Client, output interface{}) error {
-	url := c.cfg.APIUrl + r.uri
+func (r *Request) execute(ctx context.Context, c Client, output interface{}) error {
+	url := c.cfg.apiURL + r.uri
 	c.cfg.logger.Debugf("%v request sent to URL: %v", r.method, url)
 
 	//Convert the body of the request to json
@@ -68,79 +71,52 @@ func (r *Request) execute(c Client, output interface{}) error {
 	if err != nil {
 		return err
 	}
-	request.Header.Add("X-Auth-UserID", c.cfg.UserUUID)
-	request.Header.Add("X-Auth-Token", c.cfg.APIToken)
+	request = request.WithContext(ctx)
+	request.Header.Set("User-Agent", c.cfg.userAgent)
+	request.Header.Add("X-Auth-UserID", c.cfg.userUUID)
+	request.Header.Add("X-Auth-Token", c.cfg.apiToken)
 	request.Header.Add("Content-Type", "application/json")
 	c.cfg.logger.Debugf("Request body: %v", request.Body)
-
-	//execute the request
-	result, err := c.cfg.HTTPClient.Do(request)
-	if err != nil {
-		return err
-	}
-
-	iostream, err := ioutil.ReadAll(result.Body)
-	if err != nil {
-		return err
-	}
-
-	c.cfg.logger.Debugf("Status code returned: %v", result.StatusCode)
-
-	if result.StatusCode >= 300 {
-		var errorMessage RequestError //error messages have a different structure, so they are read with a different struct
-		errorMessage.StatusCode = result.StatusCode
-		json.Unmarshal(iostream, &errorMessage)
-		c.cfg.logger.Errorf("Error message: %v. Status: %v. Code: %v.", errorMessage.ErrorMessage, errorMessage.StatusMessage, errorMessage.StatusCode)
-		return errorMessage
-	}
-	json.Unmarshal(iostream, output) //Edit the given struct
-	c.cfg.logger.Debugf("Response body: %v", string(iostream))
-	return nil
-}
-
-//WaitForRequestCompletion allows to wait for a request to complete. Timeouts are currently hardcoded
-func (c *Client) WaitForRequestCompletion(id string) error {
-	r := Request{
-		uri:    path.Join("/requests/", id),
-		method: "GET",
-	}
-	timer := time.After(time.Minute)
-
-	for {
-		select {
-		case <-timer:
-			c.cfg.logger.Errorf("Timeout reached when waiting for request %v to complete", id)
-			return fmt.Errorf("Timeout reached when waiting for request %v to complete", id)
-		default:
-			time.Sleep(500 * time.Millisecond) //delay the request, so we don't do too many requests to the server
-			var response RequestStatus
-			r.execute(*c, &response)
-			if response[id].Status == "done" {
-				c.cfg.logger.Info("Done with creating")
-				return nil
-			}
+	return retryWithLimitedNumOfRetries(func() (bool, error) {
+		//execute the request
+		result, err := c.cfg.httpClient.Do(request)
+		if err != nil {
+			c.cfg.logger.Errorf("Error while executing the request: %v", err)
+			return false, err
 		}
-	}
-}
 
-//WaitForServerPowerStatus  allows to wait for a server changing its power status. Timeouts are currently hardcoded
-func (c *Client) WaitForServerPowerStatus(id string, status bool) error {
-	timer := time.After(2 * time.Minute)
-	for {
-		select {
-		case <-timer:
-			c.cfg.logger.Errorf("Timeout reached when trying to shut down system with id %v", id)
-			return fmt.Errorf("Timeout reached when trying to shut down system with id %v", id)
-		default:
-			time.Sleep(500 * time.Millisecond) //delay the request, so we don't do too many requests to the server
-			server, err := c.GetServer(id)
+		iostream, err := ioutil.ReadAll(result.Body)
+		if err != nil {
+			c.cfg.logger.Errorf("Error while reading the response's body: %v", err)
+			return false, err
+		}
+
+		c.cfg.logger.Debugf("Status code returned: %v", result.StatusCode)
+
+		if result.StatusCode >= 300 {
+			var errorMessage RequestError //error messages have a different structure, so they are read with a different struct
+			errorMessage.StatusCode = result.StatusCode
+			json.Unmarshal(iostream, &errorMessage)
+			//If internal server error or object is in status that does not allow the request, retry
+			if result.StatusCode >= 500 || result.StatusCode == 424 {
+				return true, errorMessage
+			}
+			if r.skipPrint404 && result.StatusCode == 404 {
+				c.cfg.logger.Debug("Skip 404 error code.")
+				return false, errorMessage
+			}
+			c.cfg.logger.Errorf("Error message: %v. Title: %v. Code: %v.", errorMessage.Description, errorMessage.Title, errorMessage.StatusCode)
+			return false, errorMessage
+		}
+		c.cfg.logger.Debugf("Response body: %v", string(iostream))
+		//if output is set
+		if output != nil {
+			err = json.Unmarshal(iostream, output) //Edit the given struct
 			if err != nil {
-				return err
-			}
-			if server.Properties.Power == status {
-				c.cfg.logger.Infof("The power status of the server with id %v has changed to %t", id, status)
-				return nil
+				c.cfg.logger.Errorf("Error while marshaling JSON: %v", err)
+				return false, err
 			}
 		}
-	}
+		return false, nil
+	}, c.cfg.maxNumberOfRetries, c.cfg.delayInterval)
 }

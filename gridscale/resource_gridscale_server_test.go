@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform/helper/acctest"
-	"github.com/hashicorp/terraform/helper/resource"
-	"github.com/hashicorp/terraform/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 
 	"github.com/gridscale/gsclient-go"
 )
@@ -27,9 +27,11 @@ func TestAccDataSourceGridscaleServer_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"gridscale_server.foo", "name", name),
 					resource.TestCheckResourceAttr(
-						"gridscale_server.foo", "cores", "1"),
+						"gridscale_server.foo", "cores", "2"),
 					resource.TestCheckResourceAttr(
-						"gridscale_server.foo", "memory", "1"),
+						"gridscale_server.foo", "memory", "2"),
+					resource.TestCheckResourceAttr(
+						"gridscale_server.foo", "power", "true"),
 				),
 			},
 			{
@@ -39,9 +41,9 @@ func TestAccDataSourceGridscaleServer_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"gridscale_server.foo", "name", "newname"),
 					resource.TestCheckResourceAttr(
-						"gridscale_server.foo", "cores", "2"),
+						"gridscale_server.foo", "cores", "1"),
 					resource.TestCheckResourceAttr(
-						"gridscale_server.foo", "memory", "2"),
+						"gridscale_server.foo", "memory", "1"),
 					resource.TestCheckResourceAttr(
 						"gridscale_server.foo", "power", "true"),
 				),
@@ -66,7 +68,7 @@ func testAccCheckDataSourceGridscaleServerExists(n string, object *gsclient.Serv
 
 		id := rs.Primary.ID
 
-		foundObject, err := client.GetServer(id)
+		foundObject, err := client.GetServer(emptyCtx, id)
 
 		if err != nil {
 			return err
@@ -89,9 +91,9 @@ func testAccCheckDataSourceGridscaleServerDestroyCheck(s *terraform.State) error
 			continue
 		}
 
-		_, err := client.GetServer(rs.Primary.ID)
+		_, err := client.GetServer(emptyCtx, rs.Primary.ID)
 		if err != nil {
-			if requestError, ok := err.(*gsclient.RequestError); ok {
+			if requestError, ok := err.(gsclient.RequestError); ok {
 				if requestError.StatusCode != 404 {
 					return fmt.Errorf("Object %s still exists", rs.Primary.ID)
 				}
@@ -110,8 +112,9 @@ func testAccCheckDataSourceGridscaleServerConfig_basic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_server" "foo" {
   name   = "%s"
-  cores = 1
-  memory = 1
+  cores = 2
+  memory = 2
+  power = true
 }
 `, name)
 }
@@ -120,8 +123,8 @@ func testAccCheckDataSourceGridscaleServerConfig_basic_update() string {
 	return fmt.Sprintf(`
 resource "gridscale_server" "foo" {
   name   = "newname"
-  cores = 2
-  memory = 2
+  cores = 1
+  memory = 1
   power = true
 }
 `)

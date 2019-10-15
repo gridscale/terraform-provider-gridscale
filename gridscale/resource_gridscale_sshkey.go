@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 
 	"github.com/gridscale/gsclient-go"
 )
@@ -56,9 +56,9 @@ func resourceGridscaleSshkey() *schema.Resource {
 
 func resourceGridscaleSshkeyRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	sshkey, err := client.GetSshkey(d.Id())
+	sshkey, err := client.GetSshkey(emptyCtx, d.Id())
 	if err != nil {
-		if requestError, ok := err.(*gsclient.RequestError); ok {
+		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
 				d.SetId("")
 				return nil
@@ -89,7 +89,7 @@ func resourceGridscaleSshkeyUpdate(d *schema.ResourceData, meta interface{}) err
 		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
-	err := client.UpdateSshkey(d.Id(), requestBody)
+	err := client.UpdateSshkey(emptyCtx, d.Id(), requestBody)
 	if err != nil {
 		return err
 	}
@@ -106,7 +106,7 @@ func resourceGridscaleSshkeyCreate(d *schema.ResourceData, meta interface{}) err
 		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
-	response, err := client.CreateSshkey(requestBody)
+	response, err := client.CreateSshkey(emptyCtx, requestBody)
 	if err != nil {
 		return err
 	}
@@ -120,7 +120,7 @@ func resourceGridscaleSshkeyCreate(d *schema.ResourceData, meta interface{}) err
 
 func resourceGridscaleSshkeyDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	err := client.DeleteSshkey(d.Id())
+	err := client.DeleteSshkey(emptyCtx, d.Id())
 
 	return err
 }

@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hashicorp/terraform/helper/acctest"
-	"github.com/hashicorp/terraform/helper/resource"
-	"github.com/hashicorp/terraform/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 
 	"github.com/gridscale/gsclient-go"
 )
@@ -84,7 +84,7 @@ func testAccCheckDataSourceGridscaleStorageExists(n string, object *gsclient.Sto
 
 		id := rs.Primary.ID
 
-		foundObject, err := client.GetStorage(id)
+		foundObject, err := client.GetStorage(emptyCtx, id)
 
 		if err != nil {
 			return err
@@ -110,9 +110,9 @@ func testAccCheckDataSourceGridscaleStorageDestroyCheck(s *terraform.State) erro
 		//We wait a while for the storage to delete, since it is not instant
 		time.Sleep(time.Second * 5)
 
-		_, err := client.GetStorage(rs.Primary.ID)
+		_, err := client.GetStorage(emptyCtx, rs.Primary.ID)
 		if err != nil {
-			if requestError, ok := err.(*gsclient.RequestError); ok {
+			if requestError, ok := err.(gsclient.RequestError); ok {
 				if requestError.StatusCode != 404 {
 					return fmt.Errorf("Object %s still exists", rs.Primary.ID)
 				}

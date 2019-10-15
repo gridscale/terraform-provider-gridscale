@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/gridscale/gsclient-go"
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
 
 func dataSourceGridscaleSshkey() *schema.Resource {
@@ -56,7 +56,7 @@ func dataSourceGridscaleSshkeyRead(d *schema.ResourceData, meta interface{}) err
 
 	id := d.Get("resource_id").(string)
 
-	sshkey, err := client.GetSshkey(id)
+	sshkey, err := client.GetSshkey(emptyCtx, id)
 
 	if err == nil {
 		d.SetId(sshkey.Properties.ObjectUUID)
