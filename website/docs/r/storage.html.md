@@ -18,7 +18,7 @@ The following example shows how one might use this resource to add a storage to 
 resource "gridscale_storage" "storage-john"{
 	name = "john's storage"
 	capacity = 10
-	storage = "storage_high"
+	storage_type = "storage_high"
 	template {
 	    template_uuid = "4db64bfc-9fb2-4976-80b5-94ff43b1233a"
 	    password = "${var.gridscale_password-john}"
