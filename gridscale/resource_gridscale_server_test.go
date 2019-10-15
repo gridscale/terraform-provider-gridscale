@@ -27,9 +27,11 @@ func TestAccDataSourceGridscaleServer_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"gridscale_server.foo", "name", name),
 					resource.TestCheckResourceAttr(
-						"gridscale_server.foo", "cores", "1"),
+						"gridscale_server.foo", "cores", "2"),
 					resource.TestCheckResourceAttr(
-						"gridscale_server.foo", "memory", "1"),
+						"gridscale_server.foo", "memory", "2"),
+					resource.TestCheckResourceAttr(
+						"gridscale_server.foo", "power", "true"),
 				),
 			},
 			{
@@ -39,9 +41,9 @@ func TestAccDataSourceGridscaleServer_Basic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"gridscale_server.foo", "name", "newname"),
 					resource.TestCheckResourceAttr(
-						"gridscale_server.foo", "cores", "2"),
+						"gridscale_server.foo", "cores", "1"),
 					resource.TestCheckResourceAttr(
-						"gridscale_server.foo", "memory", "2"),
+						"gridscale_server.foo", "memory", "1"),
 					resource.TestCheckResourceAttr(
 						"gridscale_server.foo", "power", "true"),
 				),
@@ -110,8 +112,9 @@ func testAccCheckDataSourceGridscaleServerConfig_basic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_server" "foo" {
   name   = "%s"
-  cores = 1
-  memory = 1
+  cores = 2
+  memory = 2
+  power = true
 }
 `, name)
 }
@@ -120,8 +123,8 @@ func testAccCheckDataSourceGridscaleServerConfig_basic_update() string {
 	return fmt.Sprintf(`
 resource "gridscale_server" "foo" {
   name   = "newname"
-  cores = 2
-  memory = 2
+  cores = 1
+  memory = 1
   power = true
 }
 `)
