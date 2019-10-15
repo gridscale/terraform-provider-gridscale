@@ -283,7 +283,7 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 		storage := map[string]interface{}{
 			"object_uuid":        value.ObjectUUID,
 			"bootdevice":         value.BootDevice,
-			"create_time":        value.CreateTime,
+			"create_time":        value.CreateTime.String(),
 			"controller":         value.Controller,
 			"target":             value.Target,
 			"lun":                value.Lun,
@@ -307,7 +307,7 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 			network := map[string]interface{}{
 				"object_uuid":            value.ObjectUUID,
 				"bootdevice":             value.BootDevice,
-				"create_time":            value.CreateTime,
+				"create_time":            value.CreateTime.String(),
 				"mac":                    value.Mac,
 				"firewall_template_uuid": value.FirewallTemplateUUID,
 				"object_name":            value.ObjectName,

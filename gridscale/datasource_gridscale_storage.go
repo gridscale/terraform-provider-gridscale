@@ -104,7 +104,7 @@ func dataSourceGridscaleStorageRead(d *schema.ResourceData, meta interface{}) er
 
 	if err == nil {
 		d.SetId(storage.Properties.ObjectUUID)
-		d.Set("change_time", storage.Properties.ChangeTime)
+		d.Set("change_time", storage.Properties.ChangeTime.String())
 		d.Set("location_iata", storage.Properties.LocationIata)
 		d.Set("status", storage.Properties.Status)
 		d.Set("license_product_no", storage.Properties.LicenseProductNo)
@@ -118,7 +118,7 @@ func dataSourceGridscaleStorageRead(d *schema.ResourceData, meta interface{}) er
 		d.Set("parent_uuid", storage.Properties.ParentUUID)
 		d.Set("name", storage.Properties.Name)
 		d.Set("location_name", storage.Properties.LocationName)
-		d.Set("create_time", storage.Properties.CreateTime)
+		d.Set("create_time", storage.Properties.CreateTime.String())
 
 		if err = d.Set("labels", storage.Properties.Labels); err != nil {
 			return fmt.Errorf("Error setting labels: %v", err)
