@@ -15,9 +15,8 @@ Get the id of a storage resource. This can be used to link storages to a server.
 Using the storage datasource for the creation of a server:
 
 ```terraform
-resource "gridscale_storage" "storagename"{
-	name = "terraform-storage"
-	capacity = 10
+data "gridscale_storage" "storagename"{
+	resource_id = "xxxx-xxxx-xxxx-xxxx"
 }
 
 resource "gridscale_server" "servername"{
@@ -25,7 +24,7 @@ resource "gridscale_server" "servername"{
 	cores = 2
 	memory = 4
 	storage {
-		object_uuid = "${gridscale_storage.storagename.id}"
+		object_uuid = "${data.gridscale_storage.storagename.id}"
 		bootdevice = true
 	}
 }
