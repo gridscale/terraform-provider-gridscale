@@ -149,10 +149,6 @@ func resourceGridscaleServer() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
-						"firewall": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
 						"firewall_template_uuid": {
 							Type:     schema.TypeString,
 							Computed: true,
@@ -313,7 +309,6 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 				"bootdevice":             value.BootDevice,
 				"create_time":            value.CreateTime,
 				"mac":                    value.Mac,
-				"firewall":               value.Firewall,
 				"firewall_template_uuid": value.FirewallTemplateUUID,
 				"object_name":            value.ObjectName,
 				"network_type":           value.NetworkType,
