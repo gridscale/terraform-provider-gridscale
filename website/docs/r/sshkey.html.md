@@ -14,7 +14,7 @@ Provides an SSH public key resource. This can be used to create, modify and dele
 
 The following example shows how one might use this resource to add an SSH public key to gridscale:
 
-```hcl
+```terraform
 resource "gridscale_sshkey" "sshkey-john"{
 	name = "john's computer"
 	sshkey = "an ssh public key"
@@ -31,7 +31,6 @@ The following arguments are supported:
 
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
 
-
 ## Attributes
 
 This resource exports the following attributes:
@@ -42,4 +41,3 @@ This resource exports the following attributes:
 * `status` - status indicates the status of the object.
 * `create_time` - The time the object was created.
 * `change_time` - Defines the date and time of the last object change.
-

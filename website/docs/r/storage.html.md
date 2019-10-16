@@ -14,11 +14,11 @@ Provides a storage resource. This can be used to create, modify and delete stora
 
 The following example shows how one might use this resource to add a storage to gridscale:
 
-```hcl
+```terraform
 resource "gridscale_storage" "storage-john"{
 	name = "john's storage"
 	capacity = 10
-	storage = "storage_high"
+	storage_type = "storage_high"
 	template {
 	    template_uuid = "4db64bfc-9fb2-4976-80b5-94ff43b1233a"
 	    password = "${var.gridscale_password-john}"
@@ -44,14 +44,14 @@ The following arguments are supported:
 
 * `template` - (Optional) List of labels in the format [ "label1", "label2" ].
 
-    * `template_uuid` - (Required) The UUID of a template. This can be found in the [expert panel](https://my.gridscale.io/Expert/Template) by clicking more on the template or by using a gridscale_tempalte datasource.
-    
-    * `password` - (Optional) The root (Linux) or Administrator (Windows) password to set for the installed storage. Valid only for public templates. The password has to be either plaintext or a crypt string (modular crypt format - MCF)..
-    
+    * `template_uuid` - (Required) The UUID of a template. This can be found in the [expert panel](https://my.gridscale.io/Expert/Template) by clicking more on the template or by using a gridscale_template datasource.
+
+    * `password` - (Optional) The root (Linux) or Administrator (Windows) password to set for the installed storage. Valid only for public templates. The password has to be either plain-text or a crypt string (modular crypt format - MCF).
+
     * `password_type` - (Optional) (one of plain, crypt) Required if password is set (ignored for private templates and public Windows templates).
-    
-    * `sshkeys` - (Optional) (array of any - minItems: 0) Public linux templates only! The UUIDs of SSHkeys to install for the root user.
-    
+
+    * `sshkeys` - (Optional) (array of any - minItems: 0) Public Linux templates only! The UUIDs of SSHkeys to install for the root user.
+
     * `hostname` - (Optional) The hostname of the installed server (ignored for private templates and public windows templates).
 
 ~> **Note** When using official templates using either a password and password_type or at least one SSH public key is required. This is not the case when using custom templates. For official templates password authentication for SSH is enabled by default, so be sure to pick a strong password.

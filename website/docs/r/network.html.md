@@ -14,7 +14,7 @@ Provides a network resource. This can be used to create, modify and delete netwo
 
 The following example shows how one might use this resource to add a network to gridscale:
 
-```hcl
+```terraform
 resource "gridscale_network" "networkname"{
 	name = "terraform-network"
 }

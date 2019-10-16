@@ -14,7 +14,7 @@ Provides an IPv4 address resource. This can be used to create, modify and delete
 
 The following example shows how one might use this resource to add an IPv4 address to gridscale:
 
-```hcl
+```terraform
 resource "gridscale_ipv4" "terra-ipv4-test" {
 	name = "terra-test"
 }

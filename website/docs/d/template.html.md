@@ -16,7 +16,7 @@ An error is triggered if the template name does not exist.
 
 Get the template:
 
-```hcl
+```terraform
    data "gridscale_template" "ubuntu" {
      name = "Ubuntu 18.04 LTS"
    }
@@ -24,7 +24,7 @@ Get the template:
 
 Using the template datasource for the creation of a storage:
 
-```hcl
+```terraform
 resource "gridscale_storage" "storage-test"{
 	name = "terra-storage-test"
 	capacity = 10
