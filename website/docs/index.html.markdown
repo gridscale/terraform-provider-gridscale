@@ -10,7 +10,7 @@ description: |-
 
 The gridscale provider is used to interact with many resources supported by gridscale. The provider needs to be configured with the proper credentials before it can be used.
 
-Use the navigation to the left to read about the available data sources.
+Use the navigation to the left to read about the available data sources and resources.
 
 ## Example Usage
 
@@ -26,6 +26,8 @@ resource "gridscale_server" "servername"{
   # ...
 }
 ```
+
+Also make sure to check out our other Terraform examples over at [github.com/gridscale/terraform_examples](https://github.com/gridscale/terraform_examples).
 
 ## Argument Reference
 
