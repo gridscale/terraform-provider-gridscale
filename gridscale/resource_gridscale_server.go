@@ -2,6 +2,7 @@ package gridscale
 
 import (
 	"fmt"
+	relation_manager "github.com/terraform-providers/terraform-provider-gridscale/gridscale/relation-manager"
 	"log"
 	"strings"
 
@@ -514,8 +515,8 @@ func flattenFirewallRuleProperties(props gsclient.FirewallRuleProperties) map[st
 }
 
 func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
-
+	gsc := meta.(*gsclient.Client)
+	serverRelMan := relation_manager.NewServerRelationManger(gsc, d)
 	requestBody := gsclient.ServerCreateRequest{
 		Name:            d.Get("name").(string),
 		Cores:           d.Get("cores").(int),
@@ -530,126 +531,67 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		requestBody.HardwareProfile = gsclient.LegacyServerHardware
 	} else if profile == "nested" {
 		requestBody.HardwareProfile = gsclient.NestedServerHardware
-
 	} else if profile == "cisco_csr" {
 		requestBody.HardwareProfile = gsclient.CiscoCSRServerHardware
-
 	} else if profile == "sophos_utm" {
 		requestBody.HardwareProfile = gsclient.SophosUTMServerHardware
-
 	} else if profile == "f5_bigip" {
 		requestBody.HardwareProfile = gsclient.F5BigipServerHardware
-
 	} else if profile == "q35" {
 		requestBody.HardwareProfile = gsclient.Q35ServerHardware
-
 	} else if profile == "q35_nested" {
 		requestBody.HardwareProfile = gsclient.Q35NestedServerHardware
-
 	} else {
 		requestBody.HardwareProfile = gsclient.DefaultServerHardware
 	}
-
-	requestBody.Relations = &gsclient.ServerCreateRequestRelations{}
-	requestBody.Relations.IsoImages = []gsclient.ServerCreateRequestIsoimage{}
-	requestBody.Relations.Storages = []gsclient.ServerCreateRequestStorage{}
-	requestBody.Relations.Networks = []gsclient.ServerCreateRequestNetwork{}
-	requestBody.Relations.PublicIPs = []gsclient.ServerCreateRequestIP{}
-
-	//Add only the bootable storage during creation
-	//When more than one device is set to bootable, the API is expected to give an error
-	if attr, ok := d.GetOk("storage"); ok {
-		for _, value := range attr.(*schema.Set).List() {
-			storage := value.(map[string]interface{})
-			if storage["bootdevice"].(bool) {
-				createStorageRequest := gsclient.ServerCreateRequestStorage{
-					StorageUUID: storage["object_uuid"].(string),
-					BootDevice:  storage["bootdevice"].(bool),
-				}
-
-				requestBody.Relations.Storages = append(requestBody.Relations.Storages, createStorageRequest)
-			}
-		}
-	}
-
-	if attr, ok := d.GetOk("ipv4"); ok {
-		if client.GetIPVersion(emptyCtx, attr.(string)) != 4 {
-			return fmt.Errorf("The IP address with UUID %v is not version 4", attr.(string))
-		}
-		ip := gsclient.ServerCreateRequestIP{
-			IPaddrUUID: attr.(string),
-		}
-		requestBody.Relations.PublicIPs = append(requestBody.Relations.PublicIPs, ip)
-	}
-	if attr, ok := d.GetOk("ipv6"); ok {
-		if client.GetIPVersion(emptyCtx, attr.(string)) != 6 {
-			return fmt.Errorf("The IP address with UUID %v is not version 6", attr.(string))
-		}
-		ip := gsclient.ServerCreateRequestIP{
-			IPaddrUUID: attr.(string),
-		}
-		requestBody.Relations.PublicIPs = append(requestBody.Relations.PublicIPs, ip)
-	}
-
-	if attr, ok := d.GetOk("isoimage"); ok {
-		createIsoimageRequest := gsclient.ServerCreateRequestIsoimage{
-			IsoimageUUID: attr.(string),
-		}
-		requestBody.Relations.IsoImages = append(requestBody.Relations.IsoImages, createIsoimageRequest)
-	}
-
-	//Add public network if we have an IP
-	if len(requestBody.Relations.PublicIPs) > 0 {
-		publicNetwork, err := client.GetNetworkPublic(emptyCtx)
-		if err != nil {
-			return err
-		}
-		network := gsclient.ServerCreateRequestNetwork{
-			NetworkUUID: publicNetwork.Properties.ObjectUUID,
-		}
-		requestBody.Relations.Networks = append(requestBody.Relations.Networks, network)
-	}
-
-	if attr, ok := d.GetOk("network"); ok {
-		for _, value := range attr.(*schema.Set).List() {
-			network := value.(map[string]interface{})
-			createNetworkRequest := gsclient.ServerCreateRequestNetwork{
-				NetworkUUID: network["object_uuid"].(string),
-				BootDevice:  network["bootdevice"].(bool),
-			}
-			requestBody.Relations.Networks = append(requestBody.Relations.Networks, createNetworkRequest)
-		}
-	}
-
-	response, err := client.CreateServer(emptyCtx, requestBody)
-
+	response, err := gsc.CreateServer(emptyCtx, requestBody)
 	if err != nil {
 		return fmt.Errorf(
 			"Error waiting for server (%s) to be created: %s", requestBody.Name, err)
 	}
-
 	d.SetId(response.ServerUUID)
-
 	log.Printf("[DEBUG] The id for %s has been set to: %v", requestBody.Name, response.ServerUUID)
 
-	//Add the rest of the storages
-	//The server might not boot if more than one storages is attached to a server when it is being created. That is why the rest of the storages are added later. See BUG-191
-	if attr, ok := d.GetOk("storage"); ok {
-		for _, value := range attr.(*schema.Set).List() {
-			storage := value.(map[string]interface{})
-			if !storage["bootdevice"].(bool) {
-				err = client.LinkStorage(emptyCtx, d.Id(), storage["object_uuid"].(string), storage["bootdevice"].(bool))
-				if err != nil {
-					return err
-				}
-			}
-		}
+	//Add server power status to serverPowerStateList
+	serverPowerStateList.addServer(d.Id())
+
+	//Link storages
+	err = serverRelMan.LinkStorages(emptyCtx)
+	if err != nil {
+		return err
+	}
+
+	//Link IPv4
+	err = serverRelMan.LinkIPv4(emptyCtx)
+	if err != nil {
+		return err
+	}
+
+	//Link IPv6
+	err = serverRelMan.LinkIPv6(emptyCtx)
+	if err != nil {
+		return err
+	}
+
+	//Link ISO-Image
+	err = serverRelMan.LinkISOImage(emptyCtx)
+	if err != nil {
+		return err
+	}
+
+	//Link networks
+	err = serverRelMan.LinkNetworks(emptyCtx)
+	if err != nil {
+		return err
 	}
 
 	//Set the power state if needed
 	power := d.Get("power").(bool)
 	if power {
-		client.StartServer(emptyCtx, d.Id())
+		err = serverPowerStateList.startServerSynchronously(emptyCtx, gsc, d.Id())
+		if err != nil {
+			return err
+		}
 	}
 
 	return resourceGridscaleServerRead(d, meta)
