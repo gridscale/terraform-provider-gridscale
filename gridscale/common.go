@@ -100,9 +100,9 @@ func (l *listServersPowerStatus) startServerSynchronously(ctx context.Context, c
 	return fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
 }
 
-//stopServerSynchronously stop the servers synchronously. That means the server
+//shutdownServerSynchronously stop the servers synchronously. That means the server
 //can only be stopped by one goroutine at a time.
-func (l *listServersPowerStatus) stopServerSynchronously(ctx context.Context, c *gsclient.Client, id string) error {
+func (l *listServersPowerStatus) shutdownServerSynchronously(ctx context.Context, c *gsclient.Client, id string) error {
 	//lock the power state of the server
 	l.list[id].mux.Lock()
 	log.Printf("[DEBUG] LOCK ACQUIRED to stop server (%v)", id)
@@ -112,7 +112,7 @@ func (l *listServersPowerStatus) stopServerSynchronously(ctx context.Context, c 
 		log.Printf("[DEBUG] LOCK RELEASED! Server (%v) is stopped", id)
 	}()
 	if _, ok := l.list[id]; ok {
-		err := c.StopServer(ctx, id)
+		err := c.ShutdownServer(ctx, id)
 		if err != nil {
 			return err
 		}
@@ -122,7 +122,7 @@ func (l *listServersPowerStatus) stopServerSynchronously(ctx context.Context, c 
 	return fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
 }
 
-//runActionRequireServerOff runs a specific action (function) after turning off (synchronously) the server successfully
+//runActionRequireServerOff runs a specific action (function) after shutting down (synchronously) the server successfully
 func (l *listServersPowerStatus) runActionRequireServerOff(ctx context.Context, c *gsclient.Client, id string, action actionRequireServerOff) error {
 	//lock the power state of the server
 	l.list[id].mux.Lock()
@@ -133,8 +133,8 @@ func (l *listServersPowerStatus) runActionRequireServerOff(ctx context.Context, 
 		log.Printf("[DEBUG] LOCK RELEASED! Action requiring server (%v) is done", id)
 	}()
 	if _, ok := l.list[id]; ok {
-		//stop the server (synchronously) before running the action
-		err := c.StopServer(ctx, id)
+		//shutdown the server (synchronously) before running the action
+		err := c.ShutdownServer(ctx, id)
 		if err != nil {
 			return err
 		}

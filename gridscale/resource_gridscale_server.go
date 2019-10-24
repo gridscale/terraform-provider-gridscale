@@ -601,7 +601,7 @@ func resourceGridscaleServerDelete(d *schema.ResourceData, meta interface{}) err
 	client := meta.(*gsclient.Client)
 	id := d.Id()
 	//Stop the server synchronously
-	err := serverPowerStateList.stopServerSynchronously(emptyCtx, client, id)
+	err := serverPowerStateList.shutdownServerSynchronously(emptyCtx, client, id)
 	if err != nil {
 		return err
 	}
@@ -682,7 +682,7 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 			return err
 		}
 	} else {
-		err = serverPowerStateList.stopServerSynchronously(emptyCtx, gsc, d.Id())
+		err = serverPowerStateList.shutdownServerSynchronously(emptyCtx, gsc, d.Id())
 		if err != nil {
 			return err
 		}
