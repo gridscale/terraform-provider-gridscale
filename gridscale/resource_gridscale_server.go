@@ -151,6 +151,34 @@ If no single storage is set as boot device. The 1st storage is always the boot s
 							Type:     schema.TypeString,
 							Computed: true,
 						},
+						"rules_v4_in": {
+							Type:     schema.TypeList,
+							Optional: true,
+							Elem: &schema.Resource{
+								Schema: getFirewallRuleCommonSchema(),
+							},
+						},
+						"rules_v4_out": {
+							Type:     schema.TypeList,
+							Optional: true,
+							Elem: &schema.Resource{
+								Schema: getFirewallRuleCommonSchema(),
+							},
+						},
+						"rules_v6_in": {
+							Type:     schema.TypeList,
+							Optional: true,
+							Elem: &schema.Resource{
+								Schema: getFirewallRuleCommonSchema(),
+							},
+						},
+						"rules_v6_out": {
+							Type:     schema.TypeList,
+							Optional: true,
+							Elem: &schema.Resource{
+								Schema: getFirewallRuleCommonSchema(),
+							},
+						},
 						"firewall_template_uuid": {
 							Type:     schema.TypeString,
 							Optional: true,
@@ -246,6 +274,93 @@ If no single storage is set as boot device. The 1st storage is always the boot s
 			},
 		},
 	}
+}
+
+//getFirewallRuleCommonSchema returns schema for custom firewall rules.
+//**Note: Every time `getFirewallRuleCommonSchema()` is called,
+//all `*schema.Schema` in `map[string]*schema.Schema` are different.
+func getFirewallRuleCommonSchema() map[string]*schema.Schema {
+	commonSchema := map[string]schema.Schema{
+		"order": {
+			Type: schema.TypeInt,
+			Description: `The order at which the firewall will compare packets against its rules, 
+a packet will be compared against the first rule, it will either allow it to pass or block it 
+and it won t be matched against any other rules. However, if it does no match the rule, 
+then it will proceed onto rule 2. Packets that do not match any rules are blocked by default.`,
+			Required: true,
+		},
+		"action": {
+			Type:        schema.TypeString,
+			Description: "This defines what the firewall will do. Either accept or drop.",
+			Required:    true,
+			ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
+				valid := false
+				for _, action := range firewallActionTypes {
+					if v.(string) == action {
+						valid = true
+						break
+					}
+				}
+				if !valid {
+					errors = append(errors, fmt.Errorf("%v is not a valid firewall action. Valid firewall actions are: %v", v.(string), strings.Join(firewallActionTypes, ",")))
+				}
+				return
+			},
+		},
+		"protocol": {
+			Type:        schema.TypeString,
+			Description: "Either 'udp' or 'tcp'",
+			Optional:    true,
+			ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
+				valid := false
+				for _, prot := range firewallRuleProtocols {
+					if v.(string) == prot {
+						valid = true
+						break
+					}
+				}
+				if !valid {
+					errors = append(errors, fmt.Errorf("%v is not a valid protocol. Valid protocols are: %v", v.(string), strings.Join(firewallRuleProtocols, ",")))
+				}
+				return
+			},
+		},
+		"dst_port": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "A Number between 1 and 65535, port ranges are seperated by a colon for FTP",
+		},
+		"src_port": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "A Number between 1 and 65535, port ranges are seperated by a colon for FTP",
+		},
+		"src_cidr": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.",
+		},
+		"dst_cidr": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then all IPs have access to this service.",
+		},
+		"comment": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "Comment.",
+		},
+	}
+	//Every time `getFirewallRuleCommonSchema()` is called,
+	//all `*schema.Schema` in `map[string]*schema.Schema` have to be different.
+	//So that new `*schema.Schema` are created.
+	schemaWithPointers := make(map[string]*schema.Schema)
+	for k, v := range commonSchema {
+		newVal := new(schema.Schema)
+		*newVal = v
+		schemaWithPointers[k] = newVal
+	}
+	return schemaWithPointers
 }
 
 func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error {
