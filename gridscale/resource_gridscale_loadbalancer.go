@@ -131,7 +131,7 @@ func resourceGridscaleLoadBalancerCreate(d *schema.ResourceData, meta interface{
 
 	requestBody := gsclient.LoadBalancerCreateRequest{
 		Name:                d.Get("name").(string),
-		Status:              d.Get("status").(string),
+		LocationUUID:        d.Get("location_uuid").(string),
 		RedirectHTTPToHTTPS: d.Get("redirect_http_to_https").(bool),
 		ListenIPv4UUID:      d.Get("listen_ipv4_uuid").(string),
 		ListenIPv6UUID:      d.Get("listen_ipv6_uuid").(string),
@@ -175,6 +175,7 @@ func resourceGridscaleLoadBalancerRead(d *schema.ResourceData, meta interface{})
 
 	d.Set("name", loadbalancer.Properties.Name)
 	d.Set("algorithm", loadbalancer.Properties.Algorithm)
+	d.Set("location_uuid", loadbalancer.Properties.LocationUUID)
 	d.Set("status", loadbalancer.Properties.Status)
 	d.Set("redirect_http_to_https", loadbalancer.Properties.RedirectHTTPToHTTPS)
 	d.Set("listen_ipv4_uuid", loadbalancer.Properties.ListenIPv4UUID)
@@ -199,7 +200,6 @@ func resourceGridscaleLoadBalancerUpdate(d *schema.ResourceData, meta interface{
 	client := meta.(*gsclient.Client)
 	requestBody := gsclient.LoadBalancerUpdateRequest{
 		Name:                d.Get("name").(string),
-		Status:              d.Get("status").(string),
 		RedirectHTTPToHTTPS: d.Get("redirect_http_to_https").(bool),
 		ListenIPv4UUID:      d.Get("listen_ipv4_uuid").(string),
 		ListenIPv6UUID:      d.Get("listen_ipv6_uuid").(string),
