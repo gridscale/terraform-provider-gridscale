@@ -204,7 +204,7 @@ func resourceGridscaleIpDelete(d *schema.ResourceData, meta interface{}) error {
 			return err
 		}
 		deleteIPAction := func(ctx context.Context) error {
-			err = client.DeleteIP(emptyCtx, d.Id())
+			err = client.DeleteIP(ctx, d.Id())
 			return err
 		}
 		//turn the server off and then delete the IP
