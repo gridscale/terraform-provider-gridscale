@@ -131,7 +131,6 @@ func resourceGridscaleLoadBalancerCreate(d *schema.ResourceData, meta interface{
 
 	requestBody := gsclient.LoadBalancerCreateRequest{
 		Name:                d.Get("name").(string),
-		Status:              d.Get("status").(string),
 		RedirectHTTPToHTTPS: d.Get("redirect_http_to_https").(bool),
 		ListenIPv4UUID:      d.Get("listen_ipv4_uuid").(string),
 		ListenIPv6UUID:      d.Get("listen_ipv6_uuid").(string),
