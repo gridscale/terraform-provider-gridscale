@@ -18,8 +18,8 @@ type ServerRelationManger struct {
 	data *schema.ResourceData
 }
 
-//NewServerDepClient creates a new instance DependencyClient
-func NewServerDepClient(gsc *gsclient.Client, d *schema.ResourceData) *ServerRelationManger {
+//NewServerRelationManger creates a new instance ServerRelationManger
+func NewServerRelationManger(gsc *gsclient.Client, d *schema.ResourceData) *ServerRelationManger {
 	return &ServerRelationManger{gsc, d}
 }
 
