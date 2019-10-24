@@ -2,14 +2,14 @@ package gridscale
 
 import (
 	"context"
-	"errors"
+	"fmt"
 	"github.com/gridscale/gsclient-go"
 	"log"
 	"sync"
 )
 
 //serverPowerStatus represents power state of a server
-//mutex is used to lock the resource when a goroutine changes a server's
+//mutex is used to lock the resource when a goroutine changes/reads a server's
 //power state, so it prevents other goroutines from accessing/modifying the server's power state
 type serverPowerStatus struct {
 	power bool
@@ -59,10 +59,10 @@ func (l *listServersPowerStatus) removeServer(id string) error {
 		delete(l.list, id)
 		return nil
 	}
-	return errors.New("server does not exist in current list of servers in terraform")
+	return fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
 }
 
-//getServerPowerStatus returns power state of a server in the list
+//getServerPowerStatus returns power state of a server in the list (synchronously)
 func (l *listServersPowerStatus) getServerPowerStatus(id string) (bool, error) {
 	//lock the power state of the server
 	l.list[id].mux.Lock()
@@ -75,10 +75,12 @@ func (l *listServersPowerStatus) getServerPowerStatus(id string) (bool, error) {
 	if _, ok := l.list[id]; ok {
 		return l.list[id].power, nil
 	}
-	return false, errors.New("server does not exist in current list of servers in terraform")
+	return false, fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
 }
 
-func (l *listServersPowerStatus) enhancedStartServer(ctx context.Context, c *gsclient.Client, id string) error {
+//startServerSynchronously starts the servers synchronously. That means the server
+//can only be started by one goroutine at a time.
+func (l *listServersPowerStatus) startServerSynchronously(ctx context.Context, c *gsclient.Client, id string) error {
 	//lock the power state of the server
 	l.list[id].mux.Lock()
 	log.Printf("[DEBUG] LOCK ACQUIRED to start server (%v)", id)
@@ -95,10 +97,12 @@ func (l *listServersPowerStatus) enhancedStartServer(ctx context.Context, c *gsc
 		l.list[id].power = true
 		return nil
 	}
-	return errors.New("server does not exist in current list of serversin terraform")
+	return fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
 }
 
-func (l *listServersPowerStatus) enhancedStopServer(ctx context.Context, c *gsclient.Client, id string) error {
+//stopServerSynchronously stop the servers synchronously. That means the server
+//can only be stopped by one goroutine at a time.
+func (l *listServersPowerStatus) stopServerSynchronously(ctx context.Context, c *gsclient.Client, id string) error {
 	//lock the power state of the server
 	l.list[id].mux.Lock()
 	log.Printf("[DEBUG] LOCK ACQUIRED to stop server (%v)", id)
@@ -115,9 +119,10 @@ func (l *listServersPowerStatus) enhancedStopServer(ctx context.Context, c *gscl
 		l.list[id].power = false
 		return nil
 	}
-	return errors.New("server does not exist in current list of servers")
+	return fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
 }
 
+//runActionRequireServerOff runs a specific action (function) after turning off (synchronously) the server successfully
 func (l *listServersPowerStatus) runActionRequireServerOff(ctx context.Context, c *gsclient.Client, id string, action actionRequireServerOff) error {
 	//lock the power state of the server
 	l.list[id].mux.Lock()
@@ -128,6 +133,7 @@ func (l *listServersPowerStatus) runActionRequireServerOff(ctx context.Context, 
 		log.Printf("[DEBUG] LOCK RELEASED! Action requiring server (%v) is done", id)
 	}()
 	if _, ok := l.list[id]; ok {
+		//stop the server (synchronously) before running the action
 		err := c.StopServer(ctx, id)
 		if err != nil {
 			return err
@@ -137,7 +143,7 @@ func (l *listServersPowerStatus) runActionRequireServerOff(ctx context.Context, 
 		err = action()
 		return err
 	}
-	return errors.New("server does not exist in current list of servers")
+	return fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
 }
 
 //currentServersPowerStatus global list of all servers' power states in terraform
