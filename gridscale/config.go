@@ -12,6 +12,8 @@ var storageTypes = []string{"storage", "storage_high", "storage_insane"}
 var availabilityZones = []string{"a", "b", "c"}
 var loadbalancerAlgs = []string{"roundrobin", "leastconn"}
 var passwordTypes = []string{"plain", "crypt"}
+var firewallActionTypes = []string{"accept", "drop"}
+var firewallRuleProtocols = []string{"udp", "tcp"}
 var emptyCtx = context.Background()
 
 type Config struct {
