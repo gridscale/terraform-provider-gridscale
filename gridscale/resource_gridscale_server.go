@@ -73,8 +73,8 @@ func resourceGridscaleServer() *schema.Resource {
 				Type:     schema.TypeList,
 				Optional: true,
 				MaxItems: 8,
-				Description: `A list of storages attached to the server. 
-If no single storage is set as boot device. The 1st storage is always the boot storage.`,
+				Description: `A list of storages attached to the server. The storage in the 1st order of the list is always the boot storage.
+In order to replace the boot storage, the new boot storage must be placed in the 1st order of the list.`,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"object_uuid": {
@@ -83,7 +83,6 @@ If no single storage is set as boot device. The 1st storage is always the boot s
 						},
 						"bootdevice": {
 							Type:     schema.TypeBool,
-							Optional: true,
 							Computed: true,
 						},
 						"object_name": {

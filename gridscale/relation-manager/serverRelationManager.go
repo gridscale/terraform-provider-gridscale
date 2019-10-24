@@ -42,7 +42,7 @@ func (c *ServerRelationManger) LinkStorages(ctx context.Context) error {
 	if attr, ok := d.GetOk("storage"); ok {
 		for _, value := range attr.([]interface{}) {
 			storage := value.(map[string]interface{})
-			err := client.LinkStorage(ctx, d.Id(), storage["object_uuid"].(string), storage["bootdevice"].(bool))
+			err := client.LinkStorage(ctx, d.Id(), storage["object_uuid"].(string), false)
 			if err != nil {
 				return fmt.Errorf(
 					"Error waiting for storage (%s) to be attached to server (%s): %s",
