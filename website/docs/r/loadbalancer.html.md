@@ -32,8 +32,35 @@ resource "gridscale_loadbalancer" "foo" {
 }
 ```
 
-## Attributes Reference
+## Argument Reference
 
-The following attributes are exported:
+The following arguments are supported:
+
+* `name` - (Required) The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+
+* `location_uuid` - (Optional) Helps to identify which datacenter an object belongs to. Frankfurt is the default.
+
+* `redirect_http_to_https` - (Required) Whether the loadbalancer is forced to redirect requests from HTTP to HTTPS.
+
+* `listen_ipv4_uuid` - (Required) The UUID of the IPv4 address the loadbalancer will listen to for incoming requests.
+
+* `listen_ipv6_uuid` - (Required) The UUID of the IPv6 address the loadbalancer will listen to for incoming requests.
+
+* `algorithm` - (Required) The algorithm used to process requests. Accepted values: roundrobin/leastconn.
+
+* `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
+
+## Attributes
+
+This resource exports the following attributes:
 
 * `id` - The UUID of the loadbalancer.
+* `name` - The human-readable name of the loadbalancer.
+* `algorithm` - The algorithm used to process requests.
+* `status` - The status of the loadbalancer.
+* `redirect_http_to_https` - Whether the Load balancer is forced to redirect requests from HTTP to HTTPS.
+* `listen_ipv4_uuid` - The UUID of the IPv4 address the loadbalancer will listen to for incoming requests.
+* `listen_ipv6_uuid` - The UUID of the IPv6 address the loadbalancer will listen to for incoming requests.
+* `forwarding_rule` - The forwarding rules of the loadbalancer.
+* `backend_server` - The servers that the loadbalancer can communicate with.
+* `labels` - The list of labels.
