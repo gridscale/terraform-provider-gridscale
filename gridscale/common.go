@@ -146,8 +146,8 @@ func (l *listServersPowerStatus) runActionRequireServerOff(ctx context.Context, 
 	return fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
 }
 
-//currentServersPowerStatus global list of all servers' power states in terraform
-var currentServersPowerStatus = listServersPowerStatus{
+//serverPowerStateList global list of all servers' power states in terraform
+var serverPowerStateList = listServersPowerStatus{
 	list: make(map[string]*serverPowerStatus),
 }
 
