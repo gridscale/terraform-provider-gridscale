@@ -13,7 +13,7 @@ func TestAccdataSourceGridscaleSSHKey_basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckDataSourceGridscaleSshkeyDestroyCheck,
+		CheckDestroy: testAccCheckGridscaleSshkeyDestroyCheck,
 		Steps: []resource.TestStep{
 			{
 

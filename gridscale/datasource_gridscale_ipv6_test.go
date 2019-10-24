@@ -13,7 +13,7 @@ func TestAccdataSourceGridscaleIPv6_basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckDataSourceGridscaleIpv6DestroyCheck,
+		CheckDestroy: testAccCheckGridscaleIpv6DestroyCheck,
 		Steps: []resource.TestStep{
 			{
 

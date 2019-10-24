@@ -18,7 +18,7 @@ func TestAccResourceGridscaleLoadBalancerBasic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckResourceGridscaleLoadBalancerDestroyCheck,
+		CheckDestroy: testAccCheckGridscaleLoadBalancerDestroyCheck,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCheckResourceGridscaleLoadBalancerConfig_basic(name, "leastconn"),
@@ -136,7 +136,7 @@ resource "gridscale_loadbalancer" "foo" {
 }`, name, name, name, name, algorithm)
 }
 
-func testAccCheckResourceGridscaleLoadBalancerDestroyCheck(s *terraform.State) error {
+func testAccCheckGridscaleLoadBalancerDestroyCheck(s *terraform.State) error {
 	client := testAccProvider.Meta().(*gsclient.Client)
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gridscale_loadbalancer" {

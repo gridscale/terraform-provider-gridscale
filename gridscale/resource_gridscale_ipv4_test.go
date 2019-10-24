@@ -11,27 +11,27 @@ import (
 	"github.com/gridscale/gsclient-go"
 )
 
-func TestAccDataSourceGridscaleIpv4_Basic(t *testing.T) {
+func TestAccResourceGridscaleIpv4_Basic(t *testing.T) {
 	var object gsclient.IP
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckDataSourceGridscaleIpv4DestroyCheck,
+		CheckDestroy: testAccCheckGridscaleIpv4DestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckDataSourceGridscaleIpv4Config_basic(name),
+				Config: testAccCheckResourceGridscaleIpv4Config_basic(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckDataSourceGridscaleIpv4Exists("gridscale_ipv4.foo", &object),
+					testAccCheckResourceGridscaleIpv4Exists("gridscale_ipv4.foo", &object),
 					resource.TestCheckResourceAttr(
 						"gridscale_ipv4.foo", "name", name),
 				),
 			},
 			{
-				Config: testAccCheckDataSourceGridscaleIpv4Config_basic_update(),
+				Config: testAccCheckResourceGridscaleIpv4Config_basic_update(),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckDataSourceGridscaleIpv4Exists("gridscale_ipv4.foo", &object),
+					testAccCheckResourceGridscaleIpv4Exists("gridscale_ipv4.foo", &object),
 					resource.TestCheckResourceAttr(
 						"gridscale_ipv4.foo", "name", "newname"),
 					resource.TestCheckResourceAttr(
@@ -44,7 +44,7 @@ func TestAccDataSourceGridscaleIpv4_Basic(t *testing.T) {
 	})
 }
 
-func testAccCheckDataSourceGridscaleIpv4Exists(n string, object *gsclient.IP) resource.TestCheckFunc {
+func testAccCheckResourceGridscaleIpv4Exists(n string, object *gsclient.IP) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 
@@ -76,7 +76,7 @@ func testAccCheckDataSourceGridscaleIpv4Exists(n string, object *gsclient.IP) re
 	}
 }
 
-func testAccCheckDataSourceGridscaleIpv4DestroyCheck(s *terraform.State) error {
+func testAccCheckGridscaleIpv4DestroyCheck(s *terraform.State) error {
 	client := testAccProvider.Meta().(*gsclient.Client)
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gridscale_ipv4" {
@@ -100,7 +100,7 @@ func testAccCheckDataSourceGridscaleIpv4DestroyCheck(s *terraform.State) error {
 	return nil
 }
 
-func testAccCheckDataSourceGridscaleIpv4Config_basic(name string) string {
+func testAccCheckResourceGridscaleIpv4Config_basic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_ipv4" "foo" {
   name   = "%s"
@@ -108,7 +108,7 @@ resource "gridscale_ipv4" "foo" {
 `, name)
 }
 
-func testAccCheckDataSourceGridscaleIpv4Config_basic_update() string {
+func testAccCheckResourceGridscaleIpv4Config_basic_update() string {
 	return fmt.Sprintf(`
 resource "gridscale_ipv4" "foo" {
   name   = "newname"
