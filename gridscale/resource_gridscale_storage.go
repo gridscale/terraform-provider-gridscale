@@ -1,6 +1,7 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strings"
@@ -277,5 +278,33 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 
 func resourceGridscaleStorageDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
+	storage, err := client.GetStorage(emptyCtx, d.Id())
+	if err != nil {
+		return err
+	}
+
+	//Stop all server relating to this IP address if there is one
+	for _, server := range storage.Properties.Relations.Servers {
+		powerStatus, err := serverPowerStateList.getServerPowerStatus(server.ObjectUUID)
+		if err != nil {
+			return err
+		}
+		unlinkStorageAction := func(ctx context.Context) error {
+			err = client.UnlinkStorage(ctx, server.ObjectUUID, d.Id())
+			return err
+		}
+		err = serverPowerStateList.runActionRequireServerOff(emptyCtx, client, server.ObjectUUID, unlinkStorageAction)
+		if err != nil {
+			return err
+		}
+		//If the server was originally ON, turn it back on
+		if powerStatus {
+			err = serverPowerStateList.startServerSynchronously(emptyCtx, client, server.ObjectUUID)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
 	return client.DeleteStorage(emptyCtx, d.Id())
 }
