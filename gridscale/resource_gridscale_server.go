@@ -418,22 +418,7 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 	}
 
 	//Get networks
-	networks := make([]interface{}, 0)
-	for _, value := range server.Properties.Relations.Networks {
-		if !value.PublicNet {
-			network := map[string]interface{}{
-				"object_uuid":            value.ObjectUUID,
-				"bootdevice":             value.BootDevice,
-				"create_time":            value.CreateTime.String(),
-				"mac":                    value.Mac,
-				"firewall_template_uuid": value.FirewallTemplateUUID,
-				"object_name":            value.ObjectName,
-				"network_type":           value.NetworkType,
-				"ordering":               value.Ordering,
-			}
-			networks = append(networks, network)
-		}
-	}
+	networks := readServerNetworkRels(server.Properties.Relations.Networks)
 	if err = d.Set("network", networks); err != nil {
 		return fmt.Errorf("Error setting network: %v", err)
 	}
