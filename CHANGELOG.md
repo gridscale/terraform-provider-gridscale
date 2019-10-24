@@ -11,6 +11,7 @@ IMPROVEMENTS:
 * Fix issue #12: Reducing cores / memory does not cause server shutdown (https://github.com/terraform-providers/terraform-provider-gridscale/issues/12)
 * Add tests for all available datasource
 * Fix all datasources missing `Schema`
+* Update website/docs
 
 ## 1.2.0 (July 30, 2019)
 
