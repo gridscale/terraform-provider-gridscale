@@ -27,7 +27,7 @@ type listServersPowerStatus struct {
 
 //actionRequireServerOff signature of a function that requires a server to be off
 //in order to run
-type actionRequireServerOff func() error
+type actionRequireServerOff func(ctx context.Context) error
 
 //addServer adds a server power state to the list
 func (l *listServersPowerStatus) addServer(id string) {
@@ -140,7 +140,7 @@ func (l *listServersPowerStatus) runActionRequireServerOff(ctx context.Context, 
 		}
 		l.list[id].power = false
 		//run action function
-		err = action()
+		err = action(ctx)
 		return err
 	}
 	return fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
