@@ -37,3 +37,16 @@ resource "gridscale_server" "servername"{
 The following attributes are exported:
 
 * `id` - The UUID of the ip.
+* `ip` - Defines the IP Address (v4 or v6) the ip.
+* `prefix` - The IP prefix of the ip.
+* `location_uuid` - The UUID of the location, that helps to identify which datacenter an object belongs to.
+* `failover` - failover mode of this ip. If true, then this IP is no longer available for DHCP and can no longer be related to any server..
+* `status` - The status of the ip.
+* `reverse_dns` - The reverse DNS of the ip.
+* `location_country` - The human-readable name of the country of the ip.
+* `location_name` - The human-readable name of the location of the ip.
+* `create_time` - The date and time the ip was initially created.
+* `change_time` - The date and time of the last ip change.
+* `delete_block` - Defines if the ip is administratively blocked.
+* `usage_in_minutes` - Total minutes the ip has been running.
+* `current_price` - The price for the current period since the last bill.
