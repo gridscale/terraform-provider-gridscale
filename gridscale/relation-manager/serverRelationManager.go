@@ -131,7 +131,7 @@ func (c *ServerRelationManger) LinkNetworks(ctx context.Context) error {
 				ctx,
 				d.Id(),
 				network["object_uuid"].(string),
-				"",
+				network["firewall_template_uuid"].(string),
 				network["bootdevice"].(bool),
 				0,
 				nil,
