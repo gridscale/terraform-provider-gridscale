@@ -175,6 +175,7 @@ func resourceGridscaleLoadBalancerRead(d *schema.ResourceData, meta interface{})
 
 	d.Set("name", loadbalancer.Properties.Name)
 	d.Set("algorithm", loadbalancer.Properties.Algorithm)
+	d.Set("location_uuid", loadbalancer.Properties.LocationUUID)
 	d.Set("status", loadbalancer.Properties.Status)
 	d.Set("redirect_http_to_https", loadbalancer.Properties.RedirectHTTPToHTTPS)
 	d.Set("listen_ipv4_uuid", loadbalancer.Properties.ListenIPv4UUID)
