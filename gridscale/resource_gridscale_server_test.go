@@ -110,22 +110,86 @@ func testAccCheckResourceGridscaleServerDestroyCheck(s *terraform.State) error {
 
 func testAccCheckResourceGridscaleServerConfig_basic(name string) string {
 	return fmt.Sprintf(`
+resource "gridscale_ipv4" "foo" {
+  name   = "ip-%s"
+}
+resource "gridscale_network" "foo" {
+  name   = "net-%s"
+}
+resource "gridscale_storage" "foo" {
+  name   = "storage- %s"
+  capacity = 1
+}
 resource "gridscale_server" "foo" {
   name   = "%s"
   cores = 2
   memory = 2
   power = true
+  ipv4 = "${gridscale_ipv4.foo.id}"
+  network {
+		object_uuid = "${gridscale_network.foo.id}"
+		rules_v4_in {
+				order = 0
+				action = "drop"
+				dst_port = "20:80"
+				comment = "test"
+		}
+		rules_v4_out {
+				order = 1
+				action = "drop"
+				dst_port = "80:443"
+				comment = "test1"
+		}
+		rules_v6_in	{
+				order = 2
+				action = "drop"
+				dst_port = "100:500"
+				comment = "test2"
+		}
+  	}
+  storage {
+  	object_uuid = gridscale_storage.foo.id
+  }
 }
-`, name)
+`, name, name, name, name)
 }
 
 func testAccCheckResourceGridscaleServerConfig_basic_update() string {
 	return fmt.Sprintf(`
+resource "gridscale_ipv4" "foo1" {
+  name   = "newname"
+}
+resource "gridscale_network" "foo" {
+  name   = "newname"
+}
+resource "gridscale_storage" "foo1" {
+  name   = "newname"
+  capacity = 1
+}
 resource "gridscale_server" "foo" {
   name   = "newname"
   cores = 1
   memory = 1
   power = true
+  ipv4 = "${gridscale_ipv4.foo1.id}"
+  network {
+		object_uuid = "${gridscale_network.foo.id}"
+		rules_v4_in {
+				order = 0
+				action = "drop"
+				dst_port = "20:80"
+				comment = "test"
+		}
+		rules_v6_in	{
+				order = 1
+				action = "drop"
+				dst_port = "10:20"
+				comment = "test1"
+		}
+  	}
+  storage {
+  	object_uuid = gridscale_storage.foo1.id
+  }
 }
 `)
 }
