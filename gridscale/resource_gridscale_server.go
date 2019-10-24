@@ -1,6 +1,7 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
 	relation_manager "github.com/terraform-providers/terraform-provider-gridscale/gridscale/relation-manager"
 	"log"
@@ -616,29 +617,10 @@ func resourceGridscaleServerDelete(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
-	shutdownRequired := false
-
+	gsc := meta.(*gsclient.Client)
+	serverDepClient := relation_manager.NewServerRelationManger(gsc, d)
+	shutdownRequired := serverDepClient.IsShutdownRequired(emptyCtx)
 	var err error
-
-	if d.HasChange("cores") {
-		old, new := d.GetChange("cores")
-		if new.(int) < old.(int) || d.Get("legacy").(bool) { //Legacy systems don't support updating the memory while running
-			shutdownRequired = true
-		}
-	}
-
-	if d.HasChange("memory") {
-		old, new := d.GetChange("memory")
-		if new.(int) < old.(int) || d.Get("legacy").(bool) { //Legacy systems don't support updating the memory while running
-			shutdownRequired = true
-		}
-	}
-
-	if d.HasChange("ipv4") || d.HasChange("ipv6") || d.HasChange("storage") || d.HasChange("network") {
-		shutdownRequired = true
-	}
-
 	requestBody := gsclient.ServerUpdateRequest{
 		Name:            d.Get("name").(string),
 		AvailablityZone: d.Get("availability_zone").(string),
@@ -647,165 +629,64 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 		Memory:          d.Get("memory").(int),
 	}
 
-	//The ShutdownServer command will check if the server is running and shut it down if it is running, so no extra checks are needed here
 	if shutdownRequired {
-		err = client.ShutdownServer(emptyCtx, d.Id())
+		updateSequence := func(ctx context.Context) error {
+			//Execute the update request
+			err = gsc.UpdateServer(ctx, d.Id(), requestBody)
+			if err != nil {
+				return err
+			}
+
+			//Update relationship between the server and IP addresses
+			err = serverDepClient.UpdateIPv4Rel(ctx)
+			if err != nil {
+				return err
+			}
+			err = serverDepClient.UpdateIPv6Rel(ctx)
+			if err != nil {
+				return err
+			}
+
+			//Update relationship between the server and networks
+			err = serverDepClient.UpdateNetworksRel(ctx)
+			if err != nil {
+				return err
+			}
+
+			//Update relationship between the server and storages
+			err = serverDepClient.UpdateStoragesRel(ctx)
+			return err
+		}
+		err = serverPowerStateList.runActionRequireServerOff(emptyCtx, gsc, d.Id(), updateSequence)
+		if err != nil {
+			return err
+		}
+	} else {
+		//Execute the update request
+		err = gsc.UpdateServer(emptyCtx, d.Id(), requestBody)
 		if err != nil {
 			return err
 		}
 	}
 
-	//Execute the update request
-	err = client.UpdateServer(emptyCtx, d.Id(), requestBody)
+	//Update relationship between the server and an ISO-image
+	err = serverDepClient.UpdateISOImageRel(emptyCtx)
 	if err != nil {
 		return err
-	}
-
-	//Link/unlink isoimages
-	if d.HasChange("isoimage") {
-		oldIso, newIso := d.GetChange("isoimage")
-		if newIso == "" {
-			err = client.UnlinkIsoImage(emptyCtx, d.Id(), oldIso.(string))
-		} else {
-			err = client.UnlinkIsoImage(emptyCtx, d.Id(), newIso.(string))
-		}
-		if err != nil {
-			return err
-		}
-	}
-
-	//Link/Unlink ip addresses
-	var needsPublicNetwork = true
-	if d.HasChange("ipv4") {
-		oldIp, newIp := d.GetChange("ipv4")
-		if newIp == "" {
-			err = client.UnlinkIP(emptyCtx, d.Id(), oldIp.(string))
-		} else {
-			err = client.LinkIP(emptyCtx, d.Id(), newIp.(string))
-		}
-		if err != nil {
-			return err
-		}
-		if oldIp != "" {
-			needsPublicNetwork = false
-		}
-	}
-	if d.HasChange("ipv6") {
-		oldIp, newIp := d.GetChange("ipv6")
-		if newIp == "" {
-			err = client.UnlinkIP(emptyCtx, d.Id(), oldIp.(string))
-		} else {
-			err = client.LinkIP(emptyCtx, d.Id(), newIp.(string))
-		}
-		if err != nil {
-			return err
-		}
-		if oldIp != "" {
-			needsPublicNetwork = false
-		}
-	}
-	//Disconnect from the public network if there is no longer and IP
-	if (d.HasChange("ipv6") || d.HasChange("ipv4")) && d.Get("ipv6").(string) == "" && d.Get("ipv4").(string) == "" {
-		publicNetwork, err := client.GetNetworkPublic(emptyCtx)
-		if err != nil {
-			return err
-		}
-		err = client.UnlinkNetwork(emptyCtx, d.Id(), publicNetwork.Properties.ObjectUUID)
-		if err != nil {
-			return err
-		}
-	}
-	//Connect to the public network if an IP was added
-	if (d.HasChange("ipv6") || d.HasChange("ipv4")) && needsPublicNetwork {
-		publicNetwork, err := client.GetNetworkPublic(emptyCtx)
-		if err != nil {
-			return err
-		}
-		err = client.LinkNetwork(emptyCtx, d.Id(), publicNetwork.Properties.ObjectUUID, "", false, 0, nil, nil)
-		if err != nil {
-			return err
-		}
-	}
-
-	//Link/unlink networks
-	//It currently unlinks and relinks all networks if any network has changed. This could probably be done better, but this way is easy and works well
-	if d.HasChange("network") {
-		oldNetworks, newNetworks := d.GetChange("network")
-		for _, value := range oldNetworks.(*schema.Set).List() {
-			network := value.(map[string]interface{})
-			if network["object_uuid"].(string) != "" {
-				err = client.UnlinkNetwork(emptyCtx, d.Id(), network["object_uuid"].(string))
-				if err != nil {
-					return err
-				}
-			}
-		}
-		for _, value := range newNetworks.(*schema.Set).List() {
-			network := value.(map[string]interface{})
-			if network["object_uuid"].(string) != "" {
-				err = client.LinkNetwork(emptyCtx, d.Id(), network["object_uuid"].(string), "", network["bootdevice"].(bool), 0, nil, nil)
-				if err != nil {
-					return err
-				}
-			}
-
-		}
-	}
-
-	//Link/unlink storages
-	if d.HasChange("storage") {
-		oldStorages, newStorages := d.GetChange("storage")
-
-		//unlink old storages if needed
-		for _, value := range oldStorages.(*schema.Set).List() {
-			oldStorage := value.(map[string]interface{})
-			unlink := true
-			for _, value := range newStorages.(*schema.Set).List() {
-				newStorage := value.(map[string]interface{})
-				if oldStorage["object_uuid"].(string) == newStorage["object_uuid"].(string) {
-					unlink = false
-					break
-				}
-			}
-			if unlink {
-				err = client.UnlinkStorage(emptyCtx, d.Id(), oldStorage["object_uuid"].(string))
-				if err != nil {
-					return err
-				}
-			}
-		}
-
-		//link new storages if needed
-		for _, value := range newStorages.(*schema.Set).List() {
-			newStorage := value.(map[string]interface{})
-			link := true
-			for _, value := range oldStorages.(*schema.Set).List() {
-				oldStorage := value.(map[string]interface{})
-				if oldStorage["object_uuid"].(string) == newStorage["object_uuid"].(string) {
-					link = false
-					break
-				}
-			}
-			if link {
-				err = client.LinkStorage(emptyCtx, d.Id(), newStorage["object_uuid"].(string), newStorage["bootdevice"].(bool))
-				if err != nil {
-					return err
-				}
-			}
-		}
 	}
 
 	// Make sure the server in is the expected power state.
 	// The StartServer and ShutdownServer functions do a check to see if the server isn't already running, so we don't need to do that here.
 	if d.Get("power").(bool) {
-		err = client.StartServer(emptyCtx, d.Id())
+		err = serverPowerStateList.startServerSynchronously(emptyCtx, gsc, d.Id())
+		if err != nil {
+			return err
+		}
 	} else {
-		err = client.ShutdownServer(emptyCtx, d.Id())
+		err = serverPowerStateList.stopServerSynchronously(emptyCtx, gsc, d.Id())
+		if err != nil {
+			return err
+		}
 	}
-	if err != nil {
-		return err
-	}
-
 	return resourceGridscaleServerRead(d, meta)
-
 }
