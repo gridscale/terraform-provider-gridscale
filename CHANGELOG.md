@@ -2,13 +2,13 @@
 
 FEATURES:
 
-* Add datasource for all available resource
+* Add datasource for all available resources
 
 IMPROVEMENTS:
 
 * Switch to gsclient-go v2.0.0 from github
-* Fix issue: Terraform destroy raises error when instances powered up (https://github.com/terraform-providers/terraform-provider-gridscale/issues/13)
-* Fix issue: Reducing cores / memory does not cause server shutdown (https://github.com/terraform-providers/terraform-provider-gridscale/issues/12)
+* Fix issue #13: Terraform destroy raises error when instances powered up (https://github.com/terraform-providers/terraform-provider-gridscale/issues/13)
+* Fix issue #12: Reducing cores / memory does not cause server shutdown (https://github.com/terraform-providers/terraform-provider-gridscale/issues/12)
 * Add tests for all available datasource
 * Fix all datasources missing `Schema`
 
