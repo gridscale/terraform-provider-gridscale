@@ -1,6 +1,7 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"time"
@@ -189,5 +190,36 @@ func resourceGridscaleIpv4Create(d *schema.ResourceData, meta interface{}) error
 
 func resourceGridscaleIpDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
+	ip, err := client.GetIP(emptyCtx, d.Id())
+	if err != nil {
+		return err
+	}
+	//Stop the server relating to this IP address if there is one
+	//ip server relation is 1-1 relation
+	if len(ip.Properties.Relations.Servers) == 1 {
+		server := ip.Properties.Relations.Servers[0]
+		//Get the power state of the server before turning it off
+		powerState, err := serverPowerStateList.getServerPowerStatus(server.ServerUUID)
+		if err != nil {
+			return err
+		}
+		deleteIPAction := func(ctx context.Context) error {
+			err = client.DeleteIP(emptyCtx, d.Id())
+			return err
+		}
+		//turn the server off and then delete the IP
+		err = serverPowerStateList.runActionRequireServerOff(emptyCtx, client, server.ServerUUID, deleteIPAction)
+		if err != nil {
+			return err
+		}
+		//If the server was originally ON, turn it back on
+		if powerState {
+			err = serverPowerStateList.startServerSynchronously(emptyCtx, client, server.ServerUUID)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	}
 	return client.DeleteIP(emptyCtx, d.Id())
 }
