@@ -41,3 +41,9 @@ resource "gridscale_storage" "storagename"{
 The following attributes are exported:
 
 * `id` - The UUID of the sshkey.
+* `name` - The human-readable name of the sshkey.
+* `sshkey` - The OpenSSH public key string of the sshkey.
+* `status` - The status of the sshkey.
+* `create_time` - The date and time of the sshkey was initially created.
+* `change_time` - The date and time of the last sshkey change.
+* `labels` - The list of labels.
