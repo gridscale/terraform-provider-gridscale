@@ -82,7 +82,7 @@ If no single storage is set as boot device. The 1st storage is always the boot s
 						"bootdevice": {
 							Type:     schema.TypeBool,
 							Optional: true,
-							Default:  false,
+							Computed: true,
 						},
 						"object_name": {
 							Type:     schema.TypeString,
@@ -141,7 +141,7 @@ If no single storage is set as boot device. The 1st storage is always the boot s
 						"bootdevice": {
 							Type:     schema.TypeBool,
 							Optional: true,
-							Default:  false,
+							Computed: true,
 						},
 						"object_name": {
 							Type:     schema.TypeString,
@@ -153,7 +153,7 @@ If no single storage is set as boot device. The 1st storage is always the boot s
 						},
 						"firewall_template_uuid": {
 							Type:     schema.TypeString,
-							Computed: true,
+							Optional: true,
 						},
 						"partner_uuid": {
 							Type:     schema.TypeString,
