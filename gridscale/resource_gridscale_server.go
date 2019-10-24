@@ -460,6 +460,74 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 	return nil
 }
 
+//readServerNetworkRels extract relationships between server and networks
+func readServerNetworkRels(serverNetRels []gsclient.ServerNetworkRelationProperties) []interface{} {
+	networks := make([]interface{}, 0)
+	for _, rel := range serverNetRels {
+		network := map[string]interface{}{
+			"object_uuid":            rel.ObjectUUID,
+			"bootdevice":             rel.BootDevice,
+			"create_time":            rel.CreateTime.String(),
+			"mac":                    rel.Mac,
+			"firewall_template_uuid": rel.FirewallTemplateUUID,
+			"object_name":            rel.ObjectName,
+			"network_type":           rel.NetworkType,
+			"ordering":               rel.Ordering,
+		}
+		//Init all types of firewall rule
+		v4InRuleProps := make([]interface{}, 0)
+		v4OutRuleProps := make([]interface{}, 0)
+		v6InRuleProps := make([]interface{}, 0)
+		v6OutRuleProps := make([]interface{}, 0)
+
+		//Add rules of type rules_v4_in
+		for _, props := range rel.Firewall.RulesV4In {
+			v4InRuleProp := flattenFirewallRuleProperties(props)
+			v4InRuleProps = append(v4InRuleProps, v4InRuleProp)
+		}
+		network["rules_v4_in"] = v4InRuleProps
+
+		//Add rules of type rules_v4_out
+		for _, props := range rel.Firewall.RulesV4Out {
+			v4OutRuleProp := flattenFirewallRuleProperties(props)
+			v4OutRuleProps = append(v4OutRuleProps, v4OutRuleProp)
+		}
+		network["rules_v4_out"] = v4OutRuleProps
+
+		//Add rules of type rules_v6_in
+		for _, props := range rel.Firewall.RulesV6In {
+			v6InRuleProp := flattenFirewallRuleProperties(props)
+			v6InRuleProps = append(v6InRuleProps, v6InRuleProp)
+		}
+		network["rules_v6_in"] = v6InRuleProps
+
+		//Add rules of type rules_v6_out
+		for _, props := range rel.Firewall.RulesV6Out {
+			v6OutRuleProp := flattenFirewallRuleProperties(props)
+			v6OutRuleProps = append(v6OutRuleProps, v6OutRuleProp)
+		}
+		network["rules_v6_out"] = v6OutRuleProps
+
+		networks = append(networks, network)
+	}
+	return networks
+}
+
+//flattenFirewallRuleProperties converts variable of type gsclient.FirewallRuleProperties to
+//map[string]interface{}
+func flattenFirewallRuleProperties(props gsclient.FirewallRuleProperties) map[string]interface{} {
+	return map[string]interface{}{
+		"order":    props.Order,
+		"action":   props.Action,
+		"protocol": props.Protocol,
+		"dst_port": props.DstPort,
+		"src_port": props.SrcPort,
+		"src_cidr": props.SrcCidr,
+		"dst_cidr": props.DstCidr,
+		"comment":  props.Comment,
+	}
+}
+
 func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 
