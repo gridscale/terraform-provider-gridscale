@@ -34,8 +34,7 @@ func (c ServerRelationManger) getData() *schema.ResourceData {
 }
 
 //LinkStorages links storages to a server
-//**Note: if no storage is set as the boot device. The storage in the
-//1st order of the list will be set as the boot device automatically
+//**Note: The first storage in the list will be automatically set as the boot device
 func (c *ServerRelationManger) LinkStorages(ctx context.Context) error {
 	d := c.getData()
 	client := c.getGSClient()
