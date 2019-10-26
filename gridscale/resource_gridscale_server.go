@@ -1,7 +1,9 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
+	relation_manager "github.com/terraform-providers/terraform-provider-gridscale/gridscale/relation-manager"
 	"log"
 	"strings"
 
@@ -68,9 +70,10 @@ func resourceGridscaleServer() *schema.Resource {
 				},
 			},
 			"storage": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				MaxItems: 8,
+				Type:        schema.TypeList,
+				Optional:    true,
+				MaxItems:    8,
+				Description: `A list of storages attached to the server. The first storage in the list is always set as the boot storage of the server.`,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"object_uuid": {
@@ -79,8 +82,7 @@ func resourceGridscaleServer() *schema.Resource {
 						},
 						"bootdevice": {
 							Type:     schema.TypeBool,
-							Optional: true,
-							Default:  false,
+							Computed: true,
 						},
 						"object_name": {
 							Type:     schema.TypeString,
@@ -139,7 +141,7 @@ func resourceGridscaleServer() *schema.Resource {
 						"bootdevice": {
 							Type:     schema.TypeBool,
 							Optional: true,
-							Default:  false,
+							Computed: true,
 						},
 						"object_name": {
 							Type:     schema.TypeString,
@@ -149,9 +151,37 @@ func resourceGridscaleServer() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
+						"rules_v4_in": {
+							Type:     schema.TypeList,
+							Optional: true,
+							Elem: &schema.Resource{
+								Schema: getFirewallRuleCommonSchema(),
+							},
+						},
+						"rules_v4_out": {
+							Type:     schema.TypeList,
+							Optional: true,
+							Elem: &schema.Resource{
+								Schema: getFirewallRuleCommonSchema(),
+							},
+						},
+						"rules_v6_in": {
+							Type:     schema.TypeList,
+							Optional: true,
+							Elem: &schema.Resource{
+								Schema: getFirewallRuleCommonSchema(),
+							},
+						},
+						"rules_v6_out": {
+							Type:     schema.TypeList,
+							Optional: true,
+							Elem: &schema.Resource{
+								Schema: getFirewallRuleCommonSchema(),
+							},
+						},
 						"firewall_template_uuid": {
 							Type:     schema.TypeString,
-							Computed: true,
+							Optional: true,
 						},
 						"partner_uuid": {
 							Type:     schema.TypeString,
@@ -246,6 +276,93 @@ func resourceGridscaleServer() *schema.Resource {
 	}
 }
 
+//getFirewallRuleCommonSchema returns schema for custom firewall rules.
+//**Note: Every time `getFirewallRuleCommonSchema()` is called,
+//all `*schema.Schema` in `map[string]*schema.Schema` are different.
+func getFirewallRuleCommonSchema() map[string]*schema.Schema {
+	commonSchema := map[string]schema.Schema{
+		"order": {
+			Type: schema.TypeInt,
+			Description: `The order at which the firewall will compare packets against its rules, 
+a packet will be compared against the first rule, it will either allow it to pass or block it 
+and it won t be matched against any other rules. However, if it does no match the rule, 
+then it will proceed onto rule 2. Packets that do not match any rules are blocked by default.`,
+			Required: true,
+		},
+		"action": {
+			Type:        schema.TypeString,
+			Description: "This defines what the firewall will do. Either accept or drop.",
+			Required:    true,
+			ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
+				valid := false
+				for _, action := range firewallActionTypes {
+					if v.(string) == action {
+						valid = true
+						break
+					}
+				}
+				if !valid {
+					errors = append(errors, fmt.Errorf("%v is not a valid firewall action. Valid firewall actions are: %v", v.(string), strings.Join(firewallActionTypes, ",")))
+				}
+				return
+			},
+		},
+		"protocol": {
+			Type:        schema.TypeString,
+			Description: "Either 'udp' or 'tcp'",
+			Optional:    true,
+			ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
+				valid := false
+				for _, prot := range firewallRuleProtocols {
+					if v.(string) == prot {
+						valid = true
+						break
+					}
+				}
+				if !valid {
+					errors = append(errors, fmt.Errorf("%v is not a valid protocol. Valid protocols are: %v", v.(string), strings.Join(firewallRuleProtocols, ",")))
+				}
+				return
+			},
+		},
+		"dst_port": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "A Number between 1 and 65535, port ranges are seperated by a colon for FTP",
+		},
+		"src_port": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "A Number between 1 and 65535, port ranges are seperated by a colon for FTP",
+		},
+		"src_cidr": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.",
+		},
+		"dst_cidr": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then all IPs have access to this service.",
+		},
+		"comment": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "Comment.",
+		},
+	}
+	//Every time `getFirewallRuleCommonSchema()` is called,
+	//all `*schema.Schema` in `map[string]*schema.Schema` have to be different.
+	//So that new `*schema.Schema` are created.
+	schemaWithPointers := make(map[string]*schema.Schema)
+	for k, v := range commonSchema {
+		newVal := new(schema.Schema)
+		*newVal = v
+		schemaWithPointers[k] = newVal
+	}
+	return schemaWithPointers
+}
+
 func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	server, err := client.GetServer(emptyCtx, d.Id())
@@ -301,22 +418,7 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 	}
 
 	//Get networks
-	networks := make([]interface{}, 0)
-	for _, value := range server.Properties.Relations.Networks {
-		if !value.PublicNet {
-			network := map[string]interface{}{
-				"object_uuid":            value.ObjectUUID,
-				"bootdevice":             value.BootDevice,
-				"create_time":            value.CreateTime.String(),
-				"mac":                    value.Mac,
-				"firewall_template_uuid": value.FirewallTemplateUUID,
-				"object_name":            value.ObjectName,
-				"network_type":           value.NetworkType,
-				"ordering":               value.Ordering,
-			}
-			networks = append(networks, network)
-		}
-	}
+	networks := readServerNetworkRels(server.Properties.Relations.Networks)
 	if err = d.Set("network", networks); err != nil {
 		return fmt.Errorf("Error setting network: %v", err)
 	}
@@ -343,9 +445,77 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 	return nil
 }
 
-func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+//readServerNetworkRels extract relationships between server and networks
+func readServerNetworkRels(serverNetRels []gsclient.ServerNetworkRelationProperties) []interface{} {
+	networks := make([]interface{}, 0)
+	for _, rel := range serverNetRels {
+		network := map[string]interface{}{
+			"object_uuid":            rel.ObjectUUID,
+			"bootdevice":             rel.BootDevice,
+			"create_time":            rel.CreateTime.String(),
+			"mac":                    rel.Mac,
+			"firewall_template_uuid": rel.FirewallTemplateUUID,
+			"object_name":            rel.ObjectName,
+			"network_type":           rel.NetworkType,
+			"ordering":               rel.Ordering,
+		}
+		//Init all types of firewall rule
+		v4InRuleProps := make([]interface{}, 0)
+		v4OutRuleProps := make([]interface{}, 0)
+		v6InRuleProps := make([]interface{}, 0)
+		v6OutRuleProps := make([]interface{}, 0)
 
+		//Add rules of type rules_v4_in
+		for _, props := range rel.Firewall.RulesV4In {
+			v4InRuleProp := flattenFirewallRuleProperties(props)
+			v4InRuleProps = append(v4InRuleProps, v4InRuleProp)
+		}
+		network["rules_v4_in"] = v4InRuleProps
+
+		//Add rules of type rules_v4_out
+		for _, props := range rel.Firewall.RulesV4Out {
+			v4OutRuleProp := flattenFirewallRuleProperties(props)
+			v4OutRuleProps = append(v4OutRuleProps, v4OutRuleProp)
+		}
+		network["rules_v4_out"] = v4OutRuleProps
+
+		//Add rules of type rules_v6_in
+		for _, props := range rel.Firewall.RulesV6In {
+			v6InRuleProp := flattenFirewallRuleProperties(props)
+			v6InRuleProps = append(v6InRuleProps, v6InRuleProp)
+		}
+		network["rules_v6_in"] = v6InRuleProps
+
+		//Add rules of type rules_v6_out
+		for _, props := range rel.Firewall.RulesV6Out {
+			v6OutRuleProp := flattenFirewallRuleProperties(props)
+			v6OutRuleProps = append(v6OutRuleProps, v6OutRuleProp)
+		}
+		network["rules_v6_out"] = v6OutRuleProps
+
+		networks = append(networks, network)
+	}
+	return networks
+}
+
+//flattenFirewallRuleProperties converts variable of type gsclient.FirewallRuleProperties to
+//map[string]interface{}
+func flattenFirewallRuleProperties(props gsclient.FirewallRuleProperties) map[string]interface{} {
+	return map[string]interface{}{
+		"order":    props.Order,
+		"action":   props.Action,
+		"protocol": props.Protocol,
+		"dst_port": props.DstPort,
+		"src_port": props.SrcPort,
+		"src_cidr": props.SrcCidr,
+		"dst_cidr": props.DstCidr,
+		"comment":  props.Comment,
+	}
+}
+
+func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) error {
+	gsc := meta.(*gsclient.Client)
+	serverRelMan := relation_manager.NewServerRelationManger(gsc, d)
 	requestBody := gsclient.ServerCreateRequest{
 		Name:            d.Get("name").(string),
 		Cores:           d.Get("cores").(int),
@@ -360,126 +530,67 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		requestBody.HardwareProfile = gsclient.LegacyServerHardware
 	} else if profile == "nested" {
 		requestBody.HardwareProfile = gsclient.NestedServerHardware
-
 	} else if profile == "cisco_csr" {
 		requestBody.HardwareProfile = gsclient.CiscoCSRServerHardware
-
 	} else if profile == "sophos_utm" {
 		requestBody.HardwareProfile = gsclient.SophosUTMServerHardware
-
 	} else if profile == "f5_bigip" {
 		requestBody.HardwareProfile = gsclient.F5BigipServerHardware
-
 	} else if profile == "q35" {
 		requestBody.HardwareProfile = gsclient.Q35ServerHardware
-
 	} else if profile == "q35_nested" {
 		requestBody.HardwareProfile = gsclient.Q35NestedServerHardware
-
 	} else {
 		requestBody.HardwareProfile = gsclient.DefaultServerHardware
 	}
-
-	requestBody.Relations = &gsclient.ServerCreateRequestRelations{}
-	requestBody.Relations.IsoImages = []gsclient.ServerCreateRequestIsoimage{}
-	requestBody.Relations.Storages = []gsclient.ServerCreateRequestStorage{}
-	requestBody.Relations.Networks = []gsclient.ServerCreateRequestNetwork{}
-	requestBody.Relations.PublicIPs = []gsclient.ServerCreateRequestIP{}
-
-	//Add only the bootable storage during creation
-	//When more than one device is set to bootable, the API is expected to give an error
-	if attr, ok := d.GetOk("storage"); ok {
-		for _, value := range attr.(*schema.Set).List() {
-			storage := value.(map[string]interface{})
-			if storage["bootdevice"].(bool) {
-				createStorageRequest := gsclient.ServerCreateRequestStorage{
-					StorageUUID: storage["object_uuid"].(string),
-					BootDevice:  storage["bootdevice"].(bool),
-				}
-
-				requestBody.Relations.Storages = append(requestBody.Relations.Storages, createStorageRequest)
-			}
-		}
-	}
-
-	if attr, ok := d.GetOk("ipv4"); ok {
-		if client.GetIPVersion(emptyCtx, attr.(string)) != 4 {
-			return fmt.Errorf("The IP address with UUID %v is not version 4", attr.(string))
-		}
-		ip := gsclient.ServerCreateRequestIP{
-			IPaddrUUID: attr.(string),
-		}
-		requestBody.Relations.PublicIPs = append(requestBody.Relations.PublicIPs, ip)
-	}
-	if attr, ok := d.GetOk("ipv6"); ok {
-		if client.GetIPVersion(emptyCtx, attr.(string)) != 6 {
-			return fmt.Errorf("The IP address with UUID %v is not version 6", attr.(string))
-		}
-		ip := gsclient.ServerCreateRequestIP{
-			IPaddrUUID: attr.(string),
-		}
-		requestBody.Relations.PublicIPs = append(requestBody.Relations.PublicIPs, ip)
-	}
-
-	if attr, ok := d.GetOk("isoimage"); ok {
-		createIsoimageRequest := gsclient.ServerCreateRequestIsoimage{
-			IsoimageUUID: attr.(string),
-		}
-		requestBody.Relations.IsoImages = append(requestBody.Relations.IsoImages, createIsoimageRequest)
-	}
-
-	//Add public network if we have an IP
-	if len(requestBody.Relations.PublicIPs) > 0 {
-		publicNetwork, err := client.GetNetworkPublic(emptyCtx)
-		if err != nil {
-			return err
-		}
-		network := gsclient.ServerCreateRequestNetwork{
-			NetworkUUID: publicNetwork.Properties.ObjectUUID,
-		}
-		requestBody.Relations.Networks = append(requestBody.Relations.Networks, network)
-	}
-
-	if attr, ok := d.GetOk("network"); ok {
-		for _, value := range attr.(*schema.Set).List() {
-			network := value.(map[string]interface{})
-			createNetworkRequest := gsclient.ServerCreateRequestNetwork{
-				NetworkUUID: network["object_uuid"].(string),
-				BootDevice:  network["bootdevice"].(bool),
-			}
-			requestBody.Relations.Networks = append(requestBody.Relations.Networks, createNetworkRequest)
-		}
-	}
-
-	response, err := client.CreateServer(emptyCtx, requestBody)
-
+	response, err := gsc.CreateServer(emptyCtx, requestBody)
 	if err != nil {
 		return fmt.Errorf(
 			"Error waiting for server (%s) to be created: %s", requestBody.Name, err)
 	}
-
 	d.SetId(response.ServerUUID)
-
 	log.Printf("[DEBUG] The id for %s has been set to: %v", requestBody.Name, response.ServerUUID)
 
-	//Add the rest of the storages
-	//The server might not boot if more than one storages is attached to a server when it is being created. That is why the rest of the storages are added later. See BUG-191
-	if attr, ok := d.GetOk("storage"); ok {
-		for _, value := range attr.(*schema.Set).List() {
-			storage := value.(map[string]interface{})
-			if !storage["bootdevice"].(bool) {
-				err = client.LinkStorage(emptyCtx, d.Id(), storage["object_uuid"].(string), storage["bootdevice"].(bool))
-				if err != nil {
-					return err
-				}
-			}
-		}
+	//Add server power status to serverPowerStateList
+	serverPowerStateList.addServer(d.Id())
+
+	//Link storages
+	err = serverRelMan.LinkStorages(emptyCtx)
+	if err != nil {
+		return err
+	}
+
+	//Link IPv4
+	err = serverRelMan.LinkIPv4(emptyCtx)
+	if err != nil {
+		return err
+	}
+
+	//Link IPv6
+	err = serverRelMan.LinkIPv6(emptyCtx)
+	if err != nil {
+		return err
+	}
+
+	//Link ISO-Image
+	err = serverRelMan.LinkISOImage(emptyCtx)
+	if err != nil {
+		return err
+	}
+
+	//Link networks
+	err = serverRelMan.LinkNetworks(emptyCtx)
+	if err != nil {
+		return err
 	}
 
 	//Set the power state if needed
 	power := d.Get("power").(bool)
 	if power {
-		client.StartServer(emptyCtx, d.Id())
+		err = serverPowerStateList.startServerSynchronously(emptyCtx, gsc, d.Id())
+		if err != nil {
+			return err
+		}
 	}
 
 	return resourceGridscaleServerRead(d, meta)
@@ -488,39 +599,26 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 func resourceGridscaleServerDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	id := d.Id()
-	err := client.StopServer(emptyCtx, id)
+	//Stop the server synchronously
+	err := serverPowerStateList.shutdownServerSynchronously(emptyCtx, client, id)
 	if err != nil {
 		return err
 	}
+	//Delete the server
 	err = client.DeleteServer(emptyCtx, id)
-
+	if err != nil {
+		return err
+	}
+	//remove server power state from serverPowerStateList
+	err = serverPowerStateList.removeServer(d.Id())
 	return err
 }
 
 func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
-	shutdownRequired := false
-
+	gsc := meta.(*gsclient.Client)
+	serverDepClient := relation_manager.NewServerRelationManger(gsc, d)
+	shutdownRequired := serverDepClient.IsShutdownRequired(emptyCtx)
 	var err error
-
-	if d.HasChange("cores") {
-		old, new := d.GetChange("cores")
-		if new.(int) < old.(int) || d.Get("legacy").(bool) { //Legacy systems don't support updating the memory while running
-			shutdownRequired = true
-		}
-	}
-
-	if d.HasChange("memory") {
-		old, new := d.GetChange("memory")
-		if new.(int) < old.(int) || d.Get("legacy").(bool) { //Legacy systems don't support updating the memory while running
-			shutdownRequired = true
-		}
-	}
-
-	if d.HasChange("ipv4") || d.HasChange("ipv6") || d.HasChange("storage") || d.HasChange("network") {
-		shutdownRequired = true
-	}
-
 	requestBody := gsclient.ServerUpdateRequest{
 		Name:            d.Get("name").(string),
 		AvailablityZone: d.Get("availability_zone").(string),
@@ -529,165 +627,64 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 		Memory:          d.Get("memory").(int),
 	}
 
-	//The ShutdownServer command will check if the server is running and shut it down if it is running, so no extra checks are needed here
 	if shutdownRequired {
-		err = client.ShutdownServer(emptyCtx, d.Id())
+		updateSequence := func(ctx context.Context) error {
+			//Execute the update request
+			err = gsc.UpdateServer(ctx, d.Id(), requestBody)
+			if err != nil {
+				return err
+			}
+
+			//Update relationship between the server and IP addresses
+			err = serverDepClient.UpdateIPv4Rel(ctx)
+			if err != nil {
+				return err
+			}
+			err = serverDepClient.UpdateIPv6Rel(ctx)
+			if err != nil {
+				return err
+			}
+
+			//Update relationship between the server and networks
+			err = serverDepClient.UpdateNetworksRel(ctx)
+			if err != nil {
+				return err
+			}
+
+			//Update relationship between the server and storages
+			err = serverDepClient.UpdateStoragesRel(ctx)
+			return err
+		}
+		err = serverPowerStateList.runActionRequireServerOff(emptyCtx, gsc, d.Id(), updateSequence)
+		if err != nil {
+			return err
+		}
+	} else {
+		//Execute the update request
+		err = gsc.UpdateServer(emptyCtx, d.Id(), requestBody)
 		if err != nil {
 			return err
 		}
 	}
 
-	//Execute the update request
-	err = client.UpdateServer(emptyCtx, d.Id(), requestBody)
+	//Update relationship between the server and an ISO-image
+	err = serverDepClient.UpdateISOImageRel(emptyCtx)
 	if err != nil {
 		return err
-	}
-
-	//Link/unlink isoimages
-	if d.HasChange("isoimage") {
-		oldIso, newIso := d.GetChange("isoimage")
-		if newIso == "" {
-			err = client.UnlinkIsoImage(emptyCtx, d.Id(), oldIso.(string))
-		} else {
-			err = client.UnlinkIsoImage(emptyCtx, d.Id(), newIso.(string))
-		}
-		if err != nil {
-			return err
-		}
-	}
-
-	//Link/Unlink ip addresses
-	var needsPublicNetwork = true
-	if d.HasChange("ipv4") {
-		oldIp, newIp := d.GetChange("ipv4")
-		if newIp == "" {
-			err = client.UnlinkIP(emptyCtx, d.Id(), oldIp.(string))
-		} else {
-			err = client.LinkIP(emptyCtx, d.Id(), newIp.(string))
-		}
-		if err != nil {
-			return err
-		}
-		if oldIp != "" {
-			needsPublicNetwork = false
-		}
-	}
-	if d.HasChange("ipv6") {
-		oldIp, newIp := d.GetChange("ipv6")
-		if newIp == "" {
-			err = client.UnlinkIP(emptyCtx, d.Id(), oldIp.(string))
-		} else {
-			err = client.LinkIP(emptyCtx, d.Id(), newIp.(string))
-		}
-		if err != nil {
-			return err
-		}
-		if oldIp != "" {
-			needsPublicNetwork = false
-		}
-	}
-	//Disconnect from the public network if there is no longer and IP
-	if (d.HasChange("ipv6") || d.HasChange("ipv4")) && d.Get("ipv6").(string) == "" && d.Get("ipv4").(string) == "" {
-		publicNetwork, err := client.GetNetworkPublic(emptyCtx)
-		if err != nil {
-			return err
-		}
-		err = client.UnlinkNetwork(emptyCtx, d.Id(), publicNetwork.Properties.ObjectUUID)
-		if err != nil {
-			return err
-		}
-	}
-	//Connect to the public network if an IP was added
-	if (d.HasChange("ipv6") || d.HasChange("ipv4")) && needsPublicNetwork {
-		publicNetwork, err := client.GetNetworkPublic(emptyCtx)
-		if err != nil {
-			return err
-		}
-		err = client.LinkNetwork(emptyCtx, d.Id(), publicNetwork.Properties.ObjectUUID, "", false, 0, nil, nil)
-		if err != nil {
-			return err
-		}
-	}
-
-	//Link/unlink networks
-	//It currently unlinks and relinks all networks if any network has changed. This could probably be done better, but this way is easy and works well
-	if d.HasChange("network") {
-		oldNetworks, newNetworks := d.GetChange("network")
-		for _, value := range oldNetworks.(*schema.Set).List() {
-			network := value.(map[string]interface{})
-			if network["object_uuid"].(string) != "" {
-				err = client.UnlinkNetwork(emptyCtx, d.Id(), network["object_uuid"].(string))
-				if err != nil {
-					return err
-				}
-			}
-		}
-		for _, value := range newNetworks.(*schema.Set).List() {
-			network := value.(map[string]interface{})
-			if network["object_uuid"].(string) != "" {
-				err = client.LinkNetwork(emptyCtx, d.Id(), network["object_uuid"].(string), "", network["bootdevice"].(bool), 0, nil, nil)
-				if err != nil {
-					return err
-				}
-			}
-
-		}
-	}
-
-	//Link/unlink storages
-	if d.HasChange("storage") {
-		oldStorages, newStorages := d.GetChange("storage")
-
-		//unlink old storages if needed
-		for _, value := range oldStorages.(*schema.Set).List() {
-			oldStorage := value.(map[string]interface{})
-			unlink := true
-			for _, value := range newStorages.(*schema.Set).List() {
-				newStorage := value.(map[string]interface{})
-				if oldStorage["object_uuid"].(string) == newStorage["object_uuid"].(string) {
-					unlink = false
-					break
-				}
-			}
-			if unlink {
-				err = client.UnlinkStorage(emptyCtx, d.Id(), oldStorage["object_uuid"].(string))
-				if err != nil {
-					return err
-				}
-			}
-		}
-
-		//link new storages if needed
-		for _, value := range newStorages.(*schema.Set).List() {
-			newStorage := value.(map[string]interface{})
-			link := true
-			for _, value := range oldStorages.(*schema.Set).List() {
-				oldStorage := value.(map[string]interface{})
-				if oldStorage["object_uuid"].(string) == newStorage["object_uuid"].(string) {
-					link = false
-					break
-				}
-			}
-			if link {
-				err = client.LinkStorage(emptyCtx, d.Id(), newStorage["object_uuid"].(string), newStorage["bootdevice"].(bool))
-				if err != nil {
-					return err
-				}
-			}
-		}
 	}
 
 	// Make sure the server in is the expected power state.
 	// The StartServer and ShutdownServer functions do a check to see if the server isn't already running, so we don't need to do that here.
 	if d.Get("power").(bool) {
-		err = client.StartServer(emptyCtx, d.Id())
+		err = serverPowerStateList.startServerSynchronously(emptyCtx, gsc, d.Id())
+		if err != nil {
+			return err
+		}
 	} else {
-		err = client.ShutdownServer(emptyCtx, d.Id())
+		err = serverPowerStateList.shutdownServerSynchronously(emptyCtx, gsc, d.Id())
+		if err != nil {
+			return err
+		}
 	}
-	if err != nil {
-		return err
-	}
-
 	return resourceGridscaleServerRead(d, meta)
-
 }
