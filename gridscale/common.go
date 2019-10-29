@@ -132,7 +132,8 @@ func (l *listServersPowerStatus) shutdownServerSynchronously(ctx context.Context
 }
 
 //runActionRequireServerOff runs a specific action (function) after shutting down (synchronously) the server successfully
-func (l *listServersPowerStatus) runActionRequireServerOff(ctx context.Context, c *gsclient.Client, id string, action actionRequireServerOff) (err error) {
+func (l *listServersPowerStatus) runActionRequireServerOff(ctx context.Context, c *gsclient.Client, id string, action actionRequireServerOff) error {
+	var err error
 	//check if the server is in the list
 	if _, ok := l.list[id]; ok {
 		//lock the power state of the server
