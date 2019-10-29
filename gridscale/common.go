@@ -30,19 +30,24 @@ type listServersPowerStatus struct {
 type actionRequireServerOff func(ctx context.Context) error
 
 //addServer adds a server power state to the list
-func (l *listServersPowerStatus) addServer(id string) {
-	//lock the list
-	l.mux.Lock()
-	log.Printf("[DEBUG] LOCK ACQUIRED to add server (%v)", id)
-	defer func() {
-		//unlock the list
-		l.mux.Unlock()
-		log.Printf("[DEBUG] LOCK RELEASED! Server (%v) is added", id)
-	}()
-	l.list[id] = &serverPowerStatus{
-		false,
-		sync.Mutex{},
+func (l *listServersPowerStatus) addServer(id string) error {
+	//check if the server is already in the list
+	if _, ok := l.list[id]; !ok {
+		//lock the list
+		l.mux.Lock()
+		log.Printf("[DEBUG] LOCK ACQUIRED to add server (%v)", id)
+		defer func() {
+			//unlock the list
+			l.mux.Unlock()
+			log.Printf("[DEBUG] LOCK RELEASED! Server (%v) is added", id)
+		}()
+		l.list[id] = &serverPowerStatus{
+			false,
+			sync.Mutex{},
+		}
+		return nil
 	}
+	return fmt.Errorf("server (%s) ALREADY exists in current list of servers in terraform", id)
 }
 
 //removeServer removes a server power state from the list

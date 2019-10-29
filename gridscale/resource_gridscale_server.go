@@ -552,7 +552,10 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	log.Printf("[DEBUG] The id for %s has been set to: %v", requestBody.Name, response.ServerUUID)
 
 	//Add server power status to serverPowerStateList
-	serverPowerStateList.addServer(d.Id())
+	err = serverPowerStateList.addServer(d.Id())
+	if err != nil {
+		return err
+	}
 
 	//Link storages
 	err = serverRelMan.LinkStorages(emptyCtx)
