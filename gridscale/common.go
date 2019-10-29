@@ -132,7 +132,7 @@ func (l *listServersPowerStatus) shutdownServerSynchronously(ctx context.Context
 }
 
 //runActionRequireServerOff runs a specific action (function) after shutting down (synchronously) the server successfully
-func (l *listServersPowerStatus) runActionRequireServerOff(ctx context.Context, c *gsclient.Client, id string, action actionRequireServerOff) error {
+func (l *listServersPowerStatus) runActionRequireServerOff(ctx context.Context, c *gsclient.Client, id string, action actionRequireServerOff) (err error) {
 	//check if the server is in the list
 	if _, ok := l.list[id]; ok {
 		//lock the power state of the server
@@ -143,17 +143,36 @@ func (l *listServersPowerStatus) runActionRequireServerOff(ctx context.Context, 
 			l.list[id].mux.Unlock()
 			log.Printf("[DEBUG] LOCK RELEASED! Action requiring server (%v) is done", id)
 		}()
-		//shutdown the server (synchronously) before running the action
-		err := c.ShutdownServer(ctx, id)
-		if err != nil {
-			return err
+		//Get the original server's power state
+		originPowerState := l.list[id].power
+		//if the server is on, shutdown the server (synchronously) before running the action,
+		//and start the server after finishing the action.
+		if originPowerState {
+			err = c.ShutdownServer(ctx, id)
+			if err != nil {
+				return err
+			}
+			log.Printf("[DEBUG] Server (%v) is OFF to run an action", id)
+			//DEFER Start the server (start the server after the action is done)
+			defer func() {
+				errStartServer := c.StartServer(ctx, id)
+				if errStartServer != nil {
+					//append error from the action (if the action returns error)
+					err = fmt.Errorf(
+						"Error from action: %v. Error from starting server: %v",
+						err,
+						errStartServer,
+					)
+				}
+				log.Printf("[DEBUG] Action is done. Server (%v) is ON", id)
+			}()
 		}
-		l.list[id].power = false
 		//run action function
 		err = action(ctx)
 		return err
 	}
-	return fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
+	err = fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
+	return err
 }
 
 //serverPowerStateList global list of all servers' power states in terraform

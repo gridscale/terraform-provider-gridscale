@@ -285,24 +285,14 @@ func resourceGridscaleStorageDelete(d *schema.ResourceData, meta interface{}) er
 
 	//Stop all server relating to this IP address if there is one
 	for _, server := range storage.Properties.Relations.Servers {
-		powerStatus, err := serverPowerStateList.getServerPowerStatus(server.ObjectUUID)
-		if err != nil {
-			return err
-		}
 		unlinkStorageAction := func(ctx context.Context) error {
 			err = client.UnlinkStorage(ctx, server.ObjectUUID, d.Id())
 			return err
 		}
+		//UnlinkStorage requires the server to be off
 		err = serverPowerStateList.runActionRequireServerOff(emptyCtx, client, server.ObjectUUID, unlinkStorageAction)
 		if err != nil {
 			return err
-		}
-		//If the server was originally ON, turn it back on
-		if powerStatus {
-			err = serverPowerStateList.startServerSynchronously(emptyCtx, client, server.ObjectUUID)
-			if err != nil {
-				return err
-			}
 		}
 	}
 
