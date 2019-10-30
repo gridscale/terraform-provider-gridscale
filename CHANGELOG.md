@@ -1,3 +1,16 @@
+## 1.4.0 (Unreleased)
+
+FEATURES:
+
+* Support firewall configuration
+
+IMPROVEMENTS:
+
+* Turn off server synchronously when removing resource attached to it 
+* Bootdevice attribute has become `computed`
+* firewall_template_uuid has become `optional`
+* Server dependency manager features: Create/Update/Remove server's relations.
+
 ## 1.3.0 (Unreleased)
 
 FEATURES:
