@@ -1,4 +1,4 @@
-## 1.4.0 (Unreleased)
+## 1.4.0 (October 31, 2019)
 
 FEATURES:
 
@@ -38,11 +38,11 @@ FEATURES:
 FEATURES:
 
 * Assure compatibility with terraform 0.12
-* Allow using availability zone C (GH-10)
+* Allow using availability zone C ([#10](https://github.com/terraform-providers/terraform-provider-template/issues/10))
 
 IMPROVEMENTS:
 
-* Switch to gsclient-go from github (GH-14)
+* Switch to gsclient-go from github ([#14](https://github.com/terraform-providers/terraform-provider-template/issues/14))
 
 ## 1.0.0 (April 30, 2019)
 
