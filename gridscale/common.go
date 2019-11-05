@@ -13,7 +13,6 @@ import (
 //power state, so it prevents other goroutines from accessing/modifying the server's power state
 type serverPowerStatus struct {
 	power bool
-	mux   sync.Mutex
 }
 
 //listServersPowerStatus represents a list of power states of
@@ -31,19 +30,18 @@ type actionRequireServerOff func(ctx context.Context) error
 
 //addServer adds a server power state to the list
 func (l *listServersPowerStatus) addServer(id string) error {
+	//lock the list
+	l.mux.Lock()
+	log.Printf("[DEBUG] LOCK ACQUIRED to add server (%v)", id)
+	defer func() {
+		//unlock the list
+		l.mux.Unlock()
+		log.Printf("[DEBUG] LOCK RELEASED! Server (%v) is added", id)
+	}()
 	//check if the server is already in the list
 	if _, ok := l.list[id]; !ok {
-		//lock the list
-		l.mux.Lock()
-		log.Printf("[DEBUG] LOCK ACQUIRED to add server (%v)", id)
-		defer func() {
-			//unlock the list
-			l.mux.Unlock()
-			log.Printf("[DEBUG] LOCK RELEASED! Server (%v) is added", id)
-		}()
 		l.list[id] = &serverPowerStatus{
 			false,
-			sync.Mutex{},
 		}
 		return nil
 	}
@@ -52,16 +50,16 @@ func (l *listServersPowerStatus) addServer(id string) error {
 
 //removeServerSynchronously removes a server
 func (l *listServersPowerStatus) removeServerSynchronously(ctx context.Context, c *gsclient.Client, id string) error {
+	//lock the list
+	l.mux.Lock()
+	log.Printf("[DEBUG] LOCK ACQUIRED to remove server (%v)", id)
+	defer func() {
+		//unlock the list
+		l.mux.Unlock()
+		log.Printf("[DEBUG] LOCK RELEASED! Server (%v) is removed", id)
+	}()
 	//check if the server is in the list
 	if _, ok := l.list[id]; ok {
-		//lock the list
-		l.mux.Lock()
-		log.Printf("[DEBUG] LOCK ACQUIRED to remove server (%v)", id)
-		defer func() {
-			//unlock the list
-			l.mux.Unlock()
-			log.Printf("[DEBUG] LOCK RELEASED! Server (%v) is removed", id)
-		}()
 		//Shutdown server
 		err := c.ShutdownServer(ctx, id)
 		if err != nil {
@@ -80,16 +78,16 @@ func (l *listServersPowerStatus) removeServerSynchronously(ctx context.Context, 
 
 //getServerPowerStatus returns power state of a server in the list (synchronously)
 func (l *listServersPowerStatus) getServerPowerStatus(id string) (bool, error) {
+	//lock the list
+	l.mux.Lock()
+	log.Printf("[DEBUG] LOCK ACQUIRED to get server (%v) power status", id)
+	defer func() {
+		//unlock the list
+		l.mux.Unlock()
+		log.Printf("[DEBUG] LOCK RELEASED! Getting server (%v) power status is done", id)
+	}()
 	//check if the server is in the list
 	if _, ok := l.list[id]; ok {
-		//lock the power state of the server
-		l.list[id].mux.Lock()
-		log.Printf("[DEBUG] LOCK ACQUIRED to get server (%v) power status", id)
-		defer func() {
-			//unlock the power state of the server after retrieving server's power state
-			l.list[id].mux.Unlock()
-			log.Printf("[DEBUG] LOCK RELEASED! Getting server (%v) power status is done", id)
-		}()
 		return l.list[id].power, nil
 	}
 	return false, fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
@@ -98,16 +96,16 @@ func (l *listServersPowerStatus) getServerPowerStatus(id string) (bool, error) {
 //startServerSynchronously starts the servers synchronously. That means the server
 //can only be started by one goroutine at a time.
 func (l *listServersPowerStatus) startServerSynchronously(ctx context.Context, c *gsclient.Client, id string) error {
+	//lock the list
+	l.mux.Lock()
+	log.Printf("[DEBUG] LOCK ACQUIRED to start server (%v)", id)
+	defer func() {
+		//unlock the list
+		l.mux.Unlock()
+		log.Printf("[DEBUG] LOCK RELEASED! Starting server (%v) is done", id)
+	}()
 	//check if the server is in the list
 	if _, ok := l.list[id]; ok {
-		//lock the power state of the server
-		l.list[id].mux.Lock()
-		log.Printf("[DEBUG] LOCK ACQUIRED to start server (%v)", id)
-		defer func() {
-			//unlock the power state of the server after server is started
-			l.list[id].mux.Unlock()
-			log.Printf("[DEBUG] LOCK RELEASED! Server (%v) is started", id)
-		}()
 		err := c.StartServer(ctx, id)
 		if err != nil {
 			return err
@@ -121,16 +119,16 @@ func (l *listServersPowerStatus) startServerSynchronously(ctx context.Context, c
 //shutdownServerSynchronously stop the servers synchronously. That means the server
 //can only be stopped by one goroutine at a time.
 func (l *listServersPowerStatus) shutdownServerSynchronously(ctx context.Context, c *gsclient.Client, id string) error {
+	//lock the list
+	l.mux.Lock()
+	log.Printf("[DEBUG] LOCK ACQUIRED to stop server (%v)", id)
+	defer func() {
+		//unlock the list
+		l.mux.Unlock()
+		log.Printf("[DEBUG] LOCK RELEASED! Shutting down server (%v) is done", id)
+	}()
 	//check if the server is in the list
 	if _, ok := l.list[id]; ok {
-		//lock the power state of the server
-		l.list[id].mux.Lock()
-		log.Printf("[DEBUG] LOCK ACQUIRED to stop server (%v)", id)
-		defer func() {
-			//unlock the power state of the server after server is stopped
-			l.list[id].mux.Unlock()
-			log.Printf("[DEBUG] LOCK RELEASED! Server (%v) is stopped", id)
-		}()
 		err := c.ShutdownServer(ctx, id)
 		if err != nil {
 			return err
@@ -143,17 +141,17 @@ func (l *listServersPowerStatus) shutdownServerSynchronously(ctx context.Context
 
 //runActionRequireServerOff runs a specific action (function) after shutting down (synchronously) the server successfully
 func (l *listServersPowerStatus) runActionRequireServerOff(ctx context.Context, c *gsclient.Client, id string, action actionRequireServerOff) error {
+	//lock the list
+	l.mux.Lock()
+	log.Printf("[DEBUG] LOCK ACQUIRED to run an action requiring server (%v) to be OFF", id)
+	defer func() {
+		//unlock the list
+		l.mux.Unlock()
+		log.Printf("[DEBUG] LOCK RELEASED! Action requiring server (%v) is done", id)
+	}()
 	var err error
 	//check if the server is in the list
 	if _, ok := l.list[id]; ok {
-		//lock the power state of the server
-		l.list[id].mux.Lock()
-		log.Printf("[DEBUG] LOCK ACQUIRED to run an action requiring server (%v) to be OFF", id)
-		defer func() {
-			//unlock the power state of the server after action is done
-			l.list[id].mux.Unlock()
-			log.Printf("[DEBUG] LOCK RELEASED! Action requiring server (%v) is done", id)
-		}()
 		//Get the original server's power state
 		originPowerState := l.list[id].power
 		//if the server is on, shutdown the server (synchronously) before running the action,
