@@ -620,7 +620,6 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 
 func resourceGridscaleServerDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-		return err
 	//remove the server
 	return serverPowerStateList.removeServerSynchronously(emptyCtx, client, d.Id())
 }
