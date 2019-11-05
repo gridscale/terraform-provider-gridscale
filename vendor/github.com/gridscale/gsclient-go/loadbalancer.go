@@ -188,9 +188,10 @@ var (
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getLoadbalancers
 func (c *Client) GetLoadBalancerList(ctx context.Context) ([]LoadBalancer, error) {
-	r := Request{
-		uri:    apiLoadBalancerBase,
-		method: http.MethodGet,
+	r := request{
+		uri:                 apiLoadBalancerBase,
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response LoadBalancers
 	var loadBalancers []LoadBalancer
@@ -208,9 +209,10 @@ func (c *Client) GetLoadBalancer(ctx context.Context, id string) (LoadBalancer, 
 	if !isValidUUID(id) {
 		return LoadBalancer{}, errors.New("'id' is invalid")
 	}
-	r := Request{
-		uri:    path.Join(apiLoadBalancerBase, id),
-		method: http.MethodGet,
+	r := request{
+		uri:                 path.Join(apiLoadBalancerBase, id),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response LoadBalancer
 	err := r.execute(ctx, *c, &response)
@@ -226,19 +228,13 @@ func (c *Client) CreateLoadBalancer(ctx context.Context, body LoadBalancerCreate
 	if body.Labels == nil {
 		body.Labels = make([]string, 0)
 	}
-	r := Request{
+	r := request{
 		uri:    apiLoadBalancerBase,
 		method: http.MethodPost,
 		body:   body,
 	}
 	var response LoadBalancerCreateResponse
 	err := r.execute(ctx, *c, &response)
-	if err != nil {
-		return LoadBalancerCreateResponse{}, err
-	}
-	if c.cfg.sync {
-		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
-	}
 	return response, err
 }
 
@@ -254,18 +250,10 @@ func (c *Client) UpdateLoadBalancer(ctx context.Context, id string, body LoadBal
 	if body.Labels == nil {
 		body.Labels = make([]string, 0)
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiLoadBalancerBase, id),
 		method: http.MethodPatch,
 		body:   body,
-	}
-	if c.cfg.sync {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		//Block until the request is finished
-		return c.waitForLoadbalancerActive(ctx, id)
 	}
 	return r.execute(ctx, *c, nil)
 }
@@ -277,9 +265,10 @@ func (c *Client) GetLoadBalancerEventList(ctx context.Context, id string) ([]Eve
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
-	r := Request{
-		uri:    path.Join(apiLoadBalancerBase, id, "events"),
-		method: http.MethodGet,
+	r := request{
+		uri:                 path.Join(apiLoadBalancerBase, id, "events"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response EventList
 	var loadBalancerEvents []Event
@@ -297,35 +286,9 @@ func (c *Client) DeleteLoadBalancer(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiLoadBalancerBase, id),
 		method: http.MethodDelete,
 	}
-	if c.cfg.sync {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		//Block until the request is finished
-		return c.waitForLoadbalancerDeleted(ctx, id)
-	}
 	return r.execute(ctx, *c, nil)
-}
-
-//waitForLoadbalancerActive allows to wait until the loadbalancer's status is active
-func (c *Client) waitForLoadbalancerActive(ctx context.Context, id string) error {
-	return retryWithTimeout(func() (bool, error) {
-		lb, err := c.GetLoadBalancer(ctx, id)
-		return lb.Properties.Status != resourceActiveStatus, err
-	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
-}
-
-//waitForLoadbalancerDeleted allows to wait until the loadbalancer is deleted
-func (c *Client) waitForLoadbalancerDeleted(ctx context.Context, id string) error {
-	if !isValidUUID(id) {
-		return errors.New("'id' is invalid")
-	}
-	uri := path.Join(apiLoadBalancerBase, id)
-	method := http.MethodGet
-	return c.waitFor404Status(ctx, uri, method)
 }

@@ -47,9 +47,10 @@ type LabelCreateRequest struct {
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/GetLabels
 func (c *Client) GetLabelList(ctx context.Context) ([]Label, error) {
-	r := Request{
-		uri:    apiLabelBase,
-		method: http.MethodGet,
+	r := request{
+		uri:                 apiLabelBase,
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response LabelList
 	var labels []Label
@@ -64,19 +65,13 @@ func (c *Client) GetLabelList(ctx context.Context) ([]Label, error) {
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/CreateLabel
 func (c *Client) CreateLabel(ctx context.Context, body LabelCreateRequest) (CreateResponse, error) {
-	r := Request{
+	r := request{
 		uri:    apiLabelBase,
 		method: http.MethodPost,
 		body:   body,
 	}
 	var response CreateResponse
 	err := r.execute(ctx, *c, &response)
-	if err != nil {
-		return CreateResponse{}, err
-	}
-	if c.cfg.sync {
-		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
-	}
 	return response, err
 }
 
@@ -87,37 +82,9 @@ func (c *Client) DeleteLabel(ctx context.Context, label string) error {
 	if label == "" {
 		return errors.New("'label' is required")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiLabelBase, label),
 		method: http.MethodDelete,
 	}
-	if c.cfg.sync {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		return c.waitForLabelDeleted(ctx, label)
-	}
 	return r.execute(ctx, *c, nil)
-}
-
-//waitForLabelDeleted allows to wait until the label is deleted
-func (c *Client) waitForLabelDeleted(ctx context.Context, label string) error {
-	if label == "" {
-		return errors.New("'label' is required")
-	}
-	return retryWithTimeout(func() (bool, error) {
-		labels, err := c.GetLabelList(ctx)
-		return isLabelInSlice(label, labels), err
-	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
-}
-
-//isLabelInSlice check if a label in a lice of labels
-func isLabelInSlice(a string, list []Label) bool {
-	for _, b := range list {
-		if b.Properties.Label == a {
-			return true
-		}
-	}
-	return false
 }

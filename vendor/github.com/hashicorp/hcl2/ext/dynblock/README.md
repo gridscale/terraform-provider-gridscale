@@ -12,7 +12,7 @@ to allow dynamic block generation within certain portions of the configuration.
 
 Dynamic block generation is performed using the `dynamic` block type:
 
-```terraform
+```hcl
 toplevel {
   nested {
     foo = "static block 1"
@@ -34,7 +34,7 @@ toplevel {
 
 The above is interpreted as if it were written as follows:
 
-```terraform
+```hcl
 toplevel {
   nested {
     foo = "static block 1"

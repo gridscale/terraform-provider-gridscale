@@ -111,29 +111,38 @@ type StorageRollbackRequest struct {
 
 //StorageSnapshotExportToS3Request JSON struct of a request for exporting a storage snapshot to S3
 type StorageSnapshotExportToS3Request struct {
-	S3auth struct {
-		//Host of S3
-		Host string `json:"host"`
+	//S3 authentication data
+	S3auth `json:"s3auth"`
 
-		//Access key of S3
-		AccessKey string `json:"access_key"`
+	//S3 info about snapshot being uploaded
+	S3data `json:"s3data"`
+}
 
-		//Secret key of S3
-		SecretKey string `json:"secret_key"`
-	} `json:"s3auth"`
-	S3data struct {
-		//Host of S3
-		Host string `json:"host"`
+//S3auth JSON struct of S3 authentication data
+type S3auth struct {
+	//Host of S3
+	Host string `json:"host"`
 
-		//Bucket that file will be uploaded to
-		Bucket string `json:"bucket"`
+	//Access key of S3
+	AccessKey string `json:"access_key"`
 
-		//Name of the file being uploaded
-		Filename string `json:"filename"`
+	//Secret key of S3
+	SecretKey string `json:"secret_key"`
+}
 
-		//Is the file private?
-		Private bool `json:"private"`
-	} `json:"s3data"`
+//S3data JSON struct of info about snapshot being uploaded
+type S3data struct {
+	//Host of S3
+	Host string `json:"host"`
+
+	//Bucket that file will be uploaded to
+	Bucket string `json:"bucket"`
+
+	//Name of the file being uploaded
+	Filename string `json:"filename"`
+
+	//Is the file private?
+	Private bool `json:"private"`
 }
 
 //GetStorageSnapshotList gets a list of storage snapshots
@@ -143,9 +152,10 @@ func (c *Client) GetStorageSnapshotList(ctx context.Context, id string) ([]Stora
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
-	r := Request{
-		uri:    path.Join(apiStorageBase, id, "snapshots"),
-		method: http.MethodGet,
+	r := request{
+		uri:                 path.Join(apiStorageBase, id, "snapshots"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response StorageSnapshotList
 	var snapshots []StorageSnapshot
@@ -163,9 +173,10 @@ func (c *Client) GetStorageSnapshot(ctx context.Context, storageID, snapshotID s
 	if !isValidUUID(storageID) || !isValidUUID(snapshotID) {
 		return StorageSnapshot{}, errors.New("'storageID' or 'snapshotID' is invalid")
 	}
-	r := Request{
-		uri:    path.Join(apiStorageBase, storageID, "snapshots", snapshotID),
-		method: http.MethodGet,
+	r := request{
+		uri:                 path.Join(apiStorageBase, storageID, "snapshots", snapshotID),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response StorageSnapshot
 	err := r.execute(ctx, *c, &response)
@@ -179,19 +190,13 @@ func (c *Client) CreateStorageSnapshot(ctx context.Context, id string, body Stor
 	if !isValidUUID(id) {
 		return StorageSnapshotCreateResponse{}, errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiStorageBase, id, "snapshots"),
 		method: http.MethodPost,
 		body:   body,
 	}
 	var response StorageSnapshotCreateResponse
 	err := r.execute(ctx, *c, &response)
-	if err != nil {
-		return StorageSnapshotCreateResponse{}, err
-	}
-	if c.cfg.sync {
-		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
-	}
 	return response, err
 }
 
@@ -202,18 +207,10 @@ func (c *Client) UpdateStorageSnapshot(ctx context.Context, storageID, snapshotI
 	if !isValidUUID(storageID) || !isValidUUID(snapshotID) {
 		return errors.New("'storageID' or 'snapshotID' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiStorageBase, storageID, "snapshots", snapshotID),
 		method: http.MethodPatch,
 		body:   body,
-	}
-	if c.cfg.sync {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		//Block until the request is finished
-		return c.waitForSnapshotActive(ctx, storageID, snapshotID)
 	}
 	return r.execute(ctx, *c, nil)
 }
@@ -225,17 +222,9 @@ func (c *Client) DeleteStorageSnapshot(ctx context.Context, storageID, snapshotI
 	if !isValidUUID(storageID) || !isValidUUID(snapshotID) {
 		return errors.New("'storageID' or 'snapshotID' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiStorageBase, storageID, "snapshots", snapshotID),
 		method: http.MethodDelete,
-	}
-	if c.cfg.sync {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		//Block until the request is finished
-		return c.waitForSnapshotDeleted(ctx, storageID, snapshotID)
 	}
 	return r.execute(ctx, *c, nil)
 }
@@ -247,18 +236,10 @@ func (c *Client) RollbackStorage(ctx context.Context, storageID, snapshotID stri
 	if !isValidUUID(storageID) || !isValidUUID(snapshotID) {
 		return errors.New("'storageID' or 'snapshotID' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiStorageBase, storageID, "snapshots", snapshotID, "rollback"),
 		method: http.MethodPatch,
 		body:   body,
-	}
-	if c.cfg.sync {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		//Block until the request is finished
-		return c.waitForSnapshotActive(ctx, storageID, snapshotID)
 	}
 	return r.execute(ctx, *c, nil)
 }
@@ -270,18 +251,10 @@ func (c *Client) ExportStorageSnapshotToS3(ctx context.Context, storageID, snaps
 	if !isValidUUID(storageID) || !isValidUUID(snapshotID) {
 		return errors.New("'storageID' and 'snapshotID' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiStorageBase, storageID, "snapshots", snapshotID, "export_to_s3"),
 		method: http.MethodPatch,
 		body:   body,
-	}
-	if c.cfg.sync {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		//Block until the request is finished
-		return c.waitForSnapshotActive(ctx, storageID, snapshotID)
 	}
 	return r.execute(ctx, *c, nil)
 }
@@ -293,9 +266,10 @@ func (c *Client) GetSnapshotsByLocation(ctx context.Context, id string) ([]Stora
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
-	r := Request{
-		uri:    path.Join(apiLocationBase, id, "snapshots"),
-		method: http.MethodGet,
+	r := request{
+		uri:                 path.Join(apiLocationBase, id, "snapshots"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response StorageSnapshotList
 	var snapshots []StorageSnapshot
@@ -310,9 +284,10 @@ func (c *Client) GetSnapshotsByLocation(ctx context.Context, id string) ([]Stora
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedSnapshots
 func (c *Client) GetDeletedSnapshots(ctx context.Context) ([]StorageSnapshot, error) {
-	r := Request{
-		uri:    path.Join(apiDeletedBase, "snapshots"),
-		method: http.MethodGet,
+	r := request{
+		uri:                 path.Join(apiDeletedBase, "snapshots"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response DeletedStorageSnapshotList
 	var snapshots []StorageSnapshot
@@ -321,22 +296,4 @@ func (c *Client) GetDeletedSnapshots(ctx context.Context) ([]StorageSnapshot, er
 		snapshots = append(snapshots, StorageSnapshot{Properties: properties})
 	}
 	return snapshots, err
-}
-
-//waitForSnapshotActive allows to wait until the snapshot's status is active
-func (c *Client) waitForSnapshotActive(ctx context.Context, storageID, snapshotID string) error {
-	return retryWithTimeout(func() (bool, error) {
-		snapshot, err := c.GetStorageSnapshot(ctx, storageID, snapshotID)
-		return snapshot.Properties.Status != resourceActiveStatus, err
-	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
-}
-
-//waitForSnapshotDeleted allows to wait until the snapshot is deleted
-func (c *Client) waitForSnapshotDeleted(ctx context.Context, storageID, snapshotID string) error {
-	if !isValidUUID(storageID) || !isValidUUID(snapshotID) {
-		return errors.New("'storageID' or 'snapshotID' is invalid")
-	}
-	uri := path.Join(apiStorageBase, storageID, "snapshots", snapshotID)
-	method := http.MethodGet
-	return c.waitFor404Status(ctx, uri, method)
 }

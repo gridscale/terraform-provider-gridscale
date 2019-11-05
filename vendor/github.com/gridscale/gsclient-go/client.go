@@ -3,8 +3,11 @@ package gsclient
 import (
 	"context"
 	"errors"
+	"fmt"
+	"github.com/sirupsen/logrus"
+	"net/http"
 	"path"
-	"strings"
+	"time"
 )
 
 const (
@@ -39,15 +42,66 @@ func NewClient(c *Config) *Client {
 	return client
 }
 
+//Logger returns logger
+func (c *Client) Logger() logrus.Logger {
+	return c.cfg.logger
+}
+
+//HttpClient returns http client
+func (c *Client) HttpClient() *http.Client {
+	return c.cfg.httpClient
+}
+
+//Synchronous returns if the client is sync or not
+func (c *Client) Synchronous() bool {
+	return c.cfg.sync
+}
+
+//RequestCheckTimeout returns request check timeout
+func (c *Client) RequestCheckTimeout() time.Duration {
+	return c.cfg.requestCheckTimeoutSecs
+}
+
+//DelayInterval returns request delay interval
+func (c *Client) DelayInterval() time.Duration {
+	return c.cfg.delayInterval
+}
+
+//MaxNumberOfRetries returns max number of retries
+func (c *Client) MaxNumberOfRetries() int {
+	return c.cfg.maxNumberOfRetries
+}
+
+//APIURL returns api URL
+func (c *Client) APIURL() string {
+	return c.cfg.apiURL
+}
+
+//UserAgent returns user agent
+func (c *Client) UserAgent() string {
+	return c.cfg.userAgent
+}
+
+//UserUUID returns user UUID
+func (c *Client) UserUUID() string {
+	return c.cfg.userUUID
+}
+
+//APIToken returns api token
+func (c *Client) APIToken() string {
+	return c.cfg.apiToken
+}
+
 //waitForRequestCompleted allows to wait for a request to complete
 func (c *Client) waitForRequestCompleted(ctx context.Context, id string) error {
-	if strings.TrimSpace(id) == "" {
-		return errors.New("'id' is required")
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
 	}
 	return retryWithTimeout(func() (bool, error) {
-		r := Request{
-			uri:    path.Join(requestBase, id),
-			method: "GET",
+		r := request{
+			uri:                 path.Join(requestBase, id),
+			method:              "GET",
+			skipCheckingRequest: true,
 		}
 		var response RequestStatus
 		err := r.execute(ctx, *c, &response)
@@ -55,51 +109,11 @@ func (c *Client) waitForRequestCompleted(ctx context.Context, id string) error {
 			return false, err
 		}
 		if response[id].Status == requestDoneStatus {
-			c.cfg.logger.Info("Done with creating")
 			return false, nil
+		} else if response[id].Status == requestFailStatus {
+			errMessage := fmt.Sprintf("request %s failed with error %s", id, response[id].Message)
+			return false, errors.New(errMessage)
 		}
 		return true, nil
-	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
-}
-
-//waitFor404Status waits until server returns 404 status code
-func (c *Client) waitFor404Status(ctx context.Context, uri, method string) error {
-	return retryWithTimeout(func() (bool, error) {
-		r := Request{
-			uri:          uri,
-			method:       method,
-			skipPrint404: true,
-		}
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			if requestError, ok := err.(RequestError); ok {
-				if requestError.StatusCode == 404 {
-					return false, nil
-				}
-			}
-			return false, err
-		}
-		return true, nil
-	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
-}
-
-//waitFor200Status waits until server returns 200 (OK) status code
-func (c *Client) waitFor200Status(ctx context.Context, uri, method string) error {
-	return retryWithTimeout(func() (bool, error) {
-		r := Request{
-			uri:          uri,
-			method:       method,
-			skipPrint404: true,
-		}
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			if requestError, ok := err.(RequestError); ok {
-				if requestError.StatusCode == 404 {
-					return true, nil
-				}
-			}
-			return false, err
-		}
-		return false, nil
-	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
+	}, c.RequestCheckTimeout(), c.DelayInterval())
 }

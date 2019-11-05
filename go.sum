@@ -74,6 +74,8 @@ github.com/gridscale/gsclient-go v1.0.0 h1:zQrWgeRwrL65dIMFm5X0JOFguitJGFIzNzQOK
 github.com/gridscale/gsclient-go v1.0.0/go.mod h1:GqJohyXKzDhL7XBgOz3+sycVXeF8lXVdZSDcK5y8AIM=
 github.com/gridscale/gsclient-go v2.0.0+incompatible h1:3PUB4hGEK1tAMSJdQEHNc7HxY1gfFqg1fCLdN68WF5I=
 github.com/gridscale/gsclient-go v2.0.0+incompatible/go.mod h1:GqJohyXKzDhL7XBgOz3+sycVXeF8lXVdZSDcK5y8AIM=
+github.com/gridscale/gsclient-go v2.1.0+incompatible h1:RO7nWtt355F2OY86erFD0qVLrRJSCxGT/GLM5eHXm7E=
+github.com/gridscale/gsclient-go v2.1.0+incompatible/go.mod h1:GqJohyXKzDhL7XBgOz3+sycVXeF8lXVdZSDcK5y8AIM=
 github.com/hashicorp/errwrap v0.0.0-20180715044906-d6c0cd880357/go.mod h1:YH+1FKiLXxHSkmPseP+kNlulaMuP3n2brvKWEqk/Jc4=
 github.com/hashicorp/errwrap v1.0.0 h1:hLrqtEDnRye3+sgx6z4qVLNuviH3MR5aQ0ykNJa/UYA=
 github.com/hashicorp/errwrap v1.0.0/go.mod h1:YH+1FKiLXxHSkmPseP+kNlulaMuP3n2brvKWEqk/Jc4=
@@ -270,6 +272,8 @@ golang.org/x/sys v0.0.0-20190624142023-c5567b49c5d0 h1:HyfiK1WMnHj5FXFXatD+Qs1A/
 golang.org/x/sys v0.0.0-20190624142023-c5567b49c5d0/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20190927073244-c990c680b611 h1:q9u40nxWT5zRClI/uU9dHCiYGottAg6Nzz4YUQyHxdA=
 golang.org/x/sys v0.0.0-20190927073244-c990c680b611/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+golang.org/x/sys v0.0.0-20191104094858-e8c54fb511f6 h1:ZJUmhYTp8GbGC0ViZRc2U+MIYQ8xx9MscsdXnclfIhw=
+golang.org/x/sys v0.0.0-20191104094858-e8c54fb511f6/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/text v0.3.0 h1:g61tztE5qeGQ89tm6NTjjM9VPIm088od1l6aSorWRWg=
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 golang.org/x/text v0.3.1-0.20180807135948-17ff2d5776d2 h1:z99zHgr7hKfrUcX/KsoJk5FJfjTceCKIp96+biqP4To=

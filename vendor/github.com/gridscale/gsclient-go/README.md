@@ -30,7 +30,20 @@ import (
 To get access to the functions of the Go client, a Client type needs to be created. This requires a Config type. Both of these can be created with the following code: 
 
 ```go
-config := gsclient.NewConfiguration("User-UUID", "API-token")
+//Using default config
+config := gsclient.DefaultConfiguration("User-UUID", "API-token")
+
+//OR Custom config
+config := gsclient.NewConfiguration(
+            "API-URL", 
+            "User-UUID", 
+            "API-token"), 
+            false, //Set debug mode
+            true, //Set sync mode 
+            120, //Timeout (in seconds) of checking requests
+            500, //Delay (in milliseconds) between requests
+            100, //Maximum number of retries
+        )
 client := gsclient.NewClient(config)
 ```
 
@@ -38,21 +51,25 @@ Make sure to replace the user-UUID and API-token strings with valid credentials 
 
 ## Using API endpoints
 
+***Note: `context` has to be passed to all APIs of `gsclient-go` as the first parameter. 
+
 After having created a Client type, as shown above, it will be possible to interact with the API. An example would be the [Servers Get endpoint](https://gridscale.io/en/api-documentation/index.html#servers-get):
 
 ```go
-servers := client.GetServerList()
+cxt := context.Background()
+servers := client.GetServerList(ctx)
 ```
 
 For creating and updating/patching objects in gridscale, it will be required to use the respective CreateRequest and UpdateRequest types. For creating an SSH-key that would be SshkeyCreateRequest and SshkeyUpdateRequest. Here an example:
 
 ```go
+cxt := context.Background()
 requestBody := gsclient.IPCreateRequest {
-	Family: 6,
+	Family: gsclient.IPv6Type,
 	Name:   "IPTest",
 }
 
-client.CreateIP(requestBody)
+client.CreateIP(ctx, requestBody)
 ```
 
 What options are available for each create and update request can be found in the source code. After installing it should be located in: 

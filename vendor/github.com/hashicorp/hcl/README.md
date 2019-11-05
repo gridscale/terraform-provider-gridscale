@@ -86,7 +86,7 @@ FOO
     of objects can be created with repeated blocks, using
     this structure:
 
-    ```terraform
+    ```hcl
     service {
         key = "value"
     }

@@ -10,12 +10,14 @@ import (
 
 const (
 	defaultCheckRequestTimeoutSecs = 120
-	defaultMaxNumberOfRetries      = 100
+	defaultMaxNumberOfRetries      = 5
 	defaultDelayIntervalMilliSecs  = 500
-	version                        = "1.0.0"
+	version                        = "2.1.0"
 	defaultAPIURL                  = "https://api.gridscale.io"
 	resourceActiveStatus           = "active"
 	requestDoneStatus              = "done"
+	requestFailStatus              = "failed"
+	bodyType                       = "application/json"
 )
 
 //Config config for client

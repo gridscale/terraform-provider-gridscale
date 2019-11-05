@@ -57,9 +57,10 @@ func (c *Client) GetServerIsoImageList(ctx context.Context, id string) ([]Server
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
-	r := Request{
-		uri:    path.Join(apiServerBase, id, "isoimages"),
-		method: http.MethodGet,
+	r := request{
+		uri:                 path.Join(apiServerBase, id, "isoimages"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response ServerIsoImageRelationList
 	err := r.execute(ctx, *c, &response)
@@ -73,9 +74,10 @@ func (c *Client) GetServerIsoImage(ctx context.Context, serverID, isoImageID str
 	if !isValidUUID(serverID) || !isValidUUID(isoImageID) {
 		return ServerIsoImageRelationProperties{}, errors.New("'id' is invalid")
 	}
-	r := Request{
-		uri:    path.Join(apiServerBase, serverID, "isoimages", isoImageID),
-		method: http.MethodGet,
+	r := request{
+		uri:                 path.Join(apiServerBase, serverID, "isoimages", isoImageID),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response ServerIsoImageRelation
 	err := r.execute(ctx, *c, &response)
@@ -89,7 +91,7 @@ func (c *Client) UpdateServerIsoImage(ctx context.Context, serverID, isoImageID 
 	if !isValidUUID(serverID) || !isValidUUID(isoImageID) {
 		return errors.New("'serverID' or 'isoImageID' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiServerBase, serverID, "isoimages", isoImageID),
 		method: http.MethodPatch,
 		body:   body,
@@ -104,17 +106,10 @@ func (c *Client) CreateServerIsoImage(ctx context.Context, id string, body Serve
 	if !isValidUUID(id) || !isValidUUID(body.ObjectUUID) {
 		return errors.New("'serverID' or 'isoImageID' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiServerBase, id, "isoimages"),
 		method: http.MethodPost,
 		body:   body,
-	}
-	if c.cfg.sync {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		return c.waitForServerISOImageRelCreation(ctx, id, body.ObjectUUID)
 	}
 	return r.execute(ctx, *c, nil)
 }
@@ -126,16 +121,9 @@ func (c *Client) DeleteServerIsoImage(ctx context.Context, serverID, isoImageID 
 	if !isValidUUID(serverID) || !isValidUUID(isoImageID) {
 		return errors.New("'serverID' or 'isoImageID' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiServerBase, serverID, "isoimages", isoImageID),
 		method: http.MethodDelete,
-	}
-	if c.cfg.sync {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		return c.waitForServerISOImageRelDeleted(ctx, serverID, isoImageID)
 	}
 	return r.execute(ctx, *c, nil)
 }
@@ -151,24 +139,4 @@ func (c *Client) LinkIsoImage(ctx context.Context, serverID string, isoimageID s
 //UnlinkIsoImage removes the link between an ISO image and a server
 func (c *Client) UnlinkIsoImage(ctx context.Context, serverID string, isoimageID string) error {
 	return c.DeleteServerIsoImage(ctx, serverID, isoimageID)
-}
-
-//waitForServerISOImageRelCreation allows to wait until the relation between a server and an ISO-Image is created
-func (c *Client) waitForServerISOImageRelCreation(ctx context.Context, serverID, isoimageID string) error {
-	if !isValidUUID(serverID) || !isValidUUID(isoimageID) {
-		return errors.New("'serverID' and 'isoimageID' are required")
-	}
-	uri := path.Join(apiServerBase, serverID, "isoimages", isoimageID)
-	method := http.MethodGet
-	return c.waitFor200Status(ctx, uri, method)
-}
-
-//waitForServerISOImageRelDeleted allows to wait until the relation between a server and an ISO-Image is deleted
-func (c *Client) waitForServerISOImageRelDeleted(ctx context.Context, serverID, isoimageID string) error {
-	if !isValidUUID(serverID) || !isValidUUID(isoimageID) {
-		return errors.New("'serverID' and 'isoimageID' are required")
-	}
-	uri := path.Join(apiServerBase, serverID, "isoimages", isoimageID)
-	method := http.MethodGet
-	return c.waitFor404Status(ctx, uri, method)
 }
