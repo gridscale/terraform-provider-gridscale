@@ -8,19 +8,12 @@ import (
 	"sync"
 )
 
-//serverPowerStatus represents power state of a server
-//mutex is used to lock the resource when a goroutine changes/reads a server's
-//power state, so it prevents other goroutines from accessing/modifying the server's power state
-type serverPowerStatus struct {
-	power bool
-}
-
 //listServersPowerStatus represents a list of power states of
 //all servers (declared in terraform).
-//mutex is used to lock when adding or removing servers.
+//mutex is used to lock when adding or removing servers or modifying servers' power states.
 //***NOTE: servers declared outside terraform are not included.
 type listServersPowerStatus struct {
-	list map[string]*serverPowerStatus
+	list map[string]bool
 	mux  sync.Mutex
 }
 
@@ -40,9 +33,7 @@ func (l *listServersPowerStatus) addServer(id string) error {
 	}()
 	//check if the server is already in the list
 	if _, ok := l.list[id]; !ok {
-		l.list[id] = &serverPowerStatus{
-			false,
-		}
+		l.list[id] = false
 		return nil
 	}
 	return fmt.Errorf("server (%s) ALREADY exists in current list of servers in terraform", id)
@@ -88,7 +79,7 @@ func (l *listServersPowerStatus) getServerPowerStatus(id string) (bool, error) {
 	}()
 	//check if the server is in the list
 	if _, ok := l.list[id]; ok {
-		return l.list[id].power, nil
+		return l.list[id], nil
 	}
 	return false, fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
 }
@@ -110,7 +101,7 @@ func (l *listServersPowerStatus) startServerSynchronously(ctx context.Context, c
 		if err != nil {
 			return err
 		}
-		l.list[id].power = true
+		l.list[id] = true
 		return nil
 	}
 	return fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
@@ -133,7 +124,7 @@ func (l *listServersPowerStatus) shutdownServerSynchronously(ctx context.Context
 		if err != nil {
 			return err
 		}
-		l.list[id].power = false
+		l.list[id] = false
 		return nil
 	}
 	return fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
@@ -161,7 +152,7 @@ func (l *listServersPowerStatus) runActionRequireServerOff(
 	if _, ok := l.list[id]; ok {
 		var err error
 		//Get the original server's power state
-		originPowerState := l.list[id].power
+		originPowerState := l.list[id]
 		//if the server is on, shutdown the server (synchronously) before running the action,
 		//and start the server after finishing the action.
 		if originPowerState {
@@ -197,7 +188,7 @@ func (l *listServersPowerStatus) runActionRequireServerOff(
 
 //serverPowerStateList global list of all servers' power states in terraform
 var serverPowerStateList = listServersPowerStatus{
-	list: make(map[string]*serverPowerStatus),
+	list: make(map[string]bool),
 }
 
 //convSOStrings converts slice of interfaces to slice of strings
