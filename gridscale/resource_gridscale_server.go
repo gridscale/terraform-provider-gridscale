@@ -183,10 +183,6 @@ func resourceGridscaleServer() *schema.Resource {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"partner_uuid": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
 						"ordering": {
 							Type:     schema.TypeInt,
 							Computed: true,
@@ -225,8 +221,9 @@ func resourceGridscaleServer() *schema.Resource {
 				Computed: true,
 			},
 			"auto_recovery": {
-				Type:        schema.TypeInt,
+				Type:        schema.TypeBool,
 				Description: "If the server should be auto-started in case of a failure (default=true).",
+				Optional:    true,
 				Computed:    true,
 			},
 			"availability_zone": {
@@ -250,7 +247,7 @@ func resourceGridscaleServer() *schema.Resource {
 			},
 			"console_token": {
 				Type:        schema.TypeString,
-				Description: "If the server should be auto-started in case of a failure (default=true).",
+				Description: "The token used by the panel to open the websocket VNC connection to the server console.",
 				Computed:    true,
 			},
 			"legacy": {
@@ -264,6 +261,18 @@ func resourceGridscaleServer() *schema.Resource {
 			},
 			"usage_in_minutes_cores": {
 				Type:     schema.TypeInt,
+				Computed: true,
+			},
+			"create_time": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"change_time": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"status": {
+				Type:     schema.TypeString,
 				Computed: true,
 			},
 			"labels": {
@@ -382,6 +391,9 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("hardware_profile", server.Properties.HardwareProfile)
 	d.Set("location_uuid", server.Properties.LocationUUID)
 	d.Set("power", server.Properties.Power)
+	d.Set("status", server.Properties.Status)
+	d.Set("create_time", server.Properties.CreateTime.String())
+	d.Set("change_time", server.Properties.ChangeTime.String())
 	d.Set("current_price", server.Properties.CurrentPrice)
 	d.Set("availability_zone", server.Properties.AvailabilityZone)
 	d.Set("auto_recovery", server.Properties.AutoRecovery)
@@ -523,6 +535,13 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		LocationUUID:    d.Get("location_uuid").(string),
 		AvailablityZone: d.Get("availability_zone").(string),
 		Labels:          convSOStrings(d.Get("labels").(*schema.Set).List()),
+	}
+
+	//If `auto_recovery` is set
+	if val, ok := d.GetOk("auto_recovery"); ok {
+		autoRecovery := new(bool)
+		*autoRecovery = val.(bool)
+		requestBody.AutoRecovery = autoRecovery
 	}
 
 	profile := d.Get("hardware_profile").(string)
