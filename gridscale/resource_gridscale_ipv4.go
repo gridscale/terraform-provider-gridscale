@@ -203,7 +203,7 @@ func resourceGridscaleIpDelete(d *schema.ResourceData, meta interface{}) error {
 			return err
 		}
 		//DeleteIP requires the server to be off
-		err = serverPowerStateList.runActionRequireServerOff(emptyCtx, client, server.ServerUUID, deleteIPAction)
+		err = serverPowerStateList.runActionRequireServerOff(emptyCtx, client, server.ServerUUID, false, deleteIPAction)
 		if err != nil {
 			return err
 		}
