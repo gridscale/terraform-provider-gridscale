@@ -50,8 +50,8 @@ func (l *listServersPowerStatus) addServer(id string) error {
 	return fmt.Errorf("server (%s) ALREADY exists in current list of servers in terraform", id)
 }
 
-//removeServer removes a server power state from the list
-func (l *listServersPowerStatus) removeServer(id string) error {
+//removeServerSynchronously removes a server
+func (l *listServersPowerStatus) removeServerSynchronously(ctx context.Context, c *gsclient.Client, id string) error {
 	//check if the server is in the list
 	if _, ok := l.list[id]; ok {
 		//lock the list
@@ -62,6 +62,16 @@ func (l *listServersPowerStatus) removeServer(id string) error {
 			l.mux.Unlock()
 			log.Printf("[DEBUG] LOCK RELEASED! Server (%v) is removed", id)
 		}()
+		//Shutdown server
+		err := c.ShutdownServer(ctx, id)
+		if err != nil {
+			return err
+		}
+		//Delete server
+		err = c.DeleteServer(ctx, id)
+		if err != nil {
+			return err
+		}
 		delete(l.list, id)
 		return nil
 	}
