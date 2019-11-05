@@ -665,7 +665,7 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 			err = serverDepClient.UpdateStoragesRel(ctx)
 			return err
 		}
-		err = serverPowerStateList.runActionRequireServerOff(emptyCtx, gsc, d.Id(), updateSequence)
+		err = serverPowerStateList.runActionRequireServerOff(emptyCtx, gsc, d.Id(), true, updateSequence)
 		if err != nil {
 			return err
 		}

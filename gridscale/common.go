@@ -139,8 +139,16 @@ func (l *listServersPowerStatus) shutdownServerSynchronously(ctx context.Context
 	return fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
 }
 
-//runActionRequireServerOff runs a specific action (function) after shutting down (synchronously) the server successfully
-func (l *listServersPowerStatus) runActionRequireServerOff(ctx context.Context, c *gsclient.Client, id string, action actionRequireServerOff) error {
+//runActionRequireServerOff runs a specific action (function) after shutting down (synchronously) the server successfully.
+//Some actions are NOT necessary if the server is already deleted (such as `UnlinkXXX` methods), that means they do
+//not need the server to exist strictly.
+//However, the are still some others requiring the server's presence (such as some server update sequences).
+func (l *listServersPowerStatus) runActionRequireServerOff(
+	ctx context.Context,
+	c *gsclient.Client,
+	id string,
+	serverRequired bool,
+	action actionRequireServerOff) error {
 	//lock the list
 	l.mux.Lock()
 	log.Printf("[DEBUG] LOCK ACQUIRED to run an action requiring server (%v) to be OFF", id)
@@ -149,9 +157,9 @@ func (l *listServersPowerStatus) runActionRequireServerOff(ctx context.Context, 
 		l.mux.Unlock()
 		log.Printf("[DEBUG] LOCK RELEASED! Action requiring server (%v) is done", id)
 	}()
-	var err error
 	//check if the server is in the list
 	if _, ok := l.list[id]; ok {
+		var err error
 		//Get the original server's power state
 		originPowerState := l.list[id].power
 		//if the server is on, shutdown the server (synchronously) before running the action,
@@ -180,8 +188,11 @@ func (l *listServersPowerStatus) runActionRequireServerOff(ctx context.Context, 
 		err = action(ctx)
 		return err
 	}
-	err = fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
-	return err
+	if serverRequired {
+		err := fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
+		return err
+	}
+	return nil
 }
 
 //serverPowerStateList global list of all servers' power states in terraform
