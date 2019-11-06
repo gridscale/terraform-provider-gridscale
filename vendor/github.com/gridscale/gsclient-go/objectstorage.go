@@ -77,9 +77,10 @@ type ObjectStorageBucketProperties struct {
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getAccessKeys
 func (c *Client) GetObjectStorageAccessKeyList(ctx context.Context) ([]ObjectStorageAccessKey, error) {
-	r := Request{
-		uri:    path.Join(apiObjectStorageBase, "access_keys"),
-		method: http.MethodGet,
+	r := request{
+		uri:                 path.Join(apiObjectStorageBase, "access_keys"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response ObjectStorageAccessKeyList
 	var accessKeys []ObjectStorageAccessKey
@@ -97,9 +98,10 @@ func (c *Client) GetObjectStorageAccessKey(ctx context.Context, id string) (Obje
 	if strings.TrimSpace(id) == "" {
 		return ObjectStorageAccessKey{}, errors.New("'id' is required")
 	}
-	r := Request{
-		uri:    path.Join(apiObjectStorageBase, "access_keys", id),
-		method: http.MethodGet,
+	r := request{
+		uri:                 path.Join(apiObjectStorageBase, "access_keys", id),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response ObjectStorageAccessKey
 	err := r.execute(ctx, *c, &response)
@@ -110,18 +112,12 @@ func (c *Client) GetObjectStorageAccessKey(ctx context.Context, id string) (Obje
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/createAccessKey
 func (c *Client) CreateObjectStorageAccessKey(ctx context.Context) (ObjectStorageAccessKeyCreateResponse, error) {
-	r := Request{
+	r := request{
 		uri:    path.Join(apiObjectStorageBase, "access_keys"),
 		method: http.MethodPost,
 	}
 	var response ObjectStorageAccessKeyCreateResponse
 	err := r.execute(ctx, *c, &response)
-	if err != nil {
-		return ObjectStorageAccessKeyCreateResponse{}, err
-	}
-	if c.cfg.sync {
-		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
-	}
 	return response, err
 }
 
@@ -132,17 +128,9 @@ func (c *Client) DeleteObjectStorageAccessKey(ctx context.Context, id string) er
 	if strings.TrimSpace(id) == "" {
 		return errors.New("'id' is required")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiObjectStorageBase, "access_keys", id),
 		method: http.MethodDelete,
-	}
-	if c.cfg.sync {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		//Block until the request is finished
-		return c.waitForObjectStorageAccessKeyDeleted(ctx, id)
 	}
 	return r.execute(ctx, *c, nil)
 }
@@ -151,9 +139,10 @@ func (c *Client) DeleteObjectStorageAccessKey(ctx context.Context, id string) er
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getBuckets
 func (c *Client) GetObjectStorageBucketList(ctx context.Context) ([]ObjectStorageBucket, error) {
-	r := Request{
-		uri:    path.Join(apiObjectStorageBase, "buckets"),
-		method: http.MethodGet,
+	r := request{
+		uri:                 path.Join(apiObjectStorageBase, "buckets"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response ObjectStorageBucketList
 	var buckets []ObjectStorageBucket
@@ -162,14 +151,4 @@ func (c *Client) GetObjectStorageBucketList(ctx context.Context) ([]ObjectStorag
 		buckets = append(buckets, ObjectStorageBucket{Properties: properties})
 	}
 	return buckets, err
-}
-
-//waitForObjectStorageAccessKeyDeleted allows to wait until the object storage's access key is deleted
-func (c *Client) waitForObjectStorageAccessKeyDeleted(ctx context.Context, id string) error {
-	if strings.TrimSpace(id) == "" {
-		return errors.New("'id' is required")
-	}
-	uri := path.Join(apiObjectStorageBase, "access_keys", id)
-	method := http.MethodGet
-	return c.waitFor404Status(ctx, uri, method)
 }

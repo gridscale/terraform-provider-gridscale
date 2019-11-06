@@ -162,9 +162,10 @@ type FirewallUpdateRequest struct {
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getFirewalls
 func (c *Client) GetFirewallList(ctx context.Context) ([]Firewall, error) {
-	r := Request{
-		uri:    path.Join(apiFirewallBase),
-		method: http.MethodGet,
+	r := request{
+		uri:                 path.Join(apiFirewallBase),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response FirewallList
 	var firewalls []Firewall
@@ -182,9 +183,10 @@ func (c *Client) GetFirewall(ctx context.Context, id string) (Firewall, error) {
 	if !isValidUUID(id) {
 		return Firewall{}, errors.New("'id' is invalid")
 	}
-	r := Request{
-		uri:    path.Join(apiFirewallBase, id),
-		method: http.MethodGet,
+	r := request{
+		uri:                 path.Join(apiFirewallBase, id),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response Firewall
 	err := r.execute(ctx, *c, &response)
@@ -195,20 +197,13 @@ func (c *Client) GetFirewall(ctx context.Context, id string) (Firewall, error) {
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/createFirewall
 func (c *Client) CreateFirewall(ctx context.Context, body FirewallCreateRequest) (FirewallCreateResponse, error) {
-	r := Request{
+	r := request{
 		uri:    path.Join(apiFirewallBase),
 		method: http.MethodPost,
 		body:   body,
 	}
 	var response FirewallCreateResponse
 	err := r.execute(ctx, *c, &response)
-	if err != nil {
-		return FirewallCreateResponse{}, err
-	}
-	//Block until the request is finished
-	if c.cfg.sync {
-		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
-	}
 	return response, err
 }
 
@@ -219,18 +214,10 @@ func (c *Client) UpdateFirewall(ctx context.Context, id string, body FirewallUpd
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiFirewallBase, id),
 		method: http.MethodPatch,
 		body:   body,
-	}
-	if c.cfg.sync {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		//Block until the request is finished
-		return c.waitForFirewallActive(ctx, id)
 	}
 	return r.execute(ctx, *c, nil)
 }
@@ -242,17 +229,9 @@ func (c *Client) DeleteFirewall(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiFirewallBase, id),
 		method: http.MethodDelete,
-	}
-	if c.cfg.sync {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		//Block until the request is finished
-		return c.waitForFirewallDeleted(ctx, id)
 	}
 	return r.execute(ctx, *c, nil)
 }
@@ -264,9 +243,10 @@ func (c *Client) GetFirewallEventList(ctx context.Context, id string) ([]Event, 
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
-	r := Request{
-		uri:    path.Join(apiFirewallBase, id, "events"),
-		method: http.MethodGet,
+	r := request{
+		uri:                 path.Join(apiFirewallBase, id, "events"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response EventList
 	var firewallEvents []Event
@@ -275,22 +255,4 @@ func (c *Client) GetFirewallEventList(ctx context.Context, id string) ([]Event, 
 		firewallEvents = append(firewallEvents, Event{Properties: properties})
 	}
 	return firewallEvents, err
-}
-
-//waitForFirewallActive allows to wait until the firewall's status is active
-func (c *Client) waitForFirewallActive(ctx context.Context, id string) error {
-	return retryWithTimeout(func() (bool, error) {
-		fw, err := c.GetFirewall(ctx, id)
-		return fw.Properties.Status != resourceActiveStatus, err
-	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
-}
-
-//waitForFirewallDeleted allows to wait until the firewall is deleted
-func (c *Client) waitForFirewallDeleted(ctx context.Context, id string) error {
-	if !isValidUUID(id) {
-		return errors.New("'id' is invalid")
-	}
-	uri := path.Join(apiFirewallBase, id)
-	method := http.MethodGet
-	return c.waitFor404Status(ctx, uri, method)
 }

@@ -78,9 +78,10 @@ func (c *Client) GetSshkey(ctx context.Context, id string) (Sshkey, error) {
 	if !isValidUUID(id) {
 		return Sshkey{}, errors.New("'id' is invalid")
 	}
-	r := Request{
-		uri:    path.Join(apiSshkeyBase, id),
-		method: http.MethodGet,
+	r := request{
+		uri:                 path.Join(apiSshkeyBase, id),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response Sshkey
 	err := r.execute(ctx, *c, &response)
@@ -91,9 +92,10 @@ func (c *Client) GetSshkey(ctx context.Context, id string) (Sshkey, error) {
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getSshKeys
 func (c *Client) GetSshkeyList(ctx context.Context) ([]Sshkey, error) {
-	r := Request{
-		uri:    apiSshkeyBase,
-		method: http.MethodGet,
+	r := request{
+		uri:                 apiSshkeyBase,
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 
 	var response SshkeyList
@@ -109,19 +111,13 @@ func (c *Client) GetSshkeyList(ctx context.Context) ([]Sshkey, error) {
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/createSshKey
 func (c *Client) CreateSshkey(ctx context.Context, body SshkeyCreateRequest) (CreateResponse, error) {
-	r := Request{
+	r := request{
 		uri:    apiSshkeyBase,
 		method: "POST",
 		body:   body,
 	}
 	var response CreateResponse
 	err := r.execute(ctx, *c, &response)
-	if err != nil {
-		return CreateResponse{}, err
-	}
-	if c.cfg.sync {
-		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
-	}
 	return response, err
 }
 
@@ -132,17 +128,9 @@ func (c *Client) DeleteSshkey(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiSshkeyBase, id),
 		method: http.MethodDelete,
-	}
-	if c.cfg.sync {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		//Block until the request is finished
-		return c.waitForSSHKeyDeleted(ctx, id)
 	}
 	return r.execute(ctx, *c, nil)
 }
@@ -154,18 +142,10 @@ func (c *Client) UpdateSshkey(ctx context.Context, id string, body SshkeyUpdateR
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiSshkeyBase, id),
 		method: http.MethodPatch,
 		body:   body,
-	}
-	if c.cfg.sync {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		//Block until the request is finished
-		return c.waitForSSHKeyActive(ctx, id)
 	}
 	return r.execute(ctx, *c, nil)
 }
@@ -177,9 +157,10 @@ func (c *Client) GetSshkeyEventList(ctx context.Context, id string) ([]Event, er
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
-	r := Request{
-		uri:    path.Join(apiSshkeyBase, id, "events"),
-		method: http.MethodGet,
+	r := request{
+		uri:                 path.Join(apiSshkeyBase, id, "events"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response EventList
 	var sshEvents []Event
@@ -188,22 +169,4 @@ func (c *Client) GetSshkeyEventList(ctx context.Context, id string) ([]Event, er
 		sshEvents = append(sshEvents, Event{Properties: properties})
 	}
 	return sshEvents, err
-}
-
-//waitForSSHKeyActive allows to wait until the SSH-Key's status is active
-func (c *Client) waitForSSHKeyActive(ctx context.Context, id string) error {
-	return retryWithTimeout(func() (bool, error) {
-		key, err := c.GetSshkey(ctx, id)
-		return key.Properties.Status != resourceActiveStatus, err
-	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
-}
-
-//waitForSSHKeyDeleted allows to wait until the SSH-Key is deleted
-func (c *Client) waitForSSHKeyDeleted(ctx context.Context, id string) error {
-	if !isValidUUID(id) {
-		return errors.New("'id' is invalid")
-	}
-	uri := path.Join(apiSshkeyBase, id)
-	method := http.MethodGet
-	return c.waitFor404Status(ctx, uri, method)
 }

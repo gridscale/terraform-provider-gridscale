@@ -2,6 +2,7 @@ package gsclient
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"time"
@@ -9,8 +10,9 @@ import (
 
 const (
 	dummyUUID        = "690de890-13c0-4e76-8a01-e10ba8786e53"
-	dummyRequestUUID = "x123xx1x-123x-1x12-123x-123xxx123x1x"
+	dummyRequestUUID = "690de890-13c0-4e76-8a01-e10ba8786e53"
 )
+
 var emptyCtx = context.Background()
 var dummyTimeOriginal, _ = time.Parse(gsTimeLayout, "2018-04-28T09:47:41Z")
 var dummyTime = GSTime{dummyTimeOriginal}
@@ -51,5 +53,10 @@ func setupTestClient(sync bool) (*httptest.Server, *Client, *http.ServeMux) {
 	mux := http.NewServeMux()
 	server := httptest.NewServer(mux)
 	config := NewConfiguration(server.URL, "uuid", "token", true, sync, 1, 100, 5)
+
+	httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
+	mux.HandleFunc(requestBase, func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, httpResponse)
+	})
 	return server, NewClient(config), mux
 }

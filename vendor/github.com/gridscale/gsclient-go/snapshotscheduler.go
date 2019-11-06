@@ -132,9 +132,10 @@ func (c *Client) GetStorageSnapshotScheduleList(ctx context.Context, id string) 
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
-	r := Request{
-		uri:    path.Join(apiStorageBase, id, "snapshot_schedules"),
-		method: http.MethodGet,
+	r := request{
+		uri:                 path.Join(apiStorageBase, id, "snapshot_schedules"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response StorageSnapshotScheduleList
 	var schedules []StorageSnapshotSchedule
@@ -152,9 +153,10 @@ func (c *Client) GetStorageSnapshotSchedule(ctx context.Context, storageID, sche
 	if !isValidUUID(storageID) || !isValidUUID(scheduleID) {
 		return StorageSnapshotSchedule{}, errors.New("'storageID' or 'scheduleID' is invalid")
 	}
-	r := Request{
-		uri:    path.Join(apiStorageBase, storageID, "snapshot_schedules", scheduleID),
-		method: http.MethodGet,
+	r := request{
+		uri:                 path.Join(apiStorageBase, storageID, "snapshot_schedules", scheduleID),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response StorageSnapshotSchedule
 	err := r.execute(ctx, *c, &response)
@@ -169,19 +171,13 @@ func (c *Client) CreateStorageSnapshotSchedule(ctx context.Context, id string, b
 	if !isValidUUID(id) {
 		return StorageSnapshotScheduleCreateResponse{}, errors.New("'id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiStorageBase, id, "snapshot_schedules"),
 		method: http.MethodPost,
 		body:   body,
 	}
 	var response StorageSnapshotScheduleCreateResponse
 	err := r.execute(ctx, *c, &response)
-	if err != nil {
-		return StorageSnapshotScheduleCreateResponse{}, err
-	}
-	if c.cfg.sync {
-		err = c.waitForRequestCompleted(ctx, response.RequestUUID)
-	}
 	return response, err
 }
 
@@ -193,18 +189,10 @@ func (c *Client) UpdateStorageSnapshotSchedule(ctx context.Context, storageID, s
 	if !isValidUUID(storageID) || !isValidUUID(scheduleID) {
 		return errors.New("'storageID' or 'scheduleID' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiStorageBase, storageID, "snapshot_schedules", scheduleID),
 		method: http.MethodPatch,
 		body:   body,
-	}
-	if c.cfg.sync {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		//Block until the request is finished
-		return c.waitForSnapshotScheduleActive(ctx, storageID, scheduleID)
 	}
 	return r.execute(ctx, *c, nil)
 }
@@ -216,35 +204,9 @@ func (c *Client) DeleteStorageSnapshotSchedule(ctx context.Context, storageID, s
 	if !isValidUUID(storageID) || !isValidUUID(scheduleID) {
 		return errors.New("'storageID' or 'scheduleID' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiStorageBase, storageID, "snapshot_schedules", scheduleID),
 		method: http.MethodDelete,
 	}
-	if c.cfg.sync {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		//Block until the request is finished
-		return c.waitForSnapshotScheduleDeleted(ctx, storageID, scheduleID)
-	}
 	return r.execute(ctx, *c, nil)
-}
-
-//waitForSnapshotScheduleActive allows to wait until the snapshot schedule's status is active
-func (c *Client) waitForSnapshotScheduleActive(ctx context.Context, storageID, scheduleID string) error {
-	return retryWithTimeout(func() (bool, error) {
-		schedule, err := c.GetStorageSnapshotSchedule(ctx, storageID, scheduleID)
-		return schedule.Properties.Status != resourceActiveStatus, err
-	}, c.cfg.requestCheckTimeoutSecs, c.cfg.delayInterval)
-}
-
-//waitForSnapshotScheduleDeleted allows to wait until the snapshot schedule deleted
-func (c *Client) waitForSnapshotScheduleDeleted(ctx context.Context, storageID, scheduleID string) error {
-	if !isValidUUID(storageID) || !isValidUUID(scheduleID) {
-		return errors.New("'storageID' or 'scheduleID' is invalid")
-	}
-	uri := path.Join(apiStorageBase, storageID, "snapshot_schedules", scheduleID)
-	method := http.MethodGet
-	return c.waitFor404Status(ctx, uri, method)
 }

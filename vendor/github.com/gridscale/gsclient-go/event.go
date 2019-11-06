@@ -51,9 +51,10 @@ type EventProperties struct {
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/EventGetAll
 func (c *Client) GetEventList(ctx context.Context) ([]Event, error) {
-	r := Request{
-		uri:    apiEventBase,
-		method: http.MethodGet,
+	r := request{
+		uri:                 apiEventBase,
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response EventList
 	var events []Event

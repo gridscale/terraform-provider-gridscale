@@ -126,9 +126,10 @@ func (c *Client) GetServerNetworkList(ctx context.Context, id string) ([]ServerN
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
-	r := Request{
-		uri:    path.Join(apiServerBase, id, "networks"),
-		method: http.MethodGet,
+	r := request{
+		uri:                 path.Join(apiServerBase, id, "networks"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response ServerNetworkRelationList
 	err := r.execute(ctx, *c, &response)
@@ -142,9 +143,10 @@ func (c *Client) GetServerNetwork(ctx context.Context, serverID, networkID strin
 	if !isValidUUID(serverID) || !isValidUUID(networkID) {
 		return ServerNetworkRelationProperties{}, errors.New("'serverID' or 'networksID' is invalid")
 	}
-	r := Request{
-		uri:    path.Join(apiServerBase, serverID, "networks", networkID),
-		method: http.MethodGet,
+	r := request{
+		uri:                 path.Join(apiServerBase, serverID, "networks", networkID),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
 	}
 	var response ServerNetworkRelation
 	err := r.execute(ctx, *c, &response)
@@ -158,7 +160,7 @@ func (c *Client) UpdateServerNetwork(ctx context.Context, serverID, networkID st
 	if !isValidUUID(serverID) || !isValidUUID(networkID) {
 		return errors.New("'serverID' or 'networksID' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiServerBase, serverID, "networks", networkID),
 		method: http.MethodPatch,
 		body:   body,
@@ -173,17 +175,10 @@ func (c *Client) CreateServerNetwork(ctx context.Context, id string, body Server
 	if !isValidUUID(id) || !isValidUUID(body.ObjectUUID) {
 		return errors.New("'serverID' or 'network_id' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiServerBase, id, "networks"),
 		method: http.MethodPost,
 		body:   body,
-	}
-	if c.cfg.sync {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		return c.waitForServerNetworkRelCreation(ctx, id, body.ObjectUUID)
 	}
 	return r.execute(ctx, *c, nil)
 }
@@ -195,16 +190,9 @@ func (c *Client) DeleteServerNetwork(ctx context.Context, serverID, networkID st
 	if !isValidUUID(serverID) || !isValidUUID(networkID) {
 		return errors.New("'serverID' or 'networkID' is invalid")
 	}
-	r := Request{
+	r := request{
 		uri:    path.Join(apiServerBase, serverID, "networks", networkID),
 		method: http.MethodDelete,
-	}
-	if c.cfg.sync {
-		err := r.execute(ctx, *c, nil)
-		if err != nil {
-			return err
-		}
-		return c.waitForServerNetworkRelDeleted(ctx, serverID, networkID)
 	}
 	return r.execute(ctx, *c, nil)
 }
@@ -226,24 +214,4 @@ func (c *Client) LinkNetwork(ctx context.Context, serverID, networkID, firewallT
 //UnlinkNetwork removes the link between a network and a server
 func (c *Client) UnlinkNetwork(ctx context.Context, serverID string, networkID string) error {
 	return c.DeleteServerNetwork(ctx, serverID, networkID)
-}
-
-//waitForServerNetworkRelCreation allows to wait until the relation between a server and a network is created
-func (c *Client) waitForServerNetworkRelCreation(ctx context.Context, serverID, networkID string) error {
-	if !isValidUUID(serverID) || !isValidUUID(networkID) {
-		return errors.New("'serverID' and 'networkID' are required")
-	}
-	uri := path.Join(apiServerBase, serverID, "networks", networkID)
-	method := http.MethodGet
-	return c.waitFor200Status(ctx, uri, method)
-}
-
-//waitForServerNetworkRelDeleted allows to wait until the relation between a server and a network is deleted
-func (c *Client) waitForServerNetworkRelDeleted(ctx context.Context, serverID, networkID string) error {
-	if !isValidUUID(serverID) || !isValidUUID(networkID) {
-		return errors.New("'serverID' and 'networkID' are required")
-	}
-	uri := path.Join(apiServerBase, serverID, "networks", networkID)
-	method := http.MethodGet
-	return c.waitFor404Status(ctx, uri, method)
 }
