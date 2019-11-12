@@ -1,10 +1,14 @@
 package gridscale
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/gridscale/gsclient-go"
+	"io"
 	"log"
+	"os"
 	"sync"
 )
 
@@ -20,6 +24,61 @@ type listServersPowerStatus struct {
 //actionRequireServerOff signature of a function that requires a server to be off
 //in order to run
 type actionRequireServerOff func(ctx context.Context) error
+
+//FlushToFile saves `listServersPowerStatus.list` to a file
+func (l *listServersPowerStatus) FlushToFile(filename string) error {
+	//lock the list
+	l.mux.Lock()
+	log.Printf("[DEBUG] LOCK ACQUIRED to save `serverPowerStateList` to file `%s`", filename)
+	defer func() {
+		//unlock the list
+		l.mux.Unlock()
+		log.Println("[DEBUG] LOCK RELEASED! `FlushToFile` finished")
+	}()
+
+	//Create file
+	f, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	r, err := json.Marshal(&l.list)
+	if err != nil {
+		return err
+	}
+	//Add bytes to a reader
+	byteReader := bytes.NewReader(r)
+	//Copy to the file
+	_, err = io.Copy(f, byteReader)
+	return err
+}
+
+//LoadFromFile load `listServersPowerStatus.list` data from a file
+func (l *listServersPowerStatus) LoadFromFile(filename string) error {
+	//lock the list
+	l.mux.Lock()
+	log.Printf("[DEBUG] LOCK ACQUIRED to load `serverPowerStateList` data from file `%s`", filename)
+	defer func() {
+		//unlock the list
+		l.mux.Unlock()
+		log.Println("[DEBUG] LOCK RELEASED! `LoadFromFile` finished")
+	}()
+
+	//Open file
+	f, err := os.Open(filename)
+	if err != nil {
+		//if the file does not exist, skip the error
+		//and no need to read the file
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+	defer f.Close()
+
+	//Decode to map[string]bool
+	return json.NewDecoder(f).Decode(&l.list)
+}
 
 //addServer adds a server power state to the list
 func (l *listServersPowerStatus) addServer(id string) error {
@@ -64,7 +123,7 @@ func (l *listServersPowerStatus) removeServerSynchronously(ctx context.Context, 
 		delete(l.list, id)
 		return nil
 	}
-	return fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
+	return fmt.Errorf("server (%s) does not exist in current list of servers in terraform 1", id)
 }
 
 //getServerPowerStatus returns power state of a server in the list (synchronously)
@@ -81,7 +140,7 @@ func (l *listServersPowerStatus) getServerPowerStatus(id string) (bool, error) {
 	if _, ok := l.list[id]; ok {
 		return l.list[id], nil
 	}
-	return false, fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
+	return false, fmt.Errorf("server (%s) does not exist in current list of servers in terraform 2", id)
 }
 
 //startServerSynchronously starts the servers synchronously. That means the server
@@ -104,7 +163,7 @@ func (l *listServersPowerStatus) startServerSynchronously(ctx context.Context, c
 		l.list[id] = true
 		return nil
 	}
-	return fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
+	return fmt.Errorf("server (%s) does not exist in current list of servers in terraform 3", id)
 }
 
 //shutdownServerSynchronously stop the servers synchronously. That means the server
@@ -127,7 +186,7 @@ func (l *listServersPowerStatus) shutdownServerSynchronously(ctx context.Context
 		l.list[id] = false
 		return nil
 	}
-	return fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
+	return fmt.Errorf("server (%s) does not exist in current list of servers in terraform 4", id)
 }
 
 //runActionRequireServerOff runs a specific action (function) after shutting down (synchronously) the server successfully.
@@ -180,13 +239,20 @@ func (l *listServersPowerStatus) runActionRequireServerOff(
 		return err
 	}
 	if serverRequired {
-		err := fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
+		err := fmt.Errorf("server (%s) does not exist in current list of servers in terraform 5", id)
 		return err
 	}
 	return nil
 }
 
-//serverPowerStateList global list of all servers' power states in terraform
-var serverPowerStateList = listServersPowerStatus{
-	list: make(map[string]bool),
+//NewGlobalServerPowerStateList create new listServersPowerStatus and return it
+func NewGlobalServerPowerStateList() listServersPowerStatus {
+	//assign serverPowerStateList to a new listServersPowerStatus
+	serverPowerStateList = listServersPowerStatus{
+		list: make(map[string]bool),
+	}
+	return serverPowerStateList
 }
+
+//serverPowerStateList global list of all servers' power states in terraform
+var serverPowerStateList listServersPowerStatus
