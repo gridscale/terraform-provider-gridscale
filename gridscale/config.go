@@ -32,7 +32,8 @@ func (c *Config) Client() (*gsclient.Client, error) {
 	log.Print("[INFO] gridscale client configured")
 
 	//Make sure the credentials are correct by getting the server list
-	_, err := client.GetServerList(emptyCtx)
+	//and init `serverPowerStateList` from fetched server list
+	err := initServerPowerStateList(emptyCtx, client)
 
 	return client, err
 }
