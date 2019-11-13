@@ -1,14 +1,10 @@
 package gridscale
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/gridscale/gsclient-go"
-	"io"
 	"log"
-	"os"
 	"sync"
 )
 
@@ -24,61 +20,6 @@ type listServersPowerStatus struct {
 //actionRequireServerOff signature of a function that requires a server to be off
 //in order to run
 type actionRequireServerOff func(ctx context.Context) error
-
-//FlushToFile saves `listServersPowerStatus.list` to a file
-func (l *listServersPowerStatus) FlushToFile(filename string) error {
-	//lock the list
-	l.mux.Lock()
-	log.Printf("[DEBUG] LOCK ACQUIRED to save `serverPowerStateList` to file `%s`", filename)
-	defer func() {
-		//unlock the list
-		l.mux.Unlock()
-		log.Println("[DEBUG] LOCK RELEASED! `FlushToFile` finished")
-	}()
-
-	//Create file
-	f, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	r, err := json.Marshal(&l.list)
-	if err != nil {
-		return err
-	}
-	//Add bytes to a reader
-	byteReader := bytes.NewReader(r)
-	//Copy to the file
-	_, err = io.Copy(f, byteReader)
-	return err
-}
-
-//LoadFromFile load `listServersPowerStatus.list` data from a file
-func (l *listServersPowerStatus) LoadFromFile(filename string) error {
-	//lock the list
-	l.mux.Lock()
-	log.Printf("[DEBUG] LOCK ACQUIRED to load `serverPowerStateList` data from file `%s`", filename)
-	defer func() {
-		//unlock the list
-		l.mux.Unlock()
-		log.Println("[DEBUG] LOCK RELEASED! `LoadFromFile` finished")
-	}()
-
-	//Open file
-	f, err := os.Open(filename)
-	if err != nil {
-		//if the file does not exist, skip the error
-		//and no need to read the file
-		if os.IsNotExist(err) {
-			return nil
-		}
-		return err
-	}
-	defer f.Close()
-
-	//Decode to map[string]bool
-	return json.NewDecoder(f).Decode(&l.list)
-}
 
 //addServer adds a server power state to the list
 func (l *listServersPowerStatus) addServer(id string) error {
@@ -245,14 +186,21 @@ func (l *listServersPowerStatus) runActionRequireServerOff(
 	return nil
 }
 
-//NewGlobalServerPowerStateList create new listServersPowerStatus and return it
-func NewGlobalServerPowerStateList() listServersPowerStatus {
-	//assign serverPowerStateList to a new listServersPowerStatus
-	serverPowerStateList = listServersPowerStatus{
-		list: make(map[string]bool),
+//initServerPowerStateList fetches server list and init `serverPowerStateList`
+func initServerPowerStateList(ctx context.Context, c *gsclient.Client) error {
+	servers, err := c.GetServerList(ctx)
+	if err != nil {
+		return err
 	}
-	return serverPowerStateList
+	for _, server := range servers {
+		uuid := server.Properties.ObjectUUID
+		powerState := server.Properties.Power
+		serverPowerStateList.list[uuid] = powerState
+	}
+	return nil
 }
 
 //serverPowerStateList global list of all servers' power states in terraform
-var serverPowerStateList listServersPowerStatus
+var serverPowerStateList = listServersPowerStatus{
+	list: make(map[string]bool),
+}

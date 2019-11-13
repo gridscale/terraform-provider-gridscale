@@ -16,9 +16,6 @@ func init() {
 	testAccProviders = map[string]terraform.ResourceProvider{
 		"gridscale": testAccProvider,
 	}
-	serverPowerStateList = listServersPowerStatus{
-		list: make(map[string]bool),
-	}
 }
 
 func TestProvider(t *testing.T) {
