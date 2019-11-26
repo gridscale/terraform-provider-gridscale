@@ -5,10 +5,13 @@ import (
 	"github.com/gridscale/gsclient-go"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+
+	"log"
 )
 
 func resourceGridscalePaaS() *schema.Resource {
 	return &schema.Resource{
+		Create: resourceGridscalePaaSServiceCreate,
 		Read:   resourceGridscalePaaSServiceRead,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
@@ -224,4 +227,55 @@ func resourceGridscalePaaSServiceRead(d *schema.ResourceData, meta interface{}) 
 		}
 	}
 	return nil
+}
+
+func resourceGridscalePaaSServiceCreate(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*gsclient.Client)
+	requestBody := gsclient.PaaSServiceCreateRequest{
+		Name:                    d.Get("name").(string),
+		PaaSServiceTemplateUUID: d.Get("service_template_uuid").(string),
+		Labels:                  convSOStrings(d.Get("labels").(*schema.Set).List()),
+		PaaSSecurityZoneUUID:    d.Get("security_zone_uuid").(string),
+	}
+
+	params := make(map[string]interface{}, 0)
+	for _, value := range d.Get("parameter").(*schema.Set).List() {
+		mapVal := value.(map[string]interface{})
+		var param string
+		var val interface{}
+		for k, v := range mapVal {
+			if k == "param" {
+				param = v.(string)
+			}
+			if k == "value" {
+				val = v
+			}
+		}
+		params[param] = val
+	}
+	requestBody.Parameters = params
+
+	limits := make([]gsclient.ResourceLimit, 0)
+	for _, value := range d.Get("resource_limit").(*schema.Set).List() {
+		mapVal := value.(map[string]interface{})
+		var resLim gsclient.ResourceLimit
+		for k, v := range mapVal {
+			if k == "resource" {
+				resLim.Resource = v.(string)
+			}
+			if k == "limit" {
+				resLim.Limit = v.(int)
+			}
+		}
+		limits = append(limits, resLim)
+	}
+	requestBody.ResourceLimits = limits
+
+	response, err := client.CreatePaaSService(emptyCtx, requestBody)
+	if err != nil {
+		return err
+	}
+	d.SetId(response.ObjectUUID)
+	log.Printf("The id for PaaS service %s has been set to %v", requestBody.Name, response.ObjectUUID)
+	return resourceGridscalePaaSServiceRead(d, meta)
 }
