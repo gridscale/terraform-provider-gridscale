@@ -13,6 +13,7 @@ func resourceGridscalePaaS() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceGridscalePaaSServiceCreate,
 		Read:   resourceGridscalePaaSServiceRead,
+		Update: resourceGridscalePaaSServiceUpdate,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -277,5 +278,52 @@ func resourceGridscalePaaSServiceCreate(d *schema.ResourceData, meta interface{}
 	}
 	d.SetId(response.ObjectUUID)
 	log.Printf("The id for PaaS service %s has been set to %v", requestBody.Name, response.ObjectUUID)
+	return resourceGridscalePaaSServiceRead(d, meta)
+}
+
+func resourceGridscalePaaSServiceUpdate(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*gsclient.Client)
+	requestBody := gsclient.PaaSServiceUpdateRequest{
+		Name:   d.Get("name").(string),
+		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
+	}
+
+	params := make(map[string]interface{}, 0)
+	for _, value := range d.Get("parameter").(*schema.Set).List() {
+		mapVal := value.(map[string]interface{})
+		var param string
+		var val interface{}
+		for k, v := range mapVal {
+			if k == "param" {
+				param = v.(string)
+			}
+			if k == "value" {
+				val = v
+			}
+		}
+		params[param] = val
+	}
+	requestBody.Parameters = params
+
+	limits := make([]gsclient.ResourceLimit, 0)
+	for _, value := range d.Get("resource_limit").(*schema.Set).List() {
+		mapVal := value.(map[string]interface{})
+		var resLim gsclient.ResourceLimit
+		for k, v := range mapVal {
+			if k == "resource" {
+				resLim.Resource = v.(string)
+			}
+			if k == "limit" {
+				resLim.Limit = v.(int)
+			}
+		}
+		limits = append(limits, resLim)
+	}
+	requestBody.ResourceLimits = limits
+
+	err := client.UpdatePaaSService(emptyCtx, d.Id(), requestBody)
+	if err != nil {
+		return err
+	}
 	return resourceGridscalePaaSServiceRead(d, meta)
 }
