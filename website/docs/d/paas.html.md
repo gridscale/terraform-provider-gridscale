@@ -29,24 +29,24 @@ data "gridscale_paas" "foo" {
 
 The following attributes are exported:
 
-* `name` - See Argument Reference above.
+* `name` - The human-readable name of the object.
 * `username` - Username for PaaS service.
 * `password` - Password for PaaS service.
 * `listen_port` - Ports that PaaS service listens to.
     * `name` - Name of a port.
     * `listen_port` - Port number.
-* `security_zone_uuid` - See Argument Reference above.
+* `security_zone_uuid` - The UUID of the security zone that the service is running in.
 * `network_uuid` - Network UUID containing security zone.
-* `service_template_uuid` - See Argument Reference above.
+* `service_template_uuid` - The template used to create the service.
 * `usage_in_minute` - Number of minutes that PaaS service is in use.
 * `current_price` - Current price of PaaS service.
 * `change_time` - Time of the last change.
 * `create_time` - Time of the creation.
 * `status` - Current status of PaaS service.
-* `parameter` - See Argument Reference above.
-    * `param` - See Argument Reference above.
-    * `value` - See Argument Reference above.
-* `resource_limit` - See Argument Reference above.
-    * `resource` - See Argument Reference above.
-    * `limit` - See Argument Reference above.
-* `labels` - See Argument Reference above.
+* `parameter` - Contains the service parameters for the service.
+    * `param` - Name of parameter.
+    * `value` - Value of the corresponding parameter.
+* `resource_limit` - A list of service resource limits.
+    * `resource` - The name of the resource you would like to cap.
+    * `limit` - The maximum number of the specific resource your service can use.
+* `labels` - List of labels in the format [ "label1", "label2" ].
