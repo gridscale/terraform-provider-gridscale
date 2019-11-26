@@ -13,6 +13,7 @@ func resourceGridscalePaaS() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceGridscalePaaSServiceCreate,
 		Read:   resourceGridscalePaaSServiceRead,
+		Delete: resourceGridscalePaaSServiceDelete,
 		Update: resourceGridscalePaaSServiceUpdate,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
@@ -326,4 +327,9 @@ func resourceGridscalePaaSServiceUpdate(d *schema.ResourceData, meta interface{}
 		return err
 	}
 	return resourceGridscalePaaSServiceRead(d, meta)
+}
+
+func resourceGridscalePaaSServiceDelete(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*gsclient.Client)
+	return client.DeletePaaSService(emptyCtx, d.Id())
 }
