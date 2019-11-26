@@ -5,6 +5,7 @@ import (
 	"github.com/gridscale/gsclient-go"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"log"
 )
 
 func dataSourceGridscalePaaS() *schema.Resource {
@@ -145,6 +146,7 @@ func dataSourceGridscalePaaSRead(d *schema.ResourceData, meta interface{}) error
 	}
 	props := paas.Properties
 	creds := props.Credentials
+	d.SetId(props.ObjectUUID)
 	d.Set("name", props.Name)
 	if creds != nil && len(creds) > 0 {
 		d.Set("username", creds[0].Username)
