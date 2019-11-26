@@ -13,10 +13,9 @@ func TestAccdataSourceGridscalePaaS_basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGridscaleStorageDestroyCheck,
+		CheckDestroy: testAccCheckResourceGridscalePaaSDestroyCheck,
 		Steps: []resource.TestStep{
 			{
-
 				Config: testAccCheckDataSourcePaaSConfig_basic(name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.gridscale_paas.foo", "name", name),
