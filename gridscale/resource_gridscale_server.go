@@ -570,12 +570,6 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	d.SetId(response.ServerUUID)
 	log.Printf("[DEBUG] The id for %s has been set to: %v", requestBody.Name, response.ServerUUID)
 
-	//Add server power status to serverPowerStateList
-	err = serverPowerStateList.addServer(d.Id())
-	if err != nil {
-		return err
-	}
-
 	//Link storages
 	err = serverRelMan.LinkStorages(emptyCtx)
 	if err != nil {
@@ -609,7 +603,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	//Set the power state if needed
 	power := d.Get("power").(bool)
 	if power {
-		err = serverPowerStateList.startServerSynchronously(emptyCtx, gsc, d.Id())
+		err = globalServerMutex.startServerSynchronously(emptyCtx, gsc, d.Id())
 		if err != nil {
 			return err
 		}
@@ -621,7 +615,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 func resourceGridscaleServerDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	//remove the server
-	return serverPowerStateList.removeServerSynchronously(emptyCtx, client, d.Id())
+	return globalServerMutex.removeServerSynchronously(emptyCtx, client, d.Id())
 }
 
 func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -665,7 +659,7 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 			err = serverDepClient.UpdateStoragesRel(ctx)
 			return err
 		}
-		err = serverPowerStateList.runActionRequireServerOff(emptyCtx, gsc, d.Id(), true, updateSequence)
+		err = globalServerMutex.runActionRequireServerOff(emptyCtx, gsc, d.Id(), true, updateSequence)
 		if err != nil {
 			return err
 		}
@@ -686,12 +680,12 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 	// Make sure the server in is the expected power state.
 	// The StartServer and ShutdownServer functions do a check to see if the server isn't already running, so we don't need to do that here.
 	if d.Get("power").(bool) {
-		err = serverPowerStateList.startServerSynchronously(emptyCtx, gsc, d.Id())
+		err = globalServerMutex.startServerSynchronously(emptyCtx, gsc, d.Id())
 		if err != nil {
 			return err
 		}
 	} else {
-		err = serverPowerStateList.shutdownServerSynchronously(emptyCtx, gsc, d.Id())
+		err = globalServerMutex.shutdownServerSynchronously(emptyCtx, gsc, d.Id())
 		if err != nil {
 			return err
 		}
