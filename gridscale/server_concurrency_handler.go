@@ -22,11 +22,11 @@ type actionRequireServerOff func(ctx context.Context) error
 
 //removeServerSynchronously removes a server
 func (m *serverMutex) removeServerSynchronously(ctx context.Context, c *gsclient.Client, id string) error {
-	//lock the list
+	//lock mutex
 	m.mux.Lock()
 	log.Printf("[DEBUG] LOCK ACQUIRED to remove server (%v)", id)
 	defer func() {
-		//unlock the list
+		//unlock mutex
 		m.mux.Unlock()
 		log.Printf("[DEBUG] LOCK RELEASED! Server (%v) is removed", id)
 	}()
@@ -40,14 +40,6 @@ func (m *serverMutex) removeServerSynchronously(ctx context.Context, c *gsclient
 
 //getServerPowerStatus returns power state of a server in the list (synchronously)
 func (m *serverMutex) getServerPowerStatus(ctx context.Context, c *gsclient.Client, id string) (bool, error) {
-	//lock the list
-	m.mux.Lock()
-	log.Printf("[DEBUG] LOCK ACQUIRED to get server (%v) power status", id)
-	defer func() {
-		//unlock the list
-		m.mux.Unlock()
-		log.Printf("[DEBUG] LOCK RELEASED! Getting server (%v) power status is done", id)
-	}()
 	server, err := c.GetServer(ctx, id)
 	return server.Properties.Power, err
 }
@@ -55,11 +47,11 @@ func (m *serverMutex) getServerPowerStatus(ctx context.Context, c *gsclient.Clie
 //startServerSynchronously starts the servers synchronously. That means the server
 //can only be started by one goroutine at a time.
 func (m *serverMutex) startServerSynchronously(ctx context.Context, c *gsclient.Client, id string) error {
-	//lock the list
+	//lock mutex
 	m.mux.Lock()
 	log.Printf("[DEBUG] LOCK ACQUIRED to start server (%v)", id)
 	defer func() {
-		//unlock the list
+		//unlock mutex
 		m.mux.Unlock()
 		log.Printf("[DEBUG] LOCK RELEASED! Starting server (%v) is done", id)
 	}()
@@ -69,11 +61,11 @@ func (m *serverMutex) startServerSynchronously(ctx context.Context, c *gsclient.
 //shutdownServerSynchronously stop the servers synchronously. That means the server
 //can only be stopped by one goroutine at a time.
 func (m *serverMutex) shutdownServerSynchronously(ctx context.Context, c *gsclient.Client, id string) error {
-	//lock the list
+	//lock mutex
 	m.mux.Lock()
 	log.Printf("[DEBUG] LOCK ACQUIRED to stop server (%v)", id)
 	defer func() {
-		//unlock the list
+		//unlock mutex
 		m.mux.Unlock()
 		log.Printf("[DEBUG] LOCK RELEASED! Shutting down server (%v) is done", id)
 	}()
@@ -90,11 +82,11 @@ func (m *serverMutex) runActionRequireServerOff(
 	id string,
 	serverRequired bool,
 	action actionRequireServerOff) error {
-	//lock the list
+	//lock mutex
 	m.mux.Lock()
 	log.Printf("[DEBUG] LOCK ACQUIRED to run an action requiring server (%v) to be OFF", id)
 	defer func() {
-		//unlock the list
+		//unlock mutex
 		m.mux.Unlock()
 		log.Printf("[DEBUG] LOCK RELEASED! Action requiring server (%v) is done", id)
 	}()
