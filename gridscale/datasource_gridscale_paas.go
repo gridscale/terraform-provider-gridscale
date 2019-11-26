@@ -5,7 +5,6 @@ import (
 	"github.com/gridscale/gsclient-go"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	"log"
 )
 
 func dataSourceGridscalePaaS() *schema.Resource {
