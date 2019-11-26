@@ -1,12 +1,15 @@
 package gridscale
 
 import (
+	"fmt"
+	"github.com/gridscale/gsclient-go"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
 
 func resourceGridscalePaaS() *schema.Resource {
 	return &schema.Resource{
+		Read:   resourceGridscalePaaSServiceRead,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -132,3 +135,93 @@ func resourceGridscalePaaS() *schema.Resource {
 	}
 }
 
+func resourceGridscalePaaSServiceRead(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*gsclient.Client)
+	paas, err := client.GetPaaSService(emptyCtx, d.Id())
+	if err != nil {
+		if requestError, ok := err.(gsclient.RequestError); ok {
+			if requestError.StatusCode == 404 {
+				d.SetId("")
+				return nil
+			}
+		}
+		return err
+	}
+	props := paas.Properties
+	creds := props.Credentials
+	d.Set("name", props.Name)
+	if creds != nil && len(creds) > 0 {
+		d.Set("username", creds[0].Username)
+		d.Set("password", creds[0].Password)
+	}
+	d.Set("security_zone_uuid", props.SecurityZoneUUID)
+	d.Set("service_template_uuid", props.ServiceTemplateUUID)
+	d.Set("usage_in_minute", props.UsageInMinutes)
+	d.Set("current_price", props.CurrentPrice)
+	d.Set("change_time", props.ChangeTime)
+	d.Set("create_time", props.CreateTime)
+	d.Set("status", props.Status)
+
+	//Get listen ports
+	listenPorts := make([]interface{}, 0)
+	for _, value := range props.ListenPorts {
+		for k, portValue := range value {
+			port := map[string]interface{}{
+				"name": k,
+				"port": portValue,
+			}
+			listenPorts = append(listenPorts, port)
+		}
+	}
+	if err = d.Set("listen_port", listenPorts); err != nil {
+		return fmt.Errorf("Error setting listen ports: %v", err)
+	}
+
+	//Get parameters
+	parameters := make([]interface{}, 0)
+	for k, value := range props.Parameters {
+		param := map[string]interface{}{
+			"param": k,
+			"value": value,
+		}
+		parameters = append(parameters, param)
+	}
+	if err = d.Set("parameter", parameters); err != nil {
+		return fmt.Errorf("Error setting parameters: %v", err)
+	}
+
+	//Get resource limits
+	resourceLimits := make([]interface{}, 0)
+	for _, value := range props.ResourceLimits {
+		limit := map[string]interface{}{
+			"resource": value.Resource,
+			"limit":    value.Limit,
+		}
+		resourceLimits = append(resourceLimits, limit)
+	}
+	if err = d.Set("resource_limit", resourceLimits); err != nil {
+		return fmt.Errorf("Error setting resource limits: %v", err)
+	}
+
+	//Set labels
+	if err = d.Set("labels", props.Labels); err != nil {
+		return fmt.Errorf("Error setting labels: %v", err)
+	}
+
+	//Get all available networks
+	networks, err := client.GetNetworkList(emptyCtx)
+	if err != nil {
+		return fmt.Errorf("Error getting networks: %v", err)
+	}
+	//look for a network that the PaaS service is in
+	for _, network := range networks {
+		securityZones := network.Properties.Relations.PaaSSecurityZones
+		//Each network can contain only one security zone
+		if len(securityZones) >= 1 {
+			if securityZones[0].ObjectUUID == props.SecurityZoneUUID {
+				d.Set("network_uuid", network.Properties.ObjectUUID)
+			}
+		}
+	}
+	return nil
+}
