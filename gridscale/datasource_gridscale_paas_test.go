@@ -19,7 +19,6 @@ func TestAccdataSourceGridscalePaaS_basic(t *testing.T) {
 
 				Config: testAccCheckDataSourcePaaSConfig_basic(name),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttrSet("data.gridscale_paas.foo", "id"),
 					resource.TestCheckResourceAttr("data.gridscale_paas.foo", "name", name),
 					resource.TestCheckResourceAttr("data.gridscale_paas.foo", "service_template_uuid", "f9625726-5ca8-4d5c-b9bd-3257e1e2211a"),
 				),
