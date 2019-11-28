@@ -5,22 +5,20 @@ import (
 	"fmt"
 	"github.com/gridscale/gsclient-go"
 	"log"
+	"net/http"
 	"sync"
 )
 
 type serverStatus struct {
-	//power state of a server
-	power bool
-
 	//is the server is deleted
 	deleted bool
 
-	//counter of actions requiring the server to be off
-	//when each action finishes, the counter is decreased by 1
-	specialActionCounter int
-
 	//mux for one server
 	mux sync.Mutex
+
+	//wait group is used to make sure all goroutines updating a server (requiring server to be off)
+	//are done before turn a server back on
+	wg sync.WaitGroup
 }
 
 //serverStatusList represents a list of power states of
@@ -87,26 +85,6 @@ func (l *serverStatusList) removeServerSynchronously(ctx context.Context, c *gsc
 	return fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
 }
 
-//getServerPowerStatus returns power state of a server in the list (synchronously)
-func (l *serverStatusList) getServerPowerStatus(id string) (bool, error) {
-	//check if the server is in the list and it is not deleted
-	if s, ok := l.list[id]; ok {
-		//lock the server
-		s.mux.Lock()
-		log.Printf("[DEBUG] LOCK ACQUIRED to get server (%v) power status", id)
-		defer func() {
-			//unlock the server
-			s.mux.Unlock()
-			log.Printf("[DEBUG] LOCK RELEASED! Getting server (%v) power status is done", id)
-		}()
-		if !s.deleted {
-			return s.power, nil
-		}
-		return false, fmt.Errorf("server (%s) is already deleted", id)
-	}
-	return false, fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
-}
-
 //startServerSynchronously starts the servers synchronously. That means the server
 //can only be started by one goroutine at a time.
 func (l *serverStatusList) startServerSynchronously(ctx context.Context, c *gsclient.Client, id string) error {
@@ -125,7 +103,6 @@ func (l *serverStatusList) startServerSynchronously(ctx context.Context, c *gscl
 			if err != nil {
 				return err
 			}
-			s.power = true
 			return nil
 		}
 		return fmt.Errorf("server (%s) is already deleted", id)
@@ -151,7 +128,6 @@ func (l *serverStatusList) shutdownServerSynchronously(ctx context.Context, c *g
 			if err != nil {
 				return err
 			}
-			s.power = false
 			return nil
 		}
 		return fmt.Errorf("server (%s) is already deleted", id)
@@ -169,48 +145,61 @@ func (l *serverStatusList) runActionRequireServerOff(
 	id string,
 	serverRequired bool,
 	action actionRequireServerOff) error {
-	var err error
-	//check if the server is in the list and it is not deleted
+	//check if the server is in the list
 	if s, ok := l.list[id]; ok {
-		//lock the server
-		s.mux.Lock()
-		log.Printf("[DEBUG] LOCK ACQUIRED to run an action requiring server (%v) to be OFF", id)
-		defer func() {
-			//unlock the server
-			s.mux.Unlock()
-			log.Printf("[DEBUG] LOCK RELEASED! Action requiring server (%v) is done", id)
-		}()
-		if !s.deleted {
-			//Get the original server's power state
-			originPowerState := s.power
-			//if the server is on, shutdown the server (synchronously) before running the action,
-			//and start the server after finishing the action.
-			if originPowerState {
-				err = c.ShutdownServer(ctx, id)
-				if err != nil {
-					return err
+		var err error
+		//Get the original server's state
+		server, err := c.GetServer(ctx, id)
+		if err != nil {
+			if reqError, ok := err.(gsclient.RequestError); ok {
+				//if server is not found
+				if reqError.StatusCode == http.StatusNotFound {
+					//if server is required to run the action
+					//return error
+					if serverRequired {
+						return err
+					} else {
+						//action does not need to be run,
+						//if server does not present and it is not required to run the action
+						return nil
+					}
 				}
-				log.Printf("[DEBUG] Server (%v) is OFF to run an action", id)
-				//run action function
-				err = action(ctx)
-				if err != nil {
-					return err
-				}
-				//Start the server (start the server after the action is done)
-				err = c.StartServer(ctx, id)
-				if err != nil {
-					return err
-				}
-				log.Printf("[DEBUG] Action is done. Server (%v) is ON", id)
 			}
-			return nil
+			return err
 		}
-		//if server must presents to run the action
-		//return error
-		if serverRequired {
-			return fmt.Errorf("server (%s) is already deleted", id)
+		//if the server is on, shutdown the server (synchronously) before running the action,
+		//and start the server after finishing the action.
+		if server.Properties.Power {
+			//shut down the server synchronously
+			//If we don't turn it off synchronously, all server-update goroutines (requiring server to be off)
+			//will send their shutdown requests at the same time. That causes false assumption error returned from
+			//gridscale backend (as the server is being turned off by the first request).
+			err = l.shutdownServerSynchronously(ctx, c, id)
+			if err != nil {
+				return err
+			}
+			log.Printf("[DEBUG] Server (%v) is OFF to run an action", id)
+			defer func() {
+				//wait group of the server blocks until all actions finish
+				s.wg.Wait()
+				//start a server synchronously. Same explanation as why use `shutdownServerSynchronously` above
+				errStartServer := l.startServerSynchronously(ctx, c, id)
+				if errStartServer != nil {
+					//append error from the action (if the action returns error)
+					err = fmt.Errorf(
+						"Error from action: %v. Error from starting server: %v",
+						err,
+						errStartServer,
+					)
+				}
+			}()
 		}
-		return nil
+		//Add 1 to wait group of the server before running the action
+		s.wg.Add(1)
+		err = action(ctx)
+		//Tell the wait group that the action is done
+		s.wg.Done()
+		return err
 	}
 	return fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
 }
@@ -223,12 +212,7 @@ func initGlobalServerStatusList(ctx context.Context, c *gsclient.Client) error {
 	}
 	for _, server := range servers {
 		uuid := server.Properties.ObjectUUID
-		props := server.Properties
-		status := &serverStatus{
-			power:                props.Power,
-			specialActionCounter: 0,
-			mux:                  sync.Mutex{},
-		}
+		status := &serverStatus{}
 		globalServerStatusList.list[uuid] = status
 	}
 	return nil
