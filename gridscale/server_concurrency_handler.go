@@ -137,7 +137,7 @@ func (l *serverStatusList) startServerSynchronously(ctx context.Context, c *gscl
 //can only be stopped by one goroutine at a time.
 func (l *serverStatusList) shutdownServerSynchronously(ctx context.Context, c *gsclient.Client, id string) error {
 	//check if the server is in the list and it is not deleted
-	if s, ok := l.list[id]; ok && !l.list[id].deleted {
+	if s, ok := l.list[id]; ok {
 		//lock the server
 		s.mux.Lock()
 		log.Printf("[DEBUG] LOCK ACQUIRED to stop server (%v)", id)
