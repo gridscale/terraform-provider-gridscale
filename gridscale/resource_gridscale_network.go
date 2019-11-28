@@ -173,11 +173,11 @@ func resourceGridscaleNetworkDelete(d *schema.ResourceData, meta interface{}) er
 	//Stop all servers relating to this network address if there is one
 	for _, server := range net.Properties.Relations.Servers {
 		unlinkNetAction := func(ctx context.Context) error {
-			err = client.UnlinkNetwork(ctx, server.ObjectUUID, d.Id())
+			err := client.UnlinkNetwork(ctx, server.ObjectUUID, d.Id())
 			return err
 		}
 		//UnlinkNetwork requires the server to be off
-		err = serverPowerStateList.runActionRequireServerOff(emptyCtx, client, server.ObjectUUID, false, unlinkNetAction)
+		err = globalServerStatusList.runActionRequireServerOff(emptyCtx, client, server.ObjectUUID, false, unlinkNetAction)
 		if err != nil {
 			return err
 		}

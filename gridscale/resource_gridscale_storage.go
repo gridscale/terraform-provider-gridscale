@@ -286,11 +286,11 @@ func resourceGridscaleStorageDelete(d *schema.ResourceData, meta interface{}) er
 	//Stop all server relating to this IP address if there is one
 	for _, server := range storage.Properties.Relations.Servers {
 		unlinkStorageAction := func(ctx context.Context) error {
-			err = client.UnlinkStorage(ctx, server.ObjectUUID, d.Id())
+			err := client.UnlinkStorage(ctx, server.ObjectUUID, d.Id())
 			return err
 		}
 		//UnlinkStorage requires the server to be off
-		err = serverPowerStateList.runActionRequireServerOff(emptyCtx, client, server.ObjectUUID, false, unlinkStorageAction)
+		err = globalServerStatusList.runActionRequireServerOff(emptyCtx, client, server.ObjectUUID, false, unlinkStorageAction)
 		if err != nil {
 			return err
 		}

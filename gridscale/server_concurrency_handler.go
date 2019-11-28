@@ -8,12 +8,27 @@ import (
 	"sync"
 )
 
-//listServersPowerStatus represents a list of power states of
+type serverStatus struct {
+	//power state of a server
+	power bool
+
+	//is the server is deleted
+	deleted bool
+
+	//counter of actions requiring the server to be off
+	//when each action finishes, the counter is decreased by 1
+	specialActionCounter int
+
+	//mux for one server
+	mux sync.Mutex
+}
+
+//serverStatusList represents a list of power states of
 //all servers (declared in terraform).
 //mutex is used to lock when adding or removing servers or modifying servers' power states.
 //***NOTE: servers declared outside terraform are not included.
-type listServersPowerStatus struct {
-	list map[string]bool
+type serverStatusList struct {
+	list map[string]*serverStatus
 	mux  sync.Mutex
 }
 
@@ -22,8 +37,10 @@ type listServersPowerStatus struct {
 type actionRequireServerOff func(ctx context.Context) error
 
 //addServer adds a server power state to the list
-func (l *listServersPowerStatus) addServer(id string) error {
+func (l *serverStatusList) addServer(id string) error {
 	//lock the list
+	//*Note: we don't need to lock the list anywhere else as
+	//addServer always runs first
 	l.mux.Lock()
 	log.Printf("[DEBUG] LOCK ACQUIRED to add server (%v)", id)
 	defer func() {
@@ -33,174 +50,191 @@ func (l *listServersPowerStatus) addServer(id string) error {
 	}()
 	//check if the server is already in the list
 	if _, ok := l.list[id]; !ok {
-		l.list[id] = false
+		l.list[id] = &serverStatus{}
 		return nil
 	}
 	return fmt.Errorf("server (%s) ALREADY exists in current list of servers in terraform", id)
 }
 
-//removeServerSynchronously removes a server
-func (l *listServersPowerStatus) removeServerSynchronously(ctx context.Context, c *gsclient.Client, id string) error {
-	//lock the list
-	l.mux.Lock()
-	log.Printf("[DEBUG] LOCK ACQUIRED to remove server (%v)", id)
-	defer func() {
-		//unlock the list
-		l.mux.Unlock()
-		log.Printf("[DEBUG] LOCK RELEASED! Server (%v) is removed", id)
-	}()
-	//check if the server is in the list
-	if _, ok := l.list[id]; ok {
-		//Shutdown server
-		err := c.ShutdownServer(ctx, id)
-		if err != nil {
-			return err
+//removeServerSynchronously removes a server and set `deleted` to true
+//when `terraform apply` command finishes, the serverStatusList will be automatically flushed
+func (l *serverStatusList) removeServerSynchronously(ctx context.Context, c *gsclient.Client, id string) error {
+	//check if the server is in the list and it is not deleted
+	if s, ok := l.list[id]; ok {
+		//lock the server
+		s.mux.Lock()
+		log.Printf("[DEBUG] LOCK ACQUIRED to remove server (%v)", id)
+		defer func() {
+			//unlock the server
+			s.mux.Unlock()
+			log.Printf("[DEBUG] LOCK RELEASED! Server (%v) is removed", id)
+		}()
+		if !s.deleted {
+			err := c.ShutdownServer(ctx, id)
+			if err != nil {
+				return err
+			}
+			//Delete server
+			err = c.DeleteServer(ctx, id)
+			if err != nil {
+				return err
+			}
+			s.deleted = true
+			return nil
 		}
-		//Delete server
-		err = c.DeleteServer(ctx, id)
-		if err != nil {
-			return err
-		}
-		delete(l.list, id)
-		return nil
+		return fmt.Errorf("server (%s) is already deleted", id)
 	}
-	return fmt.Errorf("server (%s) does not exist in current list of servers in terraform 1", id)
+	return fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
 }
 
 //getServerPowerStatus returns power state of a server in the list (synchronously)
-func (l *listServersPowerStatus) getServerPowerStatus(id string) (bool, error) {
-	//lock the list
-	l.mux.Lock()
-	log.Printf("[DEBUG] LOCK ACQUIRED to get server (%v) power status", id)
-	defer func() {
-		//unlock the list
-		l.mux.Unlock()
-		log.Printf("[DEBUG] LOCK RELEASED! Getting server (%v) power status is done", id)
-	}()
-	//check if the server is in the list
-	if _, ok := l.list[id]; ok {
-		return l.list[id], nil
+func (l *serverStatusList) getServerPowerStatus(id string) (bool, error) {
+	//check if the server is in the list and it is not deleted
+	if s, ok := l.list[id]; ok {
+		//lock the server
+		s.mux.Lock()
+		log.Printf("[DEBUG] LOCK ACQUIRED to get server (%v) power status", id)
+		defer func() {
+			//unlock the server
+			s.mux.Unlock()
+			log.Printf("[DEBUG] LOCK RELEASED! Getting server (%v) power status is done", id)
+		}()
+		if !s.deleted {
+			return s.power, nil
+		}
+		return false, fmt.Errorf("server (%s) is already deleted", id)
 	}
-	return false, fmt.Errorf("server (%s) does not exist in current list of servers in terraform 2", id)
+	return false, fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
 }
 
 //startServerSynchronously starts the servers synchronously. That means the server
 //can only be started by one goroutine at a time.
-func (l *listServersPowerStatus) startServerSynchronously(ctx context.Context, c *gsclient.Client, id string) error {
-	//lock the list
-	l.mux.Lock()
-	log.Printf("[DEBUG] LOCK ACQUIRED to start server (%v)", id)
-	defer func() {
-		//unlock the list
-		l.mux.Unlock()
-		log.Printf("[DEBUG] LOCK RELEASED! Starting server (%v) is done", id)
-	}()
-	//check if the server is in the list
-	if _, ok := l.list[id]; ok {
-		err := c.StartServer(ctx, id)
-		if err != nil {
-			return err
+func (l *serverStatusList) startServerSynchronously(ctx context.Context, c *gsclient.Client, id string) error {
+	//check if the server is in the list and it is not deleted
+	if s, ok := l.list[id]; ok {
+		//lock the server
+		s.mux.Lock()
+		log.Printf("[DEBUG] LOCK ACQUIRED to start server (%v)", id)
+		defer func() {
+			//unlock the server
+			s.mux.Unlock()
+			log.Printf("[DEBUG] LOCK RELEASED! Starting server (%v) is done", id)
+		}()
+		if !s.deleted {
+			err := c.StartServer(ctx, id)
+			if err != nil {
+				return err
+			}
+			s.power = true
+			return nil
 		}
-		l.list[id] = true
-		return nil
+		return fmt.Errorf("server (%s) is already deleted", id)
 	}
-	return fmt.Errorf("server (%s) does not exist in current list of servers in terraform 3", id)
+	return fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
 }
 
 //shutdownServerSynchronously stop the servers synchronously. That means the server
 //can only be stopped by one goroutine at a time.
-func (l *listServersPowerStatus) shutdownServerSynchronously(ctx context.Context, c *gsclient.Client, id string) error {
-	//lock the list
-	l.mux.Lock()
-	log.Printf("[DEBUG] LOCK ACQUIRED to stop server (%v)", id)
-	defer func() {
-		//unlock the list
-		l.mux.Unlock()
-		log.Printf("[DEBUG] LOCK RELEASED! Shutting down server (%v) is done", id)
-	}()
-	//check if the server is in the list
-	if _, ok := l.list[id]; ok {
-		err := c.ShutdownServer(ctx, id)
-		if err != nil {
-			return err
+func (l *serverStatusList) shutdownServerSynchronously(ctx context.Context, c *gsclient.Client, id string) error {
+	//check if the server is in the list and it is not deleted
+	if s, ok := l.list[id]; ok && !l.list[id].deleted {
+		//lock the server
+		s.mux.Lock()
+		log.Printf("[DEBUG] LOCK ACQUIRED to stop server (%v)", id)
+		defer func() {
+			//unlock the server
+			s.mux.Unlock()
+			log.Printf("[DEBUG] LOCK RELEASED! Shutting down server (%v) is done", id)
+		}()
+		if !s.deleted {
+			err := c.ShutdownServer(ctx, id)
+			if err != nil {
+				return err
+			}
+			s.power = false
+			return nil
 		}
-		l.list[id] = false
-		return nil
+		return fmt.Errorf("server (%s) is already deleted", id)
 	}
-	return fmt.Errorf("server (%s) does not exist in current list of servers in terraform 4", id)
+	return fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
 }
 
 //runActionRequireServerOff runs a specific action (function) after shutting down (synchronously) the server successfully.
 //Some actions are NOT necessary if the server is already deleted (such as `UnlinkXXX` methods), that means they do
 //not need the server to exist strictly.
 //However, the are still some others requiring the server's presence (such as some server update sequences).
-func (l *listServersPowerStatus) runActionRequireServerOff(
+func (l *serverStatusList) runActionRequireServerOff(
 	ctx context.Context,
 	c *gsclient.Client,
 	id string,
 	serverRequired bool,
 	action actionRequireServerOff) error {
-	//lock the list
-	l.mux.Lock()
-	log.Printf("[DEBUG] LOCK ACQUIRED to run an action requiring server (%v) to be OFF", id)
-	defer func() {
-		//unlock the list
-		l.mux.Unlock()
-		log.Printf("[DEBUG] LOCK RELEASED! Action requiring server (%v) is done", id)
-	}()
-	//check if the server is in the list
-	if _, ok := l.list[id]; ok {
-		var err error
-		//Get the original server's power state
-		originPowerState := l.list[id]
-		//if the server is on, shutdown the server (synchronously) before running the action,
-		//and start the server after finishing the action.
-		if originPowerState {
-			err = c.ShutdownServer(ctx, id)
-			if err != nil {
-				return err
-			}
-			log.Printf("[DEBUG] Server (%v) is OFF to run an action", id)
-			//DEFER Start the server (start the server after the action is done)
-			defer func() {
-				errStartServer := c.StartServer(ctx, id)
-				if errStartServer != nil {
-					//append error from the action (if the action returns error)
-					err = fmt.Errorf(
-						"Error from action: %v. Error from starting server: %v",
-						err,
-						errStartServer,
-					)
+	var err error
+	//check if the server is in the list and it is not deleted
+	if s, ok := l.list[id]; ok {
+		//lock the server
+		s.mux.Lock()
+		log.Printf("[DEBUG] LOCK ACQUIRED to run an action requiring server (%v) to be OFF", id)
+		defer func() {
+			//unlock the server
+			s.mux.Unlock()
+			log.Printf("[DEBUG] LOCK RELEASED! Action requiring server (%v) is done", id)
+		}()
+		if !s.deleted {
+			//Get the original server's power state
+			originPowerState := s.power
+			//if the server is on, shutdown the server (synchronously) before running the action,
+			//and start the server after finishing the action.
+			if originPowerState {
+				err = c.ShutdownServer(ctx, id)
+				if err != nil {
+					return err
+				}
+				log.Printf("[DEBUG] Server (%v) is OFF to run an action", id)
+				//run action function
+				err = action(ctx)
+				if err != nil {
+					return err
+				}
+				//Start the server (start the server after the action is done)
+				err = c.StartServer(ctx, id)
+				if err != nil {
+					return err
 				}
 				log.Printf("[DEBUG] Action is done. Server (%v) is ON", id)
-			}()
+			}
+			return nil
 		}
-		//run action function
-		err = action(ctx)
-		return err
+		//if server must presents to run the action
+		//return error
+		if serverRequired {
+			return fmt.Errorf("server (%s) is already deleted", id)
+		}
+		return nil
 	}
-	if serverRequired {
-		err := fmt.Errorf("server (%s) does not exist in current list of servers in terraform 5", id)
-		return err
-	}
-	return nil
+	return fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
 }
 
-//initServerPowerStateList fetches server list and init `serverPowerStateList`
-func initServerPowerStateList(ctx context.Context, c *gsclient.Client) error {
+//initGlobalServerStatusList fetches server list and init `globalServerStatusList`
+func initGlobalServerStatusList(ctx context.Context, c *gsclient.Client) error {
 	servers, err := c.GetServerList(ctx)
 	if err != nil {
 		return err
 	}
 	for _, server := range servers {
 		uuid := server.Properties.ObjectUUID
-		powerState := server.Properties.Power
-		serverPowerStateList.list[uuid] = powerState
+		props := server.Properties
+		status := &serverStatus{
+			power:                props.Power,
+			specialActionCounter: 0,
+			mux:                  sync.Mutex{},
+		}
+		globalServerStatusList.list[uuid] = status
 	}
 	return nil
 }
 
-//serverPowerStateList global list of all servers' power states in terraform
-var serverPowerStateList = listServersPowerStatus{
-	list: make(map[string]bool),
+//globalServerStatusList global list of all servers' status states in terraform
+var globalServerStatusList = serverStatusList{
+	list: make(map[string]*serverStatus),
 }

@@ -199,15 +199,14 @@ func resourceGridscaleIpDelete(d *schema.ResourceData, meta interface{}) error {
 	if len(ip.Properties.Relations.Servers) == 1 {
 		server := ip.Properties.Relations.Servers[0]
 		deleteIPAction := func(ctx context.Context) error {
-			err = client.DeleteIP(ctx, d.Id())
+			err := client.UnlinkIP(ctx, server.ServerUUID, d.Id())
 			return err
 		}
 		//DeleteIP requires the server to be off
-		err = serverPowerStateList.runActionRequireServerOff(emptyCtx, client, server.ServerUUID, false, deleteIPAction)
+		err = globalServerStatusList.runActionRequireServerOff(emptyCtx, client, server.ServerUUID, false, deleteIPAction)
 		if err != nil {
 			return err
 		}
-		return nil
 	}
 	return client.DeleteIP(emptyCtx, d.Id())
 }
