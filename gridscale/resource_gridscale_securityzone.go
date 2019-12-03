@@ -13,6 +13,7 @@ func resourceGridscalePaaSSecurityZone() *schema.Resource {
 		Read:   resourceGridscalePaaSSecurityZoneRead,
 		Create: resourceGridscalePaaSSecurityZoneCreate,
 		Update: resourceGridscalePaaSSecurityZoneUpdate,
+		Delete: resourceGridscalePaaSSecurityZoneDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -139,4 +140,9 @@ func resourceGridscalePaaSSecurityZoneUpdate(d *schema.ResourceData, meta interf
 		return err
 	}
 	return resourceGridscalePaaSSecurityZoneRead(d, meta)
+}
+
+func resourceGridscalePaaSSecurityZoneDelete(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*gsclient.Client)
+	return client.DeletePaaSSecurityZone(emptyCtx, d.Id())
 }
