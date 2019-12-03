@@ -1,12 +1,15 @@
 package gridscale
 
 import (
+	"fmt"
+	"github.com/gridscale/gsclient-go"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
 
 func resourceGridscalePaaSSecurityZone() *schema.Resource {
 	return &schema.Resource{
+		Read: resourceGridscalePaaSSecurityZoneRead,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -67,4 +70,42 @@ func resourceGridscalePaaSSecurityZone() *schema.Resource {
 			},
 		},
 	}
+}
+
+func resourceGridscalePaaSSecurityZoneRead(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*gsclient.Client)
+	secZone, err := client.GetPaaSSecurityZone(emptyCtx, d.Id())
+	if err != nil {
+		if requestError, ok := err.(gsclient.RequestError); ok {
+			if requestError.StatusCode == 404 {
+				d.SetId("")
+				return nil
+			}
+		}
+		return err
+	}
+	props := secZone.Properties
+	d.Set("name", props.Name)
+	d.Set("location_uuid", props.LocationUUID)
+	d.Set("location_country", props.LocationCountry)
+	d.Set("location_iata", props.LocationIata)
+	d.Set("location_name", props.LocationName)
+	d.Set("create_time", props.CreateTime)
+	d.Set("change_time", props.ChangeTime)
+	d.Set("status", props.Status)
+
+	//Set labels
+	if err = d.Set("labels", props.Labels); err != nil {
+		return fmt.Errorf("Error setting labels: %v", err)
+	}
+
+	//Set relations
+	var rels []string
+	for _, val := range props.Relation.Services {
+		rels = append(rels, val.ObjectUUID)
+	}
+	if err = d.Set("relations", rels); err != nil {
+		return fmt.Errorf("Error setting relations: %v", err)
+	}
+	return nil
 }
