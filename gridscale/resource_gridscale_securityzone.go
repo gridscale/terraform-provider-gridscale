@@ -5,11 +5,13 @@ import (
 	"github.com/gridscale/gsclient-go"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"log"
 )
 
 func resourceGridscalePaaSSecurityZone() *schema.Resource {
 	return &schema.Resource{
-		Read: resourceGridscalePaaSSecurityZoneRead,
+		Read:   resourceGridscalePaaSSecurityZoneRead,
+		Create: resourceGridscalePaaSSecurityZoneCreate,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -108,4 +110,19 @@ func resourceGridscalePaaSSecurityZoneRead(d *schema.ResourceData, meta interfac
 		return fmt.Errorf("Error setting relations: %v", err)
 	}
 	return nil
+}
+
+func resourceGridscalePaaSSecurityZoneCreate(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*gsclient.Client)
+	requestBody := gsclient.PaaSSecurityZoneCreateRequest{
+		Name:         d.Get("name").(string),
+		LocationUUID: d.Get("location_uuid").(string),
+	}
+	response, err := client.CreatePaaSSecurityZone(emptyCtx, requestBody)
+	if err != nil {
+		return err
+	}
+	d.SetId(response.ObjectUUID)
+	log.Printf("The id for security zone %s has been set to %v", requestBody.Name, response.ObjectUUID)
+	return resourceGridscalePaaSSecurityZoneRead(d, meta)
 }
