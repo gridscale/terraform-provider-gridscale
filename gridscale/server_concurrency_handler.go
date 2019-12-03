@@ -148,19 +148,19 @@ func (l *serverStatusList) runActionRequireServerOff(
 	//check if the server is in the list
 	if s, ok := l.list[id]; ok {
 		var err error
+		//Add 1 to wait group of the server before running the action
+		s.wg.Add(1)
 		//Get the original server's state
 		server, err := c.GetServer(ctx, id)
 		if err != nil {
+			//Tell the wait group that the action is done
+			s.wg.Done()
 			if reqError, ok := err.(gsclient.RequestError); ok {
 				//if server is not found
 				if reqError.StatusCode == http.StatusNotFound {
-					//if server is required to run the action
-					//return error
-					if serverRequired {
-						return err
-					} else {
-						//action does not need to be run,
-						//if server does not present and it is not required to run the action
+					//action does not need to be run,
+					//if server does not present and it is not required to run the action
+					if !serverRequired {
 						return nil
 					}
 				}
@@ -176,6 +176,8 @@ func (l *serverStatusList) runActionRequireServerOff(
 			//gridscale backend (as the server is being turned off by the first request).
 			err = l.shutdownServerSynchronously(ctx, c, id)
 			if err != nil {
+				//Tell the wait group that the action is done
+				s.wg.Done()
 				return err
 			}
 			log.Printf("[DEBUG] Server (%v) is OFF to run an action", id)
@@ -194,8 +196,6 @@ func (l *serverStatusList) runActionRequireServerOff(
 				}
 			}()
 		}
-		//Add 1 to wait group of the server before running the action
-		s.wg.Add(1)
 		err = action(ctx)
 		//Tell the wait group that the action is done
 		s.wg.Done()
