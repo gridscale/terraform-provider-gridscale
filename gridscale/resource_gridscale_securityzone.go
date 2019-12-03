@@ -12,6 +12,7 @@ func resourceGridscalePaaSSecurityZone() *schema.Resource {
 	return &schema.Resource{
 		Read:   resourceGridscalePaaSSecurityZoneRead,
 		Create: resourceGridscalePaaSSecurityZoneCreate,
+		Update: resourceGridscalePaaSSecurityZoneUpdate,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -124,5 +125,18 @@ func resourceGridscalePaaSSecurityZoneCreate(d *schema.ResourceData, meta interf
 	}
 	d.SetId(response.ObjectUUID)
 	log.Printf("The id for security zone %s has been set to %v", requestBody.Name, response.ObjectUUID)
+	return resourceGridscalePaaSSecurityZoneRead(d, meta)
+}
+
+func resourceGridscalePaaSSecurityZoneUpdate(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*gsclient.Client)
+	requestBody := gsclient.PaaSSecurityZoneUpdateRequest{
+		Name:         d.Get("name").(string),
+		LocationUUID: d.Get("location_uuid").(string),
+	}
+	err := client.UpdatePaaSSecurityZone(emptyCtx, d.Id(), requestBody)
+	if err != nil {
+		return err
+	}
 	return resourceGridscalePaaSSecurityZoneRead(d, meta)
 }
