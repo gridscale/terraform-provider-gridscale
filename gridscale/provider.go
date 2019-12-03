@@ -51,6 +51,7 @@ func Provider() terraform.ResourceProvider {
 			"gridscale_snapshot":         resourceGridscaleStorageSnapshot(),
 			"gridscale_snapshotschedule": resourceGridscaleStorageSnapshotSchedule(),
 			"gridscale_paas":             resourceGridscalePaaS(),
+			"gridscale_paas_securityzone": resourceGridscalePaaSSecurityZone(),
 		},
 
 		ConfigureFunc: providerConfigure,
