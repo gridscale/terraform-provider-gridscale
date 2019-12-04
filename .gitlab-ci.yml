@@ -16,6 +16,8 @@ vet:
 
 acceptance_tests:
   stage: test
+  variables:
+    TF_LOG: DEBUG
   script:
     # Note: this uses GRIDSCALE_URL, GRIDSCALE_UUID, GRIDSCALE_TOKEN variables
     # defined under Settings → CI/CD → Variables
