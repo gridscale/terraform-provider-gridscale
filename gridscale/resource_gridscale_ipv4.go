@@ -198,28 +198,15 @@ func resourceGridscaleIpDelete(d *schema.ResourceData, meta interface{}) error {
 	//ip server relation is 1-1 relation
 	if len(ip.Properties.Relations.Servers) == 1 {
 		server := ip.Properties.Relations.Servers[0]
-		//Get the power state of the server before turning it off
-		powerState, err := serverPowerStateList.getServerPowerStatus(server.ServerUUID)
-		if err != nil {
-			return err
-		}
 		deleteIPAction := func(ctx context.Context) error {
-			err = client.DeleteIP(ctx, d.Id())
+			err := client.UnlinkIP(ctx, server.ServerUUID, d.Id())
 			return err
 		}
-		//turn the server off and then delete the IP
-		err = serverPowerStateList.runActionRequireServerOff(emptyCtx, client, server.ServerUUID, deleteIPAction)
+		//DeleteIP requires the server to be off
+		err = globalServerStatusList.runActionRequireServerOff(emptyCtx, client, server.ServerUUID, false, deleteIPAction)
 		if err != nil {
 			return err
 		}
-		//If the server was originally ON, turn it back on
-		if powerState {
-			err = serverPowerStateList.startServerSynchronously(emptyCtx, client, server.ServerUUID)
-			if err != nil {
-				return err
-			}
-		}
-		return nil
 	}
 	return client.DeleteIP(emptyCtx, d.Id())
 }

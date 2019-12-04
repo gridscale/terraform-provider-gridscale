@@ -183,10 +183,6 @@ func resourceGridscaleServer() *schema.Resource {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-						"partner_uuid": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
 						"ordering": {
 							Type:     schema.TypeInt,
 							Computed: true,
@@ -225,8 +221,9 @@ func resourceGridscaleServer() *schema.Resource {
 				Computed: true,
 			},
 			"auto_recovery": {
-				Type:        schema.TypeInt,
+				Type:        schema.TypeBool,
 				Description: "If the server should be auto-started in case of a failure (default=true).",
+				Optional:    true,
 				Computed:    true,
 			},
 			"availability_zone": {
@@ -250,7 +247,7 @@ func resourceGridscaleServer() *schema.Resource {
 			},
 			"console_token": {
 				Type:        schema.TypeString,
-				Description: "If the server should be auto-started in case of a failure (default=true).",
+				Description: "The token used by the panel to open the websocket VNC connection to the server console.",
 				Computed:    true,
 			},
 			"legacy": {
@@ -264,6 +261,18 @@ func resourceGridscaleServer() *schema.Resource {
 			},
 			"usage_in_minutes_cores": {
 				Type:     schema.TypeInt,
+				Computed: true,
+			},
+			"create_time": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"change_time": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"status": {
+				Type:     schema.TypeString,
 				Computed: true,
 			},
 			"labels": {
@@ -382,6 +391,9 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("hardware_profile", server.Properties.HardwareProfile)
 	d.Set("location_uuid", server.Properties.LocationUUID)
 	d.Set("power", server.Properties.Power)
+	d.Set("status", server.Properties.Status)
+	d.Set("create_time", server.Properties.CreateTime.String())
+	d.Set("change_time", server.Properties.ChangeTime.String())
 	d.Set("current_price", server.Properties.CurrentPrice)
 	d.Set("availability_zone", server.Properties.AvailabilityZone)
 	d.Set("auto_recovery", server.Properties.AutoRecovery)
@@ -525,6 +537,13 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		Labels:          convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
+	//If `auto_recovery` is set
+	if val, ok := d.GetOk("auto_recovery"); ok {
+		autoRecovery := new(bool)
+		*autoRecovery = val.(bool)
+		requestBody.AutoRecovery = autoRecovery
+	}
+
 	profile := d.Get("hardware_profile").(string)
 	if profile == "legacy" {
 		requestBody.HardwareProfile = gsclient.LegacyServerHardware
@@ -551,8 +570,11 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	d.SetId(response.ServerUUID)
 	log.Printf("[DEBUG] The id for %s has been set to: %v", requestBody.Name, response.ServerUUID)
 
-	//Add server power status to serverPowerStateList
-	serverPowerStateList.addServer(d.Id())
+	//Add server power status to globalServerStatusList
+	err = globalServerStatusList.addServer(d.Id())
+	if err != nil {
+		return err
+	}
 
 	//Link storages
 	err = serverRelMan.LinkStorages(emptyCtx)
@@ -587,7 +609,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	//Set the power state if needed
 	power := d.Get("power").(bool)
 	if power {
-		err = serverPowerStateList.startServerSynchronously(emptyCtx, gsc, d.Id())
+		err = globalServerStatusList.startServerSynchronously(emptyCtx, gsc, d.Id())
 		if err != nil {
 			return err
 		}
@@ -598,20 +620,8 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 
 func resourceGridscaleServerDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	id := d.Id()
-	//Stop the server synchronously
-	err := serverPowerStateList.shutdownServerSynchronously(emptyCtx, client, id)
-	if err != nil {
-		return err
-	}
-	//Delete the server
-	err = client.DeleteServer(emptyCtx, id)
-	if err != nil {
-		return err
-	}
-	//remove server power state from serverPowerStateList
-	err = serverPowerStateList.removeServer(d.Id())
-	return err
+	//remove the server
+	return globalServerStatusList.removeServerSynchronously(emptyCtx, client, d.Id())
 }
 
 func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -655,7 +665,7 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 			err = serverDepClient.UpdateStoragesRel(ctx)
 			return err
 		}
-		err = serverPowerStateList.runActionRequireServerOff(emptyCtx, gsc, d.Id(), updateSequence)
+		err = globalServerStatusList.runActionRequireServerOff(emptyCtx, gsc, d.Id(), true, updateSequence)
 		if err != nil {
 			return err
 		}
@@ -676,12 +686,12 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 	// Make sure the server in is the expected power state.
 	// The StartServer and ShutdownServer functions do a check to see if the server isn't already running, so we don't need to do that here.
 	if d.Get("power").(bool) {
-		err = serverPowerStateList.startServerSynchronously(emptyCtx, gsc, d.Id())
+		err = globalServerStatusList.startServerSynchronously(emptyCtx, gsc, d.Id())
 		if err != nil {
 			return err
 		}
 	} else {
-		err = serverPowerStateList.shutdownServerSynchronously(emptyCtx, gsc, d.Id())
+		err = globalServerStatusList.shutdownServerSynchronously(emptyCtx, gsc, d.Id())
 		if err != nil {
 			return err
 		}
