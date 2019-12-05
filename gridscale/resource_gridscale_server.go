@@ -317,7 +317,7 @@ then it will proceed onto rule 2. Packets that do not match any rules are blocke
 		"protocol": {
 			Type:        schema.TypeString,
 			Description: "Either 'udp' or 'tcp'",
-			Optional:    true,
+			Required:    true,
 			ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
 				valid := false
 				for _, prot := range firewallRuleProtocols {

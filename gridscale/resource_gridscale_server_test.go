@@ -130,18 +130,21 @@ resource "gridscale_server" "foo" {
 		object_uuid = "${gridscale_network.foo.id}"
 		rules_v4_in {
 				order = 0
+				protocol = "tcp"
 				action = "drop"
 				dst_port = "20:80"
 				comment = "test"
 		}
 		rules_v4_out {
 				order = 1
+				protocol = "tcp"
 				action = "drop"
 				dst_port = "80:443"
 				comment = "test1"
 		}
 		rules_v6_in	{
 				order = 2
+				protocol = "tcp"
 				action = "drop"
 				dst_port = "100:500"
 				comment = "test2"
@@ -176,12 +179,14 @@ resource "gridscale_server" "foo" {
 		object_uuid = "${gridscale_network.foo.id}"
 		rules_v4_in {
 				order = 0
+				protocol = "tcp"
 				action = "drop"
 				dst_port = "20:80"
 				comment = "test"
 		}
 		rules_v6_in	{
 				order = 1
+				protocol = "tcp"
 				action = "drop"
 				dst_port = "10:20"
 				comment = "test1"
