@@ -38,8 +38,6 @@ The following arguments are supported:
 
 * `storage_type` - (Optional) (one of storage, storage_high, storage_insane).
 
-* `location_uuid` - (Optional) Helps to identify which datacenter an object belongs to. Frankfurt is the default.
-
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
 
 * `template` - (Optional) List of labels in the format [ "label1", "label2" ].
@@ -63,7 +61,7 @@ This resource exports the following attributes:
 * `name` - See Argument Reference above.
 * `capacity` - See Argument Reference above.
 * `storage_type` - See Argument Reference above.
-* `location_uuid` - See Argument Reference above.
+* `location_uuid` - Helps to identify which datacenter an object belongs to. The location of the resource depends on the location of the project.
 * `labels` - See Argument Reference above.
 * `status` - status indicates the status of the object.
 * `create_time` - The time the object was created.

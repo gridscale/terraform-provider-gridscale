@@ -49,8 +49,6 @@ The following arguments are supported:
 
 * `memory` - (Required) The amount of server memory in GB.
 
-* `location_uuid` - (Optional, ForceNew) Helps to identify which datacenter an object belongs to. Frankfurt is the default.
-
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
 
 * `auto_recovery` - (Optional) If the server should be auto-started in case of a failure (default=true).
@@ -117,7 +115,7 @@ The following arguments are supported:
 
         * `action` - (Required) This defines what the firewall will do. Either accept or drop.
 
-        * `protocol` - (Optional) Either 'udp' or 'tcp'.
+        * `protocol` - (Required) Either 'udp' or 'tcp'.
         
         * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are seperated by a colon for FTP.
         
@@ -135,7 +133,7 @@ The following arguments are supported:
     
             * `action` - (Required) This defines what the firewall will do. Either accept or drop.
     
-            * `protocol` - (Optional) Either 'udp' or 'tcp'.
+            * `protocol` - (Required) Either 'udp' or 'tcp'.
             
             * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are seperated by a colon for FTP.
             
@@ -153,7 +151,7 @@ The following arguments are supported:
 
         * `action` - (Required) This defines what the firewall will do. Either accept or drop.
 
-        * `protocol` - (Optional) Either 'udp' or 'tcp'.
+        * `protocol` - (Required) Either 'udp' or 'tcp'.
         
         * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are seperated by a colon for FTP.
         
@@ -171,7 +169,7 @@ The following arguments are supported:
 
         * `action` - (Required) This defines what the firewall will do. Either accept or drop.
 
-        * `protocol` - (Optional) Either 'udp' or 'tcp'.
+        * `protocol` - (Required) Either 'udp' or 'tcp'.
         
         * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are seperated by a colon for FTP.
         
@@ -206,7 +204,7 @@ This resource exports the following attributes:
 * `name` - See Argument Reference above.
 * `cores` - See Argument Reference above.
 * `memory` - See Argument Reference above.
-* `location_uuid` - See Argument Reference above.
+* `location_uuid` - Helps to identify which datacenter an object belongs to. The location of the resource depends on the location of the project.
 * `labels` - See Argument Reference above.
 * `hardware_profile` - See Argument Reference above.
 * `storage` - See Argument Reference above.

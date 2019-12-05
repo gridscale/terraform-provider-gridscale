@@ -46,9 +46,7 @@ func resourceGridscaleNetwork() *schema.Resource {
 			"location_uuid": {
 				Type:        schema.TypeString,
 				Description: "Helps to identify which datacenter an object belongs to",
-				Optional:    true,
-				ForceNew:    true,
-				Default:     "45ed677b-3702-4b36-be2a-a2eab9827950",
+				Computed:    true,
 			},
 			"location_country": {
 				Type:        schema.TypeString,
@@ -145,10 +143,9 @@ func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) er
 	client := meta.(*gsclient.Client)
 
 	requestBody := gsclient.NetworkCreateRequest{
-		Name:         d.Get("name").(string),
-		LocationUUID: d.Get("location_uuid").(string),
-		L2Security:   d.Get("l2security").(bool),
-		Labels:       convSOStrings(d.Get("labels").(*schema.Set).List()),
+		Name:       d.Get("name").(string),
+		L2Security: d.Get("l2security").(bool),
+		Labels:     convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
 	response, err := client.CreateNetwork(emptyCtx, requestBody)

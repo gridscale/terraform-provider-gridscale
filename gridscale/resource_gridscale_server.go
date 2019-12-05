@@ -45,9 +45,7 @@ func resourceGridscaleServer() *schema.Resource {
 			"location_uuid": {
 				Type:        schema.TypeString,
 				Description: "Helps to identify which datacenter an object belongs to.",
-				Optional:    true,
-				ForceNew:    true,
-				Default:     "45ed677b-3702-4b36-be2a-a2eab9827950",
+				Computed:    true,
 			},
 			"hardware_profile": {
 				Type:        schema.TypeString,
@@ -319,7 +317,7 @@ then it will proceed onto rule 2. Packets that do not match any rules are blocke
 		"protocol": {
 			Type:        schema.TypeString,
 			Description: "Either 'udp' or 'tcp'",
-			Optional:    true,
+			Required:    true,
 			ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
 				valid := false
 				for _, prot := range firewallRuleProtocols {
@@ -532,7 +530,6 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		Name:            d.Get("name").(string),
 		Cores:           d.Get("cores").(int),
 		Memory:          d.Get("memory").(int),
-		LocationUUID:    d.Get("location_uuid").(string),
 		AvailablityZone: d.Get("availability_zone").(string),
 		Labels:          convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}

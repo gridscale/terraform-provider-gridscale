@@ -36,9 +36,7 @@ func resourceGridscaleIpv6() *schema.Resource {
 			"location_uuid": {
 				Type:        schema.TypeString,
 				Description: "Helps to identify which datacenter an object belongs to",
-				Optional:    true,
-				ForceNew:    true,
-				Default:     "45ed677b-3702-4b36-be2a-a2eab9827950",
+				Computed:    true,
 			},
 			"failover": {
 				Type:        schema.TypeBool,
@@ -112,12 +110,11 @@ func resourceGridscaleIpv6Create(d *schema.ResourceData, meta interface{}) error
 	client := meta.(*gsclient.Client)
 
 	requestBody := gsclient.IPCreateRequest{
-		Family:       gsclient.IPv6Type,
-		LocationUUID: d.Get("location_uuid").(string),
-		Name:         d.Get("name").(string),
-		Failover:     d.Get("failover").(bool),
-		ReverseDNS:   d.Get("reverse_dns").(string),
-		Labels:       convSOStrings(d.Get("labels").(*schema.Set).List()),
+		Family:     gsclient.IPv6Type,
+		Name:       d.Get("name").(string),
+		Failover:   d.Get("failover").(bool),
+		ReverseDNS: d.Get("reverse_dns").(string),
+		Labels:     convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
 	response, err := client.CreateIP(emptyCtx, requestBody)
