@@ -110,12 +110,11 @@ func resourceGridscaleIpv6Create(d *schema.ResourceData, meta interface{}) error
 	client := meta.(*gsclient.Client)
 
 	requestBody := gsclient.IPCreateRequest{
-		Family:       gsclient.IPv6Type,
-		LocationUUID: d.Get("location_uuid").(string),
-		Name:         d.Get("name").(string),
-		Failover:     d.Get("failover").(bool),
-		ReverseDNS:   d.Get("reverse_dns").(string),
-		Labels:       convSOStrings(d.Get("labels").(*schema.Set).List()),
+		Family:     gsclient.IPv6Type,
+		Name:       d.Get("name").(string),
+		Failover:   d.Get("failover").(bool),
+		ReverseDNS: d.Get("reverse_dns").(string),
+		Labels:     convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
 	response, err := client.CreateIP(emptyCtx, requestBody)

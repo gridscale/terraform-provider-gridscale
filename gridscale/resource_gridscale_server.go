@@ -530,7 +530,6 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		Name:            d.Get("name").(string),
 		Cores:           d.Get("cores").(int),
 		Memory:          d.Get("memory").(int),
-		LocationUUID:    d.Get("location_uuid").(string),
 		AvailablityZone: d.Get("availability_zone").(string),
 		Labels:          convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}

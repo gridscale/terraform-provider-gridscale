@@ -225,10 +225,9 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 	client := meta.(*gsclient.Client)
 
 	requestBody := gsclient.StorageCreateRequest{
-		Name:         d.Get("name").(string),
-		Capacity:     d.Get("capacity").(int),
-		LocationUUID: d.Get("location_uuid").(string),
-		Labels:       convSOStrings(d.Get("labels").(*schema.Set).List()),
+		Name:     d.Get("name").(string),
+		Capacity: d.Get("capacity").(int),
+		Labels:   convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
 	storageType := d.Get("storage_type").(string)

@@ -143,10 +143,9 @@ func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) er
 	client := meta.(*gsclient.Client)
 
 	requestBody := gsclient.NetworkCreateRequest{
-		Name:         d.Get("name").(string),
-		LocationUUID: d.Get("location_uuid").(string),
-		L2Security:   d.Get("l2security").(bool),
-		Labels:       convSOStrings(d.Get("labels").(*schema.Set).List()),
+		Name:       d.Get("name").(string),
+		L2Security: d.Get("l2security").(bool),
+		Labels:     convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
 	response, err := client.CreateNetwork(emptyCtx, requestBody)
