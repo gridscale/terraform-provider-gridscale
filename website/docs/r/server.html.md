@@ -115,7 +115,7 @@ The following arguments are supported:
 
         * `action` - (Required) This defines what the firewall will do. Either accept or drop.
 
-        * `protocol` - (Optional) Either 'udp' or 'tcp'.
+        * `protocol` - (Required) Either 'udp' or 'tcp'.
         
         * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are seperated by a colon for FTP.
         
@@ -133,7 +133,7 @@ The following arguments are supported:
     
             * `action` - (Required) This defines what the firewall will do. Either accept or drop.
     
-            * `protocol` - (Optional) Either 'udp' or 'tcp'.
+            * `protocol` - (Required) Either 'udp' or 'tcp'.
             
             * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are seperated by a colon for FTP.
             
@@ -151,7 +151,7 @@ The following arguments are supported:
 
         * `action` - (Required) This defines what the firewall will do. Either accept or drop.
 
-        * `protocol` - (Optional) Either 'udp' or 'tcp'.
+        * `protocol` - (Required) Either 'udp' or 'tcp'.
         
         * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are seperated by a colon for FTP.
         
@@ -169,7 +169,7 @@ The following arguments are supported:
 
         * `action` - (Required) This defines what the firewall will do. Either accept or drop.
 
-        * `protocol` - (Optional) Either 'udp' or 'tcp'.
+        * `protocol` - (Required) Either 'udp' or 'tcp'.
         
         * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are seperated by a colon for FTP.
         
