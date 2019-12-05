@@ -26,8 +26,6 @@ The following arguments are supported:
 
 * `name` - (Required) The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
 
-* `location_uuid` - (Optional) Helps to identify which datacenter an object belongs to. Frankfurt is the default.
-
 * `l2security` - (Optional) Defines information about MAC spoofing protection (filters layer2 and ARP traffic based on MAC source). It can only be (de-)activated on a private network - the public network always has l2security enabled. It will be true if the network is public, and false if the network is private.
 
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
@@ -38,7 +36,7 @@ The following arguments are supported:
 This resource exports the following attributes:
 
 * `name` - See Argument Reference above.
-* `location_uuid` - See Argument Reference above.
+* `location_uuid` - Helps to identify which datacenter an object belongs to. The location of the resource depends on the location of the project.
 * `l2security` - See Argument Reference above.
 * `labels` - See Argument Reference above.
 * `status` - status indicates the status of the object.

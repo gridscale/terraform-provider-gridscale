@@ -26,8 +26,6 @@ The following arguments are supported:
 
 * `name` - (Optional) The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
 
-* `location_uuid` - (Optional) Helps to identify which datacenter an object belongs to. Frankfurt is the default.
-
 * `failover` - (Optional) Sets failover mode for this IP. If true, then this IP is no longer available for DHCP and can no longer be related to any server.
 
 * `reverse_dns` - (Optional) Defines the reverse DNS entry for the IP Address (PTR Resource Record).

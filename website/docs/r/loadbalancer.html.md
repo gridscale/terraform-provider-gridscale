@@ -38,8 +38,6 @@ The following arguments are supported:
 
 * `name` - (Required) The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
 
-* `location_uuid` - (Optional) Helps to identify which datacenter an object belongs to. Frankfurt is the default.
-
 * `redirect_http_to_https` - (Required) Whether the loadbalancer is forced to redirect requests from HTTP to HTTPS.
 
 * `listen_ipv4_uuid` - (Required) The UUID of the IPv4 address the loadbalancer will listen to for incoming requests.
@@ -55,6 +53,7 @@ The following arguments are supported:
 This resource exports the following attributes:
 
 * `id` - The UUID of the loadbalancer.
+* `location_uuid` - Helps to identify which datacenter an object belongs to. The location of the resource depends on the location of the project.
 * `name` - The human-readable name of the loadbalancer.
 * `algorithm` - The algorithm used to process requests.
 * `status` - The status of the loadbalancer.
