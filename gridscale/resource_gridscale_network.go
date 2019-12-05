@@ -46,9 +46,7 @@ func resourceGridscaleNetwork() *schema.Resource {
 			"location_uuid": {
 				Type:        schema.TypeString,
 				Description: "Helps to identify which datacenter an object belongs to",
-				Optional:    true,
-				ForceNew:    true,
-				Default:     "45ed677b-3702-4b36-be2a-a2eab9827950",
+				Computed:    true,
 			},
 			"location_country": {
 				Type:        schema.TypeString,
