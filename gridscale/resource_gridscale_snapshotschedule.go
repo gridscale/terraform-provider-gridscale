@@ -2,6 +2,10 @@ package gridscale
 
 import (
 	"fmt"
+	"log"
+	"strings"
+	"time"
+
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 
@@ -10,7 +14,8 @@ import (
 
 func resourceGridscaleStorageSnapshotSchedule() *schema.Resource {
 	return &schema.Resource{
-		Read: resourceGridscaleSnapshotScheduleRead,
+		Create: resourceGridscaleSnapshotScheduleCreate,
+		Read:   resourceGridscaleSnapshotScheduleRead,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -130,4 +135,28 @@ func resourceGridscaleSnapshotScheduleRead(d *schema.ResourceData, meta interfac
 		return fmt.Errorf("Error setting labels: %v", err)
 	}
 	return nil
+}
+
+func resourceGridscaleSnapshotScheduleCreate(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*gsclient.Client)
+	requestBody := gsclient.StorageSnapshotScheduleCreateRequest{
+		Name:          d.Get("name").(string),
+		Labels:        convSOStrings(d.Get("labels").(*schema.Set).List()),
+		RunInterval:   d.Get("run_interval").(int),
+		KeepSnapshots: d.Get("keep_snapshots").(int),
+	}
+	if strings.TrimSpace(d.Get("next_runtime").(string)) != "" {
+		nextRuntime, err := time.Parse(timeLayout, d.Get("next_runtime").(string))
+		if err != nil {
+			return err
+		}
+		requestBody.NextRuntime = &gsclient.GSTime{Time: nextRuntime}
+	}
+	response, err := client.CreateStorageSnapshotSchedule(emptyCtx, d.Get("storage_uuid").(string), requestBody)
+	if err != nil {
+		return err
+	}
+	d.SetId(response.ObjectUUID)
+	log.Printf("The id for snapshot schedule %s has been set to %v", requestBody.Name, response.ObjectUUID)
+	return resourceGridscaleSnapshotScheduleRead(d, meta)
 }
