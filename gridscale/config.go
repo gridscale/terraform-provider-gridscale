@@ -16,7 +16,7 @@ var firewallActionTypes = []string{"accept", "drop"}
 var firewallRuleProtocols = []string{"udp", "tcp"}
 var emptyCtx = context.Background()
 
-const timeLayout = "2006-01-02T15:04:05Z"
+const timeLayout = "2006-01-02 15:04:05"
 
 type Config struct {
 	UserUUID string
