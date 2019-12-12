@@ -14,6 +14,7 @@ func resourceGridscaleStorageSnapshot() *schema.Resource {
 	return &schema.Resource{
 		Read:   resourceGridscaleSnapshotRead,
 		Create: resourceGridscaleSnapshotCreate,
+		Update: resourceGridscaleSnapshotUpdate,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -145,5 +146,18 @@ func resourceGridscaleSnapshotCreate(d *schema.ResourceData, meta interface{}) e
 	}
 	d.SetId(response.ObjectUUID)
 	log.Printf("The id for snapshot %s has been set to %v", requestBody.Name, response.ObjectUUID)
+	return resourceGridscaleSnapshotRead(d, meta)
+}
+
+func resourceGridscaleSnapshotUpdate(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*gsclient.Client)
+	requestBody := gsclient.StorageSnapshotUpdateRequest{
+		Name:   d.Get("name").(string),
+		Labels: convSOStrings(d.Get("labels").([]interface{})),
+	}
+	err := client.UpdateStorageSnapshot(emptyCtx, d.Get("storage_uuid").(string), d.Id(), requestBody)
+	if err != nil {
+		return err
+	}
 	return resourceGridscaleSnapshotRead(d, meta)
 }
