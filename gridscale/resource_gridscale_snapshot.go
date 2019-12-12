@@ -87,7 +87,7 @@ the product_no of the license (see the /prices endpoint for more details)`,
 				Description: "Uuid of the storage used to create this snapshot",
 			},
 			"labels": {
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Description: "List of labels.",
 				Optional:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
@@ -133,7 +133,7 @@ func resourceGridscaleSnapshotCreate(d *schema.ResourceData, meta interface{}) e
 	client := meta.(*gsclient.Client)
 	requestBody := gsclient.StorageSnapshotCreateRequest{
 		Name:   d.Get("name").(string),
-		Labels: convSOStrings(d.Get("labels").([]interface{})),
+		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 	response, err := client.CreateStorageSnapshot(emptyCtx, d.Get("storage_uuid").(string), requestBody)
 	if err != nil {
@@ -148,7 +148,7 @@ func resourceGridscaleSnapshotUpdate(d *schema.ResourceData, meta interface{}) e
 	client := meta.(*gsclient.Client)
 	requestBody := gsclient.StorageSnapshotUpdateRequest{
 		Name:   d.Get("name").(string),
-		Labels: convSOStrings(d.Get("labels").([]interface{})),
+		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 	err := client.UpdateStorageSnapshot(emptyCtx, d.Get("storage_uuid").(string), d.Id(), requestBody)
 	if err != nil {
