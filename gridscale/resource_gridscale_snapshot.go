@@ -1,13 +1,17 @@
 package gridscale
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+
+	"github.com/gridscale/gsclient-go"
 )
 
-func resourceGridscaleSnapshot() *schema.Resource {
+func resourceGridscaleStorageSnapshot() *schema.Resource {
 	return &schema.Resource{
+		Read: resourceGridscaleSnapshotRead,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -92,4 +96,37 @@ the product_no of the license (see the /prices endpoint for more details)`,
 			Update: schema.DefaultTimeout(time.Minute * 3),
 		},
 	}
+}
+
+func resourceGridscaleSnapshotRead(d *schema.ResourceData, meta interface{}) error {
+	storageUuid := d.Get("storage_uuid").(string)
+	client := meta.(*gsclient.Client)
+	snapshot, err := client.GetStorageSnapshot(emptyCtx, storageUuid, d.Id())
+	if err != nil {
+		if requestError, ok := err.(gsclient.RequestError); ok {
+			if requestError.StatusCode == 404 {
+				d.SetId("")
+				return nil
+			}
+		}
+		return err
+	}
+	props := snapshot.Properties
+	d.Set("name", props.Name)
+	d.Set("status", props.Status)
+	d.Set("location_country", props.LocationCountry)
+	d.Set("location_name", props.LocationName)
+	d.Set("location_iata", props.LocationIata)
+	d.Set("location_uuid", props.LocationUUID)
+	d.Set("usage_in_minutes", props.UsageInMinutes)
+	d.Set("create_time", props.CreateTime)
+	d.Set("change_time", props.ChangeTime)
+	d.Set("license_product_no", props.LicenseProductNo)
+	d.Set("current_price", props.CurrentPrice)
+	d.Set("capacity", props.Capacity)
+	//Set labels
+	if err = d.Set("labels", props.Labels); err != nil {
+		return fmt.Errorf("Error setting labels: %v", err)
+	}
+	return nil
 }
