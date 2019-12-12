@@ -30,6 +30,7 @@ func resourceGridscaleStorageSnapshotSchedule() *schema.Resource {
 			"next_runtime": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "The date and time that the snapshot schedule will be run",
 			},
 			"keep_snapshots": {
@@ -112,7 +113,7 @@ func resourceGridscaleSnapshotScheduleRead(d *schema.ResourceData, meta interfac
 	props := scheduler.Properties
 	d.Set("status", props.Status)
 	d.Set("name", props.Name)
-	d.Set("next_runtime", props.NextRuntime.String())
+	d.Set("next_runtime", props.NextRuntime.Format(timeLayout))
 	d.Set("keep_snapshots", props.KeepSnapshots)
 	d.Set("run_interval", props.RunInterval)
 	d.Set("storage_uuid", props.StorageUUID)
