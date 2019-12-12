@@ -2,10 +2,8 @@ package gridscale
 
 import (
 	"fmt"
-	"log"
-	"time"
-
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"log"
 
 	"github.com/gridscale/gsclient-go"
 )
@@ -94,10 +92,6 @@ the product_no of the license (see the /prices endpoint for more details)`,
 				Optional:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
-		},
-		Timeouts: &schema.ResourceTimeout{
-			Delete: schema.DefaultTimeout(time.Minute * 3),
-			Update: schema.DefaultTimeout(time.Minute * 3),
 		},
 	}
 }
