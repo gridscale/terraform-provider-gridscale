@@ -68,7 +68,7 @@ func dataSourceGridscaleStorageSnapshotSchedule() *schema.Resource {
 			"snapshot": {
 				Type:        schema.TypeSet,
 				Computed:    true,
-				Description: "Related snashots",
+				Description: "Related snapshots",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"name": {
