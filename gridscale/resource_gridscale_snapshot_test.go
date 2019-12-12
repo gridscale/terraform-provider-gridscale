@@ -11,7 +11,7 @@ import (
 	"github.com/gridscale/gsclient-go"
 )
 
-func TestAccDataSourceGridscaleSnapshot_Basic(t *testing.T) {
+func TestAccResourceGridscaleSnapshot_Basic(t *testing.T) {
 	var object gsclient.StorageSnapshot
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
