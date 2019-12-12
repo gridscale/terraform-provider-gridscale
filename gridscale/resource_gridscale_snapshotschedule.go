@@ -16,6 +16,7 @@ func resourceGridscaleStorageSnapshotSchedule() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceGridscaleSnapshotScheduleCreate,
 		Read:   resourceGridscaleSnapshotScheduleRead,
+		Update: resourceGridscaleSnapshotScheduleUpdate,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -158,5 +159,27 @@ func resourceGridscaleSnapshotScheduleCreate(d *schema.ResourceData, meta interf
 	}
 	d.SetId(response.ObjectUUID)
 	log.Printf("The id for snapshot schedule %s has been set to %v", requestBody.Name, response.ObjectUUID)
+	return resourceGridscaleSnapshotScheduleRead(d, meta)
+}
+
+func resourceGridscaleSnapshotScheduleUpdate(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*gsclient.Client)
+	requestBody := gsclient.StorageSnapshotScheduleUpdateRequest{
+		Name:          d.Get("name").(string),
+		Labels:        convSOStrings(d.Get("labels").(*schema.Set).List()),
+		RunInterval:   d.Get("run_interval").(int),
+		KeepSnapshots: d.Get("keep_snapshots").(int),
+	}
+	if strings.TrimSpace(d.Get("next_runtime").(string)) != "" {
+		nextRuntime, err := time.Parse(timeLayout, d.Get("next_runtime").(string))
+		if err != nil {
+			return err
+		}
+		requestBody.NextRuntime = &gsclient.GSTime{Time: nextRuntime}
+	}
+	err := client.UpdateStorageSnapshotSchedule(emptyCtx, d.Get("storage_uuid").(string), d.Id(), requestBody)
+	if err != nil {
+		return err
+	}
 	return resourceGridscaleSnapshotScheduleRead(d, meta)
 }
