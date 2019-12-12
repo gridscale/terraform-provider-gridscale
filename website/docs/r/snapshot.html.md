@@ -33,6 +33,8 @@ The following arguments are supported:
 
 * `labels` - (Optional) The list of labels.
 
+* `rollback` - (Optional) Returns a storage to the state of the selected Snapshot. (**NOTE: `rollback` has to be set back to `false` if you want to trigger it again.)
+
 ## Attributes Reference
 
 The following attributes are exported:
