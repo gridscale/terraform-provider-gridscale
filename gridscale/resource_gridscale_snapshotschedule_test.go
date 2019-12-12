@@ -11,7 +11,7 @@ import (
 	"github.com/gridscale/gsclient-go"
 )
 
-func TestAccDataSourceGridscaleSnapshotSchedule_Basic(t *testing.T) {
+func TestAccResourceGridscaleSnapshotSchedule_Basic(t *testing.T) {
 	var object gsclient.StorageSnapshotSchedule
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
