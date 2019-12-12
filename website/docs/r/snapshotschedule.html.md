@@ -42,7 +42,7 @@ The following arguments are supported:
 
 * `run_interval` - (Required) The interval at which the schedule will run (in minutes, >=60).
 
-## Attributes
+## Attributes Reference
 
 The following attributes are exported:
 

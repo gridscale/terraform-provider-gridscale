@@ -38,7 +38,7 @@ The following arguments are supported:
 
 * `storage_uuid` - (Required) UUID of the storage that the snapshot schedule belongs to.
 
-## Attributes
+## Attributes Reference
 
 The following attributes are exported:
 
