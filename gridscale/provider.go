@@ -35,6 +35,7 @@ func Provider() terraform.ResourceProvider {
 			"gridscale_sshkey":       dataSourceGridscaleSshkey(),
 			"gridscale_template":     dataSourceGridscaleTemplate(),
 			"gridscale_loadbalancer": dataSourceGridscaleLoadBalancer(),
+			"gridscale_snapshot":     dataSourceGridscaleStorageSnapshot(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"gridscale_server":       resourceGridscaleServer(),
