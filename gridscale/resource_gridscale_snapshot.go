@@ -52,7 +52,7 @@ func resourceGridscaleStorageSnapshot() *schema.Resource {
 				Description: "Helps to identify which datacenter an object belongs to",
 			},
 			"usage_in_minutes": {
-				Type:        schema.TypeString,
+				Type:        schema.TypeInt,
 				Computed:    true,
 				Description: "Total minutes the object has been running",
 			},
@@ -67,7 +67,7 @@ func resourceGridscaleStorageSnapshot() *schema.Resource {
 				Description: "Defines the date and time of the last object change",
 			},
 			"license_product_no": {
-				Type:     schema.TypeString,
+				Type:     schema.TypeInt,
 				Computed: true,
 				Description: `If a template has been used that requires a license key (e.g. Windows Servers) this shows 
 the product_no of the license (see the /prices endpoint for more details)`,
@@ -123,8 +123,8 @@ func resourceGridscaleSnapshotRead(d *schema.ResourceData, meta interface{}) err
 	d.Set("location_iata", props.LocationIata)
 	d.Set("location_uuid", props.LocationUUID)
 	d.Set("usage_in_minutes", props.UsageInMinutes)
-	d.Set("create_time", props.CreateTime)
-	d.Set("change_time", props.ChangeTime)
+	d.Set("create_time", props.CreateTime.String())
+	d.Set("change_time", props.ChangeTime.String())
 	d.Set("license_product_no", props.LicenseProductNo)
 	d.Set("current_price", props.CurrentPrice)
 	d.Set("capacity", props.Capacity)
