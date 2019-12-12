@@ -2,6 +2,7 @@ package gridscale
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -11,7 +12,8 @@ import (
 
 func resourceGridscaleStorageSnapshot() *schema.Resource {
 	return &schema.Resource{
-		Read: resourceGridscaleSnapshotRead,
+		Read:   resourceGridscaleSnapshotRead,
+		Create: resourceGridscaleSnapshotCreate,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -129,4 +131,19 @@ func resourceGridscaleSnapshotRead(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("Error setting labels: %v", err)
 	}
 	return nil
+}
+
+func resourceGridscaleSnapshotCreate(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*gsclient.Client)
+	requestBody := gsclient.StorageSnapshotCreateRequest{
+		Name:   d.Get("name").(string),
+		Labels: convSOStrings(d.Get("labels").([]interface{})),
+	}
+	response, err := client.CreateStorageSnapshot(emptyCtx, d.Get("storage_uuid").(string), requestBody)
+	if err != nil {
+		return err
+	}
+	d.SetId(response.ObjectUUID)
+	log.Printf("The id for snapshot %s has been set to %v", requestBody.Name, response.ObjectUUID)
+	return resourceGridscaleSnapshotRead(d, meta)
 }
