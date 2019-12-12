@@ -15,6 +15,7 @@ func resourceGridscaleStorageSnapshot() *schema.Resource {
 		Read:   resourceGridscaleSnapshotRead,
 		Create: resourceGridscaleSnapshotCreate,
 		Update: resourceGridscaleSnapshotUpdate,
+		Delete: resourceGridscaleSnapshotDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -160,4 +161,9 @@ func resourceGridscaleSnapshotUpdate(d *schema.ResourceData, meta interface{}) e
 		return err
 	}
 	return resourceGridscaleSnapshotRead(d, meta)
+}
+
+func resourceGridscaleSnapshotDelete(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*gsclient.Client)
+	return client.DeleteStorageSnapshot(emptyCtx, d.Get("storage_uuid").(string), d.Id())
 }
