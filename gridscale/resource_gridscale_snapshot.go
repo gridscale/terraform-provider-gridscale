@@ -86,6 +86,12 @@ the product_no of the license (see the /prices endpoint for more details)`,
 				ForceNew:    true,
 				Description: "Uuid of the storage used to create this snapshot",
 			},
+			"rollback": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
+				Description: "Returns a storage to the state of the selected Snapshot.",
+			},
 			"labels": {
 				Type:        schema.TypeSet,
 				Description: "List of labels.",
@@ -131,13 +137,31 @@ func resourceGridscaleSnapshotRead(d *schema.ResourceData, meta interface{}) err
 
 func resourceGridscaleSnapshotCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
+	storageUUID := d.Get("storage_uuid").(string)
 	requestBody := gsclient.StorageSnapshotCreateRequest{
 		Name:   d.Get("name").(string),
 		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
-	response, err := client.CreateStorageSnapshot(emptyCtx, d.Get("storage_uuid").(string), requestBody)
+	response, err := client.CreateStorageSnapshot(emptyCtx, storageUUID, requestBody)
 	if err != nil {
 		return err
+	}
+	//Check if rollback is requested
+	rollback := d.Get("rollback").(bool)
+	if rollback {
+		log.Printf("Rolling back storage %s using snapshot %s", storageUUID, response.ObjectUUID)
+		err = client.RollbackStorage(
+			emptyCtx,
+			storageUUID,
+			response.ObjectUUID,
+			gsclient.StorageRollbackRequest{
+				Rollback: rollback,
+			},
+		)
+		if err != nil {
+			return err
+		}
+		log.Printf("Rolling back storage %s using snapshot %s SUCCESSFULLY", storageUUID, response.ObjectUUID)
 	}
 	d.SetId(response.ObjectUUID)
 	log.Printf("The id for snapshot %s has been set to %v", requestBody.Name, response.ObjectUUID)
@@ -150,9 +174,28 @@ func resourceGridscaleSnapshotUpdate(d *schema.ResourceData, meta interface{}) e
 		Name:   d.Get("name").(string),
 		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
-	err := client.UpdateStorageSnapshot(emptyCtx, d.Get("storage_uuid").(string), d.Id(), requestBody)
+	storageUUID := d.Get("storage_uuid").(string)
+	err := client.UpdateStorageSnapshot(emptyCtx, storageUUID, d.Id(), requestBody)
 	if err != nil {
 		return err
+	}
+	//Check if rollback is requested
+	rollback := d.Get("rollback").(bool)
+	rollbackHasChanged := d.HasChange("rollback")
+	if rollback && rollbackHasChanged {
+		log.Printf("Rolling back storage %s using snapshot %s", storageUUID, d.Id())
+		err = client.RollbackStorage(
+			emptyCtx,
+			storageUUID,
+			d.Id(),
+			gsclient.StorageRollbackRequest{
+				Rollback: rollback,
+			},
+		)
+		if err != nil {
+			return err
+		}
+		log.Printf("Rolling back storage %s using snapshot %s SUCCESSFULLY", storageUUID, d.Id())
 	}
 	return resourceGridscaleSnapshotRead(d, meta)
 }
