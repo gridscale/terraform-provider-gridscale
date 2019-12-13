@@ -35,6 +35,7 @@ func Provider() terraform.ResourceProvider {
 			"gridscale_sshkey":       dataSourceGridscaleSshkey(),
 			"gridscale_template":     dataSourceGridscaleTemplate(),
 			"gridscale_loadbalancer": dataSourceGridscaleLoadBalancer(),
+			"gridscale_snapshot":     dataSourceGridscaleStorageSnapshot(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"gridscale_server":       resourceGridscaleServer(),
@@ -44,6 +45,7 @@ func Provider() terraform.ResourceProvider {
 			"gridscale_ipv6":         resourceGridscaleIpv6(),
 			"gridscale_sshkey":       resourceGridscaleSshkey(),
 			"gridscale_loadbalancer": resourceGridscaleLoadBalancer(),
+			"gridscale_snapshot":     resourceGridscaleStorageSnapshot(),
 		},
 
 		ConfigureFunc: providerConfigure,
