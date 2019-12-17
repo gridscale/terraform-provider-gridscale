@@ -97,7 +97,7 @@ func testAccCheckResourceGridscalePaaSConfig_basic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_paas" "foopaas" {
   name = "%s"
-  service_template_uuid = "f9625726-5ca8-4d5c-b9bd-3257e1e2211a"
+  service_template_uuid = "8bcb216c-65ec-4c93-925d-1b8feaa5c2c5"
 }
 `, name)
 }
@@ -106,10 +106,25 @@ func testAccCheckResourceGridscalePaaSConfig_basic_update() string {
 	return fmt.Sprintf(`
 resource "gridscale_paas" "foopaas" {
   name = "newname"
-  service_template_uuid = "f9625726-5ca8-4d5c-b9bd-3257e1e2211a"
+  service_template_uuid = "8bcb216c-65ec-4c93-925d-1b8feaa5c2c5"
   resource_limit {
 	resource = "cores"
 	limit = 16
+  }
+  parameter {
+    param = "mysql_max_connections"
+    value = "2000"
+    type = "float"
+  }
+  parameter {
+    param = "mysql_query_cache"
+    value = "true"
+    type = "bool"
+  }
+  parameter {
+    param = "mysql_default_time_zone"
+    value = "UTC"
+    type = "string"
   }
 }
 `)
