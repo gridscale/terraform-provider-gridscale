@@ -5,6 +5,7 @@ import (
 	"github.com/gridscale/gsclient-go"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"strings"
 
 	"log"
 )
@@ -110,6 +111,23 @@ func resourceGridscalePaaS() *schema.Resource {
 							Type:     schema.TypeString,
 							Required: true,
 						},
+						"type": {
+							Type:     schema.TypeString,
+							Required: true,
+							ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
+								valid := false
+								for _, primType := range supportedPrimTypes {
+									if v.(string) == primType {
+										valid = true
+										break
+									}
+								}
+								if !valid {
+									errors = append(errors, fmt.Errorf("%v is not a valid primitive type. Valid primitive types are: %v", v.(string), strings.Join(supportedPrimTypes, ",")))
+								}
+								return
+							},
+						},
 					},
 				},
 			},
@@ -185,9 +203,15 @@ func resourceGridscalePaaSServiceRead(d *schema.ResourceData, meta interface{}) 
 	//Get parameters
 	parameters := make([]interface{}, 0)
 	for k, value := range props.Parameters {
+		paramValType, err := getInterfaceType(value)
+		if err != nil {
+			return err
+		}
+		valueInString, err := convInterfaceToString(paramValType, value)
 		param := map[string]interface{}{
 			"param": k,
-			"value": value,
+			"value": valueInString,
+			"type":  paramValType,
 		}
 		parameters = append(parameters, param)
 	}
@@ -245,14 +269,13 @@ func resourceGridscalePaaSServiceCreate(d *schema.ResourceData, meta interface{}
 		mapVal := value.(map[string]interface{})
 		var param string
 		var val interface{}
-		for k, v := range mapVal {
-			if k == "param" {
-				param = v.(string)
-			}
-			if k == "value" {
-				val = v
-			}
+		param = mapVal["param"].(string)
+		paramValType := mapVal["type"].(string)
+		typedVal, err := convStrToTypeInterface(paramValType, mapVal["value"].(string))
+		if err != nil {
+			return err
 		}
+		val = typedVal
 		params[param] = val
 	}
 	requestBody.Parameters = params
@@ -261,14 +284,8 @@ func resourceGridscalePaaSServiceCreate(d *schema.ResourceData, meta interface{}
 	for _, value := range d.Get("resource_limit").(*schema.Set).List() {
 		mapVal := value.(map[string]interface{})
 		var resLim gsclient.ResourceLimit
-		for k, v := range mapVal {
-			if k == "resource" {
-				resLim.Resource = v.(string)
-			}
-			if k == "limit" {
-				resLim.Limit = v.(int)
-			}
-		}
+		resLim.Resource = mapVal["resource"].(string)
+		resLim.Limit = mapVal["limit"].(int)
 		limits = append(limits, resLim)
 	}
 	requestBody.ResourceLimits = limits
@@ -294,14 +311,13 @@ func resourceGridscalePaaSServiceUpdate(d *schema.ResourceData, meta interface{}
 		mapVal := value.(map[string]interface{})
 		var param string
 		var val interface{}
-		for k, v := range mapVal {
-			if k == "param" {
-				param = v.(string)
-			}
-			if k == "value" {
-				val = v
-			}
+		param = mapVal["param"].(string)
+		paramValType := mapVal["type"].(string)
+		typedVal, err := convStrToTypeInterface(paramValType, mapVal["value"].(string))
+		if err != nil {
+			return err
 		}
+		val = typedVal
 		params[param] = val
 	}
 	requestBody.Parameters = params
@@ -310,14 +326,8 @@ func resourceGridscalePaaSServiceUpdate(d *schema.ResourceData, meta interface{}
 	for _, value := range d.Get("resource_limit").(*schema.Set).List() {
 		mapVal := value.(map[string]interface{})
 		var resLim gsclient.ResourceLimit
-		for k, v := range mapVal {
-			if k == "resource" {
-				resLim.Resource = v.(string)
-			}
-			if k == "limit" {
-				resLim.Limit = v.(int)
-			}
-		}
+		resLim.Resource = mapVal["resource"].(string)
+		resLim.Limit = mapVal["limit"].(int)
 		limits = append(limits, resLim)
 	}
 	requestBody.ResourceLimits = limits

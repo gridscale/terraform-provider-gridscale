@@ -104,6 +104,10 @@ func dataSourceGridscalePaaS() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
+						"type": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
 					},
 				},
 			},
@@ -177,9 +181,15 @@ func dataSourceGridscalePaaSRead(d *schema.ResourceData, meta interface{}) error
 	//Get parameters
 	parameters := make([]interface{}, 0)
 	for k, value := range props.Parameters {
+		paramValType, err := getInterfaceType(value)
+		if err != nil {
+			return err
+		}
+		valueInString, err := convInterfaceToString(paramValType, value)
 		param := map[string]interface{}{
 			"param": k,
-			"value": value,
+			"value": valueInString,
+			"type":  paramValType,
 		}
 		parameters = append(parameters, param)
 	}
