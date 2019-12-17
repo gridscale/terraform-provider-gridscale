@@ -46,6 +46,7 @@ The following attributes are exported:
 * `parameter` - Contains the service parameters for the service.
     * `param` - Name of parameter.
     * `value` - Value of the corresponding parameter.
+    * `type` - Primitive type of the parameter.
 * `resource_limit` - A list of service resource limits.
     * `resource` - The name of the resource you would like to cap.
     * `limit` - The maximum number of the specific resource your service can use.

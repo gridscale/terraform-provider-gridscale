@@ -45,6 +45,8 @@ The following arguments are supported:
 
     * `limit` - (Required) The maximum number of the specific resource your service can use.
 
+    * `type` - (Required) Primitive type of the parameter: bool, int (better use float for int case), float, string.
+
 ## Attributes
 
 This resource exports the following attributes:
@@ -66,6 +68,7 @@ This resource exports the following attributes:
 * `parameter` - See Argument Reference above.
     * `param` - See Argument Reference above.
     * `value` - See Argument Reference above.
+    * `type` - See Argument Reference above.
 * `resource_limit` - See Argument Reference above.
     * `resource` - See Argument Reference above.
     * `limit` - See Argument Reference above.
