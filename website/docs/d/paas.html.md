@@ -12,7 +12,7 @@ Get a PaaS resource based on given UUID.
 
 ## Example Usage
 
-Using the network datasource for the creation of a PaaS:
+Retrieving the PaaS datasource:
 
 ```terraform
 resource "gridscale_paas" "foo" {
