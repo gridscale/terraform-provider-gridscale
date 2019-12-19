@@ -10,6 +10,7 @@ func resourceGridscaleObjectStorage() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceGridscaleObjectStorageCreate,
 		Read:   resourceGridscaleObjectStorageRead,
+		Delete: resourceGridscaleObjectStorageDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -57,5 +58,10 @@ func resourceGridscaleObjectStorageCreate(d *schema.ResourceData, meta interface
 	d.SetId(response.AccessKey.AccessKey)
 
 	log.Printf("The id for the new object storage has been set to %v", response.AccessKey.AccessKey)
-	return resourceGridscaleIpRead(d, meta)
+	return resourceGridscaleObjectStorageRead(d, meta)
+}
+
+func resourceGridscaleObjectStorageDelete(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*gsclient.Client)
+	return client.DeleteObjectStorageAccessKey(emptyCtx, d.Id())
 }
