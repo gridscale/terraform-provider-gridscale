@@ -42,7 +42,7 @@ The following attributes are exported:
 * `network_type` - The type of the network.
 * `location_country` - The human-readable name of the country where the network is located.
 * `location_iata` - The IATA airport code, which works as a location identifier.
-* `location_name` - The uman-readable name of the location where the network is located.
+* `location_name` - The human-readable name of the location where the network is located.
 * `delete_block` - Defines if the network is administratively blocked.
 * `create_time` - Defines the date and time the network was initially created.
 * `change_time` - Defines the date and time of the last network change.
