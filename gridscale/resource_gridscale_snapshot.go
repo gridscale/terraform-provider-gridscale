@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
+	"time"
 
 	"github.com/gridscale/gsclient-go"
 )
@@ -87,10 +88,26 @@ the product_no of the license (see the /prices endpoint for more details)`,
 				Description: "Uuid of the storage used to create this snapshot",
 			},
 			"rollback": {
-				Type:        schema.TypeBool,
+				Type:        schema.TypeSet,
 				Optional:    true,
-				Default:     false,
 				Description: "Returns a storage to the state of the selected Snapshot.",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"id": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "ID of the rollback request. Each rollback request has to have a unique id. ID can be any string value.",
+						},
+						"rollback_time": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"status": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+					},
+				},
 			},
 			"labels": {
 				Type:        schema.TypeSet,
@@ -146,22 +163,36 @@ func resourceGridscaleSnapshotCreate(d *schema.ResourceData, meta interface{}) e
 	if err != nil {
 		return err
 	}
-	//Check if rollback is requested
-	rollback := d.Get("rollback").(bool)
-	if rollback {
-		log.Printf("Rolling back storage %s using snapshot %s", storageUUID, response.ObjectUUID)
-		err = client.RollbackStorage(
-			emptyCtx,
-			storageUUID,
-			response.ObjectUUID,
-			gsclient.StorageRollbackRequest{
-				Rollback: rollback,
-			},
-		)
-		if err != nil {
-			return err
+	//Start rolling back if there are initially requests to rollback
+	if attr, ok := d.GetOk("rollback"); ok {
+		requests := make([]interface{}, 0)
+		for _, requestProps := range attr.(*schema.Set).List() {
+			rollbackReq := requestProps.(map[string]interface{})
+			//Rollback
+			log.Printf("Start rolling back storage %s with snapshot %s", storageUUID, response.ObjectUUID)
+			err = client.RollbackStorage(
+				emptyCtx,
+				storageUUID,
+				response.ObjectUUID,
+				gsclient.StorageRollbackRequest{
+					Rollback: true,
+				},
+			)
+			//Set status
+			if err != nil {
+				rollbackReq["status"] = err.Error()
+			} else {
+				rollbackReq["status"] = "success"
+				log.Printf("Rolling back storage %s with snapshot %s SUCCESSFULLY", storageUUID, response.ObjectUUID)
+			}
+			//Set time of rollback request
+			rollbackReq["rollback_time"] = time.Now().Format(timeLayout)
+			requests = append(requests, rollbackReq)
 		}
-		log.Printf("Rolling back storage %s using snapshot %s SUCCESSFULLY", storageUUID, response.ObjectUUID)
+		//Apply value back to schema
+		if err = d.Set("rollback", requests); err != nil {
+			return fmt.Errorf("Error setting rollback: %v", err)
+		}
 	}
 	d.SetId(response.ObjectUUID)
 	log.Printf("The id for snapshot %s has been set to %v", requestBody.Name, response.ObjectUUID)
@@ -179,23 +210,39 @@ func resourceGridscaleSnapshotUpdate(d *schema.ResourceData, meta interface{}) e
 	if err != nil {
 		return err
 	}
-	//Check if rollback is requested
-	rollback := d.Get("rollback").(bool)
-	rollbackHasChanged := d.HasChange("rollback")
-	if rollback && rollbackHasChanged {
-		log.Printf("Rolling back storage %s using snapshot %s", storageUUID, d.Id())
-		err = client.RollbackStorage(
-			emptyCtx,
-			storageUUID,
-			d.Id(),
-			gsclient.StorageRollbackRequest{
-				Rollback: rollback,
-			},
-		)
-		if err != nil {
-			return err
+	//Start rolling back if there are new requests to rollback
+	if attr, ok := d.GetOk("rollback"); ok {
+		requests := make([]interface{}, 0)
+		for _, requestProps := range attr.(*schema.Set).List() {
+			rollbackReq := requestProps.(map[string]interface{})
+			//If `time` field of a request is set, it is the old request
+			if rollbackReq["rollback_time"] == "" {
+				//Rollback
+				log.Printf("Start rolling back storage %s with snapshot %s", storageUUID, d.Id())
+				err = client.RollbackStorage(
+					emptyCtx,
+					storageUUID,
+					d.Id(),
+					gsclient.StorageRollbackRequest{
+						Rollback: true,
+					},
+				)
+				//Set status
+				if err != nil {
+					rollbackReq["status"] = err.Error()
+				} else {
+					rollbackReq["status"] = "success"
+					log.Printf("Rolling back storage %s with snapshot %s SUCCESSFULLY", storageUUID, d.Id())
+				}
+				//Set time of rollback request
+				rollbackReq["rollback_time"] = time.Now().Format(timeLayout)
+			}
+			requests = append(requests, rollbackReq)
 		}
-		log.Printf("Rolling back storage %s using snapshot %s SUCCESSFULLY", storageUUID, d.Id())
+		//Apply value back to schema
+		if err = d.Set("rollback", requests); err != nil {
+			return fmt.Errorf("Error setting rollback: %v", err)
+		}
 	}
 	return resourceGridscaleSnapshotRead(d, meta)
 }
