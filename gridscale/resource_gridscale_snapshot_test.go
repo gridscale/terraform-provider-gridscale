@@ -104,7 +104,9 @@ resource "gridscale_storage" "foo" {
 resource "gridscale_snapshot" "foo" {
   name = "%s"
   storage_uuid = gridscale_storage.foo.id
-  rollback = true
+  rollback {
+	id = "first"
+  }
 }
 `, name)
 }
@@ -119,6 +121,12 @@ resource "gridscale_snapshot" "foo" {
   name = "newname"
   storage_uuid = gridscale_storage.foo.id
   labels = ["test"]
+  rollback {
+	id = "first"
+  }
+  rollback {
+	id = "second"
+  }
 }
 `)
 }
