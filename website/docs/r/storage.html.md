@@ -48,7 +48,7 @@ The following arguments are supported:
 
     * `password_type` - (Optional) (one of plain, crypt) Required if password is set (ignored for private templates and public Windows templates).
 
-    * `sshkeys` - (Optional) (array of any - minItems: 0) Public Linux templates only! The UUIDs of SSHkeys to install for the root user.
+    * `sshkeys` - (Optional) (array of any - minItems: 0) Public Linux templates only! The UUIDs of SSH keys to install for the root user.
 
     * `hostname` - (Optional) The hostname of the installed server (ignored for private templates and public windows templates).
 

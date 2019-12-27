@@ -117,9 +117,9 @@ The following arguments are supported:
 
         * `protocol` - (Required) Either 'udp' or 'tcp'.
 
-        * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are seperated by a colon for FTP.
+        * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
 
-        * `src_port` - (Optional) A Number between 1 and 65535, port ranges are seperated by a colon for FTP.
+        * `src_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
 
         * `src_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
 
@@ -135,9 +135,9 @@ The following arguments are supported:
 
             * `protocol` - (Required) Either 'udp' or 'tcp'.
 
-            * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are seperated by a colon for FTP.
+            * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
 
-            * `src_port` - (Optional) A Number between 1 and 65535, port ranges are seperated by a colon for FTP.
+            * `src_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
 
             * `src_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
 
@@ -153,9 +153,9 @@ The following arguments are supported:
 
         * `protocol` - (Required) Either 'udp' or 'tcp'.
 
-        * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are seperated by a colon for FTP.
+        * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
 
-        * `src_port` - (Optional) A Number between 1 and 65535, port ranges are seperated by a colon for FTP.
+        * `src_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
 
         * `src_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
 
@@ -171,9 +171,9 @@ The following arguments are supported:
 
         * `protocol` - (Required) Either 'udp' or 'tcp'.
 
-        * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are seperated by a colon for FTP.
+        * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
 
-        * `src_port` - (Optional) A Number between 1 and 65535, port ranges are seperated by a colon for FTP.
+        * `src_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
 
         * `src_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
 
