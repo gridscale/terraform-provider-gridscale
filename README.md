@@ -15,10 +15,10 @@ This provider plugin is maintained by the Terraform team at [gridscale](https://
 Requirements
 ------------
 
--	[Terraform](https://www.terraform.io/downloads.html) 0.12.x
--	[Go](https://golang.org/doc/install) 1.13.x (to build the provider plugin)
+- [Terraform](https://www.terraform.io/downloads.html) 0.12.x
+- [Go](https://golang.org/doc/install) 1.13.x (to build the provider plugin)
 
-Building The Provider
+Building the Provider
 ---------------------
 
 Clone repository to: `$GOPATH/src/github.com/gridscale/terraform-provider-gridscale`
@@ -35,8 +35,9 @@ $ cd $GOPATH/src/github.com/gridscale/terraform-provider-gridscale
 $ make build
 ```
 
-Using the provider
-----------------------
+Using the Provider
+------------------
+
 See the [gridscale provider documentation](https://www.terraform.io/docs/providers/gridscale) to get started on using the gridscale provider.
 
 Alternatively, this documentation can also be found within this repository. Check out [`website/docs/index.html.markdown`](website/docs/index.html.markdown) to get started. Documentation on how to create resources like servers, storages and networks can be found in [`website/docs/r`](website/docs/r). Documentation on how to add resources like storages, networks and IP addresses to servers, check out the documentation on datasources found in [`website/docs/d`](website/docs/d).
@@ -77,8 +78,9 @@ $ make testacc TEST=./gridscale/ TESTARGS='-run=TestAccResourceGridscaleLoadBala
 
 Known Issues
 ---------------------------
+
 The following issues are known to us:
 
-* Changing the name attribute in a template datasource will not trigger storages using this template to be recreated.
-* If a storage has snapshots, terraform can not delete it.
-* The autorecovery value of a server can't be changed with Terraform.
+- Changing the name attribute in a template datasource will not trigger storages using this template to be recreated.
+- If a storage has snapshots, terraform can not delete it.
+- The autorecovery value of a server can't be changed with Terraform.
