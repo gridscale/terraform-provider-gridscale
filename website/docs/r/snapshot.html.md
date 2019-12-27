@@ -19,7 +19,7 @@ resource "gridscale_storage" "foo" {
 }
 resource "gridscale_snapshot" "foo" {
   name = "snapshot"
-  storage_uuid = "${gridscale_storage.foo.id}"
+  storage_uuid = gridscale_storage.foo.id
 }
 ```
 

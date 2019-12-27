@@ -17,8 +17,8 @@ Use the navigation to the left to read about the available data sources and reso
 ```terraform
 # Configure the gridscale provider
 provider "gridscale" {
-	uuid = "${var.gridscale_uuid}"
-	token = "${var.gridscale_token}"
+	uuid = var.gridscale_uuid
+	token = var.gridscale_token
 }
 
 # Create a server

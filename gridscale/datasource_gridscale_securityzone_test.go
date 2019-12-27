@@ -35,6 +35,6 @@ resource "gridscale_paas_securityzone" "foo" {
 }
 
 data "gridscale_paas_securityzone" "foo" {
-	resource_id   = "${gridscale_paas_securityzone.foo.id}"
+	resource_id   = gridscale_paas_securityzone.foo.id
 }`, name)
 }

@@ -30,7 +30,7 @@ resource "gridscale_storage" "storage-test"{
 	capacity = 10
 	template {
 		sshkeys = [ "e17e8fd2-0797-4a00-a85d-eb9a612a6e4e" ]
-		template_uuid = "${data.gridscale_template.ubuntu.id}"
+		template_uuid = data.gridscale_template.ubuntu.id
 	}
 }
 ```

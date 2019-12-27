@@ -21,7 +21,7 @@ resource "gridscale_storage" "storage-john"{
 	storage_type = "storage_high"
 	template {
 	    template_uuid = "4db64bfc-9fb2-4976-80b5-94ff43b1233a"
-	    password = "${var.gridscale_password-john}"
+	    password = var.gridscale_password-john
 	    password_type = "plain"
 	    hostname = "Ubuntu"
 	}

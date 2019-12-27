@@ -36,6 +36,6 @@ resource "gridscale_network" "foo" {
 }
 
 data "gridscale_network" "foo" {
-	resource_id   = "${gridscale_network.foo.id}"
+	resource_id   = gridscale_network.foo.id
 }`, name)
 }

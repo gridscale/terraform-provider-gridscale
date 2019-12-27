@@ -28,8 +28,8 @@ resource "gridscale_storage" "storagename"{
 	capacity = 10
 	template {
 		sshkeys = [
-		    "${data.gridscale_sshkey.sshkey-john.id}",
-		    "${data.gridscale_sshkey.sshkey-jane.id}"
+		    data.gridscale_sshkey.sshkey-john.id,
+		    data.gridscale_sshkey.sshkey-jane.id
 		]
 		template_uuid = "4db64bfc-9fb2-4976-80b5-94ff43b1233a"
 	}

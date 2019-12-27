@@ -24,7 +24,7 @@ resource "gridscale_server" "servername"{
 	cores = 2
 	memory = 4
 	network {
-		object_uuid = "${data.gridscale_network.networkname.id}"
+		object_uuid = data.gridscale_network.networkname.id
 		bootdevice = true
 	}
 }

@@ -103,7 +103,7 @@ resource "gridscale_storage" "foo" {
 }
 resource "gridscale_snapshot" "foo" {
   name = "%s"
-  storage_uuid = "${gridscale_storage.foo.id}"
+  storage_uuid = gridscale_storage.foo.id
   rollback = true
 }
 `, name)
@@ -117,7 +117,7 @@ resource "gridscale_storage" "foo" {
 }
 resource "gridscale_snapshot" "foo" {
   name = "newname"
-  storage_uuid = "${gridscale_storage.foo.id}"
+  storage_uuid = gridscale_storage.foo.id
   labels = ["test"]
 }
 `)
@@ -131,7 +131,7 @@ resource "gridscale_storage" "new" {
 }
 resource "gridscale_snapshot" "foo" {
   name = "newname"
-  storage_uuid = "${gridscale_storage.new.id}"
+  storage_uuid = gridscale_storage.new.id
 }
 `)
 }

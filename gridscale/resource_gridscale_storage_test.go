@@ -159,7 +159,7 @@ resource "gridscale_storage" "foo" {
   template {
     template_uuid = "4db64bfc-9fb2-4976-80b5-94ff43b1233a"
     hostname = "ubuntu"
-    sshkeys = [ "${gridscale_sshkey.sshkey.id}"]
+    sshkeys = [ gridscale_sshkey.sshkey.id ]
   }
 }
 `, name, name)
