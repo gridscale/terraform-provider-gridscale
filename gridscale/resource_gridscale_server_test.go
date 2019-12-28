@@ -125,9 +125,9 @@ resource "gridscale_server" "foo" {
   cores = 2
   memory = 2
   power = true
-  ipv4 = "${gridscale_ipv4.foo.id}"
+  ipv4 = gridscale_ipv4.foo.id
   network {
-		object_uuid = "${gridscale_network.foo.id}"
+		object_uuid = gridscale_network.foo.id
 		rules_v4_in {
 				order = 0
 				protocol = "tcp"
@@ -174,9 +174,9 @@ resource "gridscale_server" "foo" {
   cores = 1
   memory = 1
   power = true
-  ipv4 = "${gridscale_ipv4.foo1.id}"
+  ipv4 = gridscale_ipv4.foo1.id
   network {
-		object_uuid = "${gridscale_network.foo.id}"
+		object_uuid = gridscale_network.foo.id
 		rules_v4_in {
 				order = 0
 				protocol = "tcp"

@@ -20,20 +20,20 @@ resource "gridscale_server" "terra-server-test"{
 	cores = 2
 	memory = 1
 	storage {
-		object_uuid = "${gridscale_storage.terra-storage-test.id}"
+		object_uuid = gridscale_storage.terra-storage-test.id
 		bootdevice = true
 	}
 	storage {
     		object_uuid = "UUID of storage 2",
     	}
 	network {
-		object_uuid = "${gridscale_network.terra-network-test.id}"
+		object_uuid = gridscale_network.terra-network-test.id
 		bootdevice = true
 	}
 	network {
     		object_uuid = "UUID of network 2"
     }
-	ipv4 = "${gridscale_ipv4.terra-ipv4-test.id}"
+	ipv4 = gridscale_ipv4.terra-ipv4-test.id}
 	ipv6 = "UUID of ipv6 address"
 	isoimage = "9be3e0a3-42ac-4207-8887-3383c405724d"
 }

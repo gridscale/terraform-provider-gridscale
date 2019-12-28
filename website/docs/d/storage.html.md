@@ -24,7 +24,7 @@ resource "gridscale_server" "servername"{
 	cores = 2
 	memory = 4
 	storage {
-		object_uuid = "${data.gridscale_storage.storagename.id}"
+		object_uuid = data.gridscale_storage.storagename.id
 		bootdevice = true
 	}
 }

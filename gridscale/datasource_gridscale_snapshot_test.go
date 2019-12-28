@@ -36,11 +36,11 @@ resource "gridscale_storage" "foo" {
 }
 resource "gridscale_snapshot" "foo" {
   name = "%s"
-  storage_uuid = "${gridscale_storage.foo.id}"
+  storage_uuid = gridscale_storage.foo.id
 }
 
 data "gridscale_snapshot" "foo" {
-	resource_id   = "${gridscale_snapshot.foo.id}"
-  	storage_uuid = "${gridscale_storage.foo.id}"
+	resource_id   = gridscale_snapshot.foo.id
+  	storage_uuid = gridscale_storage.foo.id
 }`, name)
 }

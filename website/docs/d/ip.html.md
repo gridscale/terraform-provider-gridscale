@@ -27,8 +27,8 @@ resource "gridscale_server" "servername"{
 	name = "terra-server"
 	cores = 2
 	memory = 4
-	ipv4 = "${data.gridscale_ipv4.ipv4name.id}"
-	ipv6 = "${data.gridscale_ipv6.ipv6name.id}"
+	ipv4 = data.gridscale_ipv4.ipv4name.id
+	ipv6 = data.gridscale_ipv6.ipv6name.id
 }
 ```
 

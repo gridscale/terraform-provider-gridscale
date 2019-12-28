@@ -38,7 +38,7 @@ resource "gridscale_ipv4" "foo" {
 
 
 data "gridscale_ipv4" "foo" {
-	resource_id   = "${gridscale_ipv4.foo.id}"
+	resource_id   = gridscale_ipv4.foo.id
 }
 
 `, name)

@@ -38,6 +38,6 @@ resource "gridscale_storage" "foo" {
 }
 
 data "gridscale_storage" "foo" {
-	resource_id   = "${gridscale_storage.foo.id}"
+	resource_id   = gridscale_storage.foo.id
 }`, name)
 }

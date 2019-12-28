@@ -91,12 +91,12 @@ resource "gridscale_loadbalancer" "foo" {
 	name   = "%s"
 	algorithm = "%s"
 	redirect_http_to_https = false
-	listen_ipv4_uuid = "${gridscale_ipv4.lb.id}"
-	listen_ipv6_uuid = "${gridscale_ipv6.lb.id}"
+	listen_ipv4_uuid = gridscale_ipv4.lb.id
+	listen_ipv6_uuid = gridscale_ipv6.lb.id
 	labels = []
 	backend_server {
 		weight = 100
-		host   = "${gridscale_ipv4.server.ip}"
+		host   = gridscale_ipv4.server.ip
 	}
 	forwarding_rule {
 		listen_port =  80
@@ -121,12 +121,12 @@ resource "gridscale_loadbalancer" "foo" {
 	name   = "%s"
 	algorithm = "%s"
 	redirect_http_to_https = false
-	listen_ipv4_uuid = "${gridscale_ipv4.lb.id}"
-	listen_ipv6_uuid = "${gridscale_ipv6.lb.id}"
+	listen_ipv4_uuid = gridscale_ipv4.lb.id
+	listen_ipv6_uuid = gridscale_ipv6.lb.id
 	labels = []
 	backend_server {
 		weight = 100
-		host   = "${gridscale_ipv4.server.ip}"
+		host   = gridscale_ipv4.server.ip
 	}
 	forwarding_rule {
 		listen_port =  80

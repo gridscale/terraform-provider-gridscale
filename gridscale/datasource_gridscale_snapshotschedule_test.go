@@ -38,14 +38,14 @@ resource "gridscale_storage" "foo" {
 }
 resource "gridscale_snapshotschedule" "foo" {
   name = "%s"
-  storage_uuid = "${gridscale_storage.foo.id}"
+  storage_uuid = gridscale_storage.foo.id
   keep_snapshots = 1
   run_interval = 60
   next_runtime = "2025-12-30 15:04:05"
 }
 data "gridscale_snapshotschedule" "foo" {
-	resource_id   = "${gridscale_snapshotschedule.foo.id}"
-	storage_uuid   = "${gridscale_storage.foo.id}"
+	resource_id   = gridscale_snapshotschedule.foo.id
+	storage_uuid   = gridscale_storage.foo.id
 }
 `, name)
 }

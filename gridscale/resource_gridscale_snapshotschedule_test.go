@@ -103,7 +103,7 @@ resource "gridscale_storage" "foo" {
 }
 resource "gridscale_snapshotschedule" "foo" {
   name = "%s"
-  storage_uuid = "${gridscale_storage.foo.id}"
+  storage_uuid = gridscale_storage.foo.id
   keep_snapshots = 1
   run_interval = 60
   next_runtime = "2025-12-30 15:04:05"
@@ -119,7 +119,7 @@ resource "gridscale_storage" "foo" {
 }
 resource "gridscale_snapshotschedule" "foo" {
   name = "newname"
-  storage_uuid = "${gridscale_storage.foo.id}"
+  storage_uuid = gridscale_storage.foo.id
   labels = ["test"]
   keep_snapshots = 1
   run_interval = 60
@@ -135,7 +135,7 @@ resource "gridscale_storage" "new" {
 }
 resource "gridscale_snapshotschedule" "foo" {
   name = "newname"
-  storage_uuid = "${gridscale_storage.new.id}"
+  storage_uuid = gridscale_storage.new.id
   keep_snapshots = 1
   run_interval = 60
 }

@@ -23,7 +23,7 @@ data "gridscale_paas_securityzone" "foo"{
 resource "gridscale_paas" "foo"{
 	name = "terra-paas-test"
     service_template_uuid = "f9625726-5ca8-4d5c-b9bd-3257e1e2211a"
-    security_zone_uuid = "${data.gridscale_paas_securityzone.foo.id}"
+    security_zone_uuid = data.gridscale_paas_securityzone.foo.id
 }
 ```
 

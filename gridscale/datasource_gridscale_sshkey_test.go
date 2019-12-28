@@ -37,6 +37,6 @@ resource "gridscale_sshkey" "foo" {
 }
 
 data "gridscale_sshkey" "foo" {
-	resource_id   = "${gridscale_sshkey.foo.id}"
+	resource_id   = gridscale_sshkey.foo.id
 }`, name)
 }

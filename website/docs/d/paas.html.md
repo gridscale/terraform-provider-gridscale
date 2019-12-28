@@ -21,7 +21,7 @@ resource "gridscale_paas" "foo" {
 }
 
 data "gridscale_paas" "foo" {
-	resource_id   = "${gridscale_paas.foo.id}"
+	resource_id   = gridscale_paas.foo.id
 }
 ```
 
