@@ -68,11 +68,11 @@ The following arguments are supported:
 * `storage` - (Optional) Connects a storage to the server.
 
     * `object_uuid` - (Required) The object UUID or id of the storage.
-    
+
     * `storage_type` - (Computed) Indicates the speed of the storage. This may be (storage, storage_high or storage_insane).
 
     * `bootdevice` - (Computed) True is the storage is a boot device.
-    
+
     * `object_name` - (Computed) Name of the storage.
 
     * `create_time` - (Computed) Defines the date and time the object was initially created.
@@ -82,9 +82,9 @@ The following arguments are supported:
     * `controller` - (Computed) Defines the SCSI controller id. The SCSI defines transmission routes such as Serial Attached SCSI (SAS), Fibre Channel and iSCSI.
 
     * `bus` - (Computed) The SCSI bus id. The SCSI defines transmission routes like Serial Attached SCSI (SAS), Fibre Channel and iSCSI. Each SCSI device is addressed via a specific number. Each SCSI bus can have multiple SCSI devices connected to it.
-    
+
     * `target` - (Computed) Defines the SCSI target ID. The target ID is a device (e.g. disk).
-    
+
     * `lun` - (Computed) Is the common SCSI abbreviation of the Logical Unit Number. A lun is a unique identifier for a single disk or a composite of disks.
 
     * `license_product_no` - (Computed) If a template has been used that requires a license key (e.g. Windows Servers) this shows the product_no of the license (see the /prices endpoint for more details).
@@ -110,71 +110,71 @@ The following arguments are supported:
     * `firewall_template_uuid` - (Optional) The UUID of firewall template.
 
     * `rules_v4_in` - (Optional) Firewall template rules for inbound traffic - covers ipv4 addresses.
-    
+
         * `order` - (Required) The order at which the firewall will compare packets against its rules, a packet will be compared against the first rule, it will either allow it to pass or block it and it won t be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2. Packets that do not match any rules are blocked by default.
 
         * `action` - (Required) This defines what the firewall will do. Either accept or drop.
 
         * `protocol` - (Required) Either 'udp' or 'tcp'.
-        
-        * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are seperated by a colon for FTP.
-        
-        * `src_port` - (Optional) A Number between 1 and 65535, port ranges are seperated by a colon for FTP.
-        
+
+        * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
+
+        * `src_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
+
         * `src_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
 
         * `dst_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
 
         * `comment` - (Optional) Comment.
-        
+
     * `rules_v4_out` - (Optional) Firewall template rules for outbound traffic - covers ipv4 addresses.
-        
+
             * `order` - (Required) The order at which the firewall will compare packets against its rules, a packet will be compared against the first rule, it will either allow it to pass or block it and it won t be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2. Packets that do not match any rules are blocked by default.
-    
+
             * `action` - (Required) This defines what the firewall will do. Either accept or drop.
-    
+
             * `protocol` - (Required) Either 'udp' or 'tcp'.
-            
-            * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are seperated by a colon for FTP.
-            
-            * `src_port` - (Optional) A Number between 1 and 65535, port ranges are seperated by a colon for FTP.
-            
+
+            * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
+
+            * `src_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
+
             * `src_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
-    
+
             * `dst_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
-    
+
             * `comment` - (Optional) Comment.
 
     * `rules_v6_in` - (Optional) Firewall template rules for inbound traffic - covers ipv6 addresses.
-    
+
         * `order` - (Required) The order at which the firewall will compare packets against its rules, a packet will be compared against the first rule, it will either allow it to pass or block it and it won t be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2. Packets that do not match any rules are blocked by default.
 
         * `action` - (Required) This defines what the firewall will do. Either accept or drop.
 
         * `protocol` - (Required) Either 'udp' or 'tcp'.
-        
-        * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are seperated by a colon for FTP.
-        
-        * `src_port` - (Optional) A Number between 1 and 65535, port ranges are seperated by a colon for FTP.
-        
+
+        * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
+
+        * `src_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
+
         * `src_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
 
         * `dst_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
 
         * `comment` - (Optional) Comment.
-        
+
     * `rules_v6_out` - (Optional) Firewall template rules for outbound traffic - covers ipv6 addresses.
-    
+
         * `order` - (Required) The order at which the firewall will compare packets against its rules, a packet will be compared against the first rule, it will either allow it to pass or block it and it won t be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2. Packets that do not match any rules are blocked by default.
 
         * `action` - (Required) This defines what the firewall will do. Either accept or drop.
 
         * `protocol` - (Required) Either 'udp' or 'tcp'.
-        
-        * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are seperated by a colon for FTP.
-        
-        * `src_port` - (Optional) A Number between 1 and 65535, port ranges are seperated by a colon for FTP.
-        
+
+        * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
+
+        * `src_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
+
         * `src_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
 
         * `dst_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
