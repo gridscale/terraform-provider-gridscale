@@ -75,7 +75,7 @@ func testAccCheckDataSourceGridscaleSnapshotExists(n string, object *gsclient.St
 func testAccCheckDataSourceGridscaleSnapshotDestroyCheck(s *terraform.State) error {
 	client := testAccProvider.Meta().(*gsclient.Client)
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "gridscale_securityzone" {
+		if rs.Type != "gridscale_snapshot" {
 			continue
 		}
 
