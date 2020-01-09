@@ -6,7 +6,7 @@ description: |-
   Gets the id of a network.
 ---
 
-# gridscale_storage
+# gridscale_network
 
 Get the id of a network resource. This can be used to link networks to a server.
 
