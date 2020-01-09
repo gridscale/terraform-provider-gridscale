@@ -54,6 +54,31 @@ func resourceGridscaleISOImage() *schema.Resource {
 					},
 				},
 			},
+			"server": {
+				Type:        schema.TypeSet,
+				Description: "The information about servers which are related to this isoimage.",
+				Computed:    true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"object_uuid": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"object_name": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"create_time": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"bootdevice": {
+							Type:     schema.TypeBool,
+							Computed: true,
+						},
+					},
+				},
+			},
 			"location_uuid": {
 				Type:        schema.TypeString,
 				Description: "Helps to identify which datacenter an object belongs to",
