@@ -12,6 +12,7 @@ func resourceGridscaleTemplate() *schema.Resource {
 		Read:   resourceGridscaleTemplateRead,
 		Create: resourceGridscaleTemplateCreate,
 		Update: resourceGridscaleTemplateUpdate,
+		Delete: resourceGridscaleTemplateDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -189,4 +190,9 @@ func resourceGridscaleTemplateUpdate(d *schema.ResourceData, meta interface{}) e
 	}
 
 	return resourceGridscaleTemplateRead(d, meta)
+}
+
+func resourceGridscaleTemplateDelete(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*gsclient.Client)
+	return client.DeleteTemplate(emptyCtx, d.Id())
 }
