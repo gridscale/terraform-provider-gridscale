@@ -12,6 +12,7 @@ func resourceGridscaleISOImage() *schema.Resource {
 		Read:   resourceGridscaleISOImageRead,
 		Create: resourceGridscaleISOImageCreate,
 		Update: resourceGridscaleISOImageUpdate,
+		Delete: resourceGridscaleISOImageDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -173,4 +174,9 @@ func resourceGridscaleISOImageUpdate(d *schema.ResourceData, meta interface{}) e
 	}
 
 	return resourceGridscaleISOImageRead(d, meta)
+}
+
+func resourceGridscaleISOImageDelete(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*gsclient.Client)
+	return client.DeleteISOImage(emptyCtx, d.Id())
 }
