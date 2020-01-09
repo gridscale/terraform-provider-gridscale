@@ -5,11 +5,13 @@ import (
 	"github.com/gridscale/gsclient-go"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"log"
 )
 
 func resourceGridscaleFirewall() *schema.Resource {
 	return &schema.Resource{
-		Read: resourceGridscaleFirewallRead,
+		Read:   resourceGridscaleFirewallRead,
+		Create: resourceGridscaleFirewallCreate,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -155,77 +157,25 @@ func resourceGridscaleFirewallRead(d *schema.ResourceData, meta interface{}) err
 	}
 
 	//Get rules_v4_in
-	rulesV4In := make([]interface{}, 0)
-	for _, value := range props.Rules.RulesV4In {
-		rule := map[string]interface{}{
-			"order":    value.Order,
-			"action":   value.Action,
-			"protocol": value.Protocol,
-			"dst_port": value.DstPort,
-			"src_port": value.SrcPort,
-			"src_cidr": value.SrcCidr,
-			"dst_cidr": value.DstCidr,
-			"comment":  value.Comment,
-		}
-		rulesV4In = append(rulesV4In, rule)
-	}
+	rulesV4In := convFirewallRuleSliceToInterfaceSlice(props.Rules.RulesV4In)
 	if err = d.Set("rules_v4_in", rulesV4In); err != nil {
 		return fmt.Errorf("Error setting rules_v4_in: %v", err)
 	}
 
 	//Get rules_v4_out
-	rulesV4Out := make([]interface{}, 0)
-	for _, value := range props.Rules.RulesV4Out {
-		rule := map[string]interface{}{
-			"order":    value.Order,
-			"action":   value.Action,
-			"protocol": value.Protocol,
-			"dst_port": value.DstPort,
-			"src_port": value.SrcPort,
-			"src_cidr": value.SrcCidr,
-			"dst_cidr": value.DstCidr,
-			"comment":  value.Comment,
-		}
-		rulesV4Out = append(rulesV4Out, rule)
-	}
+	rulesV4Out := convFirewallRuleSliceToInterfaceSlice(props.Rules.RulesV4Out)
 	if err = d.Set("rules_v4_out", rulesV4Out); err != nil {
 		return fmt.Errorf("Error setting rules_v4_out: %v", err)
 	}
 
 	//Get rules_v6_in
-	rulesV6In := make([]interface{}, 0)
-	for _, value := range props.Rules.RulesV4Out {
-		rule := map[string]interface{}{
-			"order":    value.Order,
-			"action":   value.Action,
-			"protocol": value.Protocol,
-			"dst_port": value.DstPort,
-			"src_port": value.SrcPort,
-			"src_cidr": value.SrcCidr,
-			"dst_cidr": value.DstCidr,
-			"comment":  value.Comment,
-		}
-		rulesV6In = append(rulesV6In, rule)
-	}
+	rulesV6In := convFirewallRuleSliceToInterfaceSlice(props.Rules.RulesV6In)
 	if err = d.Set("rules_v6_in", rulesV6In); err != nil {
 		return fmt.Errorf("Error setting rules_v6_in: %v", err)
 	}
 
 	//Get rules_v6_out
-	rulesV6Out := make([]interface{}, 0)
-	for _, value := range props.Rules.RulesV4Out {
-		rule := map[string]interface{}{
-			"order":    value.Order,
-			"action":   value.Action,
-			"protocol": value.Protocol,
-			"dst_port": value.DstPort,
-			"src_port": value.SrcPort,
-			"src_cidr": value.SrcCidr,
-			"dst_cidr": value.DstCidr,
-			"comment":  value.Comment,
-		}
-		rulesV6Out = append(rulesV6Out, rule)
-	}
+	rulesV6Out := convFirewallRuleSliceToInterfaceSlice(props.Rules.RulesV6In)
 	if err = d.Set("rules_v6_out", rulesV6Out); err != nil {
 		return fmt.Errorf("Error setting rules_v6_out: %v", err)
 	}
@@ -235,4 +185,48 @@ func resourceGridscaleFirewallRead(d *schema.ResourceData, meta interface{}) err
 	}
 
 	return nil
+}
+
+func resourceGridscaleFirewallCreate(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*gsclient.Client)
+
+	requestBody := gsclient.FirewallCreateRequest{
+		Name:   d.Get("name").(string),
+		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
+		Rules: gsclient.FirewallRules{
+			RulesV6In:  nil,
+			RulesV6Out: nil,
+			RulesV4In:  nil,
+			RulesV4Out: nil,
+		},
+	}
+
+	response, err := client.CreateFirewall(emptyCtx, requestBody)
+	if err != nil {
+		return err
+	}
+
+	d.SetId(response.ObjectUUID)
+
+	log.Printf("The id for the new firewall has been set to %v", response.ObjectUUID)
+
+	return resourceGridscaleFirewallRead(d, meta)
+}
+
+func convFirewallRuleSliceToInterfaceSlice(rules []gsclient.FirewallRuleProperties) []interface{} {
+	res := make([]interface{}, 0)
+	for _, value := range rules {
+		rule := map[string]interface{}{
+			"order":    value.Order,
+			"action":   value.Action,
+			"protocol": value.Protocol,
+			"dst_port": value.DstPort,
+			"src_port": value.SrcPort,
+			"src_cidr": value.SrcCidr,
+			"dst_cidr": value.DstCidr,
+			"comment":  value.Comment,
+		}
+		res = append(res, rule)
+	}
+	return res
 }
