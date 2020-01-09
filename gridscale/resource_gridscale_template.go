@@ -11,6 +11,7 @@ func resourceGridscaleTemplate() *schema.Resource {
 	return &schema.Resource{
 		Read:   resourceGridscaleTemplateRead,
 		Create: resourceGridscaleTemplateCreate,
+		Update: resourceGridscaleTemplateUpdate,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -170,6 +171,22 @@ func resourceGridscaleTemplateCreate(d *schema.ResourceData, meta interface{}) e
 	d.SetId(response.ObjectUUID)
 
 	log.Printf("The id for the new template has been set to %v", response.ObjectUUID)
+
+	return resourceGridscaleTemplateRead(d, meta)
+}
+
+func resourceGridscaleTemplateUpdate(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*gsclient.Client)
+
+	requestBody := gsclient.TemplateUpdateRequest{
+		Name:   d.Get("name").(string),
+		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
+	}
+
+	err := client.UpdateTemplate(emptyCtx, d.Id(), requestBody)
+	if err != nil {
+		return err
+	}
 
 	return resourceGridscaleTemplateRead(d, meta)
 }
