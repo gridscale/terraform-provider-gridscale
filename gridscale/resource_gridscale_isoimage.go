@@ -27,6 +27,7 @@ func resourceGridscaleISOImage() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "Contains the source URL of the ISO-Image that it was originally fetched from.",
 				Required:    true,
+				ForceNew:    true,
 			},
 			"server": {
 				Type:        schema.TypeSet,
