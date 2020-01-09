@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"github.com/gridscale/gsclient-go"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"log"
 )
 
 func resourceGridscaleTemplate() *schema.Resource {
 	return &schema.Resource{
-		Read: resourceGridscaleTemplateRead,
+		Read:   resourceGridscaleTemplateRead,
+		Create: resourceGridscaleTemplateCreate,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -17,7 +19,12 @@ func resourceGridscaleTemplate() *schema.Resource {
 			"name": {
 				Type:        schema.TypeString,
 				Description: "The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.",
-				Optional:    true,
+				Required:    true,
+			},
+			"snapshot_uuid": {
+				Type:        schema.TypeString,
+				Description: "Snapshot uuid for template.",
+				Required:    true,
 			},
 			"location_uuid": {
 				Type:        schema.TypeString,
@@ -144,4 +151,25 @@ func resourceGridscaleTemplateRead(d *schema.ResourceData, meta interface{}) err
 	}
 
 	return nil
+}
+
+func resourceGridscaleTemplateCreate(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*gsclient.Client)
+
+	requestBody := gsclient.TemplateCreateRequest{
+		Name:         d.Get("name").(string),
+		SnapshotUUID: d.Get("snapshot_uuid").(string),
+		Labels:       convSOStrings(d.Get("labels").(*schema.Set).List()),
+	}
+
+	response, err := client.CreateTemplate(emptyCtx, requestBody)
+	if err != nil {
+		return err
+	}
+
+	d.SetId(response.ObjectUUID)
+
+	log.Printf("The id for the new template has been set to %v", response.ObjectUUID)
+
+	return resourceGridscaleTemplateRead(d, meta)
 }
