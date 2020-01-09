@@ -89,6 +89,11 @@ func resourceGridscaleISOImage() *schema.Resource {
 				Description: "The object is private, the value will be true. Otherwise the value will be false.",
 				Computed:    true,
 			},
+			"license_product_no": {
+				Type:        schema.TypeInt,
+				Description: "If a template has been used that requires a license key (e.g. Windows Servers) this shows the product_no of the license (see the /prices endpoint for more details).",
+				Computed:    true,
+			},
 			"create_time": {
 				Type:        schema.TypeString,
 				Description: "The date and time the object was initially created.",
