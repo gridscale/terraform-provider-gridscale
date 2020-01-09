@@ -56,6 +56,7 @@ func Provider() terraform.ResourceProvider {
 			"gridscale_paas_securityzone":        resourceGridscalePaaSSecurityZone(),
 			"gridscale_object_storage_accesskey": resourceGridscaleObjectStorage(),
 			"gridscale_template":                 resourceGridscaleTemplate(),
+			"gridscale_isoimage":                 resourceGridscaleISOImage(),
 		},
 
 		ConfigureFunc: providerConfigure,
