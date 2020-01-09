@@ -196,7 +196,6 @@ func resourceGridscaleISOImageCreate(d *schema.ResourceData, meta interface{}) e
 	d.SetId(response.ObjectUUID)
 
 	log.Printf("The id for the new ISO image has been set to %v", response.ObjectUUID)
-
 	return resourceGridscaleISOImageRead(d, meta)
 }
 
