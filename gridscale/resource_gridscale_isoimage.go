@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/terraform-providers/terraform-provider-gridscale/vendor/github.com/gridscale/gsclient-go"
+	"log"
 )
 
 func resourceGridscaleISOImage() *schema.Resource {
 	return &schema.Resource{
-		Read: resourceGridscaleISOImageRead,
+		Read:   resourceGridscaleISOImageRead,
+		Create: resourceGridscaleISOImageCreate,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -133,4 +135,25 @@ func resourceGridscaleISOImageRead(d *schema.ResourceData, meta interface{}) err
 	}
 
 	return nil
+}
+
+func resourceGridscaleISOImageCreate(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*gsclient.Client)
+
+	requestBody := gsclient.ISOImageCreateRequest{
+		Name:      d.Get("name").(string),
+		SourceURL: d.Get("source_url").(string),
+		Labels:    convSOStrings(d.Get("labels").(*schema.Set).List()),
+	}
+
+	response, err := client.CreateISOImage(emptyCtx, requestBody)
+	if err != nil {
+		return err
+	}
+
+	d.SetId(response.ObjectUUID)
+
+	log.Printf("The id for the new isoimage has been set to %v", response.ObjectUUID)
+
+	return resourceGridscaleISOImageRead(d, meta)
 }
