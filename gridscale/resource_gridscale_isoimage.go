@@ -28,6 +28,31 @@ func resourceGridscaleISOImage() *schema.Resource {
 				Description: "Contains the source URL of the ISO-Image that it was originally fetched from.",
 				Required:    true,
 			},
+			"server": {
+				Type:        schema.TypeSet,
+				Description: "The information about servers which are related to this isoimage.",
+				Computed:    true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"object_uuid": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"object_name": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"create_time": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"bootdevice": {
+							Type:     schema.TypeBool,
+							Computed: true,
+						},
+					},
+				},
+			},
 			"location_uuid": {
 				Type:        schema.TypeString,
 				Description: "Helps to identify which datacenter an object belongs to",
@@ -131,6 +156,20 @@ func resourceGridscaleISOImageRead(d *schema.ResourceData, meta interface{}) err
 	d.Set("usage_in_minutes", props.UsageInMinutes)
 	d.Set("capacity", props.Capacity)
 	d.Set("current_price", props.CurrentPrice)
+
+	servers := make([]interface{}, 0)
+	for _, value := range props.Relations.Servers {
+		server := map[string]interface{}{
+			"object_uuid": value.ObjectUUID,
+			"create_time": value.CreateTime.String(),
+			"object_name": value.ObjectName,
+			"bootdevice":  value.Bootdevice,
+		}
+		servers = append(servers, server)
+	}
+	if err = d.Set("server", servers); err != nil {
+		return fmt.Errorf("Error setting server-rels: %v", err)
+	}
 
 	if err = d.Set("labels", props.Labels); err != nil {
 		return fmt.Errorf("Error setting labels: %v", err)
