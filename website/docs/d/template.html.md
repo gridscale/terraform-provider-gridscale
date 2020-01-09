@@ -46,6 +46,7 @@ The following arguments are supported:
 The following attributes are exported:
 
 * `name` - The name of the template.
+* `id` - The UUID of the template.
 * `location_uuid` - Helps to identify which datacenter an object belongs to.
 * `location_country` - Formatted by the 2 digit country code (ISO 3166-2) of the host country.
 * `location_iata` - Uses IATA airport code, which works as a location identifier.
