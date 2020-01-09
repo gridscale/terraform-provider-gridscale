@@ -41,6 +41,7 @@ func Provider() terraform.ResourceProvider {
 			"gridscale_paas":                     dataSourceGridscalePaaS(),
 			"gridscale_paas_securityzone":        dataSourceGridscalePaaSSecurityZone(),
 			"gridscale_object_storage_accesskey": dataSourceGridscaleObjectStorage(),
+			"gridscale_isoimage":                 dataSourceGridscaleISOImage(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"gridscale_server":                   resourceGridscaleServer(),
