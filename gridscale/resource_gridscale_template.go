@@ -27,6 +27,7 @@ func resourceGridscaleTemplate() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "Snapshot uuid for template.",
 				Required:    true,
+				ForceNew:    true,
 			},
 			"location_uuid": {
 				Type:        schema.TypeString,
