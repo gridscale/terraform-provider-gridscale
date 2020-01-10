@@ -1,6 +1,7 @@
 package gridscale
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gridscale/gsclient-go"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -189,15 +190,32 @@ func resourceGridscaleFirewallRead(d *schema.ResourceData, meta interface{}) err
 
 func resourceGridscaleFirewallCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-
+	var rulesV4In, rulesV4Out, rulesV6In, rulesV6Out []gsclient.FirewallRuleProperties
+	//Get firewall rules from schema
+	if attr, ok := d.GetOk("rules_v4_in"); ok {
+		rulesV4In = convInterfaceSliceToFirewallRulesSlice(attr.([]interface{}))
+	}
+	if attr, ok := d.GetOk("rules_v4_out"); ok {
+		rulesV4Out = convInterfaceSliceToFirewallRulesSlice(attr.([]interface{}))
+	}
+	if attr, ok := d.GetOk("rules_v6_in"); ok {
+		rulesV6In = convInterfaceSliceToFirewallRulesSlice(attr.([]interface{}))
+	}
+	if attr, ok := d.GetOk("rules_v6_out"); ok {
+		rulesV6Out = convInterfaceSliceToFirewallRulesSlice(attr.([]interface{}))
+	}
+	//at least one rules in firewall create request
+	if len(rulesV4In) == 0 && len(rulesV4Out) == 0 && len(rulesV6In) == 0 && len(rulesV6Out) == 0 {
+		return errors.New("at least 1 firewall rule in create request")
+	}
 	requestBody := gsclient.FirewallCreateRequest{
 		Name:   d.Get("name").(string),
 		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
 		Rules: gsclient.FirewallRules{
-			RulesV6In:  nil,
-			RulesV6Out: nil,
-			RulesV4In:  nil,
-			RulesV4Out: nil,
+			RulesV6In:  rulesV6In,
+			RulesV6Out: rulesV6Out,
+			RulesV4In:  rulesV4In,
+			RulesV4Out: rulesV4Out,
 		},
 	}
 
@@ -213,6 +231,7 @@ func resourceGridscaleFirewallCreate(d *schema.ResourceData, meta interface{}) e
 	return resourceGridscaleFirewallRead(d, meta)
 }
 
+//convFirewallRuleSliceToInterfaceSlice converts slice of firewall rules to slice of interface
 func convFirewallRuleSliceToInterfaceSlice(rules []gsclient.FirewallRuleProperties) []interface{} {
 	res := make([]interface{}, 0)
 	for _, value := range rules {
@@ -229,4 +248,23 @@ func convFirewallRuleSliceToInterfaceSlice(rules []gsclient.FirewallRuleProperti
 		res = append(res, rule)
 	}
 	return res
+}
+
+//convInterfaceSliceToFirewallRulesSlice converts slice of interface to slice of firewall rules
+func convInterfaceSliceToFirewallRulesSlice(interfaceRules []interface{}) []gsclient.FirewallRuleProperties {
+	var firewallRules []gsclient.FirewallRuleProperties
+	for _, value := range interfaceRules {
+		rule := value.(map[string]interface{})
+		firewallRules = append(firewallRules, gsclient.FirewallRuleProperties{
+			Protocol: rule["protocol"].(string),
+			DstPort:  rule["dst_port"].(string),
+			SrcPort:  rule["src_port"].(string),
+			SrcCidr:  rule["src_cidr"].(string),
+			Action:   rule["action"].(string),
+			Comment:  rule["comment"].(string),
+			DstCidr:  rule["dst_cidr"].(string),
+			Order:    rule["order"].(int),
+		})
+	}
+	return firewallRules
 }
