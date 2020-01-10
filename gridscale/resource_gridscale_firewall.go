@@ -13,6 +13,7 @@ func resourceGridscaleFirewall() *schema.Resource {
 	return &schema.Resource{
 		Read:   resourceGridscaleFirewallRead,
 		Create: resourceGridscaleFirewallCreate,
+		Update: resourceGridscaleFirewallUpdate,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -227,6 +228,44 @@ func resourceGridscaleFirewallCreate(d *schema.ResourceData, meta interface{}) e
 	d.SetId(response.ObjectUUID)
 
 	log.Printf("The id for the new firewall has been set to %v", response.ObjectUUID)
+
+	return resourceGridscaleFirewallRead(d, meta)
+}
+
+func resourceGridscaleFirewallUpdate(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*gsclient.Client)
+	var rulesV4In, rulesV4Out, rulesV6In, rulesV6Out []gsclient.FirewallRuleProperties
+	if attr, ok := d.GetOk("rules_v4_in"); ok {
+		rulesV4In = convInterfaceSliceToFirewallRulesSlice(attr.([]interface{}))
+	}
+	if attr, ok := d.GetOk("rules_v4_out"); ok {
+		rulesV4Out = convInterfaceSliceToFirewallRulesSlice(attr.([]interface{}))
+	}
+	if attr, ok := d.GetOk("rules_v6_in"); ok {
+		rulesV6In = convInterfaceSliceToFirewallRulesSlice(attr.([]interface{}))
+	}
+	if attr, ok := d.GetOk("rules_v6_out"); ok {
+		rulesV6Out = convInterfaceSliceToFirewallRulesSlice(attr.([]interface{}))
+	}
+	requestBody := gsclient.FirewallUpdateRequest{
+		Name:   d.Get("name").(string),
+		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
+	}
+	if len(rulesV4In) == 0 && len(rulesV4Out) == 0 && len(rulesV6In) == 0 && len(rulesV6Out) == 0 {
+		requestBody.Rules = nil
+	} else {
+		firewallRules := &gsclient.FirewallRules{
+			RulesV6In:  rulesV6In,
+			RulesV6Out: rulesV6Out,
+			RulesV4In:  rulesV4In,
+			RulesV4Out: rulesV4Out,
+		}
+		requestBody.Rules = firewallRules
+	}
+	err := client.UpdateFirewall(emptyCtx, d.Id(), requestBody)
+	if err != nil {
+		return err
+	}
 
 	return resourceGridscaleFirewallRead(d, meta)
 }
