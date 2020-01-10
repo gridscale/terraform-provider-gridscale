@@ -14,6 +14,7 @@ func resourceGridscaleFirewall() *schema.Resource {
 		Read:   resourceGridscaleFirewallRead,
 		Create: resourceGridscaleFirewallCreate,
 		Update: resourceGridscaleFirewallUpdate,
+		Delete: resourceGridscaleFirewallDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -268,6 +269,11 @@ func resourceGridscaleFirewallUpdate(d *schema.ResourceData, meta interface{}) e
 	}
 
 	return resourceGridscaleFirewallRead(d, meta)
+}
+
+func resourceGridscaleFirewallDelete(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*gsclient.Client)
+	return client.DeleteFirewall(emptyCtx, d.Id())
 }
 
 //convFirewallRuleSliceToInterfaceSlice converts slice of firewall rules to slice of interface
