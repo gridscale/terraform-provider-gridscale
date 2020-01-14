@@ -97,21 +97,21 @@ The following arguments are supported:
 
     * `rules_v4_out` - (Optional) Firewall template rules for outbound traffic - covers ipv4 addresses.
 
-            * `order` - (Required) The order at which the firewall will compare packets against its rules, a packet will be compared against the first rule, it will either allow it to pass or block it and it won t be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2. Packets that do not match any rules are blocked by default.
+        * `order` - (Required) The order at which the firewall will compare packets against its rules, a packet will be compared against the first rule, it will either allow it to pass or block it and it won t be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2. Packets that do not match any rules are blocked by default.
 
-            * `action` - (Required) This defines what the firewall will do. Either accept or drop.
+        * `action` - (Required) This defines what the firewall will do. Either accept or drop.
 
-            * `protocol` - (Required) Either 'udp' or 'tcp'.
+        * `protocol` - (Required) Either 'udp' or 'tcp'.
 
-            * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
+        * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
 
-            * `src_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
+        * `src_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
 
-            * `src_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
+        * `src_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
 
-            * `dst_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
+        * `dst_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
 
-            * `comment` - (Optional) Comment.
+        * `comment` - (Optional) Comment.
 
     * `rules_v6_in` - (Optional) Firewall template rules for inbound traffic - covers ipv6 addresses.
 
