@@ -178,7 +178,7 @@ func resourceGridscaleFirewallRead(d *schema.ResourceData, meta interface{}) err
 	}
 
 	//Get rules_v6_out
-	rulesV6Out := convFirewallRuleSliceToInterfaceSlice(props.Rules.RulesV6In)
+	rulesV6Out := convFirewallRuleSliceToInterfaceSlice(props.Rules.RulesV6Out)
 	if err = d.Set("rules_v6_out", rulesV6Out); err != nil {
 		return fmt.Errorf("Error setting rules_v6_out: %v", err)
 	}
