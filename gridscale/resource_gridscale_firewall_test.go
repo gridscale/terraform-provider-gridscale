@@ -107,6 +107,13 @@ resource "gridscale_firewall" "foo" {
 	dst_port = "20:80"
 	comment = "test"
   }
+  rules_v6_in {
+	order = 0
+	protocol = "tcp"
+	action = "drop"
+	dst_port = "2000:3000"
+	comment = "testv6"
+  }
 }
 `, name)
 }
@@ -121,6 +128,13 @@ resource "gridscale_firewall" "foo" {
 	action = "drop"
 	dst_port = "20:80"
 	comment = "test1"
+  }
+  rules_v6_out {
+	order = 0
+	protocol = "tcp"
+	action = "drop"
+	dst_port = "2000:3000"
+	comment = "testv6"
   }
 }
 `)
