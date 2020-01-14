@@ -3,16 +3,16 @@ layout: "gridscale"
 page_title: "gridscale: ip"
 sidebar_current: "docs-gridscale-datasource-ip"
 description: |-
-  Gets the id of an ip.
+  Gets data of an IP address.
 ---
 
 # gridscale_ip
 
-Get the id of an ip resource. This can be used to link ip addresses to a server.
+Get data of an IP address resource. This can be used to link ip addresses to a server.
 
 ## Example Usage
 
-Using the ip datasource for the creation of a server:
+Using ip datasource for the creation of a server:
 
 ```terraform
 data "gridscale_ipv4" "ipv4name"{
@@ -31,6 +31,11 @@ resource "gridscale_server" "servername"{
 	ipv6 = data.gridscale_ipv6.ipv6name.id
 }
 ```
+## Argument Reference
+
+The following arguments are supported:
+
+* `resource_id` - (Required) The UUID of the IP address.
 
 ## Attributes Reference
 

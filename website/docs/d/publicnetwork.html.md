@@ -3,7 +3,7 @@ layout: "gridscale"
 page_title: "gridscale: public network"
 sidebar_current: "docs-gridscale-datasource-public-network"
 description: |-
-  Gets the id of a public network.
+  Gets data of a public network.
 ---
 
 # gridscale_public_network
@@ -28,6 +28,12 @@ resource "gridscale_server" "servername"{
 	}
 }
 ```
+
+## Argument Reference
+
+The following arguments are supported:
+
+* `resource_id` - (Required) The UUID of the public network.
 
 ## Attributes Reference
 

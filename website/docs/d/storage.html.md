@@ -3,12 +3,12 @@ layout: "gridscale"
 page_title: "gridscale: storage"
 sidebar_current: "docs-gridscale-datasource-storage"
 description: |-
-  Gets the id of a storage.
+  Gets data of a storage.
 ---
 
 # gridscale_storage
 
-Get the id of a storage resource. This can be used to link storages to a server.
+Get data of a storage resource. This can be used to link storages to a server.
 
 ## Example Usage
 
@@ -29,6 +29,12 @@ resource "gridscale_server" "servername"{
 	}
 }
 ```
+
+## Argument Reference
+
+The following arguments are supported:
+
+* `resource_id` - (Required) The UUID of the storage.
 
 ## Attributes Reference
 
