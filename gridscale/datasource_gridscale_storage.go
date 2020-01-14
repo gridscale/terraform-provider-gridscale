@@ -85,6 +85,10 @@ func dataSourceGridscaleStorage() *schema.Resource {
 				Type:     schema.TypeFloat,
 				Computed: true,
 			},
+			"usage_in_minutes": {
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
 			"labels": {
 				Type:        schema.TypeSet,
 				Description: "List of labels.",

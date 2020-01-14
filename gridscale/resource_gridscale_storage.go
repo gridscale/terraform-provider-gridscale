@@ -3,12 +3,10 @@ package gridscale
 import (
 	"context"
 	"fmt"
-	"log"
-	"strings"
-	"time"
-
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"log"
+	"strings"
 
 	"github.com/gridscale/gsclient-go"
 )
@@ -108,6 +106,10 @@ func resourceGridscaleStorage() *schema.Resource {
 				Type:     schema.TypeFloat,
 				Computed: true,
 			},
+			"usage_in_minutes": {
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
 			"labels": {
 				Type:        schema.TypeSet,
 				Description: "List of labels.",
@@ -163,9 +165,6 @@ func resourceGridscaleStorage() *schema.Resource {
 					},
 				},
 			},
-		},
-		Timeouts: &schema.ResourceTimeout{
-			Delete: schema.DefaultTimeout(time.Minute * 3),
 		},
 	}
 }
