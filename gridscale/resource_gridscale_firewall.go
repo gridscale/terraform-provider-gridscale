@@ -151,7 +151,7 @@ func resourceGridscaleFirewallRead(d *schema.ResourceData, meta interface{}) err
 			"object_uuid":  value.ObjectUUID,
 			"network_name": value.NetworkName,
 			"object_name":  value.ObjectName,
-			"create_time":  value.CreateTime,
+			"create_time":  value.CreateTime.String(),
 		}
 		networks = append(networks, rule)
 	}
