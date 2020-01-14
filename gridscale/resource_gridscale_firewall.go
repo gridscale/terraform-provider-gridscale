@@ -248,20 +248,19 @@ func resourceGridscaleFirewallUpdate(d *schema.ResourceData, meta interface{}) e
 	if attr, ok := d.GetOk("rules_v6_out"); ok {
 		rulesV6Out = convInterfaceSliceToFirewallRulesSlice(attr.([]interface{}))
 	}
+	//at least one rules in firewall create request
+	if len(rulesV4In) == 0 && len(rulesV4Out) == 0 && len(rulesV6In) == 0 && len(rulesV6Out) == 0 {
+		return errors.New("at least 1 firewall rule in update request")
+	}
 	requestBody := gsclient.FirewallUpdateRequest{
 		Name:   d.Get("name").(string),
 		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
-	if len(rulesV4In) == 0 && len(rulesV4Out) == 0 && len(rulesV6In) == 0 && len(rulesV6Out) == 0 {
-		requestBody.Rules = nil
-	} else {
-		firewallRules := &gsclient.FirewallRules{
-			RulesV6In:  rulesV6In,
-			RulesV6Out: rulesV6Out,
-			RulesV4In:  rulesV4In,
-			RulesV4Out: rulesV4Out,
-		}
-		requestBody.Rules = firewallRules
+	requestBody.Rules = &gsclient.FirewallRules{
+		RulesV6In:  rulesV6In,
+		RulesV6Out: rulesV6Out,
+		RulesV4In:  rulesV4In,
+		RulesV4Out: rulesV4Out,
 	}
 	err := client.UpdateFirewall(emptyCtx, d.Id(), requestBody)
 	if err != nil {
