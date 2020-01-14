@@ -8,7 +8,7 @@ description: |-
 
 # gridscale_paas_securityzone
 
-Get a security zone.
+Provides a security zone resource. This can be used to create, modify and delete security zones. 
 
 ## Example Usage
 
