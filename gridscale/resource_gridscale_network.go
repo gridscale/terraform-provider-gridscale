@@ -205,5 +205,8 @@ func resourceGridscaleNetworkDelete(d *schema.ResourceData, meta interface{}) er
 	}
 
 	err = client.DeleteNetwork(emptyCtx, d.Id())
-	return fmt.Errorf("%s error: %v", errorPrefix, err)
+	if err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
+	}
+	return nil
 }

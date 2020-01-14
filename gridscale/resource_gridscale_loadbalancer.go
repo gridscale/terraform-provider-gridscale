@@ -243,7 +243,10 @@ func resourceGridscaleLoadBalancerDelete(d *schema.ResourceData, meta interface{
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete loadbalancer (%s) resource-", d.Id())
 	err := client.DeleteLoadBalancer(emptyCtx, d.Id())
-	return fmt.Errorf("%s error: %v", errorPrefix, err)
+	if err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
+	}
+	return nil
 }
 
 func expandLoadbalancerBackendServers(backendServers interface{}) []gsclient.BackendServer {

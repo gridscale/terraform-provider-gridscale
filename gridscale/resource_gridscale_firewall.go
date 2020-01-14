@@ -291,7 +291,10 @@ func resourceGridscaleFirewallDelete(d *schema.ResourceData, meta interface{}) e
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete firewall (%s) resource -", d.Id())
 	err := client.DeleteFirewall(emptyCtx, d.Id())
-	return fmt.Errorf("%s error: %v", errorPrefix, err)
+	if err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
+	}
+	return nil
 }
 
 //convFirewallRuleSliceToInterfaceSlice converts slice of firewall rules to slice of interface

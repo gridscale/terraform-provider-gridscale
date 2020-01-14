@@ -133,5 +133,8 @@ func resourceGridscaleSshkeyDelete(d *schema.ResourceData, meta interface{}) err
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete SSH key (%s) resource -", d.Id())
 	err := client.DeleteSshkey(emptyCtx, d.Id())
-	return fmt.Errorf("%s error: %v", errorPrefix, err)
+	if err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
+	}
+	return nil
 }

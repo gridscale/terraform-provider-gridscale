@@ -367,5 +367,8 @@ func resourceGridscalePaaSServiceDelete(d *schema.ResourceData, meta interface{}
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete paas (%s) resource -", d.Id())
 	err := client.DeletePaaSService(emptyCtx, d.Id())
-	return fmt.Errorf("%s error: %v", errorPrefix, err)
+	if err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
+	}
+	return nil
 }

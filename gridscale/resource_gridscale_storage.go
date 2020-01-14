@@ -325,5 +325,8 @@ func resourceGridscaleStorageDelete(d *schema.ResourceData, meta interface{}) er
 	}
 
 	err = client.DeleteStorage(emptyCtx, d.Id())
-	return fmt.Errorf("%s error: %v", errorPrefix, err)
+	if err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
+	}
+	return nil
 }

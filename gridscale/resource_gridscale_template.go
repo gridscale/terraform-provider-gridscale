@@ -232,5 +232,8 @@ func resourceGridscaleTemplateDelete(d *schema.ResourceData, meta interface{}) e
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete template (%s) resource -", d.Id())
 	err := client.DeleteTemplate(emptyCtx, d.Id())
-	return fmt.Errorf("%s error: %v", errorPrefix, err)
+	if err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
+	}
+	return nil
 }

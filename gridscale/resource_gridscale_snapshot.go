@@ -280,5 +280,8 @@ func resourceGridscaleSnapshotDelete(d *schema.ResourceData, meta interface{}) e
 	storageUUID := d.Get("storage_uuid").(string)
 	errorPrefix := fmt.Sprintf("delete snapshot (%s) resource of storage (%s) -", d.Id(), storageUUID)
 	err := client.DeleteStorageSnapshot(emptyCtx, storageUUID, d.Id())
-	return fmt.Errorf("%s error: %v", errorPrefix, err)
+	if err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
+	}
+	return nil
 }
