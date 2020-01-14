@@ -372,6 +372,7 @@ then it will proceed onto rule 2. Packets that do not match any rules are blocke
 
 func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
+	errorPrefix := fmt.Sprintf("read server (%s) resource -", d.Id())
 	server, err := client.GetServer(emptyCtx, d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
@@ -380,60 +381,60 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 				return nil
 			}
 		}
-		return err
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
 	if err = d.Set("name", server.Properties.Name); err != nil {
-		return fmt.Errorf("error setting name: %v", err)
+		return fmt.Errorf("%s error setting name: %v", errorPrefix, err)
 	}
 	if err = d.Set("memory", server.Properties.Memory); err != nil {
-		return fmt.Errorf("error setting memory: %v", err)
+		return fmt.Errorf("%s error setting memory: %v", errorPrefix, err)
 	}
 	if err = d.Set("cores", server.Properties.Cores); err != nil {
-		return fmt.Errorf("error setting cores: %v", err)
+		return fmt.Errorf("%s error setting cores: %v", errorPrefix, err)
 	}
 	if err = d.Set("hardware_profile", server.Properties.HardwareProfile); err != nil {
-		return fmt.Errorf("error setting hardware_profile: %v", err)
+		return fmt.Errorf("%s error setting hardware_profile: %v", errorPrefix, err)
 	}
 	if err = d.Set("location_uuid", server.Properties.LocationUUID); err != nil {
-		return fmt.Errorf("error setting location_uuid: %v", err)
+		return fmt.Errorf("%s error setting location_uuid: %v", errorPrefix, err)
 	}
 	if err = d.Set("power", server.Properties.Power); err != nil {
-		return fmt.Errorf("error setting power: %v", err)
+		return fmt.Errorf("%s error setting power: %v", errorPrefix, err)
 	}
 	if err = d.Set("status", server.Properties.Status); err != nil {
-		return fmt.Errorf("error setting status: %v", err)
+		return fmt.Errorf("%s error setting status: %v", errorPrefix, err)
 	}
 	if err = d.Set("create_time", server.Properties.CreateTime.String()); err != nil {
-		return fmt.Errorf("error setting create_time: %v", err)
+		return fmt.Errorf("%s error setting create_time: %v", errorPrefix, err)
 	}
 	if err = d.Set("change_time", server.Properties.ChangeTime.String()); err != nil {
-		return fmt.Errorf("error setting change_time: %v", err)
+		return fmt.Errorf("%s error setting change_time: %v", errorPrefix, err)
 	}
 	if err = d.Set("current_price", server.Properties.CurrentPrice); err != nil {
-		return fmt.Errorf("error setting current_price: %v", err)
+		return fmt.Errorf("%s error setting current_price: %v", errorPrefix, err)
 	}
 	if err = d.Set("availability_zone", server.Properties.AvailabilityZone); err != nil {
-		return fmt.Errorf("error setting availability_zone: %v", err)
+		return fmt.Errorf("%s error setting availability_zone: %v", errorPrefix, err)
 	}
 	if err = d.Set("auto_recovery", server.Properties.AutoRecovery); err != nil {
-		return fmt.Errorf("error setting auto_recovery: %v", err)
+		return fmt.Errorf("%s error setting auto_recovery: %v", errorPrefix, err)
 	}
 	if err = d.Set("console_token", server.Properties.ConsoleToken); err != nil {
-		return fmt.Errorf("error setting console_token: %v", err)
+		return fmt.Errorf("%s error setting console_token: %v", errorPrefix, err)
 	}
 	if err = d.Set("legacy", server.Properties.Legacy); err != nil {
-		return fmt.Errorf("error setting legacy: %v", err)
+		return fmt.Errorf("%s error setting legacy: %v", errorPrefix, err)
 	}
 	if err = d.Set("usage_in_minutes_memory", server.Properties.UsageInMinutesMemory); err != nil {
-		return fmt.Errorf("error setting usage_in_minutes_memory: %v", err)
+		return fmt.Errorf("%s error setting usage_in_minutes_memory: %v", errorPrefix, err)
 	}
 	if err = d.Set("usage_in_minutes_cores", server.Properties.UsageInMinutesCores); err != nil {
-		return fmt.Errorf("error setting usage_in_minutes_cores: %v", err)
+		return fmt.Errorf("%s error setting usage_in_minutes_cores: %v", errorPrefix, err)
 	}
 
 	if err = d.Set("labels", server.Properties.Labels); err != nil {
-		return fmt.Errorf("error setting labels: %v", err)
+		return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
 	}
 
 	//Get storages
@@ -456,13 +457,13 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 		storages = append(storages, storage)
 	}
 	if err = d.Set("storage", storages); err != nil {
-		return fmt.Errorf("error setting storage: %v", err)
+		return fmt.Errorf("%s error setting storage: %v", errorPrefix, err)
 	}
 
 	//Get networks
 	networks := readServerNetworkRels(server.Properties.Relations.Networks)
 	if err = d.Set("network", networks); err != nil {
-		return fmt.Errorf("error setting network: %v", err)
+		return fmt.Errorf("%s error setting network: %v", errorPrefix, err)
 	}
 
 	//Get IP addresses
@@ -476,16 +477,16 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 		}
 	}
 	if err = d.Set("ipv4", ipv4); err != nil {
-		return fmt.Errorf("error setting ipv4: %v", err)
+		return fmt.Errorf("%s error setting ipv4: %v", errorPrefix, err)
 	}
 	if err = d.Set("ipv6", ipv6); err != nil {
-		return fmt.Errorf("error setting ipv6: %v", err)
+		return fmt.Errorf("%s error setting ipv6: %v", errorPrefix, err)
 	}
 
 	//Get the ISO image, there can only be one attached to a server but it is in a list anyway
 	for _, isoimage := range server.Properties.Relations.IsoImages {
 		if err = d.Set("isoimage", isoimage.ObjectUUID); err != nil {
-			return fmt.Errorf("error setting isoimage: %v", err)
+			return fmt.Errorf("%s error setting isoimage: %v", errorPrefix, err)
 		}
 	}
 
@@ -602,42 +603,43 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 			"Error waiting for server (%s) to be created: %s", requestBody.Name, err)
 	}
 	d.SetId(response.ServerUUID)
+	errorPrefix := fmt.Sprintf("create server (%s) relation -", d.Id())
 	log.Printf("[DEBUG] The id for %s has been set to: %v", requestBody.Name, response.ServerUUID)
 
 	//Add server power status to globalServerStatusList
 	err = globalServerStatusList.addServer(d.Id())
 	if err != nil {
-		return err
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
 	//Link storages
 	err = serverRelMan.LinkStorages(emptyCtx)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
 	//Link IPv4
 	err = serverRelMan.LinkIPv4(emptyCtx)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
 	//Link IPv6
 	err = serverRelMan.LinkIPv6(emptyCtx)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
 	//Link ISO Image
 	err = serverRelMan.LinkISOImage(emptyCtx)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
 	//Link networks
 	err = serverRelMan.LinkNetworks(emptyCtx)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
 	//Set the power state if needed
@@ -645,7 +647,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	if power {
 		err = globalServerStatusList.startServerSynchronously(emptyCtx, gsc, d.Id())
 		if err != nil {
-			return err
+			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
 	}
 
@@ -654,8 +656,10 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 
 func resourceGridscaleServerDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
+	errorPrefix := fmt.Sprintf("delete server (%s) resource -", d.Id())
 	//remove the server
-	return globalServerStatusList.removeServerSynchronously(emptyCtx, client, d.Id())
+	err := globalServerStatusList.removeServerSynchronously(emptyCtx, client, d.Id())
+	return fmt.Errorf("%s error: %v", errorPrefix, err)
 }
 
 func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -663,6 +667,7 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 	serverDepClient := relation_manager.NewServerRelationManger(gsc, d)
 	shutdownRequired := serverDepClient.IsShutdownRequired(emptyCtx)
 	var err error
+	errorPrefix := fmt.Sprintf("update server (%s) resource -", d.Id())
 	requestBody := gsclient.ServerUpdateRequest{
 		Name:            d.Get("name").(string),
 		AvailablityZone: d.Get("availability_zone").(string),
@@ -701,20 +706,22 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 		}
 		err = globalServerStatusList.runActionRequireServerOff(emptyCtx, gsc, d.Id(), true, updateSequence)
 		if err != nil {
-			return err
+			return fmt.Errorf("%s error: %v", errorPrefix, err)
+
 		}
 	} else {
 		//Execute the update request
 		err = gsc.UpdateServer(emptyCtx, d.Id(), requestBody)
 		if err != nil {
-			return err
+			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
 	}
 
 	//Update relationship between the server and an ISO image
 	err = serverDepClient.UpdateISOImageRel(emptyCtx)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
+
 	}
 
 	// Make sure the server in is the expected power state.
@@ -722,12 +729,12 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 	if d.Get("power").(bool) {
 		err = globalServerStatusList.startServerSynchronously(emptyCtx, gsc, d.Id())
 		if err != nil {
-			return err
+			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
 	} else {
 		err = globalServerStatusList.shutdownServerSynchronously(emptyCtx, gsc, d.Id())
 		if err != nil {
-			return err
+			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
 	}
 	return resourceGridscaleServerRead(d, meta)

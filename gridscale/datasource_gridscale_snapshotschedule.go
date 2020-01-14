@@ -97,37 +97,38 @@ func dataSourceGridscaleSnapshotScheduleRead(d *schema.ResourceData, meta interf
 
 	storageUUID := d.Get("storage_uuid").(string)
 	scheduler, err := client.GetStorageSnapshotSchedule(emptyCtx, storageUUID, id)
+	errorPrefix := fmt.Sprintf("read snapshot schedule (%s) datasource of storage (%s) -", id, storageUUID)
 
 	if err == nil {
 		props := scheduler.Properties
 		d.SetId(props.ObjectUUID)
 		if err = d.Set("status", props.Status); err != nil {
-			return fmt.Errorf("error setting status: %v", err)
+			return fmt.Errorf("%s error setting status: %v", errorPrefix, err)
 		}
 		if err = d.Set("name", props.Name); err != nil {
-			return fmt.Errorf("error setting name: %v", err)
+			return fmt.Errorf("%s error setting name: %v", errorPrefix, err)
 		}
 		if err = d.Set("next_runtime", props.NextRuntime.Format(timeLayout)); err != nil {
-			return fmt.Errorf("error setting next_runtime: %v", err)
+			return fmt.Errorf("%s error setting next_runtime: %v", errorPrefix, err)
 		}
 		if err = d.Set("keep_snapshots", props.KeepSnapshots); err != nil {
-			return fmt.Errorf("error setting keep_snapshots: %v", err)
+			return fmt.Errorf("%s error setting keep_snapshots: %v", errorPrefix, err)
 		}
 		if err = d.Set("run_interval", props.RunInterval); err != nil {
-			return fmt.Errorf("error setting run_interval: %v", err)
+			return fmt.Errorf("%s error setting run_interval: %v", errorPrefix, err)
 		}
 		if err = d.Set("storage_uuid", props.StorageUUID); err != nil {
-			return fmt.Errorf("error setting storage_uuid: %v", err)
+			return fmt.Errorf("%s error setting storage_uuid: %v", errorPrefix, err)
 		}
 		if err = d.Set("create_time", props.CreateTime.String()); err != nil {
-			return fmt.Errorf("error setting create_time: %v", err)
+			return fmt.Errorf("%s error setting create_time: %v", errorPrefix, err)
 		}
 		if err = d.Set("change_time", props.ChangeTime.String()); err != nil {
-			return fmt.Errorf("error setting change_time: %v", err)
+			return fmt.Errorf("%s error setting change_time: %v", errorPrefix, err)
 		}
 
 		if err = d.Set("labels", props.Labels); err != nil {
-			return fmt.Errorf("error setting labels: %v", err)
+			return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
 		}
 
 		//Get snapshots
@@ -140,9 +141,9 @@ func dataSourceGridscaleSnapshotScheduleRead(d *schema.ResourceData, meta interf
 			})
 		}
 		if err = d.Set("snapshot", snapshots); err != nil {
-			return fmt.Errorf("error setting snapshots: %v", err)
+			return fmt.Errorf("%s error setting snapshots: %v", errorPrefix, err)
 		}
 	}
 
-	return err
+	return fmt.Errorf("%s error: %v", errorPrefix, err)
 }

@@ -78,6 +78,7 @@ func resourceGridscalePaaSSecurityZone() *schema.Resource {
 
 func resourceGridscalePaaSSecurityZoneRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
+	errorPrefix := fmt.Sprintf("read paas security zone (%s) resource -", d.Id())
 	secZone, err := client.GetPaaSSecurityZone(emptyCtx, d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
@@ -86,37 +87,37 @@ func resourceGridscalePaaSSecurityZoneRead(d *schema.ResourceData, meta interfac
 				return nil
 			}
 		}
-		return err
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 	props := secZone.Properties
 	if err = d.Set("name", props.Name); err != nil {
-		return fmt.Errorf("error setting name: %v", err)
+		return fmt.Errorf("%s error setting name: %v", errorPrefix, err)
 	}
 	if err = d.Set("location_uuid", props.LocationUUID); err != nil {
-		return fmt.Errorf("error setting location_uuid: %v", err)
+		return fmt.Errorf("%s error setting location_uuid: %v", errorPrefix, err)
 	}
 	if err = d.Set("location_country", props.LocationCountry); err != nil {
-		return fmt.Errorf("error setting location_country: %v", err)
+		return fmt.Errorf("%s error setting location_country: %v", errorPrefix, err)
 	}
 	if err = d.Set("location_iata", props.LocationIata); err != nil {
-		return fmt.Errorf("error setting location_iata: %v", err)
+		return fmt.Errorf("%s error setting location_iata: %v", errorPrefix, err)
 	}
 	if err = d.Set("location_name", props.LocationName); err != nil {
-		return fmt.Errorf("error setting location_name: %v", err)
+		return fmt.Errorf("%s error setting location_name: %v", errorPrefix, err)
 	}
 	if err = d.Set("create_time", props.CreateTime.String()); err != nil {
-		return fmt.Errorf("error setting create_time: %v", err)
+		return fmt.Errorf("%s error setting create_time: %v", errorPrefix, err)
 	}
 	if err = d.Set("change_time", props.ChangeTime.String()); err != nil {
-		return fmt.Errorf("error setting change_time: %v", err)
+		return fmt.Errorf("%s error setting change_time: %v", errorPrefix, err)
 	}
 	if err = d.Set("status", props.Status); err != nil {
-		return fmt.Errorf("error setting status: %v", err)
+		return fmt.Errorf("%s error setting status: %v", errorPrefix, err)
 	}
 
 	//Set labels
 	if err = d.Set("labels", props.Labels); err != nil {
-		return fmt.Errorf("error setting labels: %v", err)
+		return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
 	}
 
 	//Set relations
@@ -125,7 +126,7 @@ func resourceGridscalePaaSSecurityZoneRead(d *schema.ResourceData, meta interfac
 		rels = append(rels, val.ObjectUUID)
 	}
 	if err = d.Set("relations", rels); err != nil {
-		return fmt.Errorf("error setting relations: %v", err)
+		return fmt.Errorf("%s error setting relations: %v", errorPrefix, err)
 	}
 	return nil
 }
@@ -147,18 +148,21 @@ func resourceGridscalePaaSSecurityZoneCreate(d *schema.ResourceData, meta interf
 
 func resourceGridscalePaaSSecurityZoneUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
+	errorPrefix := fmt.Sprintf("update paas security zone (%s) resource -", d.Id())
 	requestBody := gsclient.PaaSSecurityZoneUpdateRequest{
 		Name:         d.Get("name").(string),
 		LocationUUID: d.Get("location_uuid").(string),
 	}
 	err := client.UpdatePaaSSecurityZone(emptyCtx, d.Id(), requestBody)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 	return resourceGridscalePaaSSecurityZoneRead(d, meta)
 }
 
 func resourceGridscalePaaSSecurityZoneDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	return client.DeletePaaSSecurityZone(emptyCtx, d.Id())
+	errorPrefix := fmt.Sprintf("delete paas security zone (%s) resource -", d.Id())
+	err := client.DeletePaaSSecurityZone(emptyCtx, d.Id())
+	return fmt.Errorf("%s error: %v", errorPrefix, err)
 }

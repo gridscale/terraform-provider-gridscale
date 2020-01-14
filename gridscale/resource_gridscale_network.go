@@ -93,6 +93,7 @@ func resourceGridscaleNetwork() *schema.Resource {
 
 func resourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
+	errorPrefix := fmt.Sprintf("read network (%s) resource -", d.Id())
 	network, err := client.GetNetwork(emptyCtx, d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
@@ -101,45 +102,45 @@ func resourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) erro
 				return nil
 			}
 		}
-		return err
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
 	if err = d.Set("name", network.Properties.Name); err != nil {
-		return fmt.Errorf("error setting name: %v", err)
+		return fmt.Errorf("%s error setting name: %v", errorPrefix, err)
 	}
 	if err = d.Set("location_uuid", network.Properties.LocationUUID); err != nil {
-		return fmt.Errorf("error setting location_uuid: %v", err)
+		return fmt.Errorf("%s error setting location_uuid: %v", errorPrefix, err)
 	}
 	if err = d.Set("l2security", network.Properties.L2Security); err != nil {
-		return fmt.Errorf("error setting l2security: %v", err)
+		return fmt.Errorf("%s error setting l2security: %v", errorPrefix, err)
 	}
 	if err = d.Set("status", network.Properties.Status); err != nil {
-		return fmt.Errorf("error setting status: %v", err)
+		return fmt.Errorf("%s error setting status: %v", errorPrefix, err)
 	}
 	if err = d.Set("network_type", network.Properties.NetworkType); err != nil {
-		return fmt.Errorf("error setting network_type: %v", err)
+		return fmt.Errorf("%s error setting network_type: %v", errorPrefix, err)
 	}
 	if err = d.Set("location_country", network.Properties.LocationCountry); err != nil {
-		return fmt.Errorf("error setting location_country: %v", err)
+		return fmt.Errorf("%s error setting location_country: %v", errorPrefix, err)
 	}
 	if err = d.Set("location_iata", network.Properties.LocationIata); err != nil {
-		return fmt.Errorf("error setting location_iata: %v", err)
+		return fmt.Errorf("%s error setting location_iata: %v", errorPrefix, err)
 	}
 	if err = d.Set("location_name", network.Properties.LocationName); err != nil {
-		return fmt.Errorf("error setting location_name: %v", err)
+		return fmt.Errorf("%s error setting location_name: %v", errorPrefix, err)
 	}
 	if err = d.Set("delete_block", network.Properties.DeleteBlock); err != nil {
-		return fmt.Errorf("error setting delete_block: %v", err)
+		return fmt.Errorf("%s error setting delete_block: %v", errorPrefix, err)
 	}
 	if err = d.Set("create_time", network.Properties.CreateTime.String()); err != nil {
-		return fmt.Errorf("error setting create_time: %v", err)
+		return fmt.Errorf("%s error setting create_time: %v", errorPrefix, err)
 	}
 	if err = d.Set("change_time", network.Properties.ChangeTime.String()); err != nil {
-		return fmt.Errorf("error setting change_time: %v", err)
+		return fmt.Errorf("%s error setting change_time: %v", errorPrefix, err)
 	}
 
 	if err = d.Set("labels", network.Properties.Labels); err != nil {
-		return fmt.Errorf("error setting labels: %v", err)
+		return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
 	}
 
 	return nil
@@ -147,7 +148,7 @@ func resourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) erro
 
 func resourceGridscaleNetworkUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-
+	errorPrefix := fmt.Sprintf("update network (%s) resource -", d.Id())
 	requestBody := gsclient.NetworkUpdateRequest{
 		Name:       d.Get("name").(string),
 		L2Security: d.Get("l2security").(bool),
@@ -155,7 +156,7 @@ func resourceGridscaleNetworkUpdate(d *schema.ResourceData, meta interface{}) er
 
 	err := client.UpdateNetwork(emptyCtx, d.Id(), requestBody)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
 	return resourceGridscaleNetworkRead(d, meta)
@@ -184,9 +185,10 @@ func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) er
 
 func resourceGridscaleNetworkDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
+	errorPrefix := fmt.Sprintf("delete network (%s) resource -", d.Id())
 	net, err := client.GetNetwork(emptyCtx, d.Id())
 	if err != nil {
-		return err
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
 	//Stop all servers relating to this network address if there is one
@@ -198,9 +200,10 @@ func resourceGridscaleNetworkDelete(d *schema.ResourceData, meta interface{}) er
 		//UnlinkNetwork requires the server to be off
 		err = globalServerStatusList.runActionRequireServerOff(emptyCtx, client, server.ObjectUUID, false, unlinkNetAction)
 		if err != nil {
-			return err
+			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
 	}
 
-	return client.DeleteNetwork(emptyCtx, d.Id())
+	err = client.DeleteNetwork(emptyCtx, d.Id())
+	return fmt.Errorf("%s error: %v", errorPrefix, err)
 }
