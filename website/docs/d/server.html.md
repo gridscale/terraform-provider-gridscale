@@ -67,6 +67,7 @@ The following arguments are supported:
 
 This resource exports the following attributes:
 
+* `id` - UUID of the server.
 * `name` - The name of the server.
 * `cores` - The number of server cores.
 * `memory` - The amount of server memory in GB.
