@@ -202,7 +202,7 @@ func resourceGridscaleFirewallRead(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
 	}
 
-	return fmt.Errorf("%s error: %v", errorPrefix, err)
+	return nil
 }
 
 func resourceGridscaleFirewallCreate(d *schema.ResourceData, meta interface{}) error {
