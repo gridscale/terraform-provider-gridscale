@@ -94,10 +94,10 @@ func dataSourceGridscaleSnapshotScheduleRead(d *schema.ResourceData, meta interf
 	client := meta.(*gsclient.Client)
 
 	id := d.Get("resource_id").(string)
-
 	storageUUID := d.Get("storage_uuid").(string)
-	scheduler, err := client.GetStorageSnapshotSchedule(emptyCtx, storageUUID, id)
 	errorPrefix := fmt.Sprintf("read snapshot schedule (%s) datasource of storage (%s) -", id, storageUUID)
+
+	scheduler, err := client.GetStorageSnapshotSchedule(emptyCtx, storageUUID, id)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

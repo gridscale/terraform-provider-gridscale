@@ -111,9 +111,8 @@ func resourceGridscaleIpv4() *schema.Resource {
 
 func resourceGridscaleIpRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	ip, err := client.GetIP(emptyCtx, d.Id())
 	errorPrefix := fmt.Sprintf("read IP (%s) resource -", d.Id())
-
+	ip, err := client.GetIP(emptyCtx, d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
