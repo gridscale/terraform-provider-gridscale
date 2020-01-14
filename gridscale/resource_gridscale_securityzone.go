@@ -164,5 +164,8 @@ func resourceGridscalePaaSSecurityZoneDelete(d *schema.ResourceData, meta interf
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete paas security zone (%s) resource -", d.Id())
 	err := client.DeletePaaSSecurityZone(emptyCtx, d.Id())
-	return fmt.Errorf("%s error: %v", errorPrefix, err)
+	if err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
+	}
+	return nil
 }

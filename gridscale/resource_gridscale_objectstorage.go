@@ -71,5 +71,8 @@ func resourceGridscaleObjectStorageDelete(d *schema.ResourceData, meta interface
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete object storage (%s) resource -", d.Id())
 	err := client.DeleteObjectStorageAccessKey(emptyCtx, d.Id())
-	return fmt.Errorf("%s error: %v", errorPrefix, err)
+	if err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
+	}
+	return nil
 }

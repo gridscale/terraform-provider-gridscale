@@ -239,5 +239,8 @@ func resourceGridscaleIpDelete(d *schema.ResourceData, meta interface{}) error {
 		}
 	}
 	err = client.DeleteIP(emptyCtx, d.Id())
-	return fmt.Errorf("%s error: %v", errorPrefix, err)
+	if err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
+	}
+	return nil
 }

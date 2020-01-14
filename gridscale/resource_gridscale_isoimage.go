@@ -275,5 +275,8 @@ func resourceGridscaleISOImageDelete(d *schema.ResourceData, meta interface{}) e
 		}
 	}
 	err = client.DeleteISOImage(emptyCtx, d.Id())
-	return fmt.Errorf("%s error: %v", errorPrefix, err)
+	if err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
+	}
+	return nil
 }
