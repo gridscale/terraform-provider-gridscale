@@ -3,12 +3,12 @@ layout: "gridscale"
 page_title: "gridscale: sshkey"
 sidebar_current: "docs-gridscale-datasource-sshkey"
 description: |-
-  Gets the id of an sshkey.
+  Gets data of an sshkey.
 ---
 
 # gridscale_sshkey
 
-Get the id of an sshkey resource. This can be used to link SSH keys to a storage when an official template is used.
+Get data of an sshkey resource. This can be used to link SSH keys to a storage when an official template is used.
 
 ## Example Usage
 
@@ -35,6 +35,12 @@ resource "gridscale_storage" "storagename"{
 	}
 }
 ```
+
+## Argument Reference
+
+The following arguments are supported:
+
+* `resource_id` - (Required) The UUID of the SSH key.
 
 ## Attributes Reference
 

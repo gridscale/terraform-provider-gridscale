@@ -3,12 +3,12 @@ layout: "gridscale"
 page_title: "gridscale: loadbalancer"
 sidebar_current: "docs-gridscale-datasource-loadbalancer"
 description: |-
-  Gets the id of a loadbalancer.
+  Gets data of a loadbalancer.
 ---
 
 # gridscale_loadbalancer
 
-Get the id of an loabalancer resource.
+Get data of an loabalancer resource.
 
 ## Example Usage
 
@@ -17,6 +17,12 @@ data "gridscale_loadbalancer" "foo" {
 	resource_id   = "xxxx-xxxx-xxxx-xxxx"
 }
 ```
+
+## Argument Reference
+
+The following arguments are supported:
+
+* `resource_id` - (Required) The UUID of the loadbalancer.
 
 ## Attributes Reference
 

@@ -3,12 +3,12 @@ layout: "gridscale"
 page_title: "gridscale: template"
 sidebar_current: "docs-gridscale-datasource-template"
 description: |-
-  Gets the id of a template by name.
+  Gets data of a template by name.
 ---
 
 # gridscale_template
 
-Get the id of a template with a specific name. This can be used to make it more visible which template is being used for new storages.
+Get data of a template with a specific name. This can be used to make it more visible which template is being used for new storages.
 
 An error is triggered if the template name does not exist.
 
