@@ -131,26 +131,60 @@ func resourceGridscaleTemplateRead(d *schema.ResourceData, meta interface{}) err
 		return err
 	}
 	props := template.Properties
-	d.Set("name", props.Name)
-	d.Set("location_uuid", props.LocationUUID)
-	d.Set("location_country", props.LocationCountry)
-	d.Set("location_iata", props.LocationIata)
-	d.Set("location_name", props.LocationName)
-	d.Set("status", props.Status)
-	d.Set("ostype", props.Ostype)
-	d.Set("version", props.Version)
-	d.Set("private", props.Private)
-	d.Set("license_product_no", props.LicenseProductNo)
-	d.Set("create_time", props.CreateTime)
-	d.Set("change_time", props.ChangeTime)
-	d.Set("distro", props.Distro)
-	d.Set("description", props.Description)
-	d.Set("usage_in_minutes", props.UsageInMinutes)
-	d.Set("capacity", props.Capacity)
-	d.Set("current_price", props.CurrentPrice)
+	if err = d.Set("name", props.Name); err != nil {
+		return fmt.Errorf("error setting name: %v", err)
+	}
+	if err = d.Set("location_uuid", props.LocationUUID); err != nil {
+		return fmt.Errorf("error setting location_uuid: %v", err)
+	}
+	if err = d.Set("location_country", props.LocationCountry); err != nil {
+		return fmt.Errorf("error setting location_country: %v", err)
+	}
+	if err = d.Set("location_iata", props.LocationIata); err != nil {
+		return fmt.Errorf("error setting location_iata: %v", err)
+	}
+	if err = d.Set("location_name", props.LocationName); err != nil {
+		return fmt.Errorf("error setting location_name: %v", err)
+	}
+	if err = d.Set("status", props.Status); err != nil {
+		return fmt.Errorf("error setting status: %v", err)
+	}
+	if err = d.Set("ostype", props.Ostype); err != nil {
+		return fmt.Errorf("error setting ostype: %v", err)
+	}
+	if err = d.Set("version", props.Version); err != nil {
+		return fmt.Errorf("error setting version: %v", err)
+	}
+	if err = d.Set("private", props.Private); err != nil {
+		return fmt.Errorf("error setting private: %v", err)
+	}
+	if err = d.Set("license_product_no", props.LicenseProductNo); err != nil {
+		return fmt.Errorf("error setting license_product_no: %v", err)
+	}
+	if err = d.Set("create_time", props.CreateTime); err != nil {
+		return fmt.Errorf("error setting create_time: %v", err)
+	}
+	if err = d.Set("change_time", props.ChangeTime); err != nil {
+		return fmt.Errorf("error setting change_time: %v", err)
+	}
+	if err = d.Set("distro", props.Distro); err != nil {
+		return fmt.Errorf("error setting distro: %v", err)
+	}
+	if err = d.Set("description", props.Description); err != nil {
+		return fmt.Errorf("error setting description: %v", err)
+	}
+	if err = d.Set("usage_in_minutes", props.UsageInMinutes); err != nil {
+		return fmt.Errorf("error setting usage_in_minutes: %v", err)
+	}
+	if err = d.Set("capacity", props.Capacity); err != nil {
+		return fmt.Errorf("error setting capacity: %v", err)
+	}
+	if err = d.Set("current_price", props.CurrentPrice); err != nil {
+		return fmt.Errorf("error setting current_price: %v", err)
+	}
 
 	if err = d.Set("labels", props.Labels); err != nil {
-		return fmt.Errorf("Error setting labels: %v", err)
+		return fmt.Errorf("error setting labels: %v", err)
 	}
 
 	return nil

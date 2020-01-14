@@ -83,19 +83,41 @@ func dataSourceGridscalePublicNetworkRead(d *schema.ResourceData, meta interface
 
 	if err == nil {
 		d.SetId(network.Properties.ObjectUUID)
-		d.Set("name", network.Properties.Name)
-		d.Set("location_uuid", network.Properties.LocationUUID)
-		d.Set("l2security", network.Properties.L2Security)
-		d.Set("status", network.Properties.Status)
-		d.Set("network_type", network.Properties.NetworkType)
-		d.Set("location_country", network.Properties.LocationCountry)
-		d.Set("location_iata", network.Properties.LocationIata)
-		d.Set("location_name", network.Properties.LocationName)
-		d.Set("delete_block", network.Properties.DeleteBlock)
-		d.Set("create_time", network.Properties.CreateTime.String())
-		d.Set("change_time", network.Properties.ChangeTime.String())
+		if err = d.Set("name", network.Properties.Name); err != nil {
+			return fmt.Errorf("error setting name: %v", err)
+		}
+		if err = d.Set("location_uuid", network.Properties.LocationUUID); err != nil {
+			return fmt.Errorf("error setting location_uuid: %v", err)
+		}
+		if err = d.Set("l2security", network.Properties.L2Security); err != nil {
+			return fmt.Errorf("error setting l2security: %v", err)
+		}
+		if err = d.Set("status", network.Properties.Status); err != nil {
+			return fmt.Errorf("error setting status: %v", err)
+		}
+		if err = d.Set("network_type", network.Properties.NetworkType); err != nil {
+			return fmt.Errorf("error setting network_type: %v", err)
+		}
+		if err = d.Set("location_country", network.Properties.LocationCountry); err != nil {
+			return fmt.Errorf("error setting location_country: %v", err)
+		}
+		if err = d.Set("location_iata", network.Properties.LocationIata); err != nil {
+			return fmt.Errorf("error setting location_iata: %v", err)
+		}
+		if err = d.Set("location_name", network.Properties.LocationName); err != nil {
+			return fmt.Errorf("error setting location_name: %v", err)
+		}
+		if err = d.Set("delete_block", network.Properties.DeleteBlock); err != nil {
+			return fmt.Errorf("error setting delete_block: %v", err)
+		}
+		if err = d.Set("create_time", network.Properties.CreateTime.String()); err != nil {
+			return fmt.Errorf("error setting create_time: %v", err)
+		}
+		if err = d.Set("change_time", network.Properties.ChangeTime.String()); err != nil {
+			return fmt.Errorf("error setting change_time: %v", err)
+		}
 		if err = d.Set("labels", network.Properties.Labels); err != nil {
-			return fmt.Errorf("Error setting labels: %v", err)
+			return fmt.Errorf("error setting labels: %v", err)
 		}
 	}
 

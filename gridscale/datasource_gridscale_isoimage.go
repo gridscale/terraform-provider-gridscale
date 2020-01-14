@@ -141,21 +141,51 @@ func dataSourceGridscaleISOImageRead(d *schema.ResourceData, meta interface{}) e
 	if err == nil {
 		props := isoimage.Properties
 		d.SetId(props.ObjectUUID)
-		d.Set("name", props.Name)
-		d.Set("source_url", props.SourceURL)
-		d.Set("location_uuid", props.LocationUUID)
-		d.Set("location_country", props.LocationCountry)
-		d.Set("location_iata", props.LocationIata)
-		d.Set("location_name", props.LocationName)
-		d.Set("status", props.Status)
-		d.Set("version", props.Version)
-		d.Set("private", props.Private)
-		d.Set("create_time", props.CreateTime)
-		d.Set("change_time", props.ChangeTime)
-		d.Set("description", props.Description)
-		d.Set("usage_in_minutes", props.UsageInMinutes)
-		d.Set("capacity", props.Capacity)
-		d.Set("current_price", props.CurrentPrice)
+		if err = d.Set("name", props.Name); err != nil {
+			return fmt.Errorf("error setting name: %v", err)
+		}
+		if err = d.Set("source_url", props.SourceURL); err != nil {
+			return fmt.Errorf("error setting source_url: %v", err)
+		}
+		if err = d.Set("location_uuid", props.LocationUUID); err != nil {
+			return fmt.Errorf("error setting location_uuid: %v", err)
+		}
+		if err = d.Set("location_country", props.LocationCountry); err != nil {
+			return fmt.Errorf("error setting location_country: %v", err)
+		}
+		if err = d.Set("location_iata", props.LocationIata); err != nil {
+			return fmt.Errorf("error setting location_iata: %v", err)
+		}
+		if err = d.Set("location_name", props.LocationName); err != nil {
+			return fmt.Errorf("error setting location_name: %v", err)
+		}
+		if err = d.Set("status", props.Status); err != nil {
+			return fmt.Errorf("error setting status: %v", err)
+		}
+		if err = d.Set("version", props.Version); err != nil {
+			return fmt.Errorf("error setting version: %v", err)
+		}
+		if err = d.Set("private", props.Private); err != nil {
+			return fmt.Errorf("error setting private: %v", err)
+		}
+		if err = d.Set("create_time", props.CreateTime); err != nil {
+			return fmt.Errorf("error setting create_time: %v", err)
+		}
+		if err = d.Set("change_time", props.ChangeTime); err != nil {
+			return fmt.Errorf("error setting change_time: %v", err)
+		}
+		if err = d.Set("description", props.Description); err != nil {
+			return fmt.Errorf("error setting description: %v", err)
+		}
+		if err = d.Set("usage_in_minutes", props.UsageInMinutes); err != nil {
+			return fmt.Errorf("error setting usage_in_minutes: %v", err)
+		}
+		if err = d.Set("capacity", props.Capacity); err != nil {
+			return fmt.Errorf("error setting capacity: %v", err)
+		}
+		if err = d.Set("current_price", props.CurrentPrice); err != nil {
+			return fmt.Errorf("error setting current_price: %v", err)
+		}
 
 		servers := make([]interface{}, 0)
 		for _, value := range props.Relations.Servers {
@@ -167,14 +197,12 @@ func dataSourceGridscaleISOImageRead(d *schema.ResourceData, meta interface{}) e
 			}
 			servers = append(servers, server)
 		}
-		log.Printf("aaa %v", props)
-		log.Printf("bbb %v", servers)
 		if err = d.Set("server", servers); err != nil {
-			return fmt.Errorf("Error setting server-rels: %v", err)
+			return fmt.Errorf("error setting server-rels: %v", err)
 		}
 
 		if err = d.Set("labels", props.Labels); err != nil {
-			return fmt.Errorf("Error setting labels: %v", err)
+			return fmt.Errorf("error setting labels: %v", err)
 		}
 
 		log.Printf("Found ISO image with key: %v", props.ObjectUUID)

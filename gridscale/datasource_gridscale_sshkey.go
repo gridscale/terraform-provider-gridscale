@@ -60,13 +60,23 @@ func dataSourceGridscaleSshkeyRead(d *schema.ResourceData, meta interface{}) err
 
 	if err == nil {
 		d.SetId(sshkey.Properties.ObjectUUID)
-		d.Set("name", sshkey.Properties.Name)
-		d.Set("sshkey", sshkey.Properties.Sshkey)
-		d.Set("status", sshkey.Properties.Status)
-		d.Set("create_time", sshkey.Properties.CreateTime.String())
-		d.Set("change_time", sshkey.Properties.ChangeTime.String())
+		if err = d.Set("name", sshkey.Properties.Name); err != nil {
+			return fmt.Errorf("error setting name: %v", err)
+		}
+		if err = d.Set("sshkey", sshkey.Properties.Sshkey); err != nil {
+			return fmt.Errorf("error setting sshkey: %v", err)
+		}
+		if err = d.Set("status", sshkey.Properties.Status); err != nil {
+			return fmt.Errorf("error setting status: %v", err)
+		}
+		if err = d.Set("create_time", sshkey.Properties.CreateTime.String()); err != nil {
+			return fmt.Errorf("error setting create_time: %v", err)
+		}
+		if err = d.Set("change_time", sshkey.Properties.ChangeTime.String()); err != nil {
+			return fmt.Errorf("error setting change_time: %v", err)
+		}
 		if err = d.Set("labels", sshkey.Properties.Labels); err != nil {
-			return fmt.Errorf("Error setting labels: %v", err)
+			return fmt.Errorf("error setting labels: %v", err)
 		}
 	}
 

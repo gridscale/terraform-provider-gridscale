@@ -1,6 +1,7 @@
 package gridscale
 
 import (
+	"fmt"
 	"github.com/gridscale/gsclient-go"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
@@ -42,8 +43,12 @@ func resourceGridscaleObjectStorageRead(d *schema.ResourceData, meta interface{}
 		return err
 	}
 
-	d.Set("access_key", objectStorage.Properties.AccessKey)
-	d.Set("secret_key", objectStorage.Properties.SecretKey)
+	if err = d.Set("access_key", objectStorage.Properties.AccessKey); err != nil {
+		return fmt.Errorf("error setting access_key: %v", err)
+	}
+	if err = d.Set("secret_key", objectStorage.Properties.SecretKey); err != nil {
+		return fmt.Errorf("error setting secret_key: %v", err)
+	}
 	return nil
 }
 
