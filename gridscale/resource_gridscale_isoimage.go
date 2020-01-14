@@ -25,7 +25,7 @@ func resourceGridscaleISOImage() *schema.Resource {
 			},
 			"source_url": {
 				Type:        schema.TypeString,
-				Description: "Contains the source URL of the ISO-Image that it was originally fetched from.",
+				Description: "Contains the source URL of the ISO Image that it was originally fetched from.",
 				Required:    true,
 				ForceNew:    true,
 			},
@@ -81,7 +81,7 @@ func resourceGridscaleISOImage() *schema.Resource {
 			},
 			"version": {
 				Type:        schema.TypeString,
-				Description: "Upstream version of the ISO-Image release",
+				Description: "Upstream version of the ISO Image release",
 				Computed:    true,
 			},
 			"private": {
@@ -101,7 +101,7 @@ func resourceGridscaleISOImage() *schema.Resource {
 			},
 			"description": {
 				Type:        schema.TypeString,
-				Description: "Description of the ISO-Image.",
+				Description: "Description of the ISO Image.",
 				Computed:    true,
 			},
 			"labels": {
@@ -117,7 +117,7 @@ func resourceGridscaleISOImage() *schema.Resource {
 			},
 			"capacity": {
 				Type:        schema.TypeInt,
-				Description: "The capacity of a storage/ISO-Image/template/snapshot in GB.",
+				Description: "The capacity of a storage/ISO Image/template/snapshot in GB.",
 				Computed:    true,
 			},
 			"current_price": {

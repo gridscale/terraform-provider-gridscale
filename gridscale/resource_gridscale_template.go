@@ -106,7 +106,7 @@ func resourceGridscaleTemplate() *schema.Resource {
 			},
 			"capacity": {
 				Type:        schema.TypeInt,
-				Description: "The capacity of a storage/ISO-Image/template/snapshot in GB.",
+				Description: "The capacity of a storage/ISO Image/template/snapshot in GB.",
 				Computed:    true,
 			},
 			"current_price": {

@@ -591,7 +591,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		return err
 	}
 
-	//Link ISO-Image
+	//Link ISO Image
 	err = serverRelMan.LinkISOImage(emptyCtx)
 	if err != nil {
 		return err
@@ -674,7 +674,7 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 		}
 	}
 
-	//Update relationship between the server and an ISO-image
+	//Update relationship between the server and an ISO image
 	err = serverDepClient.UpdateISOImageRel(emptyCtx)
 	if err != nil {
 		return err

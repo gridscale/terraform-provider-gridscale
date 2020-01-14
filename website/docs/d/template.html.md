@@ -61,6 +61,6 @@ The following attributes are exported:
 * `distro` - The OS distrobution that the Template contains.
 * `description` - Description of the Template.
 * `usage_in_minutes` - Total minutes the object has been running.
-* `capacity` - The capacity of a storage/ISO-Image/template/snapshot in GB.
+* `capacity` - The capacity of a storage/ISO Image/template/snapshot in GB.
 * `current_price` - Defines the price for the current period since the last bill.
 * `labels` - List of labels.

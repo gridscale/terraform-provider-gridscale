@@ -79,7 +79,7 @@ the product_no of the license (see the /prices endpoint for more details)`,
 			"capacity": {
 				Type:        schema.TypeInt,
 				Computed:    true,
-				Description: "The capacity of a storage/ISO-Image/template/snapshot in GB",
+				Description: "The capacity of a storage/ISO Image/template/snapshot in GB",
 			},
 			"storage_uuid": {
 				Type:        schema.TypeString,
