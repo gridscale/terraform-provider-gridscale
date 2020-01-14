@@ -251,6 +251,19 @@ func resourceGridscaleISOImageUpdate(d *schema.ResourceData, meta interface{}) e
 func resourceGridscaleISOImageDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete ISO-Image (%s) resource -", d.Id())
-	err := client.DeleteISOImage(emptyCtx, d.Id())
+
+	isoimage, err := client.GetISOImage(emptyCtx, d.Id())
+	if err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
+	}
+
+	//Remove all links between this ISO-Image and all servers.
+	for _, server := range isoimage.Properties.Relations.Servers {
+		err = client.UnlinkIsoImage(emptyCtx, server.ObjectUUID, d.Id())
+		if err != nil {
+			return fmt.Errorf("%s error: %v", errorPrefix, err)
+		}
+	}
+	err = client.DeleteISOImage(emptyCtx, d.Id())
 	return fmt.Errorf("%s error: %v", errorPrefix, err)
 }
