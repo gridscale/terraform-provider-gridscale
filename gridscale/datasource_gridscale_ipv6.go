@@ -89,7 +89,7 @@ func dataSourceGridscaleIpv6() *schema.Resource {
 				Computed:    true,
 			},
 			"usage_in_minutes": {
-				Type:     schema.TypeFloat,
+				Type:     schema.TypeInt,
 				Computed: true,
 			},
 			"current_price": {
