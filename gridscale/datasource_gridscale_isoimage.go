@@ -33,7 +33,7 @@ func dataSourceGridscaleISOImage() *schema.Resource {
 			},
 			"server": {
 				Type:        schema.TypeSet,
-				Description: "The information about servers which are related to this isoimage.",
+				Description: "The information about servers which are related to this ISO image.",
 				Computed:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -177,7 +177,7 @@ func dataSourceGridscaleISOImageRead(d *schema.ResourceData, meta interface{}) e
 			return fmt.Errorf("Error setting labels: %v", err)
 		}
 
-		log.Printf("Found isoimage with key: %v", props.ObjectUUID)
+		log.Printf("Found ISO image with key: %v", props.ObjectUUID)
 	}
 
 	return err

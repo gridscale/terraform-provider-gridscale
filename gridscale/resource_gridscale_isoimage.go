@@ -31,7 +31,7 @@ func resourceGridscaleISOImage() *schema.Resource {
 			},
 			"server": {
 				Type:        schema.TypeSet,
-				Description: "The information about servers which are related to this isoimage.",
+				Description: "The information about servers which are related to this ISO image.",
 				Computed:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -195,7 +195,7 @@ func resourceGridscaleISOImageCreate(d *schema.ResourceData, meta interface{}) e
 
 	d.SetId(response.ObjectUUID)
 
-	log.Printf("The id for the new isoimage has been set to %v", response.ObjectUUID)
+	log.Printf("The id for the new ISO image has been set to %v", response.ObjectUUID)
 
 	return resourceGridscaleISOImageRead(d, meta)
 }
