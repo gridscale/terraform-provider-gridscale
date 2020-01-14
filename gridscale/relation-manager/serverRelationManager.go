@@ -99,7 +99,7 @@ func (c *ServerRelationManger) LinkIPv6(ctx context.Context) error {
 	return nil
 }
 
-//LinkISOImage links an ISO-image to a server
+//LinkISOImage links an ISO image to a server
 func (c *ServerRelationManger) LinkISOImage(ctx context.Context) error {
 	d := c.getData()
 	client := c.getGSClient()
@@ -219,18 +219,18 @@ func (c *ServerRelationManger) IsShutdownRequired(ctx context.Context) bool {
 	return shutdownRequired
 }
 
-//UpdateISOImageRel updates relationship between a server and an ISO-image
+//UpdateISOImageRel updates relationship between a server and an ISO image
 func (c *ServerRelationManger) UpdateISOImageRel(ctx context.Context) error {
 	d := c.getData()
 	client := c.getGSClient()
 	var err error
-	//Check if ISO-image field is changed
+	//Check if ISO image field is changed
 	if d.HasChange("isoimage") {
 		oldIso, _ := d.GetChange("isoimage")
-		//If there is an ISO-image already linked to the server
+		//If there is an ISO image already linked to the server
 		//Unlink it
 		if oldIso != "" {
-			//If 404 or 409, that means ISO-image is already deleted => the relation between ISO-image and server is deleted automatically
+			//If 404 or 409, that means ISO image is already deleted => the relation between ISO image and server is deleted automatically
 			err = removeErrorContainsHttpCodes(
 				client.UnlinkIsoImage(ctx, d.Id(), oldIso.(string)),
 				http.StatusConflict,
@@ -240,7 +240,7 @@ func (c *ServerRelationManger) UpdateISOImageRel(ctx context.Context) error {
 				return err
 			}
 		}
-		//Link new ISO-image (if there is one)
+		//Link new ISO image (if there is one)
 		err = c.LinkISOImage(ctx)
 	}
 	return err
