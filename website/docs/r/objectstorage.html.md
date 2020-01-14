@@ -8,7 +8,7 @@ description: |-
 
 # gridscale_object_storage_accesskey
 
-Provides an access key resource of an object storage.
+Provides an access key resource of an object storage. This can be used to create, modify and delete object storages' access keys. 
 
 ## Example Usage
 
