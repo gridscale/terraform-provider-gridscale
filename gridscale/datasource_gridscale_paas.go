@@ -142,45 +142,46 @@ func dataSourceGridscalePaaSRead(d *schema.ResourceData, meta interface{}) error
 	client := meta.(*gsclient.Client)
 
 	id := d.Get("resource_id").(string)
+	errorPrefix := fmt.Sprintf("read paas (%s) datasource -", id)
 
 	paas, err := client.GetPaaSService(emptyCtx, id)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 	props := paas.Properties
 	creds := props.Credentials
 	d.SetId(props.ObjectUUID)
 	if err = d.Set("name", props.Name); err != nil {
-		return fmt.Errorf("error setting name: %v", err)
+		return fmt.Errorf("%s error setting name: %v", errorPrefix, err)
 	}
 	if creds != nil && len(creds) > 0 {
 		if err = d.Set("username", creds[0].Username); err != nil {
-			return fmt.Errorf("error setting username: %v", err)
+			return fmt.Errorf("%s error setting username: %v", errorPrefix, err)
 		}
 		if err = d.Set("password", creds[0].Password); err != nil {
-			return fmt.Errorf("error setting password: %v", err)
+			return fmt.Errorf("%s error setting password: %v", errorPrefix, err)
 		}
 	}
 	if err = d.Set("security_zone_uuid", props.SecurityZoneUUID); err != nil {
-		return fmt.Errorf("error setting security_zone_uuid: %v", err)
+		return fmt.Errorf("%s error setting security_zone_uuid: %v", errorPrefix, err)
 	}
 	if err = d.Set("service_template_uuid", props.ServiceTemplateUUID); err != nil {
-		return fmt.Errorf("error setting service_template_uuid: %v", err)
+		return fmt.Errorf("%s error setting service_template_uuid: %v", errorPrefix, err)
 	}
 	if err = d.Set("usage_in_minute", props.UsageInMinutes); err != nil {
-		return fmt.Errorf("error setting usage_in_minute: %v", err)
+		return fmt.Errorf("%s error setting usage_in_minute: %v", errorPrefix, err)
 	}
 	if err = d.Set("current_price", props.CurrentPrice); err != nil {
-		return fmt.Errorf("error setting current_price: %v", err)
+		return fmt.Errorf("%s error setting current_price: %v", errorPrefix, err)
 	}
 	if err = d.Set("change_time", props.ChangeTime.String()); err != nil {
-		return fmt.Errorf("error setting change_time: %v", err)
+		return fmt.Errorf("%s error setting change_time: %v", errorPrefix, err)
 	}
 	if err = d.Set("create_time", props.CreateTime.String()); err != nil {
-		return fmt.Errorf("error setting create_time: %v", err)
+		return fmt.Errorf("%s error setting create_time: %v", errorPrefix, err)
 	}
 	if err = d.Set("status", props.Status); err != nil {
-		return fmt.Errorf("error setting status: %v", err)
+		return fmt.Errorf("%s error setting status: %v", errorPrefix, err)
 	}
 
 	//Get listen ports
@@ -195,7 +196,7 @@ func dataSourceGridscalePaaSRead(d *schema.ResourceData, meta interface{}) error
 		}
 	}
 	if err = d.Set("listen_port", listenPorts); err != nil {
-		return fmt.Errorf("error setting listen ports: %v", err)
+		return fmt.Errorf("%s error setting listen ports: %v", errorPrefix, err)
 	}
 
 	//Get parameters
@@ -203,7 +204,7 @@ func dataSourceGridscalePaaSRead(d *schema.ResourceData, meta interface{}) error
 	for k, value := range props.Parameters {
 		paramValType, err := getInterfaceType(value)
 		if err != nil {
-			return err
+			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
 		valueInString, err := convInterfaceToString(paramValType, value)
 		param := map[string]interface{}{
@@ -214,7 +215,7 @@ func dataSourceGridscalePaaSRead(d *schema.ResourceData, meta interface{}) error
 		parameters = append(parameters, param)
 	}
 	if err = d.Set("parameter", parameters); err != nil {
-		return fmt.Errorf("error setting parameters: %v", err)
+		return fmt.Errorf("%s error setting parameters: %v", errorPrefix, err)
 	}
 
 	//Get resource limits
@@ -227,18 +228,18 @@ func dataSourceGridscalePaaSRead(d *schema.ResourceData, meta interface{}) error
 		resourceLimits = append(resourceLimits, limit)
 	}
 	if err = d.Set("resource_limit", resourceLimits); err != nil {
-		return fmt.Errorf("error setting resource limits: %v", err)
+		return fmt.Errorf("%s error setting resource limits: %v", errorPrefix, err)
 	}
 
 	//Set labels
 	if err = d.Set("labels", props.Labels); err != nil {
-		return fmt.Errorf("error setting labels: %v", err)
+		return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
 	}
 
 	//Get all available networks
 	networks, err := client.GetNetworkList(emptyCtx)
 	if err != nil {
-		return fmt.Errorf("error getting networks: %v", err)
+		return fmt.Errorf("%s error getting networks: %v", errorPrefix, err)
 	}
 	//look for a network that the PaaS service is in
 	for _, network := range networks {
@@ -247,7 +248,7 @@ func dataSourceGridscalePaaSRead(d *schema.ResourceData, meta interface{}) error
 		if len(securityZones) >= 1 {
 			if securityZones[0].ObjectUUID == props.SecurityZoneUUID {
 				if err = d.Set("network_uuid", network.Properties.ObjectUUID); err != nil {
-					return fmt.Errorf("error setting network_uuid: %v", err)
+					return fmt.Errorf("%s error setting network_uuid: %v", errorPrefix, err)
 				}
 			}
 		}

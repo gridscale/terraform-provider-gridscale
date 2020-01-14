@@ -109,41 +109,42 @@ func dataSourceGridscaleLoadBalancer() *schema.Resource {
 func dataSourceGridscaleLoadBalancerRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	id := d.Get("resource_id").(string)
+	errorPrefix := fmt.Sprintf("read loadbalancer (%s) datasource-", id)
 	loadbalancer, err := client.GetLoadBalancer(emptyCtx, id)
 
 	if err == nil {
 		d.SetId(loadbalancer.Properties.ObjectUUID)
 		if err = d.Set("name", loadbalancer.Properties.Name); err != nil {
-			return fmt.Errorf("error setting name: %v", err)
+			return fmt.Errorf("%s error setting name: %v", errorPrefix, err)
 		}
 		if err = d.Set("algorithm", loadbalancer.Properties.Algorithm); err != nil {
-			return fmt.Errorf("error setting algorithm: %v", err)
+			return fmt.Errorf("%s error setting algorithm: %v", errorPrefix, err)
 		}
 		if err = d.Set("status", loadbalancer.Properties.Status); err != nil {
-			return fmt.Errorf("error setting status: %v", err)
+			return fmt.Errorf("%s error setting status: %v", errorPrefix, err)
 		}
 		if err = d.Set("redirect_http_to_https", loadbalancer.Properties.RedirectHTTPToHTTPS); err != nil {
-			return fmt.Errorf("error setting redirect_http_to_https: %v", err)
+			return fmt.Errorf("%s error setting redirect_http_to_https: %v", errorPrefix, err)
 		}
 		if err = d.Set("listen_ipv4_uuid", loadbalancer.Properties.ListenIPv4UUID); err != nil {
-			return fmt.Errorf("error setting listen_ipv4_uuid: %v", err)
+			return fmt.Errorf("%s error setting listen_ipv4_uuid: %v", errorPrefix, err)
 		}
 		if err = d.Set("listen_ipv6_uuid", loadbalancer.Properties.ListenIPv6UUID); err != nil {
-			return fmt.Errorf("error setting listen_ipv6_uuid: %v", err)
+			return fmt.Errorf("%s error setting listen_ipv6_uuid: %v", errorPrefix, err)
 		}
 
 		if err = d.Set("forwarding_rule", flattenLoadbalancerForwardingRules(loadbalancer.Properties.ForwardingRules)); err != nil {
-			return fmt.Errorf("error setting forwarding_rule: %v", err)
+			return fmt.Errorf("%s error setting forwarding_rule: %v", errorPrefix, err)
 		}
 
 		if err = d.Set("backend_server", flattenLoadbalancerBackendServers(loadbalancer.Properties.BackendServers)); err != nil {
-			return fmt.Errorf("error setting BackendServers: %v", err)
+			return fmt.Errorf("%s error setting BackendServers: %v", errorPrefix, err)
 		}
 
 		if err = d.Set("labels", loadbalancer.Properties.Labels); err != nil {
-			return fmt.Errorf("error setting Labels: %v", err)
+			return fmt.Errorf("%s error setting Labels: %v", errorPrefix, err)
 		}
 	}
 
-	return err
+	return fmt.Errorf("%s error: %v", errorPrefix, err)
 }

@@ -55,30 +55,31 @@ func dataSourceGridscaleSshkeyRead(d *schema.ResourceData, meta interface{}) err
 	client := meta.(*gsclient.Client)
 
 	id := d.Get("resource_id").(string)
+	errorPrefix := fmt.Sprintf("read SSH key (%s) datasource -", id)
 
 	sshkey, err := client.GetSshkey(emptyCtx, id)
 
 	if err == nil {
 		d.SetId(sshkey.Properties.ObjectUUID)
 		if err = d.Set("name", sshkey.Properties.Name); err != nil {
-			return fmt.Errorf("error setting name: %v", err)
+			return fmt.Errorf("%s error setting name: %v", errorPrefix, err)
 		}
 		if err = d.Set("sshkey", sshkey.Properties.Sshkey); err != nil {
-			return fmt.Errorf("error setting sshkey: %v", err)
+			return fmt.Errorf("%s error setting sshkey: %v", errorPrefix, err)
 		}
 		if err = d.Set("status", sshkey.Properties.Status); err != nil {
-			return fmt.Errorf("error setting status: %v", err)
+			return fmt.Errorf("%s error setting status: %v", errorPrefix, err)
 		}
 		if err = d.Set("create_time", sshkey.Properties.CreateTime.String()); err != nil {
-			return fmt.Errorf("error setting create_time: %v", err)
+			return fmt.Errorf("%s error setting create_time: %v", errorPrefix, err)
 		}
 		if err = d.Set("change_time", sshkey.Properties.ChangeTime.String()); err != nil {
-			return fmt.Errorf("error setting change_time: %v", err)
+			return fmt.Errorf("%s error setting change_time: %v", errorPrefix, err)
 		}
 		if err = d.Set("labels", sshkey.Properties.Labels); err != nil {
-			return fmt.Errorf("error setting labels: %v", err)
+			return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
 		}
 	}
 
-	return err
+	return fmt.Errorf("%s error: %v", errorPrefix, err)
 }

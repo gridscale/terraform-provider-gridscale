@@ -100,6 +100,7 @@ func dataSourceGridscaleSnapshotRead(d *schema.ResourceData, meta interface{}) e
 
 	storageUuid := d.Get("storage_uuid").(string)
 	id := d.Get("resource_id").(string)
+	errorPrefix := fmt.Sprintf("read snapshot (%s) datasource of storage (%s)-", id, storageUuid)
 
 	snapshot, err := client.GetStorageSnapshot(emptyCtx, storageUuid, id)
 
@@ -107,46 +108,46 @@ func dataSourceGridscaleSnapshotRead(d *schema.ResourceData, meta interface{}) e
 		props := snapshot.Properties
 		d.SetId(props.ObjectUUID)
 		if err = d.Set("name", props.Name); err != nil {
-			return fmt.Errorf("error setting name: %v", err)
+			return fmt.Errorf("%s error setting name: %v", errorPrefix, err)
 		}
 		if err = d.Set("status", props.Status); err != nil {
-			return fmt.Errorf("error setting status: %v", err)
+			return fmt.Errorf("%s error setting status: %v", errorPrefix, err)
 		}
 		if err = d.Set("location_country", props.LocationCountry); err != nil {
-			return fmt.Errorf("error setting location_country: %v", err)
+			return fmt.Errorf("%s error setting location_country: %v", errorPrefix, err)
 		}
 		if err = d.Set("location_name", props.LocationName); err != nil {
-			return fmt.Errorf("error setting location_name: %v", err)
+			return fmt.Errorf("%s error setting location_name: %v", errorPrefix, err)
 		}
 		if err = d.Set("location_iata", props.LocationIata); err != nil {
-			return fmt.Errorf("error setting location_iata: %v", err)
+			return fmt.Errorf("%s error setting location_iata: %v", errorPrefix, err)
 		}
 		if err = d.Set("location_uuid", props.LocationUUID); err != nil {
-			return fmt.Errorf("error setting location_uuid: %v", err)
+			return fmt.Errorf("%s error setting location_uuid: %v", errorPrefix, err)
 		}
 		if err = d.Set("usage_in_minutes", props.UsageInMinutes); err != nil {
-			return fmt.Errorf("error setting usage_in_minutes: %v", err)
+			return fmt.Errorf("%s error setting usage_in_minutes: %v", errorPrefix, err)
 		}
 		if err = d.Set("create_time", props.CreateTime.String()); err != nil {
-			return fmt.Errorf("error setting create_time: %v", err)
+			return fmt.Errorf("%s error setting create_time: %v", errorPrefix, err)
 		}
 		if err = d.Set("change_time", props.ChangeTime.String()); err != nil {
-			return fmt.Errorf("error setting change_time: %v", err)
+			return fmt.Errorf("%s error setting change_time: %v", errorPrefix, err)
 		}
 		if err = d.Set("license_product_no", props.LicenseProductNo); err != nil {
-			return fmt.Errorf("error setting license_product_no: %v", err)
+			return fmt.Errorf("%s error setting license_product_no: %v", errorPrefix, err)
 		}
 		if err = d.Set("current_price", props.CurrentPrice); err != nil {
-			return fmt.Errorf("error setting current_price: %v", err)
+			return fmt.Errorf("%s error setting current_price: %v", errorPrefix, err)
 		}
 		if err = d.Set("capacity", props.Capacity); err != nil {
-			return fmt.Errorf("error setting capacity: %v", err)
+			return fmt.Errorf("%s error setting capacity: %v", errorPrefix, err)
 		}
 		//Set labels
 		if err = d.Set("labels", props.Labels); err != nil {
-			return fmt.Errorf("error setting labels: %v", err)
+			return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
 		}
 	}
 
-	return err
+	return fmt.Errorf("%s error: %v", errorPrefix, err)
 }

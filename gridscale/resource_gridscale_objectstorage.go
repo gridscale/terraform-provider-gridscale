@@ -32,6 +32,7 @@ func resourceGridscaleObjectStorage() *schema.Resource {
 
 func resourceGridscaleObjectStorageRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
+	errorPrefix := fmt.Sprintf("read object storage (%s) resource -", d.Id())
 	objectStorage, err := client.GetObjectStorageAccessKey(emptyCtx, d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
@@ -40,14 +41,14 @@ func resourceGridscaleObjectStorageRead(d *schema.ResourceData, meta interface{}
 				return nil
 			}
 		}
-		return err
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
 	if err = d.Set("access_key", objectStorage.Properties.AccessKey); err != nil {
-		return fmt.Errorf("error setting access_key: %v", err)
+		return fmt.Errorf("%s error setting access_key: %v", errorPrefix, err)
 	}
 	if err = d.Set("secret_key", objectStorage.Properties.SecretKey); err != nil {
-		return fmt.Errorf("error setting secret_key: %v", err)
+		return fmt.Errorf("%s error setting secret_key: %v", errorPrefix, err)
 	}
 	return nil
 }
@@ -68,5 +69,7 @@ func resourceGridscaleObjectStorageCreate(d *schema.ResourceData, meta interface
 
 func resourceGridscaleObjectStorageDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	return client.DeleteObjectStorageAccessKey(emptyCtx, d.Id())
+	errorPrefix := fmt.Sprintf("delete object storage (%s) resource -", d.Id())
+	err := client.DeleteObjectStorageAccessKey(emptyCtx, d.Id())
+	return fmt.Errorf("%s error: %v", errorPrefix, err)
 }

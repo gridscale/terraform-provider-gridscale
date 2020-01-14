@@ -56,6 +56,7 @@ func resourceGridscaleSshkey() *schema.Resource {
 
 func resourceGridscaleSshkeyRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
+	errorPrefix := fmt.Sprintf("read SSH key (%s) resource -", d.Id())
 	sshkey, err := client.GetSshkey(emptyCtx, d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
@@ -64,27 +65,27 @@ func resourceGridscaleSshkeyRead(d *schema.ResourceData, meta interface{}) error
 				return nil
 			}
 		}
-		return err
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
 	if err = d.Set("name", sshkey.Properties.Name); err != nil {
-		return fmt.Errorf("error setting name: %v", err)
+		return fmt.Errorf("%s error setting name: %v", errorPrefix, err)
 	}
 	if err = d.Set("sshkey", sshkey.Properties.Sshkey); err != nil {
-		return fmt.Errorf("error setting sshkey: %v", err)
+		return fmt.Errorf("%s error setting sshkey: %v", errorPrefix, err)
 	}
 	if err = d.Set("status", sshkey.Properties.Status); err != nil {
-		return fmt.Errorf("error setting status: %v", err)
+		return fmt.Errorf("%s error setting status: %v", errorPrefix, err)
 	}
 	if err = d.Set("create_time", sshkey.Properties.CreateTime.String()); err != nil {
-		return fmt.Errorf("error setting create_time: %v", err)
+		return fmt.Errorf("%s error setting create_time: %v", errorPrefix, err)
 	}
 	if err = d.Set("change_time", sshkey.Properties.ChangeTime.String()); err != nil {
-		return fmt.Errorf("error setting change_time: %v", err)
+		return fmt.Errorf("%s error setting change_time: %v", errorPrefix, err)
 	}
 
 	if err = d.Set("labels", sshkey.Properties.Labels); err != nil {
-		return fmt.Errorf("error setting labels: %v", err)
+		return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
 	}
 
 	return nil
@@ -92,7 +93,7 @@ func resourceGridscaleSshkeyRead(d *schema.ResourceData, meta interface{}) error
 
 func resourceGridscaleSshkeyUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-
+	errorPrefix := fmt.Sprintf("update SSH key (%s) resource -", d.Id())
 	requestBody := gsclient.SshkeyUpdateRequest{
 		Name:   d.Get("name").(string),
 		Sshkey: d.Get("sshkey").(string),
@@ -101,7 +102,7 @@ func resourceGridscaleSshkeyUpdate(d *schema.ResourceData, meta interface{}) err
 
 	err := client.UpdateSshkey(emptyCtx, d.Id(), requestBody)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
 	return resourceGridscaleSshkeyRead(d, meta)
@@ -130,7 +131,7 @@ func resourceGridscaleSshkeyCreate(d *schema.ResourceData, meta interface{}) err
 
 func resourceGridscaleSshkeyDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
+	errorPrefix := fmt.Sprintf("delete SSH key (%s) resource -", d.Id())
 	err := client.DeleteSshkey(emptyCtx, d.Id())
-
-	return err
+	return fmt.Errorf("%s error: %v", errorPrefix, err)
 }

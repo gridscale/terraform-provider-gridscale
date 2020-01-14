@@ -97,14 +97,14 @@ func (r *request) execute(ctx context.Context, c Client, output interface{}) err
 		//execute the request
 		result, err := httpClient.Do(request)
 		if err != nil {
-			logger.Errorf("Error while executing the request: %v", err)
+			logger.Errorf("Error while executing the request: %v", errorPrefix, err)
 			return false, err
 		}
 		statusCode := result.StatusCode
 		requestUUID = result.Header.Get(requestUUIDHeaderParam)
 		responseBodyBytes, err = ioutil.ReadAll(result.Body)
 		if err != nil {
-			logger.Errorf("Error while reading the response's body: %v", err)
+			logger.Errorf("Error while reading the response's body: %v", errorPrefix, err)
 			return false, err
 		}
 
@@ -142,7 +142,7 @@ func (r *request) execute(ctx context.Context, c Client, output interface{}) err
 		//Unmarshal body bytes to the given struct
 		err = json.Unmarshal(responseBodyBytes, output)
 		if err != nil {
-			logger.Errorf("Error while marshaling JSON: %v", err)
+			logger.Errorf("Error while marshaling JSON: %v", errorPrefix, err)
 			return err
 		}
 	}
