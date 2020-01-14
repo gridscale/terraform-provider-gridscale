@@ -104,10 +104,10 @@ func dataSourceGridscalePaaSSecurityZoneRead(d *schema.ResourceData, meta interf
 	if err = d.Set("location_name", props.LocationName); err != nil {
 		return fmt.Errorf("error setting location_name: %v", err)
 	}
-	if err = d.Set("create_time", props.CreateTime); err != nil {
+	if err = d.Set("create_time", props.CreateTime.String()); err != nil {
 		return fmt.Errorf("error setting create_time: %v", err)
 	}
-	if err = d.Set("change_time", props.ChangeTime); err != nil {
+	if err = d.Set("change_time", props.ChangeTime.String()); err != nil {
 		return fmt.Errorf("error setting change_time: %v", err)
 	}
 	if err = d.Set("status", props.Status); err != nil {

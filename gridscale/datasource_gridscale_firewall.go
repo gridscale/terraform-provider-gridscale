@@ -143,10 +143,10 @@ func dataSourceGridscaleFirewallRead(d *schema.ResourceData, meta interface{}) e
 		if err = d.Set("private", props.Private); err != nil {
 			return fmt.Errorf("error setting private: %v", err)
 		}
-		if err = d.Set("create_time", props.CreateTime); err != nil {
+		if err = d.Set("create_time", props.CreateTime.String()); err != nil {
 			return fmt.Errorf("error setting create_time: %v", err)
 		}
-		if err = d.Set("change_time", props.ChangeTime); err != nil {
+		if err = d.Set("change_time", props.ChangeTime.String()); err != nil {
 			return fmt.Errorf("error setting change_time: %v", err)
 		}
 		if err = d.Set("description", props.Description); err != nil {

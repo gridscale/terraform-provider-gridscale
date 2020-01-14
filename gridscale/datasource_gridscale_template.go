@@ -146,10 +146,10 @@ func dataSourceGridscaleTemplateRead(d *schema.ResourceData, meta interface{}) e
 		if err = d.Set("license_product_no", template.Properties.LicenseProductNo); err != nil {
 			return fmt.Errorf("error setting license_product_no: %v", err)
 		}
-		if err = d.Set("create_time", template.Properties.CreateTime); err != nil {
+		if err = d.Set("create_time", template.Properties.CreateTime.String()); err != nil {
 			return fmt.Errorf("error setting create_time: %v", err)
 		}
-		if err = d.Set("change_time", template.Properties.ChangeTime); err != nil {
+		if err = d.Set("change_time", template.Properties.ChangeTime.String()); err != nil {
 			return fmt.Errorf("error setting change_time: %v", err)
 		}
 		if err = d.Set("distro", template.Properties.Distro); err != nil {

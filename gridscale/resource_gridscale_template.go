@@ -161,10 +161,10 @@ func resourceGridscaleTemplateRead(d *schema.ResourceData, meta interface{}) err
 	if err = d.Set("license_product_no", props.LicenseProductNo); err != nil {
 		return fmt.Errorf("error setting license_product_no: %v", err)
 	}
-	if err = d.Set("create_time", props.CreateTime); err != nil {
+	if err = d.Set("create_time", props.CreateTime.String()); err != nil {
 		return fmt.Errorf("error setting create_time: %v", err)
 	}
-	if err = d.Set("change_time", props.ChangeTime); err != nil {
+	if err = d.Set("change_time", props.ChangeTime.String()); err != nil {
 		return fmt.Errorf("error setting change_time: %v", err)
 	}
 	if err = d.Set("distro", props.Distro); err != nil {
