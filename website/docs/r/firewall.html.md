@@ -14,20 +14,20 @@ Provides a firewall resource. This can be used to create, modify and delete fire
 
 ```terraform
 resource "gridscale_firewall" "foo" {
-  name   = "newname"
+  name   = "example-firewall"
   rules_v4_in {
 	order = 0
 	protocol = "tcp"
 	action = "drop"
 	dst_port = "20:80"
-	comment = "test"
+	comment = "some comments"
   }
   rules_v6_in {
 	order = 0
 	protocol = "tcp"
 	action = "drop"
 	dst_port = "2000:3000"
-	comment = "testv6"
+	comment = "some comments"
   }
 }
 ```
