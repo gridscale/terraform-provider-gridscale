@@ -127,77 +127,77 @@ func dataSourceGridscaleFirewallRead(d *schema.ResourceData, meta interface{}) e
 	errorPrefix := fmt.Sprintf("read firewall (%s) datasource -", id)
 
 	fw, err := client.GetFirewall(emptyCtx, id)
-
-	if err == nil {
-		props := fw.Properties
-		d.SetId(props.ObjectUUID)
-
-		if err = d.Set("name", props.Name); err != nil {
-			return fmt.Errorf("%s error setting name: %v", errorPrefix, err)
-		}
-		if err = d.Set("location_name", props.LocationName); err != nil {
-			return fmt.Errorf("%s error setting location_name: %v", errorPrefix, err)
-		}
-		if err = d.Set("status", props.Status); err != nil {
-			return fmt.Errorf("%s error setting status: %v", errorPrefix, err)
-		}
-		if err = d.Set("private", props.Private); err != nil {
-			return fmt.Errorf("%s error setting private: %v", errorPrefix, err)
-		}
-		if err = d.Set("create_time", props.CreateTime.String()); err != nil {
-			return fmt.Errorf("%s error setting create_time: %v", errorPrefix, err)
-		}
-		if err = d.Set("change_time", props.ChangeTime.String()); err != nil {
-			return fmt.Errorf("%s error setting change_time: %v", errorPrefix, err)
-		}
-		if err = d.Set("description", props.Description); err != nil {
-			return fmt.Errorf("%s error setting description: %v", errorPrefix, err)
-		}
-
-		//Get network relating to this firewall
-		networks := make([]interface{}, 0)
-		for _, value := range props.Relations.Networks {
-			rule := map[string]interface{}{
-				"network_uuid": value.NetworkUUID,
-				"object_uuid":  value.ObjectUUID,
-				"network_name": value.NetworkName,
-				"object_name":  value.ObjectName,
-				"create_time":  value.CreateTime.String(),
-			}
-			networks = append(networks, rule)
-		}
-		if err = d.Set("network", networks); err != nil {
-			return fmt.Errorf("%s error setting network: %v", errorPrefix, err)
-		}
-
-		//Get rules_v4_in
-		rulesV4In := convFirewallRuleSliceToInterfaceSlice(props.Rules.RulesV4In)
-		if err = d.Set("rules_v4_in", rulesV4In); err != nil {
-			return fmt.Errorf("%s error setting rules_v4_in: %v", errorPrefix, err)
-		}
-
-		//Get rules_v4_out
-		rulesV4Out := convFirewallRuleSliceToInterfaceSlice(props.Rules.RulesV4Out)
-		if err = d.Set("rules_v4_out", rulesV4Out); err != nil {
-			return fmt.Errorf("%s error setting rules_v4_out: %v", errorPrefix, err)
-		}
-
-		//Get rules_v6_in
-		rulesV6In := convFirewallRuleSliceToInterfaceSlice(props.Rules.RulesV6In)
-		if err = d.Set("rules_v6_in", rulesV6In); err != nil {
-			return fmt.Errorf("%s error setting rules_v6_in: %v", errorPrefix, err)
-		}
-
-		//Get rules_v6_out
-		rulesV6Out := convFirewallRuleSliceToInterfaceSlice(props.Rules.RulesV6Out)
-		if err = d.Set("rules_v6_out", rulesV6Out); err != nil {
-			return fmt.Errorf("%s error setting rules_v6_out: %v", errorPrefix, err)
-		}
-
-		if err = d.Set("labels", props.Labels); err != nil {
-			return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
-		}
+	if err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
-	return fmt.Errorf("%s error: %v", errorPrefix, err)
+	props := fw.Properties
+	d.SetId(props.ObjectUUID)
+
+	if err = d.Set("name", props.Name); err != nil {
+		return fmt.Errorf("%s error setting name: %v", errorPrefix, err)
+	}
+	if err = d.Set("location_name", props.LocationName); err != nil {
+		return fmt.Errorf("%s error setting location_name: %v", errorPrefix, err)
+	}
+	if err = d.Set("status", props.Status); err != nil {
+		return fmt.Errorf("%s error setting status: %v", errorPrefix, err)
+	}
+	if err = d.Set("private", props.Private); err != nil {
+		return fmt.Errorf("%s error setting private: %v", errorPrefix, err)
+	}
+	if err = d.Set("create_time", props.CreateTime.String()); err != nil {
+		return fmt.Errorf("%s error setting create_time: %v", errorPrefix, err)
+	}
+	if err = d.Set("change_time", props.ChangeTime.String()); err != nil {
+		return fmt.Errorf("%s error setting change_time: %v", errorPrefix, err)
+	}
+	if err = d.Set("description", props.Description); err != nil {
+		return fmt.Errorf("%s error setting description: %v", errorPrefix, err)
+	}
+
+	//Get network relating to this firewall
+	networks := make([]interface{}, 0)
+	for _, value := range props.Relations.Networks {
+		rule := map[string]interface{}{
+			"network_uuid": value.NetworkUUID,
+			"object_uuid":  value.ObjectUUID,
+			"network_name": value.NetworkName,
+			"object_name":  value.ObjectName,
+			"create_time":  value.CreateTime.String(),
+		}
+		networks = append(networks, rule)
+	}
+	if err = d.Set("network", networks); err != nil {
+		return fmt.Errorf("%s error setting network: %v", errorPrefix, err)
+	}
+
+	//Get rules_v4_in
+	rulesV4In := convFirewallRuleSliceToInterfaceSlice(props.Rules.RulesV4In)
+	if err = d.Set("rules_v4_in", rulesV4In); err != nil {
+		return fmt.Errorf("%s error setting rules_v4_in: %v", errorPrefix, err)
+	}
+
+	//Get rules_v4_out
+	rulesV4Out := convFirewallRuleSliceToInterfaceSlice(props.Rules.RulesV4Out)
+	if err = d.Set("rules_v4_out", rulesV4Out); err != nil {
+		return fmt.Errorf("%s error setting rules_v4_out: %v", errorPrefix, err)
+	}
+
+	//Get rules_v6_in
+	rulesV6In := convFirewallRuleSliceToInterfaceSlice(props.Rules.RulesV6In)
+	if err = d.Set("rules_v6_in", rulesV6In); err != nil {
+		return fmt.Errorf("%s error setting rules_v6_in: %v", errorPrefix, err)
+	}
+
+	//Get rules_v6_out
+	rulesV6Out := convFirewallRuleSliceToInterfaceSlice(props.Rules.RulesV6Out)
+	if err = d.Set("rules_v6_out", rulesV6Out); err != nil {
+		return fmt.Errorf("%s error setting rules_v6_out: %v", errorPrefix, err)
+	}
+
+	if err = d.Set("labels", props.Labels); err != nil {
+		return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
+	}
+	return nil
 }

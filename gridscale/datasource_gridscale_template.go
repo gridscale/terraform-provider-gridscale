@@ -117,63 +117,64 @@ func dataSourceGridscaleTemplateRead(d *schema.ResourceData, meta interface{}) e
 	errorPrefix := fmt.Sprintf("read template (%s) datasource -", name)
 
 	template, err := client.GetTemplateByName(emptyCtx, name)
-
-	if err == nil {
-		d.SetId(template.Properties.ObjectUUID)
-		if err = d.Set("location_uuid", template.Properties.LocationUUID); err != nil {
-			return fmt.Errorf("%s error setting location_uuid: %v", errorPrefix, err)
-		}
-		if err = d.Set("location_country", template.Properties.LocationCountry); err != nil {
-			return fmt.Errorf("%s error setting location_country: %v", errorPrefix, err)
-		}
-		if err = d.Set("location_iata", template.Properties.LocationIata); err != nil {
-			return fmt.Errorf("%s error setting location_iata: %v", errorPrefix, err)
-		}
-		if err = d.Set("location_name", template.Properties.LocationName); err != nil {
-			return fmt.Errorf("%s error setting location_name: %v", errorPrefix, err)
-		}
-		if err = d.Set("status", template.Properties.Status); err != nil {
-			return fmt.Errorf("%s error setting status: %v", errorPrefix, err)
-		}
-		if err = d.Set("ostype", template.Properties.Ostype); err != nil {
-			return fmt.Errorf("%s error setting ostype: %v", errorPrefix, err)
-		}
-		if err = d.Set("version", template.Properties.Version); err != nil {
-			return fmt.Errorf("%s error setting version: %v", errorPrefix, err)
-		}
-		if err = d.Set("private", template.Properties.Private); err != nil {
-			return fmt.Errorf("%s error setting private: %v", errorPrefix, err)
-		}
-		if err = d.Set("license_product_no", template.Properties.LicenseProductNo); err != nil {
-			return fmt.Errorf("%s error setting license_product_no: %v", errorPrefix, err)
-		}
-		if err = d.Set("create_time", template.Properties.CreateTime.String()); err != nil {
-			return fmt.Errorf("%s error setting create_time: %v", errorPrefix, err)
-		}
-		if err = d.Set("change_time", template.Properties.ChangeTime.String()); err != nil {
-			return fmt.Errorf("%s error setting change_time: %v", errorPrefix, err)
-		}
-		if err = d.Set("distro", template.Properties.Distro); err != nil {
-			return fmt.Errorf("%s error setting distro: %v", errorPrefix, err)
-		}
-		if err = d.Set("description", template.Properties.Description); err != nil {
-			return fmt.Errorf("%s error setting description: %v", errorPrefix, err)
-		}
-		if err = d.Set("usage_in_minutes", template.Properties.UsageInMinutes); err != nil {
-			return fmt.Errorf("%s error setting usage_in_minutes: %v", errorPrefix, err)
-		}
-		if err = d.Set("capacity", template.Properties.Capacity); err != nil {
-			return fmt.Errorf("%s error setting capacity: %v", errorPrefix, err)
-		}
-		if err = d.Set("current_price", template.Properties.CurrentPrice); err != nil {
-			return fmt.Errorf("%s error setting current_price: %v", errorPrefix, err)
-		}
-
-		if err = d.Set("labels", template.Properties.Labels); err != nil {
-			return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
-		}
-		log.Printf("Found template with key: %v", template.Properties.ObjectUUID)
+	if err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
-	return fmt.Errorf("%s error: %v", errorPrefix, err)
+	d.SetId(template.Properties.ObjectUUID)
+	if err = d.Set("location_uuid", template.Properties.LocationUUID); err != nil {
+		return fmt.Errorf("%s error setting location_uuid: %v", errorPrefix, err)
+	}
+	if err = d.Set("location_country", template.Properties.LocationCountry); err != nil {
+		return fmt.Errorf("%s error setting location_country: %v", errorPrefix, err)
+	}
+	if err = d.Set("location_iata", template.Properties.LocationIata); err != nil {
+		return fmt.Errorf("%s error setting location_iata: %v", errorPrefix, err)
+	}
+	if err = d.Set("location_name", template.Properties.LocationName); err != nil {
+		return fmt.Errorf("%s error setting location_name: %v", errorPrefix, err)
+	}
+	if err = d.Set("status", template.Properties.Status); err != nil {
+		return fmt.Errorf("%s error setting status: %v", errorPrefix, err)
+	}
+	if err = d.Set("ostype", template.Properties.Ostype); err != nil {
+		return fmt.Errorf("%s error setting ostype: %v", errorPrefix, err)
+	}
+	if err = d.Set("version", template.Properties.Version); err != nil {
+		return fmt.Errorf("%s error setting version: %v", errorPrefix, err)
+	}
+	if err = d.Set("private", template.Properties.Private); err != nil {
+		return fmt.Errorf("%s error setting private: %v", errorPrefix, err)
+	}
+	if err = d.Set("license_product_no", template.Properties.LicenseProductNo); err != nil {
+		return fmt.Errorf("%s error setting license_product_no: %v", errorPrefix, err)
+	}
+	if err = d.Set("create_time", template.Properties.CreateTime.String()); err != nil {
+		return fmt.Errorf("%s error setting create_time: %v", errorPrefix, err)
+	}
+	if err = d.Set("change_time", template.Properties.ChangeTime.String()); err != nil {
+		return fmt.Errorf("%s error setting change_time: %v", errorPrefix, err)
+	}
+	if err = d.Set("distro", template.Properties.Distro); err != nil {
+		return fmt.Errorf("%s error setting distro: %v", errorPrefix, err)
+	}
+	if err = d.Set("description", template.Properties.Description); err != nil {
+		return fmt.Errorf("%s error setting description: %v", errorPrefix, err)
+	}
+	if err = d.Set("usage_in_minutes", template.Properties.UsageInMinutes); err != nil {
+		return fmt.Errorf("%s error setting usage_in_minutes: %v", errorPrefix, err)
+	}
+	if err = d.Set("capacity", template.Properties.Capacity); err != nil {
+		return fmt.Errorf("%s error setting capacity: %v", errorPrefix, err)
+	}
+	if err = d.Set("current_price", template.Properties.CurrentPrice); err != nil {
+		return fmt.Errorf("%s error setting current_price: %v", errorPrefix, err)
+	}
+
+	if err = d.Set("labels", template.Properties.Labels); err != nil {
+		return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
+	}
+	log.Printf("Found template with key: %v", template.Properties.ObjectUUID)
+
+	return nil
 }
