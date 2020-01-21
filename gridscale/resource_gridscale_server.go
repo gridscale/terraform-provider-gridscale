@@ -10,7 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 
-	"github.com/gridscale/gsclient-go"
+	"github.com/gridscale/gsclient-go/v2"
 )
 
 func resourceGridscaleServer() *schema.Resource {
@@ -549,16 +549,21 @@ func readServerNetworkRels(serverNetRels []gsclient.ServerNetworkRelationPropert
 //flattenFirewallRuleProperties converts variable of type gsclient.FirewallRuleProperties to
 //map[string]interface{}
 func flattenFirewallRuleProperties(props gsclient.FirewallRuleProperties) map[string]interface{} {
-	return map[string]interface{}{
+	rule := map[string]interface{}{
 		"order":    props.Order,
 		"action":   props.Action,
-		"protocol": props.Protocol,
 		"dst_port": props.DstPort,
 		"src_port": props.SrcPort,
 		"src_cidr": props.SrcCidr,
 		"dst_cidr": props.DstCidr,
 		"comment":  props.Comment,
 	}
+	if props.Protocol == gsclient.TCPTransport {
+		rule["protocol"] = "tcp"
+	} else if props.Protocol == gsclient.UDPTransport {
+		rule["protocol"] = "udp"
+	}
+	return rule
 }
 
 func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) error {
@@ -671,10 +676,12 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 	shutdownRequired := serverDepClient.IsShutdownRequired(emptyCtx)
 	var err error
 	errorPrefix := fmt.Sprintf("update server (%s) resource -", d.Id())
+
+	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
 	requestBody := gsclient.ServerUpdateRequest{
 		Name:            d.Get("name").(string),
 		AvailablityZone: d.Get("availability_zone").(string),
-		Labels:          convSOStrings(d.Get("labels").(*schema.Set).List()),
+		Labels:          &labels,
 		Cores:           d.Get("cores").(int),
 		Memory:          d.Get("memory").(int),
 	}

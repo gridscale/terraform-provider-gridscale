@@ -147,9 +147,6 @@ type NetworkCreateRequest struct {
 	//List of labels. Can be empty.
 	Labels []string `json:"labels,omitempty"`
 
-	//Helps to identify which datacenter an object belongs to.
-	LocationUUID string `json:"location_uuid"`
-
 	//Defines information about MAC spoofing protection (filters layer2 and ARP traffic based on MAC source).
 	//It can only be (de-)activated on a private network - the public network always has l2security enabled.
 	//It will be true if the network is public, and false if the network is private.
@@ -172,6 +169,9 @@ type NetworkUpdateRequest struct {
 
 	//L2Security. Leave it if you do not want to update the l2 security
 	L2Security bool `json:"l2security"`
+
+	//List of labels. Can be empty.
+	Labels *[]string `json:"labels,omitempty"`
 }
 
 //GetNetwork get a specific network based on given id

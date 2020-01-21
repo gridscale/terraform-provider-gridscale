@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 
-	"github.com/gridscale/gsclient-go"
+	"github.com/gridscale/gsclient-go/v2"
 )
 
 func resourceGridscaleStorageSnapshotSchedule() *schema.Resource {
@@ -186,9 +186,10 @@ func resourceGridscaleSnapshotScheduleUpdate(d *schema.ResourceData, meta interf
 	storageUUID := d.Get("storage_uuid").(string)
 	errorPrefix := fmt.Sprintf("update snapshot schedule (%s) resource of storage (%s)-", d.Id(), storageUUID)
 
+	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
 	requestBody := gsclient.StorageSnapshotScheduleUpdateRequest{
 		Name:          d.Get("name").(string),
-		Labels:        convSOStrings(d.Get("labels").(*schema.Set).List()),
+		Labels:        &labels,
 		RunInterval:   d.Get("run_interval").(int),
 		KeepSnapshots: d.Get("keep_snapshots").(int),
 	}

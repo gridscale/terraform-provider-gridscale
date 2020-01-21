@@ -3,7 +3,7 @@ package gridscale
 import (
 	"context"
 	"fmt"
-	"github.com/gridscale/gsclient-go"
+	"github.com/gridscale/gsclient-go/v2"
 	"log"
 	"net/http"
 	"sync"

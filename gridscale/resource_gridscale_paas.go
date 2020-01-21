@@ -2,7 +2,7 @@ package gridscale
 
 import (
 	"fmt"
-	"github.com/gridscale/gsclient-go"
+	"github.com/gridscale/gsclient-go/v2"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"strings"
@@ -325,9 +325,11 @@ func resourceGridscalePaaSServiceCreate(d *schema.ResourceData, meta interface{}
 func resourceGridscalePaaSServiceUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("update paas (%s) resource -", d.Id())
+
+	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
 	requestBody := gsclient.PaaSServiceUpdateRequest{
 		Name:   d.Get("name").(string),
-		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
+		Labels: &labels,
 	}
 
 	params := make(map[string]interface{}, 0)

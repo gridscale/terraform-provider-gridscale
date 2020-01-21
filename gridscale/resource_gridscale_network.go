@@ -8,7 +8,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 
-	"github.com/gridscale/gsclient-go"
+	"github.com/gridscale/gsclient-go/v2"
 )
 
 func resourceGridscaleNetwork() *schema.Resource {
@@ -149,9 +149,12 @@ func resourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) erro
 func resourceGridscaleNetworkUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("update network (%s) resource -", d.Id())
+
+	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
 	requestBody := gsclient.NetworkUpdateRequest{
 		Name:       d.Get("name").(string),
 		L2Security: d.Get("l2security").(bool),
+		Labels:     &labels,
 	}
 
 	err := client.UpdateNetwork(emptyCtx, d.Id(), requestBody)

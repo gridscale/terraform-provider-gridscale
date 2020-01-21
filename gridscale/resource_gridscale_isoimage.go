@@ -2,7 +2,7 @@ package gridscale
 
 import (
 	"fmt"
-	"github.com/gridscale/gsclient-go"
+	"github.com/gridscale/gsclient-go/v2"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
 	"net/http"
@@ -236,9 +236,10 @@ func resourceGridscaleISOImageUpdate(d *schema.ResourceData, meta interface{}) e
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("update ISO-Image (%s) resource -", d.Id())
 
+	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
 	requestBody := gsclient.ISOImageUpdateRequest{
 		Name:   d.Get("name").(string),
-		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
+		Labels: &labels,
 	}
 
 	err := client.UpdateISOImage(emptyCtx, d.Id(), requestBody)

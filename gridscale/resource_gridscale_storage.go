@@ -8,7 +8,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/gridscale/gsclient-go"
+	"github.com/gridscale/gsclient-go/v2"
 )
 
 func resourceGridscaleStorage() *schema.Resource {
@@ -238,9 +238,11 @@ func resourceGridscaleStorageRead(d *schema.ResourceData, meta interface{}) erro
 func resourceGridscaleStorageUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("update storage (%s) resource -", d.Id())
+
+	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
 	requestBody := gsclient.StorageUpdateRequest{
 		Name:   d.Get("name").(string),
-		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
+		Labels: &labels,
 	}
 
 	err := client.UpdateStorage(emptyCtx, d.Id(), requestBody)

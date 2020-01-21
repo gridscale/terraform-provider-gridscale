@@ -72,3 +72,22 @@ type passwordType struct {
 func (p passwordType) MarshalJSON() ([]byte, error) {
 	return json.Marshal(p.string)
 }
+
+type transportLayerProtocol struct {
+	string
+}
+
+//MarshalJSON custom marshal for transportLayerProtocol
+func (p transportLayerProtocol) MarshalJSON() ([]byte, error) {
+	return json.Marshal(p.string)
+}
+
+//UnmarshalJSON custom unmarshaller for transportLayerProtocol
+func (t *transportLayerProtocol) UnmarshalJSON(b []byte) error {
+	var str string
+	if err := json.Unmarshal(b, &str); err != nil {
+		return err
+	}
+	*t = transportLayerProtocol{str}
+	return nil
+}
