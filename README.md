@@ -79,7 +79,7 @@ $ make testacc TEST=./gridscale/ TESTARGS='-run=TestAccResourceGridscaleLoadBala
 Available Features
 ---------------------------
 
-| | |
+| Feature | Availability |
 |---|:---:|
 | Server (CRUD) | :heavy_check_mark: |  
 | Server dependency (Link/Unlink) | :heavy_check_mark: |  
