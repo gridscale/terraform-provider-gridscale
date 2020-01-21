@@ -76,6 +76,30 @@ In order to run a specific Acceptance test.
 $ make testacc TEST=./gridscale/ TESTARGS='-run=TestAccResourceGridscaleLoadBalancerBasic'
 ```
 
+Available Features
+---------------------------
+
+| | | | |
+|---|:---:|:---:|:---:|
+| Server (CRUD) | :heavy_check_mark: |
+| Server dependency (Link/Unlink) | :heavy_check_mark: |
+| Loadbalancer (CRUD) | :heavy_check_mark: |
+| PaaS (CRUD) | :heavy_check_mark: |
+| Storage (CRUD) | :heavy_check_mark: |
+| Object Storage (CRUD) | :heavy_check_mark: |
+| IP address (CRUD) | :heavy_check_mark: |
+| Network (CRUD) | :heavy_check_mark: |
+| Security zone (PaaS) (CRUD) | :heavy_check_mark: |
+| Firewall (CRUD) | :heavy_check_mark: |
+| SSH key (CRUD) | :heavy_check_mark: |
+| ISO Image (CRUD) | :heavy_check_mark: |
+| Snapshot (CRUD) | :heavy_check_mark: |
+| Snapshot rollback | :heavy_check_mark: |
+| Snapshot to S3 | :x: |
+| Snapshot schedule (CRUD) | :heavy_check_mark: |
+| Template (CRUD) | :heavy_check_mark: |
+| Multiple project support | :x: |
+
 Known Issues
 ---------------------------
 
