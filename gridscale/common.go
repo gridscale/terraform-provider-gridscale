@@ -17,7 +17,7 @@ var supportedPrimTypes = []string{boolInterfaceType, intInterfaceType, floatInte
 
 //convSOStrings converts slice of interfaces to slice of strings
 func convSOStrings(interfaceList []interface{}) []string {
-	var labels []string
+	labels := make([]string, 0)
 	for _, labelInterface := range interfaceList {
 		labels = append(labels, labelInterface.(string))
 	}
