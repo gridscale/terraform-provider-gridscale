@@ -5,6 +5,7 @@ import (
 	"github.com/gridscale/gsclient-go"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
+	"net/http"
 )
 
 func resourceGridscaleISOImage() *schema.Resource {
@@ -261,7 +262,16 @@ func resourceGridscaleISOImageDelete(d *schema.ResourceData, meta interface{}) e
 	for _, server := range isoimage.Properties.Relations.Servers {
 		err = client.UnlinkIsoImage(emptyCtx, server.ObjectUUID, d.Id())
 		if err != nil {
-			return fmt.Errorf("%s error: %v", errorPrefix, err)
+			//If error is an instance of `gsclient.RequestError`
+			if requestError, ok := err.(gsclient.RequestError); ok {
+				//If 404 or 409, that means the server is already deleted
+				//=> the relation between ISO image and server is already deleted
+				if requestError.StatusCode != http.StatusNotFound && requestError.StatusCode != http.StatusConflict {
+					return fmt.Errorf("%s error: %v", errorPrefix, err)
+				}
+			} else {
+				return fmt.Errorf("%s error: %v", errorPrefix, err)
+			}
 		}
 	}
 	err = client.DeleteISOImage(emptyCtx, d.Id())
