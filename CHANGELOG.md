@@ -1,4 +1,21 @@
-## 1.4.1 (Unreleased)
+## 1.5.0 (Unreleased)
+
+FEATURES:
+
+* Support all available gridscale's resources
+* Better documentation
+* Server CRUD is faster
+
+IMPROVEMENTS:
+
+* Switch to gsclient-go v2.2.1 from github (better connection error handling)
+* Handle all errors when setting values
+* Robust error reporting
+* Fix bugs caused by:
+    * Missing properties
+    * Type mismatch
+    * Weak error handling
+
 ## 1.4.0 (October 31, 2019)
 
 FEATURES:
