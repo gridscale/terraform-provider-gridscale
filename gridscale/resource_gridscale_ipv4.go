@@ -111,6 +111,7 @@ func resourceGridscaleIpv4() *schema.Resource {
 
 func resourceGridscaleIpRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
+	errorPrefix := fmt.Sprintf("read IP (%s) resource -", d.Id())
 	ip, err := client.GetIP(emptyCtx, d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
@@ -119,54 +120,54 @@ func resourceGridscaleIpRead(d *schema.ResourceData, meta interface{}) error {
 				return nil
 			}
 		}
-		return err
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
 	if err = d.Set("ip", ip.Properties.IP); err != nil {
-		return fmt.Errorf("error setting ip: %v", err)
+		return fmt.Errorf("%s error setting ip: %v", errorPrefix, err)
 	}
 	if err = d.Set("prefix", ip.Properties.Prefix); err != nil {
-		return fmt.Errorf("error setting prefix: %v", err)
+		return fmt.Errorf("%s error setting prefix: %v", errorPrefix, err)
 	}
 	if err = d.Set("location_uuid", ip.Properties.LocationUUID); err != nil {
-		return fmt.Errorf("error setting location_uuid: %v", err)
+		return fmt.Errorf("%s error setting location_uuid: %v", errorPrefix, err)
 	}
 	if err = d.Set("failover", ip.Properties.Failover); err != nil {
-		return fmt.Errorf("error setting failover: %v", err)
+		return fmt.Errorf("%s error setting failover: %v", errorPrefix, err)
 	}
 	if err = d.Set("status", ip.Properties.Status); err != nil {
-		return fmt.Errorf("error setting status: %v", err)
+		return fmt.Errorf("%s error setting status: %v", errorPrefix, err)
 	}
 	if err = d.Set("reverse_dns", ip.Properties.ReverseDNS); err != nil {
-		return fmt.Errorf("error setting reverse_dns: %v", err)
+		return fmt.Errorf("%s error setting reverse_dns: %v", errorPrefix, err)
 	}
 	if err = d.Set("location_country", ip.Properties.LocationCountry); err != nil {
-		return fmt.Errorf("error setting location_country: %v", err)
+		return fmt.Errorf("%s error setting location_country: %v", errorPrefix, err)
 	}
 	if err = d.Set("location_iata", ip.Properties.LocationIata); err != nil {
-		return fmt.Errorf("error setting location_iata: %v", err)
+		return fmt.Errorf("%s error setting location_iata: %v", errorPrefix, err)
 	}
 	if err = d.Set("location_name", ip.Properties.LocationName); err != nil {
-		return fmt.Errorf("error setting location_name: %v", err)
+		return fmt.Errorf("%s error setting location_name: %v", errorPrefix, err)
 	}
 	if err = d.Set("create_time", ip.Properties.CreateTime.String()); err != nil {
-		return fmt.Errorf("error setting create_time: %v", err)
+		return fmt.Errorf("%s error setting create_time: %v", errorPrefix, err)
 	}
 	if err = d.Set("change_time", ip.Properties.ChangeTime.String()); err != nil {
-		return fmt.Errorf("error setting change_time: %v", err)
+		return fmt.Errorf("%s error setting change_time: %v", errorPrefix, err)
 	}
 	if err = d.Set("delete_block", ip.Properties.DeleteBlock); err != nil {
-		return fmt.Errorf("error setting delete_block: %v", err)
+		return fmt.Errorf("%s error setting delete_block: %v", errorPrefix, err)
 	}
 	if err = d.Set("usage_in_minutes", ip.Properties.UsagesInMinutes); err != nil {
-		return fmt.Errorf("error setting usage_in_minutes: %v", err)
+		return fmt.Errorf("%s error setting usage_in_minutes: %v", errorPrefix, err)
 	}
 	if err = d.Set("current_price", ip.Properties.CurrentPrice); err != nil {
-		return fmt.Errorf("error setting current_price: %v", err)
+		return fmt.Errorf("%s error setting current_price: %v", errorPrefix, err)
 	}
 
 	if err = d.Set("labels", ip.Properties.Labels); err != nil {
-		return fmt.Errorf("error setting labels: %v", err)
+		return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
 	}
 
 	return nil
@@ -174,6 +175,7 @@ func resourceGridscaleIpRead(d *schema.ResourceData, meta interface{}) error {
 
 func resourceGridscaleIpUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
+	errorPrefix := fmt.Sprintf("update IP (%s) resource -", d.Id())
 
 	requestBody := gsclient.IPUpdateRequest{
 		Name:       d.Get("name").(string),
@@ -184,7 +186,7 @@ func resourceGridscaleIpUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	err := client.UpdateIP(emptyCtx, d.Id(), requestBody)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
 	return resourceGridscaleIpRead(d, meta)
@@ -215,23 +217,29 @@ func resourceGridscaleIpv4Create(d *schema.ResourceData, meta interface{}) error
 
 func resourceGridscaleIpDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
+	errorPrefix := fmt.Sprintf("delete IP (%s) resource -", d.Id())
+
 	ip, err := client.GetIP(emptyCtx, d.Id())
 	if err != nil {
-		return err
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 	//Stop the server relating to this IP address if there is one
 	//ip server relation is 1-1 relation
 	if len(ip.Properties.Relations.Servers) == 1 {
 		server := ip.Properties.Relations.Servers[0]
-		deleteIPAction := func(ctx context.Context) error {
+		unlinkIPAction := func(ctx context.Context) error {
 			err := client.UnlinkIP(ctx, server.ServerUUID, d.Id())
 			return err
 		}
 		//DeleteIP requires the server to be off
-		err = globalServerStatusList.runActionRequireServerOff(emptyCtx, client, server.ServerUUID, false, deleteIPAction)
+		err = globalServerStatusList.runActionRequireServerOff(emptyCtx, client, server.ServerUUID, false, unlinkIPAction)
 		if err != nil {
-			return err
+			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
 	}
-	return client.DeleteIP(emptyCtx, d.Id())
+	err = client.DeleteIP(emptyCtx, d.Id())
+	if err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
+	}
+	return nil
 }

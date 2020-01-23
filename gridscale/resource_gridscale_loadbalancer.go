@@ -159,6 +159,7 @@ func resourceGridscaleLoadBalancerCreate(d *schema.ResourceData, meta interface{
 
 func resourceGridscaleLoadBalancerRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
+	errorPrefix := fmt.Sprintf("read loadbalancer (%s) resource -", d.Id())
 	loadbalancer, err := client.GetLoadBalancer(emptyCtx, d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
@@ -167,41 +168,41 @@ func resourceGridscaleLoadBalancerRead(d *schema.ResourceData, meta interface{})
 				return nil
 			}
 		}
-		return err
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
 	if err = d.Set("name", loadbalancer.Properties.Name); err != nil {
-		return fmt.Errorf("error setting name: %v", err)
+		return fmt.Errorf("%s error setting name: %v", errorPrefix, err)
 	}
 	if err = d.Set("algorithm", loadbalancer.Properties.Algorithm); err != nil {
-		return fmt.Errorf("error setting algorithm: %v", err)
+		return fmt.Errorf("%s error setting algorithm: %v", errorPrefix, err)
 	}
 	if err = d.Set("location_uuid", loadbalancer.Properties.LocationUUID); err != nil {
-		return fmt.Errorf("error setting location_uuid: %v", err)
+		return fmt.Errorf("%s error setting location_uuid: %v", errorPrefix, err)
 	}
 	if err = d.Set("status", loadbalancer.Properties.Status); err != nil {
-		return fmt.Errorf("error setting status: %v", err)
+		return fmt.Errorf("%s error setting status: %v", errorPrefix, err)
 	}
 	if err = d.Set("redirect_http_to_https", loadbalancer.Properties.RedirectHTTPToHTTPS); err != nil {
-		return fmt.Errorf("error setting redirect_http_to_https: %v", err)
+		return fmt.Errorf("%s error setting redirect_http_to_https: %v", errorPrefix, err)
 	}
 	if err = d.Set("listen_ipv4_uuid", loadbalancer.Properties.ListenIPv4UUID); err != nil {
-		return fmt.Errorf("error setting listen_ipv4_uuid: %v", err)
+		return fmt.Errorf("%s error setting listen_ipv4_uuid: %v", errorPrefix, err)
 	}
 	if err = d.Set("listen_ipv6_uuid", loadbalancer.Properties.ListenIPv6UUID); err != nil {
-		return fmt.Errorf("error setting listen_ipv6_uuid: %v", err)
+		return fmt.Errorf("%s error setting listen_ipv6_uuid: %v", errorPrefix, err)
 	}
 
 	if err = d.Set("forwarding_rule", flattenLoadbalancerForwardingRules(loadbalancer.Properties.ForwardingRules)); err != nil {
-		return fmt.Errorf("error setting forwarding_rule: %v", err)
+		return fmt.Errorf("%s error setting forwarding_rule: %v", errorPrefix, err)
 	}
 
 	if err = d.Set("backend_server", flattenLoadbalancerBackendServers(loadbalancer.Properties.BackendServers)); err != nil {
-		return fmt.Errorf("error setting backend_server: %v", err)
+		return fmt.Errorf("%s error setting backend_server: %v", errorPrefix, err)
 	}
 
 	if err = d.Set("labels", loadbalancer.Properties.Labels); err != nil {
-		return fmt.Errorf("error setting labels: %v", err)
+		return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
 	}
 
 	return nil
@@ -209,6 +210,7 @@ func resourceGridscaleLoadBalancerRead(d *schema.ResourceData, meta interface{})
 
 func resourceGridscaleLoadBalancerUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
+	errorPrefix := fmt.Sprintf("update loadbalancer (%s) resource -", d.Id())
 	requestBody := gsclient.LoadBalancerUpdateRequest{
 		Name:                d.Get("name").(string),
 		RedirectHTTPToHTTPS: d.Get("redirect_http_to_https").(bool),
@@ -230,18 +232,21 @@ func resourceGridscaleLoadBalancerUpdate(d *schema.ResourceData, meta interface{
 		requestBody.ForwardingRules = expandLoadbalancerForwardingRules(forwardingRules)
 	}
 	err := client.UpdateLoadBalancer(emptyCtx, d.Id(), requestBody)
-
 	if err != nil {
-		return fmt.Errorf(
-			"Error waiting for loadbalancer (%s) to be updated: %s", requestBody.Name, err)
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
+
 	}
 	return resourceGridscaleLoadBalancerRead(d, meta)
 }
 
 func resourceGridscaleLoadBalancerDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	id := d.Id()
-	return client.DeleteLoadBalancer(emptyCtx, id)
+	errorPrefix := fmt.Sprintf("delete loadbalancer (%s) resource-", d.Id())
+	err := client.DeleteLoadBalancer(emptyCtx, d.Id())
+	if err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
+	}
+	return nil
 }
 
 func expandLoadbalancerBackendServers(backendServers interface{}) []gsclient.BackendServer {

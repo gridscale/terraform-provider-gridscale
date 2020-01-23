@@ -3,12 +3,12 @@ layout: "gridscale"
 page_title: "gridscale: network"
 sidebar_current: "docs-gridscale-datasource-network"
 description: |-
-  Gets the id of a network.
+  Get the data of a network.
 ---
 
 # gridscale_network
 
-Get the id of a network resource. This can be used to link networks to a server.
+Get data of a network resource. This can be used to link networks to a server.
 
 ## Example Usage
 
@@ -29,6 +29,12 @@ resource "gridscale_server" "servername"{
 	}
 }
 ```
+
+## Argument Reference
+
+The following arguments are supported:
+
+* `resource_id` - (Required) The UUID of the network.
 
 ## Attributes Reference
 

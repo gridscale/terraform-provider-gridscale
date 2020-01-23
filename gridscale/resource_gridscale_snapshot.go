@@ -121,6 +121,7 @@ the product_no of the license (see the /prices endpoint for more details)`,
 
 func resourceGridscaleSnapshotRead(d *schema.ResourceData, meta interface{}) error {
 	storageUuid := d.Get("storage_uuid").(string)
+	errorPrefix := fmt.Sprintf("read snapshot (%s) resource of storage (%s)-", d.Id(), storageUuid)
 	client := meta.(*gsclient.Client)
 	snapshot, err := client.GetStorageSnapshot(emptyCtx, storageUuid, d.Id())
 	if err != nil {
@@ -130,48 +131,48 @@ func resourceGridscaleSnapshotRead(d *schema.ResourceData, meta interface{}) err
 				return nil
 			}
 		}
-		return err
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 	props := snapshot.Properties
 	if err = d.Set("name", props.Name); err != nil {
-		return fmt.Errorf("error setting name: %v", err)
+		return fmt.Errorf("%s error setting name: %v", errorPrefix, err)
 	}
 	if err = d.Set("status", props.Status); err != nil {
-		return fmt.Errorf("error setting status: %v", err)
+		return fmt.Errorf("%s error setting status: %v", errorPrefix, err)
 	}
 	if err = d.Set("location_country", props.LocationCountry); err != nil {
-		return fmt.Errorf("error setting location_country: %v", err)
+		return fmt.Errorf("%s error setting location_country: %v", errorPrefix, err)
 	}
 	if err = d.Set("location_name", props.LocationName); err != nil {
-		return fmt.Errorf("error setting location_name: %v", err)
+		return fmt.Errorf("%s error setting location_name: %v", errorPrefix, err)
 	}
 	if err = d.Set("location_iata", props.LocationIata); err != nil {
-		return fmt.Errorf("error setting location_iata: %v", err)
+		return fmt.Errorf("%s error setting location_iata: %v", errorPrefix, err)
 	}
 	if err = d.Set("location_uuid", props.LocationUUID); err != nil {
-		return fmt.Errorf("error setting location_uuid: %v", err)
+		return fmt.Errorf("%s error setting location_uuid: %v", errorPrefix, err)
 	}
 	if err = d.Set("usage_in_minutes", props.UsageInMinutes); err != nil {
-		return fmt.Errorf("error setting usage_in_minutes: %v", err)
+		return fmt.Errorf("%s error setting usage_in_minutes: %v", errorPrefix, err)
 	}
 	if err = d.Set("create_time", props.CreateTime.String()); err != nil {
-		return fmt.Errorf("error setting create_time: %v", err)
+		return fmt.Errorf("%s error setting create_time: %v", errorPrefix, err)
 	}
 	if err = d.Set("change_time", props.ChangeTime.String()); err != nil {
-		return fmt.Errorf("error setting change_time: %v", err)
+		return fmt.Errorf("%s error setting change_time: %v", errorPrefix, err)
 	}
 	if err = d.Set("license_product_no", props.LicenseProductNo); err != nil {
-		return fmt.Errorf("error setting license_product_no: %v", err)
+		return fmt.Errorf("%s error setting license_product_no: %v", errorPrefix, err)
 	}
 	if err = d.Set("current_price", props.CurrentPrice); err != nil {
-		return fmt.Errorf("error setting current_price: %v", err)
+		return fmt.Errorf("%s error setting current_price: %v", errorPrefix, err)
 	}
 	if err = d.Set("capacity", props.Capacity); err != nil {
-		return fmt.Errorf("error setting capacity: %v", err)
+		return fmt.Errorf("%s error setting capacity: %v", errorPrefix, err)
 	}
 	//Set labels
 	if err = d.Set("labels", props.Labels); err != nil {
-		return fmt.Errorf("error setting labels: %v", err)
+		return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
 	}
 	return nil
 }
@@ -187,6 +188,8 @@ func resourceGridscaleSnapshotCreate(d *schema.ResourceData, meta interface{}) e
 	if err != nil {
 		return err
 	}
+	errorPrefix := fmt.Sprintf("rollback storage (%s) snapshot (%s) -", storageUUID, response.ObjectUUID)
+
 	//Start rolling back if there are initially requests to rollback
 	if attr, ok := d.GetOk("rollback"); ok {
 		requests := make([]interface{}, 0)
@@ -215,7 +218,7 @@ func resourceGridscaleSnapshotCreate(d *schema.ResourceData, meta interface{}) e
 		}
 		//Apply value back to schema
 		if err = d.Set("rollback", requests); err != nil {
-			return fmt.Errorf("error setting rollback: %v", err)
+			return fmt.Errorf("%s error setting rollback: %v", errorPrefix, err)
 		}
 	}
 	d.SetId(response.ObjectUUID)
@@ -230,9 +233,10 @@ func resourceGridscaleSnapshotUpdate(d *schema.ResourceData, meta interface{}) e
 		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 	storageUUID := d.Get("storage_uuid").(string)
+	errorPrefix := fmt.Sprintf("update snapshot (%s) resource of storage (%s) -", d.Id(), storageUUID)
 	err := client.UpdateStorageSnapshot(emptyCtx, storageUUID, d.Id(), requestBody)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 	//Start rolling back if there are new requests to rollback
 	if attr, ok := d.GetOk("rollback"); ok {
@@ -265,7 +269,7 @@ func resourceGridscaleSnapshotUpdate(d *schema.ResourceData, meta interface{}) e
 		}
 		//Apply value back to schema
 		if err = d.Set("rollback", requests); err != nil {
-			return fmt.Errorf("error setting rollback: %v", err)
+			return fmt.Errorf("%s error setting rollback: %v", errorPrefix, err)
 		}
 	}
 	return resourceGridscaleSnapshotRead(d, meta)
@@ -273,5 +277,11 @@ func resourceGridscaleSnapshotUpdate(d *schema.ResourceData, meta interface{}) e
 
 func resourceGridscaleSnapshotDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	return client.DeleteStorageSnapshot(emptyCtx, d.Get("storage_uuid").(string), d.Id())
+	storageUUID := d.Get("storage_uuid").(string)
+	errorPrefix := fmt.Sprintf("delete snapshot (%s) resource of storage (%s) -", d.Id(), storageUUID)
+	err := client.DeleteStorageSnapshot(emptyCtx, storageUUID, d.Id())
+	if err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
+	}
+	return nil
 }

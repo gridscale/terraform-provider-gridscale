@@ -245,120 +245,122 @@ func dataSourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) err
 	client := meta.(*gsclient.Client)
 
 	id := d.Get("resource_id").(string)
+	errorPrefix := fmt.Sprintf("read server (%s) datasource-", id)
 
 	server, err := client.GetServer(emptyCtx, id)
+	if err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
+	}
 
-	if err == nil {
-		props := server.Properties
-		d.SetId(props.ObjectUUID)
+	props := server.Properties
+	d.SetId(props.ObjectUUID)
 
-		if err = d.Set("name", server.Properties.Name); err != nil {
-			return fmt.Errorf("error setting name: %v", err)
-		}
-		if err = d.Set("memory", server.Properties.Memory); err != nil {
-			return fmt.Errorf("error setting memory: %v", err)
-		}
-		if err = d.Set("cores", server.Properties.Cores); err != nil {
-			return fmt.Errorf("error setting cores: %v", err)
-		}
-		if err = d.Set("hardware_profile", server.Properties.HardwareProfile); err != nil {
-			return fmt.Errorf("error setting hardware_profile: %v", err)
-		}
-		if err = d.Set("location_uuid", server.Properties.LocationUUID); err != nil {
-			return fmt.Errorf("error setting location_uuid: %v", err)
-		}
-		if err = d.Set("power", server.Properties.Power); err != nil {
-			return fmt.Errorf("error setting power: %v", err)
-		}
-		if err = d.Set("status", server.Properties.Status); err != nil {
-			return fmt.Errorf("error setting status: %v", err)
-		}
-		if err = d.Set("create_time", server.Properties.CreateTime.String()); err != nil {
-			return fmt.Errorf("error setting create_time: %v", err)
-		}
-		if err = d.Set("change_time", server.Properties.ChangeTime.String()); err != nil {
-			return fmt.Errorf("error setting change_time: %v", err)
-		}
-		if err = d.Set("current_price", server.Properties.CurrentPrice); err != nil {
-			return fmt.Errorf("error setting current_price: %v", err)
-		}
-		if err = d.Set("availability_zone", server.Properties.AvailabilityZone); err != nil {
-			return fmt.Errorf("error setting availability_zone: %v", err)
-		}
-		if err = d.Set("auto_recovery", server.Properties.AutoRecovery); err != nil {
-			return fmt.Errorf("error setting auto_recovery: %v", err)
-		}
-		if err = d.Set("console_token", server.Properties.ConsoleToken); err != nil {
-			return fmt.Errorf("error setting console_token: %v", err)
-		}
-		if err = d.Set("legacy", server.Properties.Legacy); err != nil {
-			return fmt.Errorf("error setting legacy: %v", err)
-		}
-		if err = d.Set("usage_in_minutes_memory", server.Properties.UsageInMinutesMemory); err != nil {
-			return fmt.Errorf("error setting usage_in_minutes_memory: %v", err)
-		}
-		if err = d.Set("usage_in_minutes_cores", server.Properties.UsageInMinutesCores); err != nil {
-			return fmt.Errorf("error setting usage_in_minutes_cores: %v", err)
-		}
+	if err = d.Set("name", server.Properties.Name); err != nil {
+		return fmt.Errorf("%s error setting name: %v", errorPrefix, err)
+	}
+	if err = d.Set("memory", server.Properties.Memory); err != nil {
+		return fmt.Errorf("%s error setting memory: %v", errorPrefix, err)
+	}
+	if err = d.Set("cores", server.Properties.Cores); err != nil {
+		return fmt.Errorf("%s error setting cores: %v", errorPrefix, err)
+	}
+	if err = d.Set("hardware_profile", server.Properties.HardwareProfile); err != nil {
+		return fmt.Errorf("%s error setting hardware_profile: %v", errorPrefix, err)
+	}
+	if err = d.Set("location_uuid", server.Properties.LocationUUID); err != nil {
+		return fmt.Errorf("%s error setting location_uuid: %v", errorPrefix, err)
+	}
+	if err = d.Set("power", server.Properties.Power); err != nil {
+		return fmt.Errorf("%s error setting power: %v", errorPrefix, err)
+	}
+	if err = d.Set("status", server.Properties.Status); err != nil {
+		return fmt.Errorf("%s error setting status: %v", errorPrefix, err)
+	}
+	if err = d.Set("create_time", server.Properties.CreateTime.String()); err != nil {
+		return fmt.Errorf("%s error setting create_time: %v", errorPrefix, err)
+	}
+	if err = d.Set("change_time", server.Properties.ChangeTime.String()); err != nil {
+		return fmt.Errorf("%s error setting change_time: %v", errorPrefix, err)
+	}
+	if err = d.Set("current_price", server.Properties.CurrentPrice); err != nil {
+		return fmt.Errorf("%s error setting current_price: %v", errorPrefix, err)
+	}
+	if err = d.Set("availability_zone", server.Properties.AvailabilityZone); err != nil {
+		return fmt.Errorf("%s error setting availability_zone: %v", errorPrefix, err)
+	}
+	if err = d.Set("auto_recovery", server.Properties.AutoRecovery); err != nil {
+		return fmt.Errorf("%s error setting auto_recovery: %v", errorPrefix, err)
+	}
+	if err = d.Set("console_token", server.Properties.ConsoleToken); err != nil {
+		return fmt.Errorf("%s error setting console_token: %v", errorPrefix, err)
+	}
+	if err = d.Set("legacy", server.Properties.Legacy); err != nil {
+		return fmt.Errorf("%s error setting legacy: %v", errorPrefix, err)
+	}
+	if err = d.Set("usage_in_minutes_memory", server.Properties.UsageInMinutesMemory); err != nil {
+		return fmt.Errorf("%s error setting usage_in_minutes_memory: %v", errorPrefix, err)
+	}
+	if err = d.Set("usage_in_minutes_cores", server.Properties.UsageInMinutesCores); err != nil {
+		return fmt.Errorf("%s error setting usage_in_minutes_cores: %v", errorPrefix, err)
+	}
 
-		if err = d.Set("labels", server.Properties.Labels); err != nil {
-			return fmt.Errorf("error setting labels: %v", err)
-		}
+	if err = d.Set("labels", server.Properties.Labels); err != nil {
+		return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
+	}
 
-		//Get storages
-		storages := make([]interface{}, 0)
-		for _, value := range server.Properties.Relations.Storages {
-			storage := map[string]interface{}{
-				"object_uuid":        value.ObjectUUID,
-				"bootdevice":         value.BootDevice,
-				"create_time":        value.CreateTime.String(),
-				"controller":         value.Controller,
-				"target":             value.Target,
-				"lun":                value.Lun,
-				"license_product_no": value.LicenseProductNo,
-				"bus":                value.Bus,
-				"object_name":        value.ObjectName,
-				"storage_type":       value.StorageType,
-				"last_used_template": value.LastUsedTemplate,
-				"capacity":           value.Capacity,
-			}
-			storages = append(storages, storage)
+	//Get storages
+	storages := make([]interface{}, 0)
+	for _, value := range server.Properties.Relations.Storages {
+		storage := map[string]interface{}{
+			"object_uuid":        value.ObjectUUID,
+			"bootdevice":         value.BootDevice,
+			"create_time":        value.CreateTime.String(),
+			"controller":         value.Controller,
+			"target":             value.Target,
+			"lun":                value.Lun,
+			"license_product_no": value.LicenseProductNo,
+			"bus":                value.Bus,
+			"object_name":        value.ObjectName,
+			"storage_type":       value.StorageType,
+			"last_used_template": value.LastUsedTemplate,
+			"capacity":           value.Capacity,
 		}
+		storages = append(storages, storage)
+	}
 
-		//Get networks
-		networks := readServerNetworkRels(server.Properties.Relations.Networks)
-		if err = d.Set("network", networks); err != nil {
-			return fmt.Errorf("error setting network: %v", err)
-		}
+	//Get networks
+	networks := readServerNetworkRels(server.Properties.Relations.Networks)
+	if err = d.Set("network", networks); err != nil {
+		return fmt.Errorf("%s error setting network: %v", errorPrefix, err)
+	}
 
-		//Get IP addresses
-		var ipv4, ipv6 string
-		for _, ip := range server.Properties.Relations.PublicIPs {
-			if ip.Family == 4 {
-				ipv4 = ip.ObjectUUID
-			}
-			if ip.Family == 6 {
-				ipv6 = ip.ObjectUUID
-			}
+	//Get IP addresses
+	var ipv4, ipv6 string
+	for _, ip := range server.Properties.Relations.PublicIPs {
+		if ip.Family == 4 {
+			ipv4 = ip.ObjectUUID
 		}
-		if err = d.Set("ipv4", ipv4); err != nil {
-			return fmt.Errorf("error setting ipv4: %v", err)
+		if ip.Family == 6 {
+			ipv6 = ip.ObjectUUID
 		}
-		if err = d.Set("ipv6", ipv6); err != nil {
-			return fmt.Errorf("error setting ipv6: %v", err)
-		}
+	}
+	if err = d.Set("ipv4", ipv4); err != nil {
+		return fmt.Errorf("%s error setting ipv4: %v", errorPrefix, err)
+	}
+	if err = d.Set("ipv6", ipv6); err != nil {
+		return fmt.Errorf("%s error setting ipv6: %v", errorPrefix, err)
+	}
 
-		//Get the ISO image, there can only be one attached to a server but it is in a list anyway
-		for _, isoimage := range server.Properties.Relations.IsoImages {
-			if err = d.Set("isoimage", isoimage.ObjectUUID); err != nil {
-				return fmt.Errorf("error setting isoimage: %v", err)
-			}
-		}
-
-		if err = d.Set("labels", props.Labels); err != nil {
-			return fmt.Errorf("error setting labels: %v", err)
+	//Get the ISO image, there can only be one attached to a server but it is in a list anyway
+	for _, isoimage := range server.Properties.Relations.IsoImages {
+		if err = d.Set("isoimage", isoimage.ObjectUUID); err != nil {
+			return fmt.Errorf("%s error setting isoimage: %v", errorPrefix, err)
 		}
 	}
 
-	return err
+	if err = d.Set("labels", props.Labels); err != nil {
+		return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
+	}
+
+	return nil
 }

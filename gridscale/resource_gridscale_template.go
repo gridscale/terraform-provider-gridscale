@@ -120,6 +120,7 @@ func resourceGridscaleTemplate() *schema.Resource {
 
 func resourceGridscaleTemplateRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
+	errorPrefix := fmt.Sprintf("read template (%s) resource -", d.Id())
 	template, err := client.GetTemplate(emptyCtx, d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
@@ -128,63 +129,63 @@ func resourceGridscaleTemplateRead(d *schema.ResourceData, meta interface{}) err
 				return nil
 			}
 		}
-		return err
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 	props := template.Properties
 	if err = d.Set("name", props.Name); err != nil {
-		return fmt.Errorf("error setting name: %v", err)
+		return fmt.Errorf("%s error setting name: %v", errorPrefix, err)
 	}
 	if err = d.Set("location_uuid", props.LocationUUID); err != nil {
-		return fmt.Errorf("error setting location_uuid: %v", err)
+		return fmt.Errorf("%s error setting location_uuid: %v", errorPrefix, err)
 	}
 	if err = d.Set("location_country", props.LocationCountry); err != nil {
-		return fmt.Errorf("error setting location_country: %v", err)
+		return fmt.Errorf("%s error setting location_country: %v", errorPrefix, err)
 	}
 	if err = d.Set("location_iata", props.LocationIata); err != nil {
-		return fmt.Errorf("error setting location_iata: %v", err)
+		return fmt.Errorf("%s error setting location_iata: %v", errorPrefix, err)
 	}
 	if err = d.Set("location_name", props.LocationName); err != nil {
-		return fmt.Errorf("error setting location_name: %v", err)
+		return fmt.Errorf("%s error setting location_name: %v", errorPrefix, err)
 	}
 	if err = d.Set("status", props.Status); err != nil {
-		return fmt.Errorf("error setting status: %v", err)
+		return fmt.Errorf("%s error setting status: %v", errorPrefix, err)
 	}
 	if err = d.Set("ostype", props.Ostype); err != nil {
-		return fmt.Errorf("error setting ostype: %v", err)
+		return fmt.Errorf("%s error setting ostype: %v", errorPrefix, err)
 	}
 	if err = d.Set("version", props.Version); err != nil {
-		return fmt.Errorf("error setting version: %v", err)
+		return fmt.Errorf("%s error setting version: %v", errorPrefix, err)
 	}
 	if err = d.Set("private", props.Private); err != nil {
-		return fmt.Errorf("error setting private: %v", err)
+		return fmt.Errorf("%s error setting private: %v", errorPrefix, err)
 	}
 	if err = d.Set("license_product_no", props.LicenseProductNo); err != nil {
-		return fmt.Errorf("error setting license_product_no: %v", err)
+		return fmt.Errorf("%s error setting license_product_no: %v", errorPrefix, err)
 	}
 	if err = d.Set("create_time", props.CreateTime.String()); err != nil {
-		return fmt.Errorf("error setting create_time: %v", err)
+		return fmt.Errorf("%s error setting create_time: %v", errorPrefix, err)
 	}
 	if err = d.Set("change_time", props.ChangeTime.String()); err != nil {
-		return fmt.Errorf("error setting change_time: %v", err)
+		return fmt.Errorf("%s error setting change_time: %v", errorPrefix, err)
 	}
 	if err = d.Set("distro", props.Distro); err != nil {
-		return fmt.Errorf("error setting distro: %v", err)
+		return fmt.Errorf("%s error setting distro: %v", errorPrefix, err)
 	}
 	if err = d.Set("description", props.Description); err != nil {
-		return fmt.Errorf("error setting description: %v", err)
+		return fmt.Errorf("%s error setting description: %v", errorPrefix, err)
 	}
 	if err = d.Set("usage_in_minutes", props.UsageInMinutes); err != nil {
-		return fmt.Errorf("error setting usage_in_minutes: %v", err)
+		return fmt.Errorf("%s error setting usage_in_minutes: %v", errorPrefix, err)
 	}
 	if err = d.Set("capacity", props.Capacity); err != nil {
-		return fmt.Errorf("error setting capacity: %v", err)
+		return fmt.Errorf("%s error setting capacity: %v", errorPrefix, err)
 	}
 	if err = d.Set("current_price", props.CurrentPrice); err != nil {
-		return fmt.Errorf("error setting current_price: %v", err)
+		return fmt.Errorf("%s error setting current_price: %v", errorPrefix, err)
 	}
 
 	if err = d.Set("labels", props.Labels); err != nil {
-		return fmt.Errorf("error setting labels: %v", err)
+		return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
 	}
 
 	return nil
@@ -213,7 +214,7 @@ func resourceGridscaleTemplateCreate(d *schema.ResourceData, meta interface{}) e
 
 func resourceGridscaleTemplateUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-
+	errorPrefix := fmt.Sprintf("update template (%s) resource -", d.Id())
 	requestBody := gsclient.TemplateUpdateRequest{
 		Name:   d.Get("name").(string),
 		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
@@ -221,7 +222,7 @@ func resourceGridscaleTemplateUpdate(d *schema.ResourceData, meta interface{}) e
 
 	err := client.UpdateTemplate(emptyCtx, d.Id(), requestBody)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
 	return resourceGridscaleTemplateRead(d, meta)
@@ -229,5 +230,10 @@ func resourceGridscaleTemplateUpdate(d *schema.ResourceData, meta interface{}) e
 
 func resourceGridscaleTemplateDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	return client.DeleteTemplate(emptyCtx, d.Id())
+	errorPrefix := fmt.Sprintf("delete template (%s) resource -", d.Id())
+	err := client.DeleteTemplate(emptyCtx, d.Id())
+	if err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
+	}
+	return nil
 }

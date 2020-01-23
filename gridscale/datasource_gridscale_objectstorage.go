@@ -35,18 +35,20 @@ func dataSourceGridscaleObjectStorageRead(d *schema.ResourceData, meta interface
 	client := meta.(*gsclient.Client)
 
 	id := d.Get("resource_id").(string)
+	errorPrefix := fmt.Sprintf("read object storage (%s) datasource-", id)
 
 	objectStorage, err := client.GetObjectStorageAccessKey(emptyCtx, id)
-
-	if err == nil {
-		d.SetId(objectStorage.Properties.AccessKey)
-		if err = d.Set("access_key", objectStorage.Properties.AccessKey); err != nil {
-			return fmt.Errorf("error setting access_key: %v", err)
-		}
-		if err = d.Set("secret_key", objectStorage.Properties.SecretKey); err != nil {
-			return fmt.Errorf("error setting access_key: %v", err)
-		}
+	if err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
-	return err
+	d.SetId(objectStorage.Properties.AccessKey)
+	if err = d.Set("access_key", objectStorage.Properties.AccessKey); err != nil {
+		return fmt.Errorf("%s error setting access_key: %v", errorPrefix, err)
+	}
+	if err = d.Set("secret_key", objectStorage.Properties.SecretKey); err != nil {
+		return fmt.Errorf("%s error setting access_key: %v", errorPrefix, err)
+	}
+
+	return nil
 }

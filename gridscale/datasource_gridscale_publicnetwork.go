@@ -79,47 +79,49 @@ func dataSourceGridscalePublicNetwork() *schema.Resource {
 
 func dataSourceGridscalePublicNetworkRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
+	errorPrefix := "read public network datasource -"
 	network, err := client.GetNetworkPublic(emptyCtx)
-
-	if err == nil {
-		d.SetId(network.Properties.ObjectUUID)
-		if err = d.Set("name", network.Properties.Name); err != nil {
-			return fmt.Errorf("error setting name: %v", err)
-		}
-		if err = d.Set("location_uuid", network.Properties.LocationUUID); err != nil {
-			return fmt.Errorf("error setting location_uuid: %v", err)
-		}
-		if err = d.Set("l2security", network.Properties.L2Security); err != nil {
-			return fmt.Errorf("error setting l2security: %v", err)
-		}
-		if err = d.Set("status", network.Properties.Status); err != nil {
-			return fmt.Errorf("error setting status: %v", err)
-		}
-		if err = d.Set("network_type", network.Properties.NetworkType); err != nil {
-			return fmt.Errorf("error setting network_type: %v", err)
-		}
-		if err = d.Set("location_country", network.Properties.LocationCountry); err != nil {
-			return fmt.Errorf("error setting location_country: %v", err)
-		}
-		if err = d.Set("location_iata", network.Properties.LocationIata); err != nil {
-			return fmt.Errorf("error setting location_iata: %v", err)
-		}
-		if err = d.Set("location_name", network.Properties.LocationName); err != nil {
-			return fmt.Errorf("error setting location_name: %v", err)
-		}
-		if err = d.Set("delete_block", network.Properties.DeleteBlock); err != nil {
-			return fmt.Errorf("error setting delete_block: %v", err)
-		}
-		if err = d.Set("create_time", network.Properties.CreateTime.String()); err != nil {
-			return fmt.Errorf("error setting create_time: %v", err)
-		}
-		if err = d.Set("change_time", network.Properties.ChangeTime.String()); err != nil {
-			return fmt.Errorf("error setting change_time: %v", err)
-		}
-		if err = d.Set("labels", network.Properties.Labels); err != nil {
-			return fmt.Errorf("error setting labels: %v", err)
-		}
+	if err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
-	return err
+	d.SetId(network.Properties.ObjectUUID)
+	if err = d.Set("name", network.Properties.Name); err != nil {
+		return fmt.Errorf("%s error setting name: %v", errorPrefix, err)
+	}
+	if err = d.Set("location_uuid", network.Properties.LocationUUID); err != nil {
+		return fmt.Errorf("%s error setting location_uuid: %v", errorPrefix, err)
+	}
+	if err = d.Set("l2security", network.Properties.L2Security); err != nil {
+		return fmt.Errorf("%s error setting l2security: %v", errorPrefix, err)
+	}
+	if err = d.Set("status", network.Properties.Status); err != nil {
+		return fmt.Errorf("%s error setting status: %v", errorPrefix, err)
+	}
+	if err = d.Set("network_type", network.Properties.NetworkType); err != nil {
+		return fmt.Errorf("%s error setting network_type: %v", errorPrefix, err)
+	}
+	if err = d.Set("location_country", network.Properties.LocationCountry); err != nil {
+		return fmt.Errorf("%s error setting location_country: %v", errorPrefix, err)
+	}
+	if err = d.Set("location_iata", network.Properties.LocationIata); err != nil {
+		return fmt.Errorf("%s error setting location_iata: %v", errorPrefix, err)
+	}
+	if err = d.Set("location_name", network.Properties.LocationName); err != nil {
+		return fmt.Errorf("%s error setting location_name: %v", errorPrefix, err)
+	}
+	if err = d.Set("delete_block", network.Properties.DeleteBlock); err != nil {
+		return fmt.Errorf("%s error setting delete_block: %v", errorPrefix, err)
+	}
+	if err = d.Set("create_time", network.Properties.CreateTime.String()); err != nil {
+		return fmt.Errorf("%s error setting create_time: %v", errorPrefix, err)
+	}
+	if err = d.Set("change_time", network.Properties.ChangeTime.String()); err != nil {
+		return fmt.Errorf("%s error setting change_time: %v", errorPrefix, err)
+	}
+	if err = d.Set("labels", network.Properties.Labels); err != nil {
+		return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
+	}
+
+	return nil
 }

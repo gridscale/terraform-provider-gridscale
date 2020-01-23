@@ -25,6 +25,12 @@ data "gridscale_paas" "foo" {
 }
 ```
 
+## Argument Reference
+
+The following arguments are supported:
+
+* `resource_id` - (Required) The UUID of the PaaS service.
+
 ## Attributes Reference
 
 The following attributes are exported:

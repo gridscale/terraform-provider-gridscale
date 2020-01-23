@@ -135,78 +135,78 @@ func dataSourceGridscaleISOImageRead(d *schema.ResourceData, meta interface{}) e
 	client := meta.(*gsclient.Client)
 
 	id := d.Get("resource_id").(string)
+	errorPrefix := fmt.Sprintf("read ISO-Image (%s) datasource -", id)
 
 	isoimage, err := client.GetISOImage(emptyCtx, id)
-
-	if err == nil {
-		props := isoimage.Properties
-		d.SetId(props.ObjectUUID)
-		if err = d.Set("name", props.Name); err != nil {
-			return fmt.Errorf("error setting name: %v", err)
-		}
-		if err = d.Set("source_url", props.SourceURL); err != nil {
-			return fmt.Errorf("error setting source_url: %v", err)
-		}
-		if err = d.Set("location_uuid", props.LocationUUID); err != nil {
-			return fmt.Errorf("error setting location_uuid: %v", err)
-		}
-		if err = d.Set("location_country", props.LocationCountry); err != nil {
-			return fmt.Errorf("error setting location_country: %v", err)
-		}
-		if err = d.Set("location_iata", props.LocationIata); err != nil {
-			return fmt.Errorf("error setting location_iata: %v", err)
-		}
-		if err = d.Set("location_name", props.LocationName); err != nil {
-			return fmt.Errorf("error setting location_name: %v", err)
-		}
-		if err = d.Set("status", props.Status); err != nil {
-			return fmt.Errorf("error setting status: %v", err)
-		}
-		if err = d.Set("version", props.Version); err != nil {
-			return fmt.Errorf("error setting version: %v", err)
-		}
-		if err = d.Set("private", props.Private); err != nil {
-			return fmt.Errorf("error setting private: %v", err)
-		}
-		if err = d.Set("create_time", props.CreateTime.String()); err != nil {
-			return fmt.Errorf("error setting create_time: %v", err)
-		}
-		if err = d.Set("change_time", props.ChangeTime.String()); err != nil {
-			return fmt.Errorf("error setting change_time: %v", err)
-		}
-		if err = d.Set("description", props.Description); err != nil {
-			return fmt.Errorf("error setting description: %v", err)
-		}
-		if err = d.Set("usage_in_minutes", props.UsageInMinutes); err != nil {
-			return fmt.Errorf("error setting usage_in_minutes: %v", err)
-		}
-		if err = d.Set("capacity", props.Capacity); err != nil {
-			return fmt.Errorf("error setting capacity: %v", err)
-		}
-		if err = d.Set("current_price", props.CurrentPrice); err != nil {
-			return fmt.Errorf("error setting current_price: %v", err)
-		}
-
-		servers := make([]interface{}, 0)
-		for _, value := range props.Relations.Servers {
-			server := map[string]interface{}{
-				"object_uuid": value.ObjectUUID,
-				"create_time": value.CreateTime.String(),
-				"object_name": value.ObjectName,
-				"bootdevice":  value.Bootdevice,
-			}
-			servers = append(servers, server)
-		}
-		if err = d.Set("server", servers); err != nil {
-			return fmt.Errorf("error setting server-rels: %v", err)
-		}
-
-		if err = d.Set("labels", props.Labels); err != nil {
-			return fmt.Errorf("error setting labels: %v", err)
-		}
-
-		log.Printf("Found ISO image with key: %v", props.ObjectUUID)
+	if err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
-	return err
+	props := isoimage.Properties
+	d.SetId(props.ObjectUUID)
+	if err = d.Set("name", props.Name); err != nil {
+		return fmt.Errorf("%s error setting name: %v", errorPrefix, err)
+	}
+	if err = d.Set("source_url", props.SourceURL); err != nil {
+		return fmt.Errorf("%s error setting source_url: %v", errorPrefix, err)
+	}
+	if err = d.Set("location_uuid", props.LocationUUID); err != nil {
+		return fmt.Errorf("%s error setting location_uuid: %v", errorPrefix, err)
+	}
+	if err = d.Set("location_country", props.LocationCountry); err != nil {
+		return fmt.Errorf("%s error setting location_country: %v", errorPrefix, err)
+	}
+	if err = d.Set("location_iata", props.LocationIata); err != nil {
+		return fmt.Errorf("%s error setting location_iata: %v", errorPrefix, err)
+	}
+	if err = d.Set("location_name", props.LocationName); err != nil {
+		return fmt.Errorf("%s error setting location_name: %v", errorPrefix, err)
+	}
+	if err = d.Set("status", props.Status); err != nil {
+		return fmt.Errorf("%s error setting status: %v", errorPrefix, err)
+	}
+	if err = d.Set("version", props.Version); err != nil {
+		return fmt.Errorf("%s error setting version: %v", errorPrefix, err)
+	}
+	if err = d.Set("private", props.Private); err != nil {
+		return fmt.Errorf("%s error setting private: %v", errorPrefix, err)
+	}
+	if err = d.Set("create_time", props.CreateTime.String()); err != nil {
+		return fmt.Errorf("%s error setting create_time: %v", errorPrefix, err)
+	}
+	if err = d.Set("change_time", props.ChangeTime.String()); err != nil {
+		return fmt.Errorf("%s error setting change_time: %v", errorPrefix, err)
+	}
+	if err = d.Set("description", props.Description); err != nil {
+		return fmt.Errorf("%s error setting description: %v", errorPrefix, err)
+	}
+	if err = d.Set("usage_in_minutes", props.UsageInMinutes); err != nil {
+		return fmt.Errorf("%s error setting usage_in_minutes: %v", errorPrefix, err)
+	}
+	if err = d.Set("capacity", props.Capacity); err != nil {
+		return fmt.Errorf("%s error setting capacity: %v", errorPrefix, err)
+	}
+	if err = d.Set("current_price", props.CurrentPrice); err != nil {
+		return fmt.Errorf("%s error setting current_price: %v", errorPrefix, err)
+	}
+
+	servers := make([]interface{}, 0)
+	for _, value := range props.Relations.Servers {
+		server := map[string]interface{}{
+			"object_uuid": value.ObjectUUID,
+			"create_time": value.CreateTime.String(),
+			"object_name": value.ObjectName,
+			"bootdevice":  value.Bootdevice,
+		}
+		servers = append(servers, server)
+	}
+	if err = d.Set("server", servers); err != nil {
+		return fmt.Errorf("%s error setting server-rels: %v", errorPrefix, err)
+	}
+	if err = d.Set("labels", props.Labels); err != nil {
+		return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
+	}
+
+	log.Printf("Found isoimage with key: %v", props.ObjectUUID)
+	return nil
 }

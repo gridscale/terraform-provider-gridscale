@@ -124,6 +124,7 @@ func resourceGridscaleFirewall() *schema.Resource {
 
 func resourceGridscaleFirewallRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
+	errorPrefix := fmt.Sprintf("read firewall (%s) resource -", d.Id())
 	template, err := client.GetFirewall(emptyCtx, d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
@@ -132,29 +133,29 @@ func resourceGridscaleFirewallRead(d *schema.ResourceData, meta interface{}) err
 				return nil
 			}
 		}
-		return err
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 	props := template.Properties
 	if err = d.Set("name", props.Name); err != nil {
-		return fmt.Errorf("error setting name: %v", err)
+		return fmt.Errorf("%s error setting name: %v", errorPrefix, err)
 	}
 	if err = d.Set("location_name", props.LocationName); err != nil {
-		return fmt.Errorf("error setting location_name: %v", err)
+		return fmt.Errorf("%s error setting location_name: %v", errorPrefix, err)
 	}
 	if err = d.Set("status", props.Status); err != nil {
-		return fmt.Errorf("error setting status: %v", err)
+		return fmt.Errorf("%s error setting status: %v", errorPrefix, err)
 	}
 	if err = d.Set("private", props.Private); err != nil {
-		return fmt.Errorf("error setting private: %v", err)
+		return fmt.Errorf("%s error setting private: %v", errorPrefix, err)
 	}
 	if err = d.Set("create_time", props.CreateTime.String()); err != nil {
-		return fmt.Errorf("error setting create_time: %v", err)
+		return fmt.Errorf("%s error setting create_time: %v", errorPrefix, err)
 	}
 	if err = d.Set("change_time", props.ChangeTime.String()); err != nil {
-		return fmt.Errorf("error setting change_time: %v", err)
+		return fmt.Errorf("%s error setting change_time: %v", errorPrefix, err)
 	}
 	if err = d.Set("description", props.Description); err != nil {
-		return fmt.Errorf("error setting description: %v", err)
+		return fmt.Errorf("%s error setting description: %v", errorPrefix, err)
 	}
 
 	//Get network relating to this firewall
@@ -170,35 +171,35 @@ func resourceGridscaleFirewallRead(d *schema.ResourceData, meta interface{}) err
 		networks = append(networks, rule)
 	}
 	if err = d.Set("network", networks); err != nil {
-		return fmt.Errorf("error setting network: %v", err)
+		return fmt.Errorf("%s error setting network: %v", errorPrefix, err)
 	}
 
 	//Get rules_v4_in
 	rulesV4In := convFirewallRuleSliceToInterfaceSlice(props.Rules.RulesV4In)
 	if err = d.Set("rules_v4_in", rulesV4In); err != nil {
-		return fmt.Errorf("error setting rules_v4_in: %v", err)
+		return fmt.Errorf("%s error setting rules_v4_in: %v", errorPrefix, err)
 	}
 
 	//Get rules_v4_out
 	rulesV4Out := convFirewallRuleSliceToInterfaceSlice(props.Rules.RulesV4Out)
 	if err = d.Set("rules_v4_out", rulesV4Out); err != nil {
-		return fmt.Errorf("error setting rules_v4_out: %v", err)
+		return fmt.Errorf("%s error setting rules_v4_out: %v", errorPrefix, err)
 	}
 
 	//Get rules_v6_in
 	rulesV6In := convFirewallRuleSliceToInterfaceSlice(props.Rules.RulesV6In)
 	if err = d.Set("rules_v6_in", rulesV6In); err != nil {
-		return fmt.Errorf("error setting rules_v6_in: %v", err)
+		return fmt.Errorf("%s error setting rules_v6_in: %v", errorPrefix, err)
 	}
 
 	//Get rules_v6_out
 	rulesV6Out := convFirewallRuleSliceToInterfaceSlice(props.Rules.RulesV6Out)
 	if err = d.Set("rules_v6_out", rulesV6Out); err != nil {
-		return fmt.Errorf("error setting rules_v6_out: %v", err)
+		return fmt.Errorf("%s error setting rules_v6_out: %v", errorPrefix, err)
 	}
 
 	if err = d.Set("labels", props.Labels); err != nil {
-		return fmt.Errorf("error setting labels: %v", err)
+		return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
 	}
 
 	return nil
@@ -249,6 +250,8 @@ func resourceGridscaleFirewallCreate(d *schema.ResourceData, meta interface{}) e
 
 func resourceGridscaleFirewallUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
+	errorPrefix := fmt.Sprintf("update firewall (%s) resource -", d.Id())
+
 	var rulesV4In, rulesV4Out, rulesV6In, rulesV6Out []gsclient.FirewallRuleProperties
 	if attr, ok := d.GetOk("rules_v4_in"); ok {
 		rulesV4In = convInterfaceSliceToFirewallRulesSlice(attr.([]interface{}))
@@ -264,7 +267,7 @@ func resourceGridscaleFirewallUpdate(d *schema.ResourceData, meta interface{}) e
 	}
 	//at least one rules in firewall create request
 	if len(rulesV4In) == 0 && len(rulesV4Out) == 0 && len(rulesV6In) == 0 && len(rulesV6Out) == 0 {
-		return errors.New("at least 1 firewall rule in update request")
+		return fmt.Errorf("%s error: At least 1 firewall rule in update request", errorPrefix)
 	}
 	requestBody := gsclient.FirewallUpdateRequest{
 		Name:   d.Get("name").(string),
@@ -278,7 +281,7 @@ func resourceGridscaleFirewallUpdate(d *schema.ResourceData, meta interface{}) e
 	}
 	err := client.UpdateFirewall(emptyCtx, d.Id(), requestBody)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
 	return resourceGridscaleFirewallRead(d, meta)
@@ -286,7 +289,12 @@ func resourceGridscaleFirewallUpdate(d *schema.ResourceData, meta interface{}) e
 
 func resourceGridscaleFirewallDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	return client.DeleteFirewall(emptyCtx, d.Id())
+	errorPrefix := fmt.Sprintf("delete firewall (%s) resource -", d.Id())
+	err := client.DeleteFirewall(emptyCtx, d.Id())
+	if err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
+	}
+	return nil
 }
 
 //convFirewallRuleSliceToInterfaceSlice converts slice of firewall rules to slice of interface

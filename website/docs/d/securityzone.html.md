@@ -3,12 +3,12 @@ layout: "gridscale"
 page_title: "gridscale: securityzone"
 sidebar_current: "docs-gridscale-datasource-securityzone"
 description: |-
-  Get a security zone.
+  Get data of a security zone.
 ---
 
 # gridscale_paas_securityzone
 
-Get a security zone.
+Get data of a security zone.
 
 ## Example Usage
 
@@ -26,6 +26,12 @@ resource "gridscale_paas" "foo"{
     security_zone_uuid = data.gridscale_paas_securityzone.foo.id
 }
 ```
+
+## Argument Reference
+
+The following arguments are supported:
+
+* `resource_id` - (Required) The UUID of the security zone.
 
 ## Attributes Reference
 

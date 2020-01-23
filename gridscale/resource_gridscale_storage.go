@@ -171,6 +171,7 @@ func resourceGridscaleStorage() *schema.Resource {
 
 func resourceGridscaleStorageRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
+	errorPrefix := fmt.Sprintf("read storage (%s) resource -", d.Id())
 	storage, err := client.GetStorage(emptyCtx, d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
@@ -179,64 +180,64 @@ func resourceGridscaleStorageRead(d *schema.ResourceData, meta interface{}) erro
 				return nil
 			}
 		}
-		return err
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
 	if err = d.Set("change_time", storage.Properties.ChangeTime.String()); err != nil {
-		return fmt.Errorf("error setting change_time: %v", err)
+		return fmt.Errorf("%s error setting change_time: %v", errorPrefix, err)
 	}
 	if err = d.Set("location_iata", storage.Properties.LocationIata); err != nil {
-		return fmt.Errorf("error setting location_iata: %v", err)
+		return fmt.Errorf("%s error setting location_iata: %v", errorPrefix, err)
 	}
 	if err = d.Set("status", storage.Properties.Status); err != nil {
-		return fmt.Errorf("error setting status: %v", err)
+		return fmt.Errorf("%s error setting status: %v", errorPrefix, err)
 	}
 	if err = d.Set("license_product_no", storage.Properties.LicenseProductNo); err != nil {
-		return fmt.Errorf("error setting license_product_no: %v", err)
+		return fmt.Errorf("%s error setting license_product_no: %v", errorPrefix, err)
 	}
 	if err = d.Set("location_country", storage.Properties.LocationCountry); err != nil {
-		return fmt.Errorf("error setting location_country: %v", err)
+		return fmt.Errorf("%s error setting location_country: %v", errorPrefix, err)
 	}
 	if err = d.Set("usage_in_minutes", storage.Properties.UsageInMinutes); err != nil {
-		return fmt.Errorf("error setting usage_in_minutes: %v", err)
+		return fmt.Errorf("%s error setting usage_in_minutes: %v", errorPrefix, err)
 	}
 	if err = d.Set("last_used_template", storage.Properties.LastUsedTemplate); err != nil {
-		return fmt.Errorf("error setting last_used_template: %v", err)
+		return fmt.Errorf("%s error setting last_used_template: %v", errorPrefix, err)
 	}
 	if err = d.Set("current_price", storage.Properties.CurrentPrice); err != nil {
-		return fmt.Errorf("error setting current_price: %v", err)
+		return fmt.Errorf("%s error setting current_price: %v", errorPrefix, err)
 	}
 	if err = d.Set("capacity", storage.Properties.Capacity); err != nil {
-		return fmt.Errorf("error setting capacity: %v", err)
+		return fmt.Errorf("%s error setting capacity: %v", errorPrefix, err)
 	}
 	if err = d.Set("location_uuid", storage.Properties.LocationUUID); err != nil {
-		return fmt.Errorf("error setting location_uuid: %v", err)
+		return fmt.Errorf("%s error setting location_uuid: %v", errorPrefix, err)
 	}
 	if err = d.Set("storage_type", storage.Properties.StorageType); err != nil {
-		return fmt.Errorf("error setting storage_type: %v", err)
+		return fmt.Errorf("%s error setting storage_type: %v", errorPrefix, err)
 	}
 	if err = d.Set("parent_uuid", storage.Properties.ParentUUID); err != nil {
-		return fmt.Errorf("error setting parent_uuid: %v", err)
+		return fmt.Errorf("%s error setting parent_uuid: %v", errorPrefix, err)
 	}
 	if err = d.Set("name", storage.Properties.Name); err != nil {
-		return fmt.Errorf("error setting name: %v", err)
+		return fmt.Errorf("%s error setting name: %v", errorPrefix, err)
 	}
 	if err = d.Set("location_name", storage.Properties.LocationName); err != nil {
-		return fmt.Errorf("error setting location_name: %v", err)
+		return fmt.Errorf("%s error setting location_name: %v", errorPrefix, err)
 	}
 	if err = d.Set("create_time", storage.Properties.CreateTime.String()); err != nil {
-		return fmt.Errorf("error setting create_time: %v", err)
+		return fmt.Errorf("%s error setting create_time: %v", errorPrefix, err)
 	}
 
 	if err = d.Set("labels", storage.Properties.Labels); err != nil {
-		return fmt.Errorf("error setting labels: %v", err)
+		return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
 	}
 	return nil
 }
 
 func resourceGridscaleStorageUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-
+	errorPrefix := fmt.Sprintf("update storage (%s) resource -", d.Id())
 	requestBody := gsclient.StorageUpdateRequest{
 		Name:   d.Get("name").(string),
 		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
@@ -244,7 +245,7 @@ func resourceGridscaleStorageUpdate(d *schema.ResourceData, meta interface{}) er
 
 	err := client.UpdateStorage(emptyCtx, d.Id(), requestBody)
 	if err != nil {
-		return err
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
 	return resourceGridscaleStorageRead(d, meta)
@@ -304,9 +305,10 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 
 func resourceGridscaleStorageDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
+	errorPrefix := fmt.Sprintf("delete storage (%s) resource -", d.Id())
 	storage, err := client.GetStorage(emptyCtx, d.Id())
 	if err != nil {
-		return err
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
 	//Stop all server relating to this IP address if there is one
@@ -318,9 +320,13 @@ func resourceGridscaleStorageDelete(d *schema.ResourceData, meta interface{}) er
 		//UnlinkStorage requires the server to be off
 		err = globalServerStatusList.runActionRequireServerOff(emptyCtx, client, server.ObjectUUID, false, unlinkStorageAction)
 		if err != nil {
-			return err
+			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
 	}
 
-	return client.DeleteStorage(emptyCtx, d.Id())
+	err = client.DeleteStorage(emptyCtx, d.Id())
+	if err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
+	}
+	return nil
 }

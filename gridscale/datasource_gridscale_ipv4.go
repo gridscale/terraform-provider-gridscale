@@ -105,61 +105,62 @@ func dataSourceGridscaleIpv4Read(d *schema.ResourceData, meta interface{}) error
 	client := meta.(*gsclient.Client)
 
 	id := d.Get("resource_id").(string)
+	errorPrefix := fmt.Sprintf("read IPv4 (%s) datasource -", id)
 
 	ip, err := client.GetIP(emptyCtx, id)
-
-	if err == nil {
-		d.SetId(ip.Properties.ObjectUUID)
-		if err = d.Set("ip", ip.Properties.IP); err != nil {
-			return fmt.Errorf("error setting ip: %v", err)
-		}
-		if err = d.Set("name", ip.Properties.Name); err != nil {
-			return fmt.Errorf("error setting name: %v", err)
-		}
-		if err = d.Set("prefix", ip.Properties.Prefix); err != nil {
-			return fmt.Errorf("error setting prefix: %v", err)
-		}
-		if err = d.Set("location_uuid", ip.Properties.LocationUUID); err != nil {
-			return fmt.Errorf("error setting location_uuid: %v", err)
-		}
-		if err = d.Set("failover", ip.Properties.Failover); err != nil {
-			return fmt.Errorf("error setting failover: %v", err)
-		}
-		if err = d.Set("status", ip.Properties.Status); err != nil {
-			return fmt.Errorf("error setting status: %v", err)
-		}
-		if err = d.Set("reverse_dns", ip.Properties.ReverseDNS); err != nil {
-			return fmt.Errorf("error setting reverse_dns: %v", err)
-		}
-		if err = d.Set("location_country", ip.Properties.LocationCountry); err != nil {
-			return fmt.Errorf("error setting location_country: %v", err)
-		}
-		if err = d.Set("location_iata", ip.Properties.LocationIata); err != nil {
-			return fmt.Errorf("error setting location_iata: %v", err)
-		}
-		if err = d.Set("location_name", ip.Properties.LocationName); err != nil {
-			return fmt.Errorf("error setting location_name: %v", err)
-		}
-		if err = d.Set("create_time", ip.Properties.CreateTime.String()); err != nil {
-			return fmt.Errorf("error setting create_time: %v", err)
-		}
-		if err = d.Set("change_time", ip.Properties.ChangeTime.String()); err != nil {
-			return fmt.Errorf("error setting change_time: %v", err)
-		}
-		if err = d.Set("delete_block", ip.Properties.DeleteBlock); err != nil {
-			return fmt.Errorf("error setting delete_block: %v", err)
-		}
-		if err = d.Set("usage_in_minutes", ip.Properties.UsagesInMinutes); err != nil {
-			return fmt.Errorf("error setting usage_in_minutes: %v", err)
-		}
-		if err = d.Set("current_price", ip.Properties.CurrentPrice); err != nil {
-			return fmt.Errorf("error setting current_price: %v", err)
-		}
-
-		if err = d.Set("labels", ip.Properties.Labels); err != nil {
-			return fmt.Errorf("error setting labels: %v", err)
-		}
+	if err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
-	return err
+	d.SetId(ip.Properties.ObjectUUID)
+	if err = d.Set("ip", ip.Properties.IP); err != nil {
+		return fmt.Errorf("%s error setting ip: %v", errorPrefix, err)
+	}
+	if err = d.Set("name", ip.Properties.Name); err != nil {
+		return fmt.Errorf("%s error setting name: %v", errorPrefix, err)
+	}
+	if err = d.Set("prefix", ip.Properties.Prefix); err != nil {
+		return fmt.Errorf("%s error setting prefix: %v", errorPrefix, err)
+	}
+	if err = d.Set("location_uuid", ip.Properties.LocationUUID); err != nil {
+		return fmt.Errorf("%s error setting location_uuid: %v", errorPrefix, err)
+	}
+	if err = d.Set("failover", ip.Properties.Failover); err != nil {
+		return fmt.Errorf("%s error setting failover: %v", errorPrefix, err)
+	}
+	if err = d.Set("status", ip.Properties.Status); err != nil {
+		return fmt.Errorf("%s error setting status: %v", errorPrefix, err)
+	}
+	if err = d.Set("reverse_dns", ip.Properties.ReverseDNS); err != nil {
+		return fmt.Errorf("%s error setting reverse_dns: %v", errorPrefix, err)
+	}
+	if err = d.Set("location_country", ip.Properties.LocationCountry); err != nil {
+		return fmt.Errorf("%s error setting location_country: %v", errorPrefix, err)
+	}
+	if err = d.Set("location_iata", ip.Properties.LocationIata); err != nil {
+		return fmt.Errorf("%s error setting location_iata: %v", errorPrefix, err)
+	}
+	if err = d.Set("location_name", ip.Properties.LocationName); err != nil {
+		return fmt.Errorf("%s error setting location_name: %v", errorPrefix, err)
+	}
+	if err = d.Set("create_time", ip.Properties.CreateTime.String()); err != nil {
+		return fmt.Errorf("%s error setting create_time: %v", errorPrefix, err)
+	}
+	if err = d.Set("change_time", ip.Properties.ChangeTime.String()); err != nil {
+		return fmt.Errorf("%s error setting change_time: %v", errorPrefix, err)
+	}
+	if err = d.Set("delete_block", ip.Properties.DeleteBlock); err != nil {
+		return fmt.Errorf("%s error setting delete_block: %v", errorPrefix, err)
+	}
+	if err = d.Set("usage_in_minutes", ip.Properties.UsagesInMinutes); err != nil {
+		return fmt.Errorf("%s error setting usage_in_minutes: %v", errorPrefix, err)
+	}
+	if err = d.Set("current_price", ip.Properties.CurrentPrice); err != nil {
+		return fmt.Errorf("%s error setting current_price: %v", errorPrefix, err)
+	}
+	if err = d.Set("labels", ip.Properties.Labels); err != nil {
+		return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
+	}
+
+	return nil
 }
