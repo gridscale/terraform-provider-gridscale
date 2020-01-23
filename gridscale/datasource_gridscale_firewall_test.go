@@ -14,7 +14,7 @@ func TestAccdataSourceGridscaleFirewall_basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGridscaleIpv4DestroyCheck,
+		CheckDestroy: testAccCheckGridscaleFirewallDestroyCheck,
 		Steps: []resource.TestStep{
 			{
 

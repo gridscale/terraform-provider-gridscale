@@ -1,6 +1,7 @@
 package gridscale
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -118,22 +119,58 @@ func dataSourceGridscaleTemplateRead(d *schema.ResourceData, meta interface{}) e
 
 	if err == nil {
 		d.SetId(template.Properties.ObjectUUID)
-		d.Set("location_uuid", template.Properties.LocationUUID)
-		d.Set("location_country", template.Properties.LocationCountry)
-		d.Set("location_iata", template.Properties.LocationIata)
-		d.Set("location_name", template.Properties.LocationName)
-		d.Set("status", template.Properties.Status)
-		d.Set("ostype", template.Properties.Ostype)
-		d.Set("version", template.Properties.Version)
-		d.Set("private", template.Properties.Private)
-		d.Set("license_product_no", template.Properties.LicenseProductNo)
-		d.Set("create_time", template.Properties.CreateTime)
-		d.Set("change_time", template.Properties.ChangeTime)
-		d.Set("distro", template.Properties.Distro)
-		d.Set("description", template.Properties.Description)
-		d.Set("usage_in_minutes", template.Properties.UsageInMinutes)
-		d.Set("capacity", template.Properties.Capacity)
-		d.Set("current_price", template.Properties.CurrentPrice)
+		if err = d.Set("location_uuid", template.Properties.LocationUUID); err != nil {
+			return fmt.Errorf("error setting location_uuid: %v", err)
+		}
+		if err = d.Set("location_country", template.Properties.LocationCountry); err != nil {
+			return fmt.Errorf("error setting location_country: %v", err)
+		}
+		if err = d.Set("location_iata", template.Properties.LocationIata); err != nil {
+			return fmt.Errorf("error setting location_iata: %v", err)
+		}
+		if err = d.Set("location_name", template.Properties.LocationName); err != nil {
+			return fmt.Errorf("error setting location_name: %v", err)
+		}
+		if err = d.Set("status", template.Properties.Status); err != nil {
+			return fmt.Errorf("error setting status: %v", err)
+		}
+		if err = d.Set("ostype", template.Properties.Ostype); err != nil {
+			return fmt.Errorf("error setting ostype: %v", err)
+		}
+		if err = d.Set("version", template.Properties.Version); err != nil {
+			return fmt.Errorf("error setting version: %v", err)
+		}
+		if err = d.Set("private", template.Properties.Private); err != nil {
+			return fmt.Errorf("error setting private: %v", err)
+		}
+		if err = d.Set("license_product_no", template.Properties.LicenseProductNo); err != nil {
+			return fmt.Errorf("error setting license_product_no: %v", err)
+		}
+		if err = d.Set("create_time", template.Properties.CreateTime.String()); err != nil {
+			return fmt.Errorf("error setting create_time: %v", err)
+		}
+		if err = d.Set("change_time", template.Properties.ChangeTime.String()); err != nil {
+			return fmt.Errorf("error setting change_time: %v", err)
+		}
+		if err = d.Set("distro", template.Properties.Distro); err != nil {
+			return fmt.Errorf("error setting distro: %v", err)
+		}
+		if err = d.Set("description", template.Properties.Description); err != nil {
+			return fmt.Errorf("error setting description: %v", err)
+		}
+		if err = d.Set("usage_in_minutes", template.Properties.UsageInMinutes); err != nil {
+			return fmt.Errorf("error setting usage_in_minutes: %v", err)
+		}
+		if err = d.Set("capacity", template.Properties.Capacity); err != nil {
+			return fmt.Errorf("error setting capacity: %v", err)
+		}
+		if err = d.Set("current_price", template.Properties.CurrentPrice); err != nil {
+			return fmt.Errorf("error setting current_price: %v", err)
+		}
+
+		if err = d.Set("labels", template.Properties.Labels); err != nil {
+			return fmt.Errorf("error setting labels: %v", err)
+		}
 		log.Printf("Found template with key: %v", template.Properties.ObjectUUID)
 	}
 

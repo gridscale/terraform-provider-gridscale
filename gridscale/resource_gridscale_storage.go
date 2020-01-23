@@ -3,12 +3,10 @@ package gridscale
 import (
 	"context"
 	"fmt"
-	"log"
-	"strings"
-	"time"
-
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"log"
+	"strings"
 
 	"github.com/gridscale/gsclient-go"
 )
@@ -108,6 +106,10 @@ func resourceGridscaleStorage() *schema.Resource {
 				Type:     schema.TypeFloat,
 				Computed: true,
 			},
+			"usage_in_minutes": {
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
 			"labels": {
 				Type:        schema.TypeSet,
 				Description: "List of labels.",
@@ -164,9 +166,6 @@ func resourceGridscaleStorage() *schema.Resource {
 				},
 			},
 		},
-		Timeouts: &schema.ResourceTimeout{
-			Delete: schema.DefaultTimeout(time.Minute * 3),
-		},
 	}
 }
 
@@ -183,24 +182,54 @@ func resourceGridscaleStorageRead(d *schema.ResourceData, meta interface{}) erro
 		return err
 	}
 
-	d.Set("change_time", storage.Properties.ChangeTime.String())
-	d.Set("location_iata", storage.Properties.LocationIata)
-	d.Set("status", storage.Properties.Status)
-	d.Set("license_product_no", storage.Properties.LicenseProductNo)
-	d.Set("location_country", storage.Properties.LocationCountry)
-	d.Set("usage_in_minutes", storage.Properties.UsageInMinutes)
-	d.Set("last_used_template", storage.Properties.LastUsedTemplate)
-	d.Set("current_price", storage.Properties.CurrentPrice)
-	d.Set("capacity", storage.Properties.Capacity)
-	d.Set("location_uuid", storage.Properties.LocationUUID)
-	d.Set("storage_type", storage.Properties.StorageType)
-	d.Set("parent_uuid", storage.Properties.ParentUUID)
-	d.Set("name", storage.Properties.Name)
-	d.Set("location_name", storage.Properties.LocationName)
-	d.Set("create_time", storage.Properties.CreateTime.String())
+	if err = d.Set("change_time", storage.Properties.ChangeTime.String()); err != nil {
+		return fmt.Errorf("error setting change_time: %v", err)
+	}
+	if err = d.Set("location_iata", storage.Properties.LocationIata); err != nil {
+		return fmt.Errorf("error setting location_iata: %v", err)
+	}
+	if err = d.Set("status", storage.Properties.Status); err != nil {
+		return fmt.Errorf("error setting status: %v", err)
+	}
+	if err = d.Set("license_product_no", storage.Properties.LicenseProductNo); err != nil {
+		return fmt.Errorf("error setting license_product_no: %v", err)
+	}
+	if err = d.Set("location_country", storage.Properties.LocationCountry); err != nil {
+		return fmt.Errorf("error setting location_country: %v", err)
+	}
+	if err = d.Set("usage_in_minutes", storage.Properties.UsageInMinutes); err != nil {
+		return fmt.Errorf("error setting usage_in_minutes: %v", err)
+	}
+	if err = d.Set("last_used_template", storage.Properties.LastUsedTemplate); err != nil {
+		return fmt.Errorf("error setting last_used_template: %v", err)
+	}
+	if err = d.Set("current_price", storage.Properties.CurrentPrice); err != nil {
+		return fmt.Errorf("error setting current_price: %v", err)
+	}
+	if err = d.Set("capacity", storage.Properties.Capacity); err != nil {
+		return fmt.Errorf("error setting capacity: %v", err)
+	}
+	if err = d.Set("location_uuid", storage.Properties.LocationUUID); err != nil {
+		return fmt.Errorf("error setting location_uuid: %v", err)
+	}
+	if err = d.Set("storage_type", storage.Properties.StorageType); err != nil {
+		return fmt.Errorf("error setting storage_type: %v", err)
+	}
+	if err = d.Set("parent_uuid", storage.Properties.ParentUUID); err != nil {
+		return fmt.Errorf("error setting parent_uuid: %v", err)
+	}
+	if err = d.Set("name", storage.Properties.Name); err != nil {
+		return fmt.Errorf("error setting name: %v", err)
+	}
+	if err = d.Set("location_name", storage.Properties.LocationName); err != nil {
+		return fmt.Errorf("error setting location_name: %v", err)
+	}
+	if err = d.Set("create_time", storage.Properties.CreateTime.String()); err != nil {
+		return fmt.Errorf("error setting create_time: %v", err)
+	}
 
 	if err = d.Set("labels", storage.Properties.Labels); err != nil {
-		return fmt.Errorf("Error setting labels: %v", err)
+		return fmt.Errorf("error setting labels: %v", err)
 	}
 	return nil
 }

@@ -113,23 +113,35 @@ func dataSourceGridscaleLoadBalancerRead(d *schema.ResourceData, meta interface{
 
 	if err == nil {
 		d.SetId(loadbalancer.Properties.ObjectUUID)
-		d.Set("name", loadbalancer.Properties.Name)
-		d.Set("algorithm", loadbalancer.Properties.Algorithm)
-		d.Set("status", loadbalancer.Properties.Status)
-		d.Set("redirect_http_to_https", loadbalancer.Properties.RedirectHTTPToHTTPS)
-		d.Set("listen_ipv4_uuid", loadbalancer.Properties.ListenIPv4UUID)
-		d.Set("listen_ipv6_uuid", loadbalancer.Properties.ListenIPv6UUID)
+		if err = d.Set("name", loadbalancer.Properties.Name); err != nil {
+			return fmt.Errorf("error setting name: %v", err)
+		}
+		if err = d.Set("algorithm", loadbalancer.Properties.Algorithm); err != nil {
+			return fmt.Errorf("error setting algorithm: %v", err)
+		}
+		if err = d.Set("status", loadbalancer.Properties.Status); err != nil {
+			return fmt.Errorf("error setting status: %v", err)
+		}
+		if err = d.Set("redirect_http_to_https", loadbalancer.Properties.RedirectHTTPToHTTPS); err != nil {
+			return fmt.Errorf("error setting redirect_http_to_https: %v", err)
+		}
+		if err = d.Set("listen_ipv4_uuid", loadbalancer.Properties.ListenIPv4UUID); err != nil {
+			return fmt.Errorf("error setting listen_ipv4_uuid: %v", err)
+		}
+		if err = d.Set("listen_ipv6_uuid", loadbalancer.Properties.ListenIPv6UUID); err != nil {
+			return fmt.Errorf("error setting listen_ipv6_uuid: %v", err)
+		}
 
 		if err = d.Set("forwarding_rule", flattenLoadbalancerForwardingRules(loadbalancer.Properties.ForwardingRules)); err != nil {
-			return fmt.Errorf("Error setting ForwardingRules: %v", err)
+			return fmt.Errorf("error setting forwarding_rule: %v", err)
 		}
 
 		if err = d.Set("backend_server", flattenLoadbalancerBackendServers(loadbalancer.Properties.BackendServers)); err != nil {
-			return fmt.Errorf("Error setting BackendServers: %v", err)
+			return fmt.Errorf("error setting BackendServers: %v", err)
 		}
 
 		if err = d.Set("labels", loadbalancer.Properties.Labels); err != nil {
-			return fmt.Errorf("Error setting Labels: %v", err)
+			return fmt.Errorf("error setting Labels: %v", err)
 		}
 	}
 

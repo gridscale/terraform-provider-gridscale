@@ -28,6 +28,7 @@ func Provider() terraform.ResourceProvider {
 			},
 		},
 		DataSourcesMap: map[string]*schema.Resource{
+			"gridscale_server":                   dataSourceGridscaleServer(),
 			"gridscale_storage":                  dataSourceGridscaleStorage(),
 			"gridscale_network":                  dataSourceGridscaleNetwork(),
 			"gridscale_public_network":           dataSourceGridscalePublicNetwork(),

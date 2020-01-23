@@ -383,25 +383,57 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 		return err
 	}
 
-	d.Set("name", server.Properties.Name)
-	d.Set("memory", server.Properties.Memory)
-	d.Set("cores", server.Properties.Cores)
-	d.Set("hardware_profile", server.Properties.HardwareProfile)
-	d.Set("location_uuid", server.Properties.LocationUUID)
-	d.Set("power", server.Properties.Power)
-	d.Set("status", server.Properties.Status)
-	d.Set("create_time", server.Properties.CreateTime.String())
-	d.Set("change_time", server.Properties.ChangeTime.String())
-	d.Set("current_price", server.Properties.CurrentPrice)
-	d.Set("availability_zone", server.Properties.AvailabilityZone)
-	d.Set("auto_recovery", server.Properties.AutoRecovery)
-	d.Set("console_token", server.Properties.ConsoleToken)
-	d.Set("legacy", server.Properties.Legacy)
-	d.Set("usage_in_minutes_memory", server.Properties.UsageInMinutesMemory)
-	d.Set("usage_in_minutes_cores", server.Properties.UsageInMinutesCores)
+	if err = d.Set("name", server.Properties.Name); err != nil {
+		return fmt.Errorf("error setting name: %v", err)
+	}
+	if err = d.Set("memory", server.Properties.Memory); err != nil {
+		return fmt.Errorf("error setting memory: %v", err)
+	}
+	if err = d.Set("cores", server.Properties.Cores); err != nil {
+		return fmt.Errorf("error setting cores: %v", err)
+	}
+	if err = d.Set("hardware_profile", server.Properties.HardwareProfile); err != nil {
+		return fmt.Errorf("error setting hardware_profile: %v", err)
+	}
+	if err = d.Set("location_uuid", server.Properties.LocationUUID); err != nil {
+		return fmt.Errorf("error setting location_uuid: %v", err)
+	}
+	if err = d.Set("power", server.Properties.Power); err != nil {
+		return fmt.Errorf("error setting power: %v", err)
+	}
+	if err = d.Set("status", server.Properties.Status); err != nil {
+		return fmt.Errorf("error setting status: %v", err)
+	}
+	if err = d.Set("create_time", server.Properties.CreateTime.String()); err != nil {
+		return fmt.Errorf("error setting create_time: %v", err)
+	}
+	if err = d.Set("change_time", server.Properties.ChangeTime.String()); err != nil {
+		return fmt.Errorf("error setting change_time: %v", err)
+	}
+	if err = d.Set("current_price", server.Properties.CurrentPrice); err != nil {
+		return fmt.Errorf("error setting current_price: %v", err)
+	}
+	if err = d.Set("availability_zone", server.Properties.AvailabilityZone); err != nil {
+		return fmt.Errorf("error setting availability_zone: %v", err)
+	}
+	if err = d.Set("auto_recovery", server.Properties.AutoRecovery); err != nil {
+		return fmt.Errorf("error setting auto_recovery: %v", err)
+	}
+	if err = d.Set("console_token", server.Properties.ConsoleToken); err != nil {
+		return fmt.Errorf("error setting console_token: %v", err)
+	}
+	if err = d.Set("legacy", server.Properties.Legacy); err != nil {
+		return fmt.Errorf("error setting legacy: %v", err)
+	}
+	if err = d.Set("usage_in_minutes_memory", server.Properties.UsageInMinutesMemory); err != nil {
+		return fmt.Errorf("error setting usage_in_minutes_memory: %v", err)
+	}
+	if err = d.Set("usage_in_minutes_cores", server.Properties.UsageInMinutesCores); err != nil {
+		return fmt.Errorf("error setting usage_in_minutes_cores: %v", err)
+	}
 
 	if err = d.Set("labels", server.Properties.Labels); err != nil {
-		return fmt.Errorf("Error setting labels: %v", err)
+		return fmt.Errorf("error setting labels: %v", err)
 	}
 
 	//Get storages
@@ -424,13 +456,13 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 		storages = append(storages, storage)
 	}
 	if err = d.Set("storage", storages); err != nil {
-		return fmt.Errorf("Error setting storage: %v", err)
+		return fmt.Errorf("error setting storage: %v", err)
 	}
 
 	//Get networks
 	networks := readServerNetworkRels(server.Properties.Relations.Networks)
 	if err = d.Set("network", networks); err != nil {
-		return fmt.Errorf("Error setting network: %v", err)
+		return fmt.Errorf("error setting network: %v", err)
 	}
 
 	//Get IP addresses
@@ -443,13 +475,18 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 			ipv6 = ip.ObjectUUID
 		}
 	}
-	d.Set("ipv4", ipv4)
-	d.Set("ipv6", ipv6)
+	if err = d.Set("ipv4", ipv4); err != nil {
+		return fmt.Errorf("error setting ipv4: %v", err)
+	}
+	if err = d.Set("ipv6", ipv6); err != nil {
+		return fmt.Errorf("error setting ipv6: %v", err)
+	}
 
 	//Get the ISO image, there can only be one attached to a server but it is in a list anyway
-	d.Set("isoimage", "")
 	for _, isoimage := range server.Properties.Relations.IsoImages {
-		d.Set("isoimage", isoimage.ObjectUUID)
+		if err = d.Set("isoimage", isoimage.ObjectUUID); err != nil {
+			return fmt.Errorf("error setting isoimage: %v", err)
+		}
 	}
 
 	return nil

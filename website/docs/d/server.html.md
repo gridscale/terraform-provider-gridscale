@@ -1,41 +1,59 @@
 ---
 layout: "gridscale"
 page_title: "gridscale: gridscale_server"
-sidebar_current: "docs-gridscale-resource-server"
+sidebar_current: "docs-gridscale-datasource-server"
 description: |-
-  Manages a server in gridscale.
+  Gets data of a server by its UUID.
 ---
 
 # gridscale_server
 
-Provides a server resource. This can be used to create, modify and delete servers.
+Get data of a server by its UUID.
 
 ## Example
 
-The following example shows how one might use this resource to add a server to gridscale:
-
 ```terraform
-resource "gridscale_server" "terra-server-test"{
-	name = "terra-server-test"
-	cores = 2
-	memory = 1
-	storage {
-		object_uuid = gridscale_storage.terra-storage-test.id
-		bootdevice = true
-	}
-	storage {
-    		object_uuid = "UUID of storage 2",
-    	}
-	network {
-		object_uuid = gridscale_network.terra-network-test.id
-		bootdevice = true
-	}
-	network {
-    		object_uuid = "UUID of network 2"
-    }
-	ipv4 = gridscale_ipv4.terra-ipv4-test.id}
-	ipv6 = "UUID of ipv6 address"
-	isoimage = "9be3e0a3-42ac-4207-8887-3383c405724d"
+resource "gridscale_ipv4" "foo1" {
+  name   = "newname"
+}
+resource "gridscale_network" "foo" {
+  name   = "newname"
+}
+resource "gridscale_storage" "foo1" {
+  name   = "newname"
+  capacity = 1
+}
+resource "gridscale_server" "foo" {
+  name   = "newname"
+  cores = 1
+  memory = 1
+  power = true
+  ipv4 = gridscale_ipv4.foo1.id
+  network {
+		object_uuid = gridscale_network.foo.id
+		rules_v4_in {
+				order = 0
+				protocol = "tcp"
+				action = "drop"
+				dst_port = "20:80"
+				comment = "test"
+		}
+		rules_v6_in	{
+				order = 1
+				protocol = "tcp"
+				action = "drop"
+				dst_port = "10:20"
+				comment = "test1"
+		}
+  	}
+  storage {
+  	object_uuid = gridscale_storage.foo1.id
+  }
+}
+
+
+data "gridscale_server" "foo" {
+	resource_id   = gridscale_server.foo.id
 }
 ```
 
@@ -43,113 +61,9 @@ resource "gridscale_server" "terra-server-test"{
 
 The following arguments are supported:
 
-* `name` - (Required) The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+* `resource_id` - (Required) The UUID of the firewall.
 
-* `cores` - (Required) The number of server cores.
-
-* `memory` - (Required) The amount of server memory in GB.
-
-* `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
-
-* `auto_recovery` - (Optional) If the server should be auto-started in case of a failure (default=true).
-
-* `hardware_profile` - (Optional, ForceNew) The hardware profile of the Server. Options are default, legacy, nested, cisco_csr, sophos_utm, f5_bigip and q35 at the moment of writing. Check the
-
-* `ipv4` - (Optional) The UUID of the IPv4 address of the server. (***NOTE: The server will NOT automatically be connected to the public network; to give it access to the internet, please add server to the public network.)
-
-* `ipv6` - (Optional) The UUID of the IPv6 address of the server. (***NOTE: The server will NOT automatically be connected to the public network; to give it access to the internet, please add server to the public network.)
-
-* `isoimage` - (Optional) The UUID of an ISO image in gridscale. The server will automatically boot from the ISO if one was added. The UUIDs of ISO images can be found in [the expert panel](https://my.gridscale.io/Expert/ISOImage).
-
-* `power` - (Optional, Computed) The power state of the server. Set this to true to will boot the server, false will shut it down.
-
-* `availability_zone` - (Optional, Computed) Defines which Availability-Zone the Server is placed.
-
-* `storage` - (Optional) Connects a storage to the server.
-
-    * `object_uuid` - (Required) The object UUID or id of the storage.
-
-* `network` - (Optional) Connects a network to the server.
-
-    * `object_uuid` - (Required) The object UUID or id of the network.
-
-    * `bootdevice` - (Optional, Computed) Make this network the boot device. This can only be set for one network.
-
-    * `firewall_template_uuid` - (Optional) The UUID of firewall template.
-
-    * `rules_v4_in` - (Optional) Firewall template rules for inbound traffic - covers ipv4 addresses.
-
-        * `order` - (Required) The order at which the firewall will compare packets against its rules, a packet will be compared against the first rule, it will either allow it to pass or block it and it won t be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2. Packets that do not match any rules are blocked by default.
-
-        * `action` - (Required) This defines what the firewall will do. Either accept or drop.
-
-        * `protocol` - (Required) Either 'udp' or 'tcp'.
-
-        * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
-
-        * `src_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
-
-        * `src_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
-
-        * `dst_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
-
-        * `comment` - (Optional) Comment.
-
-    * `rules_v4_out` - (Optional) Firewall template rules for outbound traffic - covers ipv4 addresses.
-
-        * `order` - (Required) The order at which the firewall will compare packets against its rules, a packet will be compared against the first rule, it will either allow it to pass or block it and it won t be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2. Packets that do not match any rules are blocked by default.
-
-        * `action` - (Required) This defines what the firewall will do. Either accept or drop.
-
-        * `protocol` - (Required) Either 'udp' or 'tcp'.
-
-        * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
-
-        * `src_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
-
-        * `src_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
-
-        * `dst_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
-
-        * `comment` - (Optional) Comment.
-
-    * `rules_v6_in` - (Optional) Firewall template rules for inbound traffic - covers ipv6 addresses.
-
-        * `order` - (Required) The order at which the firewall will compare packets against its rules, a packet will be compared against the first rule, it will either allow it to pass or block it and it won t be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2. Packets that do not match any rules are blocked by default.
-
-        * `action` - (Required) This defines what the firewall will do. Either accept or drop.
-
-        * `protocol` - (Required) Either 'udp' or 'tcp'.
-
-        * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
-
-        * `src_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
-
-        * `src_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
-
-        * `dst_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
-
-        * `comment` - (Optional) Comment.
-
-    * `rules_v6_out` - (Optional) Firewall template rules for outbound traffic - covers ipv6 addresses.
-
-        * `order` - (Required) The order at which the firewall will compare packets against its rules, a packet will be compared against the first rule, it will either allow it to pass or block it and it won t be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2. Packets that do not match any rules are blocked by default.
-
-        * `action` - (Required) This defines what the firewall will do. Either accept or drop.
-
-        * `protocol` - (Required) Either 'udp' or 'tcp'.
-
-        * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
-
-        * `src_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
-
-        * `src_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
-
-        * `dst_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
-
-        * `comment` - (Optional) Comment.
-
-## Attributes
+## Attributes Reference
 
 This resource exports the following attributes:
 

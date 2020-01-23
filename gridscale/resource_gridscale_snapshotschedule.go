@@ -111,14 +111,30 @@ func resourceGridscaleSnapshotScheduleRead(d *schema.ResourceData, meta interfac
 		return err
 	}
 	props := scheduler.Properties
-	d.Set("status", props.Status)
-	d.Set("name", props.Name)
-	d.Set("next_runtime", props.NextRuntime.Format(timeLayout))
-	d.Set("keep_snapshots", props.KeepSnapshots)
-	d.Set("run_interval", props.RunInterval)
-	d.Set("storage_uuid", props.StorageUUID)
-	d.Set("create_time", props.CreateTime.String())
-	d.Set("change_time", props.ChangeTime.String())
+	if err = d.Set("status", props.Status); err != nil {
+		return fmt.Errorf("error setting status: %v", err)
+	}
+	if err = d.Set("name", props.Name); err != nil {
+		return fmt.Errorf("error setting name: %v", err)
+	}
+	if err = d.Set("next_runtime", props.NextRuntime.Format(timeLayout)); err != nil {
+		return fmt.Errorf("error setting next_runtime: %v", err)
+	}
+	if err = d.Set("keep_snapshots", props.KeepSnapshots); err != nil {
+		return fmt.Errorf("error setting keep_snapshots: %v", err)
+	}
+	if err = d.Set("run_interval", props.RunInterval); err != nil {
+		return fmt.Errorf("error setting run_interval: %v", err)
+	}
+	if err = d.Set("storage_uuid", props.StorageUUID); err != nil {
+		return fmt.Errorf("error setting storage_uuid: %v", err)
+	}
+	if err = d.Set("create_time", props.CreateTime.String()); err != nil {
+		return fmt.Errorf("error setting create_time: %v", err)
+	}
+	if err = d.Set("change_time", props.ChangeTime.String()); err != nil {
+		return fmt.Errorf("error setting change_time: %v", err)
+	}
 
 	//Get snapshots
 	snapshots := make([]interface{}, 0)
@@ -130,12 +146,12 @@ func resourceGridscaleSnapshotScheduleRead(d *schema.ResourceData, meta interfac
 		})
 	}
 	if err = d.Set("snapshot", snapshots); err != nil {
-		return fmt.Errorf("Error setting snapshots: %v", err)
+		return fmt.Errorf("error setting snapshots: %v", err)
 	}
 
 	//Set labels
 	if err = d.Set("labels", props.Labels); err != nil {
-		return fmt.Errorf("Error setting labels: %v", err)
+		return fmt.Errorf("error setting labels: %v", err)
 	}
 	return nil
 }

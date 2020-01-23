@@ -89,18 +89,34 @@ func resourceGridscalePaaSSecurityZoneRead(d *schema.ResourceData, meta interfac
 		return err
 	}
 	props := secZone.Properties
-	d.Set("name", props.Name)
-	d.Set("location_uuid", props.LocationUUID)
-	d.Set("location_country", props.LocationCountry)
-	d.Set("location_iata", props.LocationIata)
-	d.Set("location_name", props.LocationName)
-	d.Set("create_time", props.CreateTime)
-	d.Set("change_time", props.ChangeTime)
-	d.Set("status", props.Status)
+	if err = d.Set("name", props.Name); err != nil {
+		return fmt.Errorf("error setting name: %v", err)
+	}
+	if err = d.Set("location_uuid", props.LocationUUID); err != nil {
+		return fmt.Errorf("error setting location_uuid: %v", err)
+	}
+	if err = d.Set("location_country", props.LocationCountry); err != nil {
+		return fmt.Errorf("error setting location_country: %v", err)
+	}
+	if err = d.Set("location_iata", props.LocationIata); err != nil {
+		return fmt.Errorf("error setting location_iata: %v", err)
+	}
+	if err = d.Set("location_name", props.LocationName); err != nil {
+		return fmt.Errorf("error setting location_name: %v", err)
+	}
+	if err = d.Set("create_time", props.CreateTime.String()); err != nil {
+		return fmt.Errorf("error setting create_time: %v", err)
+	}
+	if err = d.Set("change_time", props.ChangeTime.String()); err != nil {
+		return fmt.Errorf("error setting change_time: %v", err)
+	}
+	if err = d.Set("status", props.Status); err != nil {
+		return fmt.Errorf("error setting status: %v", err)
+	}
 
 	//Set labels
 	if err = d.Set("labels", props.Labels); err != nil {
-		return fmt.Errorf("Error setting labels: %v", err)
+		return fmt.Errorf("error setting labels: %v", err)
 	}
 
 	//Set relations
@@ -109,7 +125,7 @@ func resourceGridscalePaaSSecurityZoneRead(d *schema.ResourceData, meta interfac
 		rels = append(rels, val.ObjectUUID)
 	}
 	if err = d.Set("relations", rels); err != nil {
-		return fmt.Errorf("Error setting relations: %v", err)
+		return fmt.Errorf("error setting relations: %v", err)
 	}
 	return nil
 }
