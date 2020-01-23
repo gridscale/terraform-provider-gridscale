@@ -4,7 +4,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/gridscale/gsclient-go"
+	"github.com/gridscale/gsclient-go/v2"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 

@@ -68,7 +68,7 @@ type SshkeyUpdateRequest struct {
 	Sshkey string `json:"sshkey,omitempty"`
 
 	//List of labels. Optional.
-	Labels []string `json:"labels,omitempty"`
+	Labels *[]string `json:"labels,omitempty"`
 }
 
 //GetSshkey gets a ssh key

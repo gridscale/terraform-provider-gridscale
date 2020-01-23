@@ -66,14 +66,14 @@ type FirewallRules struct {
 	//Firewall template rules for inbound traffic - covers ipv4 addresses.
 	RulesV4In []FirewallRuleProperties `json:"rules-v4-in,omitempty"`
 
-	//Firewall template tules for outbound traffic - covers ipv4 addresses.
+	//Firewall template rules for outbound traffic - covers ipv4 addresses.
 	RulesV4Out []FirewallRuleProperties `json:"rules-v4-out,omitempty"`
 }
 
 //FirewallRuleProperties is JSON struct of a firewall's rule properties
 type FirewallRuleProperties struct {
-	//Enum:"udp" "tcp". Either udp or tcp
-	Protocol string `json:"protocol,omitempty"`
+	//Enum:"udp" "tcp". Allowed values: `TCPTransport`, `UDPTransport`
+	Protocol transportLayerProtocol `json:"protocol"`
 
 	//A Number between 1 and 65535, port ranges are seperated by a colon for FTP.
 	DstPort string `json:"dst_port,omitempty"`
@@ -152,11 +152,17 @@ type FirewallUpdateRequest struct {
 	Name string `json:"name,omitempty"`
 
 	//New list of labels. Leave it if you do not want to update the Labels
-	Labels []string `json:"labels,omitempty"`
+	Labels *[]string `json:"labels,omitempty"`
 
 	//FirewallRules. Leave it if you do not want to update the firewall rules
 	Rules *FirewallRules `json:"rules,omitempty"`
 }
+
+//All available transport protocol
+var (
+	TCPTransport = transportLayerProtocol{"tcp"}
+	UDPTransport = transportLayerProtocol{"udp"}
+)
 
 //GetFirewallList gets a list of available firewalls
 //

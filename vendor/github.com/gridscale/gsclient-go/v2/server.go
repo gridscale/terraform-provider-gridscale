@@ -114,9 +114,6 @@ type ServerCreateRequest struct {
 	//The number of server cores.
 	Cores int `json:"cores"`
 
-	//Helps to identify which datacenter an object belongs to.
-	LocationUUID string `json:"location_uuid"`
-
 	//Specifies the hardware settings for the virtual machine.
 	//Allowed values: nil, DefaultServerHardware, NestedServerHardware, LegacyServerHardware, CiscoCSRServerHardware,
 	//SophosUTMServerHardware, F5BigipServerHardware, Q35ServerHardware, Q35NestedServerHardware.
@@ -229,7 +226,7 @@ type ServerUpdateRequest struct {
 	Cores int `json:"cores,omitempty"`
 
 	//List of labels. Leave it if you do not want to update the list of labels
-	Labels []string `json:"labels,omitempty"`
+	Labels *[]string `json:"labels,omitempty"`
 
 	//If the server should be auto-started in case of a failure (default=true).
 	//Leave it if you do not want to update this feature of the server.

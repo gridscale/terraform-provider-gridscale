@@ -2,7 +2,7 @@ package gridscale
 
 import (
 	"fmt"
-	"github.com/gridscale/gsclient-go"
+	"github.com/gridscale/gsclient-go/v2"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"log"
@@ -134,8 +134,7 @@ func resourceGridscalePaaSSecurityZoneRead(d *schema.ResourceData, meta interfac
 func resourceGridscalePaaSSecurityZoneCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	requestBody := gsclient.PaaSSecurityZoneCreateRequest{
-		Name:         d.Get("name").(string),
-		LocationUUID: d.Get("location_uuid").(string),
+		Name: d.Get("name").(string),
 	}
 	response, err := client.CreatePaaSSecurityZone(emptyCtx, requestBody)
 	if err != nil {
@@ -150,8 +149,7 @@ func resourceGridscalePaaSSecurityZoneUpdate(d *schema.ResourceData, meta interf
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("update paas security zone (%s) resource -", d.Id())
 	requestBody := gsclient.PaaSSecurityZoneUpdateRequest{
-		Name:         d.Get("name").(string),
-		LocationUUID: d.Get("location_uuid").(string),
+		Name: d.Get("name").(string),
 	}
 	err := client.UpdatePaaSSecurityZone(emptyCtx, d.Id(), requestBody)
 	if err != nil {

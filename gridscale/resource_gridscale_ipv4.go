@@ -8,7 +8,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 
-	"github.com/gridscale/gsclient-go"
+	"github.com/gridscale/gsclient-go/v2"
 )
 
 func resourceGridscaleIpv4() *schema.Resource {
@@ -177,11 +177,12 @@ func resourceGridscaleIpUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("update IP (%s) resource -", d.Id())
 
+	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
 	requestBody := gsclient.IPUpdateRequest{
 		Name:       d.Get("name").(string),
 		Failover:   d.Get("failover").(bool),
 		ReverseDNS: d.Get("reverse_dns").(string),
-		Labels:     convSOStrings(d.Get("labels").(*schema.Set).List()),
+		Labels:     &labels,
 	}
 
 	err := client.UpdateIP(emptyCtx, d.Id(), requestBody)

@@ -2,11 +2,14 @@ package gsclient
 
 import (
 	"errors"
-	"github.com/google/uuid"
+	"fmt"
 	"time"
+
+	"github.com/google/uuid"
 )
 
-type isContinue func() (bool, error)
+//retryableFunc defines a function that can be retried
+type retryableFunc func() (bool, error)
 
 //isValidUUID validates the uuid
 func isValidUUID(u string) bool {
@@ -15,7 +18,7 @@ func isValidUUID(u string) bool {
 }
 
 //retryWithTimeout reruns a function within a period of time
-func retryWithTimeout(targetFunc isContinue, timeout, delay time.Duration) error {
+func retryWithTimeout(targetFunc retryableFunc, timeout, delay time.Duration) error {
 	timer := time.After(timeout)
 	var err error
 	var continueRetrying bool
@@ -37,20 +40,21 @@ func retryWithTimeout(targetFunc isContinue, timeout, delay time.Duration) error
 }
 
 //retryWithLimitedNumOfRetries reruns a function within a number of retries
-func retryWithLimitedNumOfRetries(targetFunc isContinue, numOfRetries int, delay time.Duration) error {
+func retryWithLimitedNumOfRetries(targetFunc retryableFunc, numOfRetries int, delay time.Duration) error {
 	retryNo := 0
 	var err error
 	var continueRetrying bool
 	for retryNo <= numOfRetries {
-		time.Sleep(delay) //delay between retries
+		retryNo++
+		time.Sleep(delay * time.Duration(retryNo)) //delay between retries
 		continueRetrying, err = targetFunc()
 		if !continueRetrying {
 			return err
 		}
-		retryNo++
+
 	}
 	if err != nil {
-		return err
+		return fmt.Errorf("Maximum number of trials has been exhausted with error: %v", err)
 	}
-	return errors.New("timeout reached")
+	return errors.New("Maximum number of trials has been exhausted")
 }

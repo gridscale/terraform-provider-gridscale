@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 
-	"github.com/gridscale/gsclient-go"
+	"github.com/gridscale/gsclient-go/v2"
 )
 
 func TestAccResourceGridscaleFirewall_Basic(t *testing.T) {
@@ -114,6 +114,7 @@ resource "gridscale_firewall" "foo" {
 	dst_port = "2000:3000"
 	comment = "testv6"
   }
+  labels = []
 }
 `, name)
 }

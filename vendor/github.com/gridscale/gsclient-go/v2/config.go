@@ -1,18 +1,19 @@
 package gsclient
 
 import (
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"os"
 	"runtime"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 const (
 	defaultCheckRequestTimeoutSecs = 120
 	defaultMaxNumberOfRetries      = 5
-	defaultDelayIntervalMilliSecs  = 500
-	version                        = "2.1.0"
+	defaultDelayIntervalMilliSecs  = 1000
+	version                        = "2.2.1"
 	defaultAPIURL                  = "https://api.gridscale.io"
 	resourceActiveStatus           = "active"
 	requestDoneStatus              = "done"

@@ -3,7 +3,7 @@ package gridscale
 import (
 	"errors"
 	"fmt"
-	"github.com/gridscale/gsclient-go"
+	"github.com/gridscale/gsclient-go/v2"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"log"
@@ -269,9 +269,10 @@ func resourceGridscaleFirewallUpdate(d *schema.ResourceData, meta interface{}) e
 	if len(rulesV4In) == 0 && len(rulesV4Out) == 0 && len(rulesV6In) == 0 && len(rulesV6Out) == 0 {
 		return fmt.Errorf("%s error: At least 1 firewall rule in update request", errorPrefix)
 	}
+	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
 	requestBody := gsclient.FirewallUpdateRequest{
 		Name:   d.Get("name").(string),
-		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
+		Labels: &labels,
 	}
 	requestBody.Rules = &gsclient.FirewallRules{
 		RulesV6In:  rulesV6In,
@@ -311,6 +312,11 @@ func convFirewallRuleSliceToInterfaceSlice(rules []gsclient.FirewallRuleProperti
 			"dst_cidr": value.DstCidr,
 			"comment":  value.Comment,
 		}
+		if value.Protocol == gsclient.TCPTransport {
+			rule["protocol"] = "tcp"
+		} else if value.Protocol == gsclient.UDPTransport {
+			rule["protocol"] = "udp"
+		}
 		res = append(res, rule)
 	}
 	return res
@@ -321,16 +327,21 @@ func convInterfaceSliceToFirewallRulesSlice(interfaceRules []interface{}) []gscl
 	var firewallRules []gsclient.FirewallRuleProperties
 	for _, value := range interfaceRules {
 		rule := value.(map[string]interface{})
-		firewallRules = append(firewallRules, gsclient.FirewallRuleProperties{
-			Protocol: rule["protocol"].(string),
-			DstPort:  rule["dst_port"].(string),
-			SrcPort:  rule["src_port"].(string),
-			SrcCidr:  rule["src_cidr"].(string),
-			Action:   rule["action"].(string),
-			Comment:  rule["comment"].(string),
-			DstCidr:  rule["dst_cidr"].(string),
-			Order:    rule["order"].(int),
-		})
+		fwRule := gsclient.FirewallRuleProperties{
+			DstPort: rule["dst_port"].(string),
+			SrcPort: rule["src_port"].(string),
+			SrcCidr: rule["src_cidr"].(string),
+			Action:  rule["action"].(string),
+			Comment: rule["comment"].(string),
+			DstCidr: rule["dst_cidr"].(string),
+			Order:   rule["order"].(int),
+		}
+		if rule["protocol"].(string) == "tcp" {
+			fwRule.Protocol = gsclient.TCPTransport
+		} else if rule["protocol"].(string) == "udp" {
+			fwRule.Protocol = gsclient.UDPTransport
+		}
+		firewallRules = append(firewallRules, fwRule)
 	}
 	return firewallRules
 }

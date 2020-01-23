@@ -6,7 +6,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 
-	"github.com/gridscale/gsclient-go"
+	"github.com/gridscale/gsclient-go/v2"
 )
 
 func resourceGridscaleSshkey() *schema.Resource {
@@ -94,10 +94,12 @@ func resourceGridscaleSshkeyRead(d *schema.ResourceData, meta interface{}) error
 func resourceGridscaleSshkeyUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("update SSH key (%s) resource -", d.Id())
+
+	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
 	requestBody := gsclient.SshkeyUpdateRequest{
 		Name:   d.Get("name").(string),
 		Sshkey: d.Get("sshkey").(string),
-		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
+		Labels: &labels,
 	}
 
 	err := client.UpdateSshkey(emptyCtx, d.Id(), requestBody)

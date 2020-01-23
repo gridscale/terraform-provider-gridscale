@@ -201,9 +201,6 @@ type StorageCreateRequest struct {
 	//Required (integer - minimum: 1 - maximum: 4096).
 	Capacity int `json:"capacity"`
 
-	//Helps to identify which datacenter an object belongs to. Optional.
-	LocationUUID string `json:"location_uuid"`
-
 	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
 	Name string `json:"name"`
 
@@ -225,7 +222,7 @@ type StorageUpdateRequest struct {
 	Name string `json:"name,omitempty"`
 
 	//List of labels. Optional.
-	Labels []string `json:"labels,omitempty"`
+	Labels *[]string `json:"labels,omitempty"`
 
 	//The Capacity of the Storage in GB. Optional.
 	Capacity int `json:"capacity,omitempty"`

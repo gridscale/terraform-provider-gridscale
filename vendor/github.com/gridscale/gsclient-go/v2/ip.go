@@ -147,9 +147,6 @@ type IPCreateRequest struct {
 	//IP address family. Can only be either `IPv4Type` or `IPv6Type`
 	Family ipAddressType `json:"family"`
 
-	//Helps to identify which datacenter an object belongs to.
-	LocationUUID string `json:"location_uuid"`
-
 	//Sets failover mode for this IP. If true, then this IP is no longer available for DHCP and can no longer be related to any server.
 	Failover bool `json:"failover,omitempty"`
 
@@ -172,7 +169,7 @@ type IPUpdateRequest struct {
 	ReverseDNS string `json:"reverse_dns,omitempty"`
 
 	//List of labels. Leave it if you do not want to update the labels.
-	Labels []string `json:"labels,omitempty"`
+	Labels *[]string `json:"labels,omitempty"`
 }
 
 //Allowed IP address versions

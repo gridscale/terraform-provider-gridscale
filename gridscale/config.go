@@ -2,7 +2,7 @@ package gridscale
 
 import (
 	"context"
-	"github.com/gridscale/gsclient-go"
+	"github.com/gridscale/gsclient-go/v2"
 	"log"
 )
 

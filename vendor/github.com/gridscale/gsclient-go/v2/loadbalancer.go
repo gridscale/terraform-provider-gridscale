@@ -126,9 +126,6 @@ type LoadBalancerCreateRequest struct {
 	//List of labels.
 	Labels []string `json:"labels"`
 
-	//Helps to identify which datacenter an object belongs to.
-	LocationUUID string `json:"location_uuid"`
-
 	//Whether the Load balancer is forced to redirect requests from HTTP to HTTPS
 	RedirectHTTPToHTTPS bool `json:"redirect_http_to_https"`
 
@@ -158,9 +155,6 @@ type LoadBalancerUpdateRequest struct {
 
 	//List of labels.
 	Labels []string `json:"labels"`
-
-	//Helps to identify which datacenter an object belongs to.
-	LocationUUID string `json:"location_uuid"`
 
 	//Whether the Load balancer is forced to redirect requests from HTTP to HTTPS
 	RedirectHTTPToHTTPS bool `json:"redirect_http_to_https"`
