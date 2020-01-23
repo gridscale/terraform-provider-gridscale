@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 )
 
@@ -95,28 +96,44 @@ func (r *request) execute(ctx context.Context, c Client, output interface{}) err
 	//
 	err = retryWithLimitedNumOfRetries(func() (bool, error) {
 		//execute the request
-		result, err := httpClient.Do(request)
+		resp, err := httpClient.Do(request)
 		if err != nil {
+			if err, ok := err.(net.Error); ok {
+				// exclude retry request with none GET method (write operations) in case of a request timeout
+				if err.Timeout() && r.method != http.MethodGet {
+					return false, err
+				}
+				logger.Debugf("Retrying request due to network error %v", err)
+				return true, err
+			}
 			logger.Errorf("Error while executing the request: %v", err)
+			//stop retrying (false) and return error
 			return false, err
 		}
-		statusCode := result.StatusCode
-		requestUUID = result.Header.Get(requestUUIDHeaderParam)
-		responseBodyBytes, err = ioutil.ReadAll(result.Body)
+		//Close body to prevent resource leak
+		defer resp.Body.Close()
+
+		statusCode := resp.StatusCode
+		requestUUID = resp.Header.Get(requestUUIDHeaderParam)
+		responseBodyBytes, err = ioutil.ReadAll(resp.Body)
 		if err != nil {
 			logger.Errorf("Error while reading the response's body: %v", err)
+			//stop retrying (false) and return error
 			return false, err
 		}
 
 		logger.Debugf("Status code: %v. Request UUID: %v.", statusCode, requestUUID)
 
-		if result.StatusCode >= 300 {
+		if resp.StatusCode >= 300 {
 			var errorMessage RequestError //error messages have a different structure, so they are read with a different struct
 			errorMessage.StatusCode = statusCode
 			errorMessage.RequestUUID = requestUUID
 			json.Unmarshal(responseBodyBytes, &errorMessage)
 			//if internal server error OR object is in status that does not allow the request, retry
-			if result.StatusCode >= 500 || result.StatusCode == 424 {
+			if resp.StatusCode >= 500 || resp.StatusCode == 424 {
+				//retry (true) and accumulate error (in case that maximum number of retries is reached, and
+				//the latest error is still reported)
+				logger.Debugf("Retrying request: %v method sent to url %v with body %v", r.method, url, r.body)
 				return true, errorMessage
 			}
 			logger.Errorf(
@@ -126,10 +143,11 @@ func (r *request) execute(ctx context.Context, c Client, output interface{}) err
 				errorMessage.StatusCode,
 				errorMessage.RequestUUID,
 			)
+			//stop retrying (false) and return custom error
 			return false, errorMessage
 		}
 		logger.Debugf("Response body: %v", string(responseBodyBytes))
-
+		//stop retrying (false) as no more errors
 		return false, nil
 	}, c.MaxNumberOfRetries(), c.DelayInterval())
 	//if retry fails

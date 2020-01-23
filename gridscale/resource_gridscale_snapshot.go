@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/gridscale/gsclient-go"
+	"github.com/gridscale/gsclient-go/v2"
 )
 
 func resourceGridscaleStorageSnapshot() *schema.Resource {
@@ -228,12 +228,14 @@ func resourceGridscaleSnapshotCreate(d *schema.ResourceData, meta interface{}) e
 
 func resourceGridscaleSnapshotUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	requestBody := gsclient.StorageSnapshotUpdateRequest{
-		Name:   d.Get("name").(string),
-		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
-	}
 	storageUUID := d.Get("storage_uuid").(string)
 	errorPrefix := fmt.Sprintf("update snapshot (%s) resource of storage (%s) -", d.Id(), storageUUID)
+
+	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
+	requestBody := gsclient.StorageSnapshotUpdateRequest{
+		Name:   d.Get("name").(string),
+		Labels: &labels,
+	}
 	err := client.UpdateStorageSnapshot(emptyCtx, storageUUID, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)

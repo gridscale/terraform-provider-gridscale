@@ -111,7 +111,7 @@ type StorageSnapshotScheduleUpdateRequest struct {
 	Name string `json:"name,omitempty"`
 
 	//List of labels. Optional.
-	Labels []string `json:"labels,omitempty"`
+	Labels *[]string `json:"labels,omitempty"`
 
 	//The interval at which the schedule will run (in minutes). Optional.
 	//Allowed value >= 60

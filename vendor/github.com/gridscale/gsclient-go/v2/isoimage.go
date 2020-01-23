@@ -113,9 +113,6 @@ type ISOImageCreateRequest struct {
 
 	//List of labels. Can be leave empty.
 	Labels []string `json:"labels,omitempty"`
-
-	//Helps to identify which datacenter an object belongs to.
-	LocationUUID string `json:"location_uuid"`
 }
 
 //ISOImageCreateResponse is JSON struct of a response for creating an ISO-Image
@@ -133,7 +130,7 @@ type ISOImageUpdateRequest struct {
 	Name string `json:"name,omitempty"`
 
 	//List of labels. Leave it if you do not want to update the list of labels.
-	Labels []string `json:"labels,omitempty"`
+	Labels *[]string `json:"labels,omitempty"`
 }
 
 //GetISOImageList returns a list of available ISO images

@@ -106,7 +106,7 @@ type TemplateUpdateRequest struct {
 	Name string `json:"name,omitempty"`
 
 	//List of labels. Optional.
-	Labels []string `json:"labels,omitempty"`
+	Labels *[]string `json:"labels,omitempty"`
 }
 
 //GetTemplate gets a template

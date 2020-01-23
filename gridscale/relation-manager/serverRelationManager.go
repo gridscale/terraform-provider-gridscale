@@ -3,7 +3,7 @@ package relation_manager
 import (
 	"context"
 	"fmt"
-	"github.com/gridscale/gsclient-go"
+	"github.com/gridscale/gsclient-go/v2"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"net/http"
 )
@@ -166,14 +166,18 @@ func readCustomFirewallRules(netData map[string]interface{}) gsclient.FirewallRu
 			for _, rulesInType := range rulesInTypeAttr.([]interface{}) {
 				ruleProps := rulesInType.(map[string]interface{})
 				ruleProperties := gsclient.FirewallRuleProperties{
-					Protocol: ruleProps["protocol"].(string),
-					DstPort:  ruleProps["dst_port"].(string),
-					SrcPort:  ruleProps["src_port"].(string),
-					SrcCidr:  ruleProps["src_cidr"].(string),
-					Action:   ruleProps["action"].(string),
-					Comment:  ruleProps["comment"].(string),
-					DstCidr:  ruleProps["dst_cidr"].(string),
-					Order:    ruleProps["order"].(int),
+					DstPort: ruleProps["dst_port"].(string),
+					SrcPort: ruleProps["src_port"].(string),
+					SrcCidr: ruleProps["src_cidr"].(string),
+					Action:  ruleProps["action"].(string),
+					Comment: ruleProps["comment"].(string),
+					DstCidr: ruleProps["dst_cidr"].(string),
+					Order:   ruleProps["order"].(int),
+				}
+				if ruleProps["protocol"].(string) == "tcp" {
+					ruleProperties.Protocol = gsclient.TCPTransport
+				} else if ruleProps["protocol"].(string) == "udp" {
+					ruleProperties.Protocol = gsclient.UDPTransport
 				}
 				//Add rule to the array of rules
 				rules = append(rules, ruleProperties)

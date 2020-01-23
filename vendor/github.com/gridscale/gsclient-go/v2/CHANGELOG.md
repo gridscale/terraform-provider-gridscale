@@ -1,5 +1,24 @@
 # Changelog
 
+## 2.2.1 (January 21, 2020)
+
+BUG FIXES:
+* (Hot fix) Fix incompatible major version when using gomod due to missing `/v2` suffix in module path of `go.mod` file 
+
+## 2.2.0 (January 21, 2020)
+
+IMPROVEMENTS:
+* Retry requests in case of network issues (timeouts, connection resets, connection refused, etc)
+* Simple requests backoff in case of retrying errors
+* Increase defaultDelayIntervalMilliSecs to 1000 to reduce stress on API
+* Better variables/functions' names
+* Remove `LocationUUID` as objects' location depends on Project's location
+* Add gomod
+
+BUG FIXES:
+* Fix "cannot remove all labels of an object"
+* Fix resource leak due to not closing response's body
+
 ## 2.1.0 (November 05, 2019)
 
 IMPROVEMENTS:

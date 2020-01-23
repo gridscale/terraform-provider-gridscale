@@ -2,7 +2,7 @@ package gridscale
 
 import (
 	"fmt"
-	"github.com/gridscale/gsclient-go"
+	"github.com/gridscale/gsclient-go/v2"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
 )
@@ -215,9 +215,11 @@ func resourceGridscaleTemplateCreate(d *schema.ResourceData, meta interface{}) e
 func resourceGridscaleTemplateUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("update template (%s) resource -", d.Id())
+
+	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
 	requestBody := gsclient.TemplateUpdateRequest{
 		Name:   d.Get("name").(string),
-		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
+		Labels: &labels,
 	}
 
 	err := client.UpdateTemplate(emptyCtx, d.Id(), requestBody)
