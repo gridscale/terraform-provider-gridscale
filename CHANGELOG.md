@@ -2,8 +2,8 @@
 
 FEATURES:
 
-* Support all available gridscale's resources
-* Better documentation
+* Support all available gridscale resources
+* Improve documentation
 * Server CRUD is faster
 
 IMPROVEMENTS:
