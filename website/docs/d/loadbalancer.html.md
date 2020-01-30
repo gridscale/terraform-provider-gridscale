@@ -3,12 +3,12 @@ layout: "gridscale"
 page_title: "gridscale: loadbalancer"
 sidebar_current: "docs-gridscale-datasource-loadbalancer"
 description: |-
-  Gets data of a loadbalancer.
+  Get the data of a Load Balancer.
 ---
 
 # gridscale_loadbalancer
 
-Get data of an loabalancer resource.
+Get the data of a Load Balancer.
 
 ## Example Usage
 
