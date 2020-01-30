@@ -21,7 +21,6 @@ resource "gridscale_server" "terra-server-test"{
 	memory = 1
 	storage {
 		object_uuid = gridscale_storage.terra-storage-test.id
-		bootdevice = true
 	}
 	storage {
     		object_uuid = "UUID of storage 2",
@@ -65,7 +64,7 @@ The following arguments are supported:
 
 * `availability_zone` - (Optional, Computed) Defines which Availability-Zone the Server is placed.
 
-* `storage` - (Optional) Connects a storage to the server.
+* `storage` - (Optional) Connects a storage to the server. **NOTE: The first storage is always the boot device.
 
     * `object_uuid` - (Required) The object UUID or id of the storage.
 
