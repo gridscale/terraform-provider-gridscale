@@ -16,6 +16,7 @@ vet:
 
 acceptance_tests:
   stage: test
+  retry: 1
   variables:
     TF_LOG: DEBUG
   script:
