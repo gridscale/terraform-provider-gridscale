@@ -3,10 +3,11 @@ package gridscale
 import (
 	"context"
 	"fmt"
-	"github.com/gridscale/gsclient-go/v2"
 	"log"
 	"net/http"
 	"sync"
+
+	"github.com/gridscale/gsclient-go/v2"
 )
 
 type serverStatus struct {
@@ -205,20 +206,25 @@ func (l *serverStatusList) runActionRequireServerOff(
 }
 
 //initGlobalServerStatusList fetches server list and init `globalServerStatusList`
-func initGlobalServerStatusList(ctx context.Context, c *gsclient.Client) error {
-	servers, err := c.GetServerList(ctx)
-	if err != nil {
-		return err
-	}
-	for _, server := range servers {
-		uuid := server.Properties.ObjectUUID
-		status := &serverStatus{}
-		globalServerStatusList.list[uuid] = status
+func initGlobalServerStatusList(ctx context.Context, projectClients map[string]*gsclient.Client) error {
+	globalServerStatusList = make(map[string]*serverStatusList)
+	for projectName, c := range projectClients {
+		globalServerStatusList[projectName] = &serverStatusList{
+			list: make(map[string]*serverStatus),
+		}
+		servers, err := c.GetServerList(ctx)
+		if err != nil {
+			return err
+		}
+		for _, server := range servers {
+			uuid := server.Properties.ObjectUUID
+			status := &serverStatus{}
+			globalServerStatusList[projectName].list[uuid] = status
+		}
 	}
 	return nil
 }
 
 //globalServerStatusList global list of all servers' status states in terraform
-var globalServerStatusList = serverStatusList{
-	list: make(map[string]*serverStatus),
-}
+//each project has different `serverStatusList`
+var globalServerStatusList map[string]*serverStatusList
