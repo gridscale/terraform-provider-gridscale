@@ -2,8 +2,9 @@ package gridscale
 
 import (
 	"context"
-	"github.com/gridscale/gsclient-go/v2"
 	"log"
+
+	"github.com/gridscale/gsclient-go/v2"
 )
 
 //Arrays can't be constants in Go, but these will be used as constants
@@ -19,23 +20,24 @@ var emptyCtx = context.Background()
 const timeLayout = "2006-01-02 15:04:05"
 
 type Config struct {
-	UserUUID string
-	APIToken string
-	APIUrl   string
+	UserUUID        string
+	ProjectAPIToken map[string]string
+	APIUrl          string
 }
 
-func (c *Config) Client() (*gsclient.Client, error) {
-	config := gsclient.DefaultConfiguration(
-		c.UserUUID,
-		c.APIToken,
-	)
-	client := gsclient.NewClient(config)
-
-	log.Print("[INFO] gridscale client configured")
+func (c *Config) Clients() (map[string]*gsclient.Client, error) {
+	projectClients := make(map[string]*gsclient.Client)
+	for projectName, token := range c.ProjectAPIToken {
+		config := gsclient.DefaultConfiguration(
+			c.UserUUID,
+			token,
+		)
+		log.Print("[INFO] gridscale client configured")
+		projectClients[projectName] = gsclient.NewClient(config)
+	}
 
 	//Make sure the credentials are correct by getting the server list
 	//and init `globalServerStatusList` from fetched server list
-	err := initGlobalServerStatusList(emptyCtx, client)
-
-	return client, err
+	err := initGlobalServerStatusList(emptyCtx, projectClients)
+	return projectClients, err
 }
