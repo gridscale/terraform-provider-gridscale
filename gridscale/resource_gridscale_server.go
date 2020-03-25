@@ -378,7 +378,11 @@ then it will proceed onto rule 2. Packets that do not match any rules are blocke
 }
 
 func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("read server (%s) resource -", d.Id())
 	server, err := client.GetServer(emptyCtx, d.Id())
 	if err != nil {
@@ -667,7 +671,11 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceGridscaleServerDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("delete server (%s) resource -", d.Id())
 	//remove the server
 	err := globalServerStatusList.removeServerSynchronously(emptyCtx, client, d.Id())

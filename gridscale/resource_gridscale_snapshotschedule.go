@@ -104,7 +104,11 @@ func resourceGridscaleStorageSnapshotSchedule() *schema.Resource {
 }
 
 func resourceGridscaleSnapshotScheduleRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	storageUUID := d.Get("storage_uuid").(string)
 	errorPrefix := fmt.Sprintf("read snapshot schedule (%s) resource of storage (%s)-", d.Id(), storageUUID)
 	scheduler, err := client.GetStorageSnapshotSchedule(emptyCtx, storageUUID, d.Id())
@@ -164,7 +168,11 @@ func resourceGridscaleSnapshotScheduleRead(d *schema.ResourceData, meta interfac
 }
 
 func resourceGridscaleSnapshotScheduleCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	requestBody := gsclient.StorageSnapshotScheduleCreateRequest{
 		Name:          d.Get("name").(string),
 		Labels:        convSOStrings(d.Get("labels").(*schema.Set).List()),
@@ -188,7 +196,11 @@ func resourceGridscaleSnapshotScheduleCreate(d *schema.ResourceData, meta interf
 }
 
 func resourceGridscaleSnapshotScheduleUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	storageUUID := d.Get("storage_uuid").(string)
 	errorPrefix := fmt.Sprintf("update snapshot schedule (%s) resource of storage (%s)-", d.Id(), storageUUID)
 
@@ -214,7 +226,11 @@ func resourceGridscaleSnapshotScheduleUpdate(d *schema.ResourceData, meta interf
 }
 
 func resourceGridscaleSnapshotScheduleDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	storageUUID := d.Get("storage_uuid").(string)
 	errorPrefix := fmt.Sprintf("delete snapshot schedule (%s) resource of storage (%s)-", d.Id(), storageUUID)
 	err := client.DeleteStorageSnapshotSchedule(emptyCtx, storageUUID, d.Id())

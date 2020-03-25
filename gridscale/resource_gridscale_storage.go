@@ -177,7 +177,11 @@ func resourceGridscaleStorage() *schema.Resource {
 }
 
 func resourceGridscaleStorageRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("read storage (%s) resource -", d.Id())
 	storage, err := client.GetStorage(emptyCtx, d.Id())
 	if err != nil {
@@ -243,7 +247,11 @@ func resourceGridscaleStorageRead(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceGridscaleStorageUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("update storage (%s) resource -", d.Id())
 
 	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
@@ -261,7 +269,11 @@ func resourceGridscaleStorageUpdate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 
 	requestBody := gsclient.StorageCreateRequest{
 		Name:     d.Get("name").(string),
@@ -313,7 +325,11 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceGridscaleStorageDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("delete storage (%s) resource -", d.Id())
 	storage, err := client.GetStorage(emptyCtx, d.Id())
 	if err != nil {

@@ -138,7 +138,11 @@ func resourceGridscaleISOImage() *schema.Resource {
 }
 
 func resourceGridscaleISOImageRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("read ISO-Image (%s) resource -", d.Id())
 	iso, err := client.GetISOImage(emptyCtx, d.Id())
 	if err != nil {
@@ -219,7 +223,11 @@ func resourceGridscaleISOImageRead(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceGridscaleISOImageCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 
 	requestBody := gsclient.ISOImageCreateRequest{
 		Name:      d.Get("name").(string),
@@ -240,7 +248,11 @@ func resourceGridscaleISOImageCreate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceGridscaleISOImageUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("update ISO-Image (%s) resource -", d.Id())
 
 	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
@@ -258,7 +270,11 @@ func resourceGridscaleISOImageUpdate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceGridscaleISOImageDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("delete ISO-Image (%s) resource -", d.Id())
 
 	isoimage, err := client.GetISOImage(emptyCtx, d.Id())

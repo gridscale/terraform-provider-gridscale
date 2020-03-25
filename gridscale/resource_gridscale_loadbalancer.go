@@ -131,7 +131,11 @@ func resourceGridscaleLoadBalancer() *schema.Resource {
 }
 
 func resourceGridscaleLoadBalancerCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 
 	requestBody := gsclient.LoadBalancerCreateRequest{
 		Name:                d.Get("name").(string),
@@ -164,7 +168,11 @@ func resourceGridscaleLoadBalancerCreate(d *schema.ResourceData, meta interface{
 }
 
 func resourceGridscaleLoadBalancerRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("read loadbalancer (%s) resource -", d.Id())
 	loadbalancer, err := client.GetLoadBalancer(emptyCtx, d.Id())
 	if err != nil {
@@ -215,7 +223,11 @@ func resourceGridscaleLoadBalancerRead(d *schema.ResourceData, meta interface{})
 }
 
 func resourceGridscaleLoadBalancerUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("update loadbalancer (%s) resource -", d.Id())
 	requestBody := gsclient.LoadBalancerUpdateRequest{
 		Name:                d.Get("name").(string),
@@ -246,7 +258,11 @@ func resourceGridscaleLoadBalancerUpdate(d *schema.ResourceData, meta interface{
 }
 
 func resourceGridscaleLoadBalancerDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("delete loadbalancer (%s) resource-", d.Id())
 	err := client.DeleteLoadBalancer(emptyCtx, d.Id())
 	if err != nil {

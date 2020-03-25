@@ -61,7 +61,11 @@ func resourceGridscaleSshkey() *schema.Resource {
 }
 
 func resourceGridscaleSshkeyRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("read SSH key (%s) resource -", d.Id())
 	sshkey, err := client.GetSshkey(emptyCtx, d.Id())
 	if err != nil {
@@ -98,7 +102,11 @@ func resourceGridscaleSshkeyRead(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceGridscaleSshkeyUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("update SSH key (%s) resource -", d.Id())
 
 	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
@@ -117,7 +125,11 @@ func resourceGridscaleSshkeyUpdate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceGridscaleSshkeyCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 
 	requestBody := gsclient.SshkeyCreateRequest{
 		Name:   d.Get("name").(string),
@@ -138,7 +150,11 @@ func resourceGridscaleSshkeyCreate(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceGridscaleSshkeyDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("delete SSH key (%s) resource -", d.Id())
 	err := client.DeleteSshkey(emptyCtx, d.Id())
 	if err != nil {

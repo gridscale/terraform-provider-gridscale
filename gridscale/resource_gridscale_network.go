@@ -98,7 +98,11 @@ func resourceGridscaleNetwork() *schema.Resource {
 }
 
 func resourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("read network (%s) resource -", d.Id())
 	network, err := client.GetNetwork(emptyCtx, d.Id())
 	if err != nil {
@@ -153,7 +157,11 @@ func resourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) erro
 }
 
 func resourceGridscaleNetworkUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("update network (%s) resource -", d.Id())
 
 	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
@@ -172,7 +180,11 @@ func resourceGridscaleNetworkUpdate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 
 	requestBody := gsclient.NetworkCreateRequest{
 		Name:       d.Get("name").(string),
@@ -193,7 +205,11 @@ func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) er
 }
 
 func resourceGridscaleNetworkDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("delete network (%s) resource -", d.Id())
 	net, err := client.GetNetwork(emptyCtx, d.Id())
 	if err != nil {

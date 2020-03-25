@@ -126,7 +126,11 @@ func resourceGridscaleTemplate() *schema.Resource {
 }
 
 func resourceGridscaleTemplateRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("read template (%s) resource -", d.Id())
 	template, err := client.GetTemplate(emptyCtx, d.Id())
 	if err != nil {
@@ -199,7 +203,11 @@ func resourceGridscaleTemplateRead(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceGridscaleTemplateCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 
 	requestBody := gsclient.TemplateCreateRequest{
 		Name:         d.Get("name").(string),
@@ -220,7 +228,11 @@ func resourceGridscaleTemplateCreate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceGridscaleTemplateUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("update template (%s) resource -", d.Id())
 
 	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
@@ -238,7 +250,11 @@ func resourceGridscaleTemplateUpdate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceGridscaleTemplateDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("delete template (%s) resource -", d.Id())
 	err := client.DeleteTemplate(emptyCtx, d.Id())
 	if err != nil {

@@ -116,7 +116,11 @@ func resourceGridscaleIpv4() *schema.Resource {
 }
 
 func resourceGridscaleIpRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("read IP (%s) resource -", d.Id())
 	ip, err := client.GetIP(emptyCtx, d.Id())
 	if err != nil {
@@ -180,7 +184,11 @@ func resourceGridscaleIpRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceGridscaleIpUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("update IP (%s) resource -", d.Id())
 
 	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
@@ -200,7 +208,11 @@ func resourceGridscaleIpUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceGridscaleIpv4Create(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 
 	requestBody := gsclient.IPCreateRequest{
 		Family:     gsclient.IPv4Type,
@@ -223,7 +235,11 @@ func resourceGridscaleIpv4Create(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceGridscaleIpDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("delete IP (%s) resource -", d.Id())
 
 	ip, err := client.GetIP(emptyCtx, d.Id())

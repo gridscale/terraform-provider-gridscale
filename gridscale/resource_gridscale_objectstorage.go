@@ -38,7 +38,11 @@ func resourceGridscaleObjectStorage() *schema.Resource {
 }
 
 func resourceGridscaleObjectStorageRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("read object storage (%s) resource -", d.Id())
 	objectStorage, err := client.GetObjectStorageAccessKey(emptyCtx, d.Id())
 	if err != nil {
@@ -61,7 +65,11 @@ func resourceGridscaleObjectStorageRead(d *schema.ResourceData, meta interface{}
 }
 
 func resourceGridscaleObjectStorageCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 
 	response, err := client.CreateObjectStorageAccessKey(emptyCtx)
 	if err != nil {
@@ -75,7 +83,11 @@ func resourceGridscaleObjectStorageCreate(d *schema.ResourceData, meta interface
 }
 
 func resourceGridscaleObjectStorageDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("delete object storage (%s) resource -", d.Id())
 	err := client.DeleteObjectStorageAccessKey(emptyCtx, d.Id())
 	if err != nil {

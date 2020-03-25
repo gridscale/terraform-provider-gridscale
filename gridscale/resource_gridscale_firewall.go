@@ -130,7 +130,11 @@ func resourceGridscaleFirewall() *schema.Resource {
 }
 
 func resourceGridscaleFirewallRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("read firewall (%s) resource -", d.Id())
 	template, err := client.GetFirewall(emptyCtx, d.Id())
 	if err != nil {
@@ -213,7 +217,11 @@ func resourceGridscaleFirewallRead(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceGridscaleFirewallCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	var rulesV4In, rulesV4Out, rulesV6In, rulesV6Out []gsclient.FirewallRuleProperties
 	//Get firewall rules from schema
 	if attr, ok := d.GetOk("rules_v4_in"); ok {
@@ -256,7 +264,11 @@ func resourceGridscaleFirewallCreate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceGridscaleFirewallUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("update firewall (%s) resource -", d.Id())
 
 	var rulesV4In, rulesV4Out, rulesV6In, rulesV6Out []gsclient.FirewallRuleProperties
@@ -296,7 +308,11 @@ func resourceGridscaleFirewallUpdate(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceGridscaleFirewallDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("delete firewall (%s) resource -", d.Id())
 	err := client.DeleteFirewall(emptyCtx, d.Id())
 	if err != nil {

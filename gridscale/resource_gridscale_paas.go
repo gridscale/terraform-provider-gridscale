@@ -166,7 +166,11 @@ func resourceGridscalePaaS() *schema.Resource {
 }
 
 func resourceGridscalePaaSServiceRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("read paas (%s) resource -", d.Id())
 	paas, err := client.GetPaaSService(emptyCtx, d.Id())
 	if err != nil {
@@ -286,7 +290,11 @@ func resourceGridscalePaaSServiceRead(d *schema.ResourceData, meta interface{}) 
 }
 
 func resourceGridscalePaaSServiceCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	requestBody := gsclient.PaaSServiceCreateRequest{
 		Name:                    d.Get("name").(string),
 		PaaSServiceTemplateUUID: d.Get("service_template_uuid").(string),
@@ -330,7 +338,11 @@ func resourceGridscalePaaSServiceCreate(d *schema.ResourceData, meta interface{}
 }
 
 func resourceGridscalePaaSServiceUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("update paas (%s) resource -", d.Id())
 
 	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
@@ -373,7 +385,11 @@ func resourceGridscalePaaSServiceUpdate(d *schema.ResourceData, meta interface{}
 }
 
 func resourceGridscalePaaSServiceDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("delete paas (%s) resource -", d.Id())
 	err := client.DeletePaaSService(emptyCtx, d.Id())
 	if err != nil {

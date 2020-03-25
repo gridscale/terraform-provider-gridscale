@@ -113,7 +113,11 @@ func resourceGridscaleIpv6() *schema.Resource {
 }
 
 func resourceGridscaleIpv6Create(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 
 	requestBody := gsclient.IPCreateRequest{
 		Family:     gsclient.IPv6Type,

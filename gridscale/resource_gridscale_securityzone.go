@@ -84,7 +84,11 @@ func resourceGridscalePaaSSecurityZone() *schema.Resource {
 }
 
 func resourceGridscalePaaSSecurityZoneRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("read paas security zone (%s) resource -", d.Id())
 	secZone, err := client.GetPaaSSecurityZone(emptyCtx, d.Id())
 	if err != nil {
@@ -139,7 +143,11 @@ func resourceGridscalePaaSSecurityZoneRead(d *schema.ResourceData, meta interfac
 }
 
 func resourceGridscalePaaSSecurityZoneCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	requestBody := gsclient.PaaSSecurityZoneCreateRequest{
 		Name: d.Get("name").(string),
 	}
@@ -153,7 +161,11 @@ func resourceGridscalePaaSSecurityZoneCreate(d *schema.ResourceData, meta interf
 }
 
 func resourceGridscalePaaSSecurityZoneUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("update paas security zone (%s) resource -", d.Id())
 	requestBody := gsclient.PaaSSecurityZoneUpdateRequest{
 		Name: d.Get("name").(string),
@@ -166,7 +178,11 @@ func resourceGridscalePaaSSecurityZoneUpdate(d *schema.ResourceData, meta interf
 }
 
 func resourceGridscalePaaSSecurityZoneDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	errorPrefix := fmt.Sprintf("delete paas security zone (%s) resource -", d.Id())
 	err := client.DeletePaaSSecurityZone(emptyCtx, d.Id())
 	if err != nil {
