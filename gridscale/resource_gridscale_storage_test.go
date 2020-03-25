@@ -80,7 +80,11 @@ func testAccCheckResourceGridscaleStorageExists(n string, object *gsclient.Stora
 			return fmt.Errorf("No object UUID is set")
 		}
 
-		client := testAccProvider.Meta().(*gsclient.Client)
+		projectName := rs.Primary.Attributes["project"]
+		client, err := getProjectClientFromMeta(projectName, testAccProvider.Meta())
+		if err != nil {
+			return err
+		}
 
 		id := rs.Primary.ID
 
@@ -101,16 +105,19 @@ func testAccCheckResourceGridscaleStorageExists(n string, object *gsclient.Stora
 }
 
 func testAccCheckGridscaleStorageDestroyCheck(s *terraform.State) error {
-	client := testAccProvider.Meta().(*gsclient.Client)
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gridscale_storage" {
 			continue
 		}
-
+		projectName := rs.Primary.Attributes["project"]
+		client, err := getProjectClientFromMeta(projectName, testAccProvider.Meta())
+		if err != nil {
+			return err
+		}
 		//We wait a while for the storage to delete, since it is not instant
 		time.Sleep(time.Second * 5)
 
-		_, err := client.GetStorage(emptyCtx, rs.Primary.ID)
+		_, err = client.GetStorage(emptyCtx, rs.Primary.ID)
 		if err != nil {
 			if requestError, ok := err.(gsclient.RequestError); ok {
 				if requestError.StatusCode != 404 {

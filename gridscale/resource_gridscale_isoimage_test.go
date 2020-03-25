@@ -52,7 +52,11 @@ func testAccCheckResourceGridscaleISOImageExists(n string, object *gsclient.ISOI
 			return fmt.Errorf("No object UUID is set")
 		}
 
-		client := testAccProvider.Meta().(*gsclient.Client)
+		projectName := rs.Primary.Attributes["project"]
+		client, err := getProjectClientFromMeta(projectName, testAccProvider.Meta())
+		if err != nil {
+			return err
+		}
 
 		id := rs.Primary.ID
 
@@ -73,13 +77,16 @@ func testAccCheckResourceGridscaleISOImageExists(n string, object *gsclient.ISOI
 }
 
 func testAccCheckGridscaleISOImageDestroyCheck(s *terraform.State) error {
-	client := testAccProvider.Meta().(*gsclient.Client)
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gridscale_isoimage" {
 			continue
 		}
-
-		_, err := client.GetISOImage(emptyCtx, rs.Primary.ID)
+		projectName := rs.Primary.Attributes["project"]
+		client, err := getProjectClientFromMeta(projectName, testAccProvider.Meta())
+		if err != nil {
+			return err
+		}
+		_, err = client.GetISOImage(emptyCtx, rs.Primary.ID)
 		if err != nil {
 			if requestError, ok := err.(gsclient.RequestError); ok {
 				if requestError.StatusCode != 404 {

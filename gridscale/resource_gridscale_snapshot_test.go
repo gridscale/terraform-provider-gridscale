@@ -57,7 +57,11 @@ func testAccCheckDataSourceGridscaleSnapshotExists(n string, object *gsclient.St
 		if rs.Primary.ID == "" {
 			return fmt.Errorf("No object UUID is set")
 		}
-		client := testAccProvider.Meta().(*gsclient.Client)
+		projectName := rs.Primary.Attributes["project"]
+		client, err := getProjectClientFromMeta(projectName, testAccProvider.Meta())
+		if err != nil {
+			return err
+		}
 		id := rs.Primary.ID
 		storageID := rs.Primary.Attributes["storage_uuid"]
 		foundObject, err := client.GetStorageSnapshot(emptyCtx, storageID, id)
@@ -73,13 +77,16 @@ func testAccCheckDataSourceGridscaleSnapshotExists(n string, object *gsclient.St
 }
 
 func testAccCheckDataSourceGridscaleSnapshotDestroyCheck(s *terraform.State) error {
-	client := testAccProvider.Meta().(*gsclient.Client)
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gridscale_snapshot" {
 			continue
 		}
-
-		_, err := client.GetStorageSnapshot(emptyCtx, rs.Primary.Attributes["storage_uuid"], rs.Primary.ID)
+		projectName := rs.Primary.Attributes["project"]
+		client, err := getProjectClientFromMeta(projectName, testAccProvider.Meta())
+		if err != nil {
+			return err
+		}
+		_, err = client.GetStorageSnapshot(emptyCtx, rs.Primary.Attributes["storage_uuid"], rs.Primary.ID)
 		if err != nil {
 			if requestError, ok := err.(gsclient.RequestError); ok {
 				if requestError.StatusCode != 404 {

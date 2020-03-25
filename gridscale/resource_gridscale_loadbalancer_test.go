@@ -56,7 +56,11 @@ func testAccCheckResourceGridscaleLoadBalancerExists(n string, object *gsclient.
 			return fmt.Errorf("No object UUID is set")
 		}
 
-		client := testAccProvider.Meta().(*gsclient.Client)
+		projectName := rs.Primary.Attributes["project"]
+		client, err := getProjectClientFromMeta(projectName, testAccProvider.Meta())
+		if err != nil {
+			return err
+		}
 
 		id := rs.Primary.ID
 
@@ -145,13 +149,16 @@ resource "gridscale_loadbalancer" "foo" {
 }
 
 func testAccCheckGridscaleLoadBalancerDestroyCheck(s *terraform.State) error {
-	client := testAccProvider.Meta().(*gsclient.Client)
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gridscale_loadbalancer" {
 			continue
 		}
-
-		_, err := client.GetLoadBalancer(emptyCtx, rs.Primary.ID)
+		projectName := rs.Primary.Attributes["project"]
+		client, err := getProjectClientFromMeta(projectName, testAccProvider.Meta())
+		if err != nil {
+			return err
+		}
+		_, err = client.GetLoadBalancer(emptyCtx, rs.Primary.ID)
 		if err != nil {
 			if requestError, ok := err.(gsclient.RequestError); ok {
 				if requestError.StatusCode != 404 {
