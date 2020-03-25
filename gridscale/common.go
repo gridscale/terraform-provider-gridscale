@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -88,4 +89,31 @@ func convInterfaceToString(interfaceType string, val interface{}) (string, error
 	default:
 		return "", errors.New("type is invalid")
 	}
+}
+
+//covStringToMapStringString converts a string to map[string]string
+//String format: "key1:val1,key2:val2,key3:val3"
+func covStringToMapStringString(str string) (map[string]string, error) {
+	formatError := errors.New(`invalid string. valid format: "key1:val1,key2:val2,key3:val3"`)
+	result := make(map[string]string)
+	//Split string by commas
+	commaSplitSlice := strings.Split(str, ",")
+	//loop through all "key:value" element in commaSplitSlice
+	for _, v := range commaSplitSlice {
+		if strings.TrimSpace(v) != "" {
+			//Split the element by a colon
+			colonSplitSlice := strings.Split(v, ":")
+			//the length of colonSplitSlice has to be 2 as
+			//there are 2 elements: key and value
+			if len(colonSplitSlice) == 2 {
+				result[colonSplitSlice[0]] = colonSplitSlice[1]
+			} else {
+				return nil, formatError
+			}
+		} else {
+			//if there is a empty element, return error
+			return nil, formatError
+		}
+	}
+	return result, nil
 }
