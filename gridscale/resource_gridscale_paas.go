@@ -377,7 +377,7 @@ func resourceGridscalePaaSServiceUpdate(d *schema.ResourceData, meta interface{}
 	}
 	requestBody.ResourceLimits = limits
 
-	err := client.UpdatePaaSService(emptyCtx, d.Id(), requestBody)
+	err = client.UpdatePaaSService(emptyCtx, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -391,7 +391,7 @@ func resourceGridscalePaaSServiceDelete(d *schema.ResourceData, meta interface{}
 		return err
 	}
 	errorPrefix := fmt.Sprintf("delete paas (%s) resource -", d.Id())
-	err := client.DeletePaaSService(emptyCtx, d.Id())
+	err = client.DeletePaaSService(emptyCtx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

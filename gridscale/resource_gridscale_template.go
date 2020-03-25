@@ -241,7 +241,7 @@ func resourceGridscaleTemplateUpdate(d *schema.ResourceData, meta interface{}) e
 		Labels: &labels,
 	}
 
-	err := client.UpdateTemplate(emptyCtx, d.Id(), requestBody)
+	err = client.UpdateTemplate(emptyCtx, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -256,7 +256,7 @@ func resourceGridscaleTemplateDelete(d *schema.ResourceData, meta interface{}) e
 		return err
 	}
 	errorPrefix := fmt.Sprintf("delete template (%s) resource -", d.Id())
-	err := client.DeleteTemplate(emptyCtx, d.Id())
+	err = client.DeleteTemplate(emptyCtx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

@@ -171,7 +171,7 @@ func resourceGridscaleNetworkUpdate(d *schema.ResourceData, meta interface{}) er
 		Labels:     &labels,
 	}
 
-	err := client.UpdateNetwork(emptyCtx, d.Id(), requestBody)
+	err = client.UpdateNetwork(emptyCtx, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

@@ -249,7 +249,7 @@ func resourceGridscaleLoadBalancerUpdate(d *schema.ResourceData, meta interface{
 	if forwardingRules, ok := d.GetOk("forwarding_rule"); ok {
 		requestBody.ForwardingRules = expandLoadbalancerForwardingRules(forwardingRules)
 	}
-	err := client.UpdateLoadBalancer(emptyCtx, d.Id(), requestBody)
+	err = client.UpdateLoadBalancer(emptyCtx, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 
@@ -264,7 +264,7 @@ func resourceGridscaleLoadBalancerDelete(d *schema.ResourceData, meta interface{
 		return err
 	}
 	errorPrefix := fmt.Sprintf("delete loadbalancer (%s) resource-", d.Id())
-	err := client.DeleteLoadBalancer(emptyCtx, d.Id())
+	err = client.DeleteLoadBalancer(emptyCtx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

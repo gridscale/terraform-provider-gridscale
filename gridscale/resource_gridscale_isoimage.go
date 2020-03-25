@@ -261,7 +261,7 @@ func resourceGridscaleISOImageUpdate(d *schema.ResourceData, meta interface{}) e
 		Labels: &labels,
 	}
 
-	err := client.UpdateISOImage(emptyCtx, d.Id(), requestBody)
+	err = client.UpdateISOImage(emptyCtx, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

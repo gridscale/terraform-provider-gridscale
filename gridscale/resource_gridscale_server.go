@@ -678,7 +678,7 @@ func resourceGridscaleServerDelete(d *schema.ResourceData, meta interface{}) err
 	}
 	errorPrefix := fmt.Sprintf("delete server (%s) resource -", d.Id())
 	//remove the server
-	err := globalServerStatusList.removeServerSynchronously(emptyCtx, client, d.Id())
+	err = globalServerStatusList.removeServerSynchronously(emptyCtx, client, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

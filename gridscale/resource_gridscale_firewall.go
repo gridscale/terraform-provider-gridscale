@@ -299,7 +299,7 @@ func resourceGridscaleFirewallUpdate(d *schema.ResourceData, meta interface{}) e
 		RulesV4In:  rulesV4In,
 		RulesV4Out: rulesV4Out,
 	}
-	err := client.UpdateFirewall(emptyCtx, d.Id(), requestBody)
+	err = client.UpdateFirewall(emptyCtx, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -314,7 +314,7 @@ func resourceGridscaleFirewallDelete(d *schema.ResourceData, meta interface{}) e
 		return err
 	}
 	errorPrefix := fmt.Sprintf("delete firewall (%s) resource -", d.Id())
-	err := client.DeleteFirewall(emptyCtx, d.Id())
+	err = client.DeleteFirewall(emptyCtx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

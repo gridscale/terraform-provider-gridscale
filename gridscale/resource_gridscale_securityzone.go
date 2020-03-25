@@ -170,7 +170,7 @@ func resourceGridscalePaaSSecurityZoneUpdate(d *schema.ResourceData, meta interf
 	requestBody := gsclient.PaaSSecurityZoneUpdateRequest{
 		Name: d.Get("name").(string),
 	}
-	err := client.UpdatePaaSSecurityZone(emptyCtx, d.Id(), requestBody)
+	err = client.UpdatePaaSSecurityZone(emptyCtx, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -184,7 +184,7 @@ func resourceGridscalePaaSSecurityZoneDelete(d *schema.ResourceData, meta interf
 		return err
 	}
 	errorPrefix := fmt.Sprintf("delete paas security zone (%s) resource -", d.Id())
-	err := client.DeletePaaSSecurityZone(emptyCtx, d.Id())
+	err = client.DeletePaaSSecurityZone(emptyCtx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

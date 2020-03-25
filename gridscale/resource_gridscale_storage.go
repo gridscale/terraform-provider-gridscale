@@ -260,7 +260,7 @@ func resourceGridscaleStorageUpdate(d *schema.ResourceData, meta interface{}) er
 		Labels: &labels,
 	}
 
-	err := client.UpdateStorage(emptyCtx, d.Id(), requestBody)
+	err = client.UpdateStorage(emptyCtx, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

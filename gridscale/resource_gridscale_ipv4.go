@@ -199,7 +199,7 @@ func resourceGridscaleIpUpdate(d *schema.ResourceData, meta interface{}) error {
 		Labels:     &labels,
 	}
 
-	err := client.UpdateIP(emptyCtx, d.Id(), requestBody)
+	err = client.UpdateIP(emptyCtx, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

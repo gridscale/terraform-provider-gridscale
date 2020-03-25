@@ -116,7 +116,7 @@ func resourceGridscaleSshkeyUpdate(d *schema.ResourceData, meta interface{}) err
 		Labels: &labels,
 	}
 
-	err := client.UpdateSshkey(emptyCtx, d.Id(), requestBody)
+	err = client.UpdateSshkey(emptyCtx, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -156,7 +156,7 @@ func resourceGridscaleSshkeyDelete(d *schema.ResourceData, meta interface{}) err
 		return err
 	}
 	errorPrefix := fmt.Sprintf("delete SSH key (%s) resource -", d.Id())
-	err := client.DeleteSshkey(emptyCtx, d.Id())
+	err = client.DeleteSshkey(emptyCtx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
