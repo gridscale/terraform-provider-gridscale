@@ -2,10 +2,11 @@ package gridscale
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/gridscale/gsclient-go/v2"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	"strings"
 
 	"log"
 )
@@ -20,6 +21,12 @@ func resourceGridscalePaaS() *schema.Resource {
 			State: schema.ImportStatePassthrough,
 		},
 		Schema: map[string]*schema.Schema{
+			"project": {
+				Type:        schema.TypeString,
+				Description: "The project name that set in `GRIDSCALE_PROJECTS_TOKENS` env or `projects_tokens` tf variable",
+				Required:    true,
+				ForceNew:    true,
+			},
 			"name": {
 				Type:         schema.TypeString,
 				Description:  "The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters",

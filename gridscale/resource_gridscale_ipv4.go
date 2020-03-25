@@ -22,6 +22,12 @@ func resourceGridscaleIpv4() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
+			"project": {
+				Type:        schema.TypeString,
+				Description: "The project name that set in `GRIDSCALE_PROJECTS_TOKENS` env or `projects_tokens` tf variable",
+				Required:    true,
+				ForceNew:    true,
+			},
 			"ip": {
 				Type:        schema.TypeString,
 				Description: "Defines the IP Address.",

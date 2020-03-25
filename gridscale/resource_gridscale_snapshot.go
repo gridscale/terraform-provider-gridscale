@@ -2,9 +2,10 @@ package gridscale
 
 import (
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
 	"time"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 
 	"github.com/gridscale/gsclient-go/v2"
 )
@@ -20,6 +21,12 @@ func resourceGridscaleStorageSnapshot() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
+			"project": {
+				Type:        schema.TypeString,
+				Description: "The project name that set in `GRIDSCALE_PROJECTS_TOKENS` env or `projects_tokens` tf variable",
+				Required:    true,
+				ForceNew:    true,
+			},
 			"name": {
 				Type:        schema.TypeString,
 				Required:    true,

@@ -2,9 +2,10 @@ package gridscale
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/gridscale/gsclient-go/v2"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"log"
 )
 
 func resourceGridscaleObjectStorage() *schema.Resource {
@@ -16,6 +17,12 @@ func resourceGridscaleObjectStorage() *schema.Resource {
 			State: schema.ImportStatePassthrough,
 		},
 		Schema: map[string]*schema.Schema{
+			"project": {
+				Type:        schema.TypeString,
+				Description: "The project name that set in `GRIDSCALE_PROJECTS_TOKENS` env or `projects_tokens` tf variable",
+				Required:    true,
+				ForceNew:    true,
+			},
 			"access_key": {
 				Type:        schema.TypeString,
 				Description: "The object storage secret_key.",
