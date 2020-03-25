@@ -578,7 +578,11 @@ func flattenFirewallRuleProperties(props gsclient.FirewallRuleProperties) map[st
 }
 
 func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) error {
-	gsc := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	gsc, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	serverRelMan := relation_manager.NewServerRelationManger(gsc, d)
 	requestBody := gsclient.ServerCreateRequest{
 		Name:            d.Get("name").(string),
@@ -623,7 +627,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	log.Printf("[DEBUG] The id for %s has been set to: %v", requestBody.Name, response.ServerUUID)
 
 	//Add server power status to globalServerStatusList
-	err = globalServerStatusList.addServer(d.Id())
+	err = globalServerStatusList[projectName].addServer(d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -661,7 +665,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	//Set the power state if needed
 	power := d.Get("power").(bool)
 	if power {
-		err = globalServerStatusList.startServerSynchronously(emptyCtx, gsc, d.Id())
+		err = globalServerStatusList[projectName].startServerSynchronously(emptyCtx, gsc, d.Id())
 		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
@@ -678,7 +682,7 @@ func resourceGridscaleServerDelete(d *schema.ResourceData, meta interface{}) err
 	}
 	errorPrefix := fmt.Sprintf("delete server (%s) resource -", d.Id())
 	//remove the server
-	err = globalServerStatusList.removeServerSynchronously(emptyCtx, client, d.Id())
+	err = globalServerStatusList[projectName].removeServerSynchronously(emptyCtx, client, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -686,10 +690,13 @@ func resourceGridscaleServerDelete(d *schema.ResourceData, meta interface{}) err
 }
 
 func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) error {
-	gsc := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	gsc, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	serverDepClient := relation_manager.NewServerRelationManger(gsc, d)
 	shutdownRequired := serverDepClient.IsShutdownRequired(emptyCtx)
-	var err error
 	errorPrefix := fmt.Sprintf("update server (%s) resource -", d.Id())
 
 	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
@@ -729,7 +736,7 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 			err = serverDepClient.UpdateStoragesRel(ctx)
 			return err
 		}
-		err = globalServerStatusList.runActionRequireServerOff(emptyCtx, gsc, d.Id(), true, updateSequence)
+		err = globalServerStatusList[projectName].runActionRequireServerOff(emptyCtx, gsc, d.Id(), true, updateSequence)
 		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 
@@ -752,12 +759,12 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 	// Make sure the server in is the expected power state.
 	// The StartServer and ShutdownServer functions do a check to see if the server isn't already running, so we don't need to do that here.
 	if d.Get("power").(bool) {
-		err = globalServerStatusList.startServerSynchronously(emptyCtx, gsc, d.Id())
+		err = globalServerStatusList[projectName].startServerSynchronously(emptyCtx, gsc, d.Id())
 		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
 	} else {
-		err = globalServerStatusList.shutdownServerSynchronously(emptyCtx, gsc, d.Id())
+		err = globalServerStatusList[projectName].shutdownServerSynchronously(emptyCtx, gsc, d.Id())
 		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}

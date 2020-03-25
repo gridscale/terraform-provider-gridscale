@@ -255,7 +255,7 @@ func resourceGridscaleIpDelete(d *schema.ResourceData, meta interface{}) error {
 			return err
 		}
 		//DeleteIP requires the server to be off
-		err = globalServerStatusList.runActionRequireServerOff(emptyCtx, client, server.ServerUUID, false, unlinkIPAction)
+		err = globalServerStatusList[projectName].runActionRequireServerOff(emptyCtx, client, server.ServerUUID, false, unlinkIPAction)
 		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}

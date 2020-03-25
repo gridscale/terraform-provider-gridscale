@@ -223,7 +223,7 @@ func resourceGridscaleNetworkDelete(d *schema.ResourceData, meta interface{}) er
 			return err
 		}
 		//UnlinkNetwork requires the server to be off
-		err = globalServerStatusList.runActionRequireServerOff(emptyCtx, client, server.ObjectUUID, false, unlinkNetAction)
+		err = globalServerStatusList[projectName].runActionRequireServerOff(emptyCtx, client, server.ObjectUUID, false, unlinkNetAction)
 		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}

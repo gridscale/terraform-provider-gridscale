@@ -343,7 +343,7 @@ func resourceGridscaleStorageDelete(d *schema.ResourceData, meta interface{}) er
 			return err
 		}
 		//UnlinkStorage requires the server to be off
-		err = globalServerStatusList.runActionRequireServerOff(emptyCtx, client, server.ObjectUUID, false, unlinkStorageAction)
+		err = globalServerStatusList[projectName].runActionRequireServerOff(emptyCtx, client, server.ObjectUUID, false, unlinkStorageAction)
 		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
