@@ -14,11 +14,11 @@ func Provider() terraform.ResourceProvider {
 				DefaultFunc: schema.EnvDefaultFunc("GRIDSCALE_UUID", nil),
 				Description: "User-UUID for the gridscale API.",
 			},
-			"token": {
+			"projects_tokens": {
 				Type:        schema.TypeString,
 				Required:    true,
-				DefaultFunc: schema.EnvDefaultFunc("GRIDSCALE_TOKEN", nil),
-				Description: "API-token for the gridscale API.",
+				DefaultFunc: schema.EnvDefaultFunc("GRIDSCALE_PROJECTS_TOKENS", nil),
+				Description: "Projects' API-tokens for the gridscale API.",
 			},
 			"api_url": {
 				Type:        schema.TypeString,
@@ -68,11 +68,15 @@ func Provider() terraform.ResourceProvider {
 }
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
+	projectsTokensMap, err := covStringToMapStringString(d.Get("projects_tokens").(string))
+	if err != nil {
+		return nil, err
+	}
 	config := Config{
-		UserUUID: d.Get("uuid").(string),
-		APIToken: d.Get("token").(string),
-		APIUrl:   d.Get("api_url").(string),
+		UserUUID:        d.Get("uuid").(string),
+		APIUrl:          d.Get("api_url").(string),
+		ProjectAPIToken: projectsTokensMap,
 	}
 
-	return config.Client()
+	return config.Clients()
 }
