@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/gridscale/gsclient-go/v2"
 )
 
 const (
@@ -116,4 +118,17 @@ func covStringToMapStringString(str string) (map[string]string, error) {
 		}
 	}
 	return result, nil
+}
+
+//getProjectClientFromMeta get gs client from meta by project's name
+func getProjectClientFromMeta(projectName string, meta interface{}) (*gsclient.Client, error) {
+	projectsClients, ok := meta.(map[string]*gsclient.Client)
+	if !ok {
+		return nil, fmt.Errorf("project %s: cannot convert meta to map[string]*gsclient.Client", projectName)
+	}
+	client, ok := projectsClients[projectName]
+	if !ok {
+		return nil, fmt.Errorf("project %s's client has not configured", projectName)
+	}
+	return client, nil
 }
