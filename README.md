@@ -64,7 +64,7 @@ Available Features
 | Snapshot to S3 | :x: |  
 | Snapshot schedule (CRUD) | :heavy_check_mark: |  
 | Template (CRUD) | :heavy_check_mark: |  
-| Multiple project support | :x: |
+| Multiple project support | :heavy_check_mark: |
 
 Developing the Provider
 ---------------------------
