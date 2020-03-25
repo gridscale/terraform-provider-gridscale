@@ -6,8 +6,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-
-	"github.com/gridscale/gsclient-go/v2"
 )
 
 func dataSourceGridscaleTemplate() *schema.Resource {
@@ -15,6 +13,11 @@ func dataSourceGridscaleTemplate() *schema.Resource {
 		Read: dataSourceGridscaleTemplateRead,
 
 		Schema: map[string]*schema.Schema{
+			"project": {
+				Type:        schema.TypeString,
+				Description: "The project name that set in `GRIDSCALE_PROJECTS_TOKENS` env or `projects_tokens` tf variable",
+				Required:    true,
+			},
 			"name": &schema.Schema{
 				Type:         schema.TypeString,
 				Required:     true,
@@ -111,7 +114,11 @@ func dataSourceGridscaleTemplate() *schema.Resource {
 }
 
 func dataSourceGridscaleTemplateRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 
 	name := d.Get("name").(string)
 	errorPrefix := fmt.Sprintf("read template (%s) datasource -", name)

@@ -3,7 +3,6 @@ package gridscale
 import (
 	"fmt"
 
-	"github.com/gridscale/gsclient-go/v2"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
@@ -12,6 +11,11 @@ func dataSourceGridscaleStorage() *schema.Resource {
 	return &schema.Resource{
 		Read: dataSourceGridscaleStorageRead,
 		Schema: map[string]*schema.Schema{
+			"project": {
+				Type:        schema.TypeString,
+				Description: "The project name that set in `GRIDSCALE_PROJECTS_TOKENS` env or `projects_tokens` tf variable",
+				Required:    true,
+			},
 			"resource_id": &schema.Schema{
 				Type:         schema.TypeString,
 				Required:     true,
@@ -100,7 +104,11 @@ func dataSourceGridscaleStorage() *schema.Resource {
 }
 
 func dataSourceGridscaleStorageRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 
 	id := d.Get("resource_id").(string)
 	errorPrefix := fmt.Sprintf("read storage (%s) datasource -", id)

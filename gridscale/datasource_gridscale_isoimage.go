@@ -6,8 +6,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-
-	"github.com/gridscale/gsclient-go/v2"
 )
 
 func dataSourceGridscaleISOImage() *schema.Resource {
@@ -15,6 +13,11 @@ func dataSourceGridscaleISOImage() *schema.Resource {
 		Read: dataSourceGridscaleISOImageRead,
 
 		Schema: map[string]*schema.Schema{
+			"project": {
+				Type:        schema.TypeString,
+				Description: "The project name that set in `GRIDSCALE_PROJECTS_TOKENS` env or `projects_tokens` tf variable",
+				Required:    true,
+			},
 			"resource_id": {
 				Type:         schema.TypeString,
 				Required:     true,
@@ -132,7 +135,11 @@ func dataSourceGridscaleISOImage() *schema.Resource {
 }
 
 func dataSourceGridscaleISOImageRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 
 	id := d.Get("resource_id").(string)
 	errorPrefix := fmt.Sprintf("read ISO-Image (%s) datasource -", id)

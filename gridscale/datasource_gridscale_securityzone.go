@@ -12,6 +12,11 @@ func dataSourceGridscalePaaSSecurityZone() *schema.Resource {
 	return &schema.Resource{
 		Read: dataSourceGridscalePaaSSecurityZoneRead,
 		Schema: map[string]*schema.Schema{
+			"project": {
+				Type:        schema.TypeString,
+				Description: "The project name that set in `GRIDSCALE_PROJECTS_TOKENS` env or `projects_tokens` tf variable",
+				Required:    true,
+			},
 			"resource_id": &schema.Schema{
 				Type:         schema.TypeString,
 				Required:     true,
@@ -75,7 +80,11 @@ func dataSourceGridscalePaaSSecurityZone() *schema.Resource {
 }
 
 func dataSourceGridscalePaaSSecurityZoneRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gsclient.Client)
+	projectName := d.Get("project").(string)
+	client, err := getProjectClientFromMeta(projectName, meta)
+	if err != nil {
+		return err
+	}
 	id := d.Get("resource_id").(string)
 	errorPrefix := fmt.Sprintf("read paas security zone (%s) datasource -", id)
 	secZone, err := client.GetPaaSSecurityZone(emptyCtx, id)
