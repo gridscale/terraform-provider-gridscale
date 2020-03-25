@@ -2,6 +2,7 @@ package gridscale
 
 import (
 	"fmt"
+
 	"github.com/gridscale/gsclient-go/v2"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
@@ -96,6 +97,7 @@ func testAccCheckResourceGridscalePaaSDestroyCheck(s *terraform.State) error {
 func testAccCheckResourceGridscalePaaSConfig_basic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_paas" "foopaas" {
+  project = "default"
   name = "%s"
   service_template_uuid = "8bcb216c-65ec-4c93-925d-1b8feaa5c2c5"
 }
@@ -105,6 +107,7 @@ resource "gridscale_paas" "foopaas" {
 func testAccCheckResourceGridscalePaaSConfig_basic_update() string {
 	return fmt.Sprintf(`
 resource "gridscale_paas" "foopaas" {
+  project = "default"
   name = "newname"
   service_template_uuid = "8bcb216c-65ec-4c93-925d-1b8feaa5c2c5"
   resource_limit {
@@ -133,6 +136,7 @@ resource "gridscale_paas" "foopaas" {
 func testAccCheckResourceGridscalePaaSConfig_forcenew_update() string {
 	return fmt.Sprintf(`
 resource "gridscale_paas" "foopaas" {
+  project = "default"
   name = "newname"
   service_template_uuid = "136c1446-13e0-4734-bdb6-ab0a15c1d680"
   resource_limit {

@@ -30,6 +30,7 @@ func TestAccdataSourceGridscalePaaS_basic(t *testing.T) {
 func testAccCheckDataSourcePaaSConfig_basic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_paas" "foo" {
+  project = "default"
   name = "%s"
   service_template_uuid = "8bcb216c-65ec-4c93-925d-1b8feaa5c2c5"
   parameter {
@@ -40,6 +41,7 @@ resource "gridscale_paas" "foo" {
 }
 
 data "gridscale_paas" "foo" {
+	project = gridscale_paas.foo.project
 	resource_id   = gridscale_paas.foo.id
 }`, name)
 }

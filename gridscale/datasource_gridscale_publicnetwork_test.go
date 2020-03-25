@@ -28,5 +28,6 @@ func TestAccdataSourceGridscalePublicNetwork_basic(t *testing.T) {
 func testAccCheckDataSourcePublicNetworkConfig_basic() string {
 	return fmt.Sprint(`
 data "gridscale_public_network" "foo" {
+	project = "default"
 }`)
 }

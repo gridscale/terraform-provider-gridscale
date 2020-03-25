@@ -99,6 +99,7 @@ func testAccCheckGridscaleFirewallDestroyCheck(s *terraform.State) error {
 func testAccCheckResourceGridscaleFirewallConfig_basic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_firewall" "foo" {
+  project = "default"
   name   = "%s"
   rules_v4_in {
 	order = 0
@@ -122,6 +123,7 @@ resource "gridscale_firewall" "foo" {
 func testAccCheckResourceGridscaleFirewallConfig_basic_update() string {
 	return fmt.Sprintf(`
 resource "gridscale_firewall" "foo" {
+  project = "default"
   name   = "newname"
   rules_v4_out {
 	order = 0

@@ -101,6 +101,7 @@ func testAccCheckGridscaleNetworkDestroyCheck(s *terraform.State) error {
 func testAccCheckResourceGridscaleNetworkConfig_basic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_network" "foo" {
+  project = "default"
   name   = "%s"
 }
 `, name)
@@ -109,6 +110,7 @@ resource "gridscale_network" "foo" {
 func testAccCheckResourceGridscaleNetworkConfig_basic_update() string {
 	return fmt.Sprintf(`
 resource "gridscale_network" "foo" {
+  project = "default"
   name   = "newname"
   l2security = true
 }

@@ -33,7 +33,7 @@ func testAccPreCheck(t *testing.T) {
 		t.Fatal("GRIDSCALE_UUID must be set for acceptance tests")
 	}
 
-	if v := os.Getenv("GRIDSCALE_TOKEN"); v == "" {
-		t.Fatal("GRIDSCALE_TOKEN must be set for acceptance tests")
+	if v := os.Getenv("GRIDSCALE_PROJECTS_TOKENS"); v == "" {
+		t.Fatal("GRIDSCALE_PROJECTS_TOKENS must be set for acceptance tests")
 	}
 }

@@ -30,6 +30,7 @@ func TestAccDataSourceTemplate_basic(t *testing.T) {
 func testAccCheckDataSourceGridscaleTemplateConfig_basic(name string) string {
 	return fmt.Sprintf(`
 data "gridscale_template" "foo" {
+	project = "default"
 	name   = "%s"
 }
 `, name)

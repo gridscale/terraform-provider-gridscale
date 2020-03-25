@@ -31,10 +31,12 @@ func TestAccdataSourceGridscaleSecurityZone_basic(t *testing.T) {
 func testAccCheckDataSourceSecurityZoneConfig_basic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_paas_securityzone" "foo" {
+  project = "default"
   name = "%s"
 }
 
 data "gridscale_paas_securityzone" "foo" {
+	project = gridscale_paas_securityzone.foo.project
 	resource_id   = gridscale_paas_securityzone.foo.id
 }`, name)
 }

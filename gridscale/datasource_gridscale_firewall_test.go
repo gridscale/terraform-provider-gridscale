@@ -32,6 +32,7 @@ func TestAccdataSourceGridscaleFirewall_basic(t *testing.T) {
 func testAccCheckDataSourceFirewallConfig_basic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_firewall" "foo" {
+  project = "default"
   name   = "%s"
   rules_v4_in {
 	order = 0
@@ -50,6 +51,7 @@ resource "gridscale_firewall" "foo" {
 }
 
 data "gridscale_firewall" "foo" {
+	project   = gridscale_firewall.foo.project
 	resource_id   = gridscale_firewall.foo.id
 }
 

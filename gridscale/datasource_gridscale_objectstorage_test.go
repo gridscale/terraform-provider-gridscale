@@ -31,10 +31,12 @@ func TestAccdataSourceGridscaleObjectStorage_basic(t *testing.T) {
 func testAccCheckDataSourceObjectStorageConfig_basic() string {
 	return fmt.Sprint(`
 resource "gridscale_object_storage_accesskey" "foo" {
+	project = "default"
 }
 
 data "gridscale_object_storage_accesskey" "foo" {
-	resource_id   = "${gridscale_object_storage_accesskey.foo.id}"
+	project = gridscale_object_storage_accesskey.foo.project
+	resource_id   = gridscale_object_storage_accesskey.foo.id
 }
 `)
 }

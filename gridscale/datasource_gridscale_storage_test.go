@@ -33,11 +33,13 @@ func testAccCheckDataSourceStorageConfig_basic(name string) string {
 	return fmt.Sprintf(`
 
 resource "gridscale_storage" "foo" {
+  project = "default"
   name   = "%s"
   capacity = 1
 }
 
 data "gridscale_storage" "foo" {
+	project   = gridscale_storage.foo.project
 	resource_id   = gridscale_storage.foo.id
 }`, name)
 }

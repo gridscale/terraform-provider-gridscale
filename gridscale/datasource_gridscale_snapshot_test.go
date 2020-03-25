@@ -31,15 +31,18 @@ func TestAccdataSourceGridscaleSnapshot_basic(t *testing.T) {
 func testAccCheckDataSourceSnapshotConfig_basic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_storage" "foo" {
+  project = "default"
   name   = "storage"
   capacity = 1
 }
 resource "gridscale_snapshot" "foo" {
+  project = gridscale_storage.foo.project
   name = "%s"
   storage_uuid = gridscale_storage.foo.id
 }
 
 data "gridscale_snapshot" "foo" {
+	project = gridscale_storage.foo.project
 	resource_id   = gridscale_snapshot.foo.id
   	storage_uuid = gridscale_storage.foo.id
 }`, name)

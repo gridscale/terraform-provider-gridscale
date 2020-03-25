@@ -130,6 +130,7 @@ func testAccCheckGridscaleStorageDestroyCheck(s *terraform.State) error {
 func testAccCheckResourceGridscaleStorageConfig_basic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_storage" "foo" {
+  project = "default"
   name   = "%s"
   capacity = 1
 }
@@ -139,6 +140,7 @@ resource "gridscale_storage" "foo" {
 func testAccCheckResourceGridscaleStorageConfig_basic_update() string {
 	return fmt.Sprintf(`
 resource "gridscale_storage" "foo" {
+  project = "default"
   name   = "newname"
   capacity = 1
 }
@@ -148,10 +150,12 @@ resource "gridscale_storage" "foo" {
 func testAccCheckResourceGridscaleStorageConfig_advanced(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_sshkey" "sshkey" {
+  project = "default"
   name = "%s"
   sshkey = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQClJCCOAFyBNIWUpzU4/mFqns5G4+nXzf5iFblNZqtAJmPzKnl0m0Gxj9GV27EkaWpqivVSUblmw3KRWMgCAiJUrMoQt4VAUKUzwdlNZ+6cIDSncEg671SLmCGZmWmVdOR5KaHWlkIRnowfB7UIDyubu/B7r+9L5IPdVgqw3KQW4jZRSsaOOG+I6z0J46c0j+/uJBxuqsr0QD0RQYc2n2Q8O9oNvp3U/L0B5ZYkecAZCCTuGpfNnJdpjj4ww+Qgq/qt4WEIWgVIPEU3B5PlqKZDTO+0JjCsAaQIkN6HOSVHP7h9b+grBnTxSc55CPqBGEBP8zlcne29olJttseJgnBT"
 }
 resource "gridscale_storage" "foo" {
+  project = "default"
   name   = "%s"
   capacity = 10
   storage_type= "storage"

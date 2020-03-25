@@ -38,15 +38,19 @@ func testAccCheckDataSourceLoadBalancerConfig_basic(name string) string {
 	return fmt.Sprintf(`
 
 resource "gridscale_ipv4" "lb" {
+	project = "default"
 	name   = "ipv4-%s"
 }
 resource "gridscale_ipv6" "lb" {
+	project = "default"
 	name   = "ipv6-%s"
 }
 resource "gridscale_ipv4" "server" {
+	project = "default"
 	name   = "server-%s"
 }
 resource "gridscale_loadbalancer" "foo" {
+	project = "default"
 	name   = "%s"
 	algorithm = "leastconn"
 	redirect_http_to_https = false
@@ -65,6 +69,7 @@ resource "gridscale_loadbalancer" "foo" {
 }
 
 data "gridscale_loadbalancer" "foo" {
+	project = gridscale_loadbalancer.foo.project
 	resource_id   = gridscale_loadbalancer.foo.id
 }`, name, name, name, name)
 }

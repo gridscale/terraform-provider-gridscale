@@ -33,11 +33,13 @@ func testAccCheckDataSourceIPv4Config_basic(name string) string {
 	return fmt.Sprintf(`
 
 resource "gridscale_ipv4" "foo" {
+	project = "default"
 	name   = "%s"
 }
 
 
 data "gridscale_ipv4" "foo" {
+	project = gridscale_ipv4.foo.project
 	resource_id   = gridscale_ipv4.foo.id
 }
 

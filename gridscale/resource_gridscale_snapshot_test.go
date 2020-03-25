@@ -98,10 +98,12 @@ func testAccCheckDataSourceGridscaleSnapshotDestroyCheck(s *terraform.State) err
 func testAccCheckDataSourceGridscaleSnapshotConfig_basic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_storage" "foo" {
+  project = "default"
   name   = "storage"
   capacity = 1
 }
 resource "gridscale_snapshot" "foo" {
+  project = "default"
   name = "%s"
   storage_uuid = gridscale_storage.foo.id
   rollback {
@@ -114,10 +116,12 @@ resource "gridscale_snapshot" "foo" {
 func testAccCheckDataSourceGridscaleSnapshotConfig_basic_update() string {
 	return fmt.Sprintf(`
 resource "gridscale_storage" "foo" {
+  project = "default"
   name   = "storage"
   capacity = 1
 }
 resource "gridscale_snapshot" "foo" {
+  project = "default"
   name = "newname"
   storage_uuid = gridscale_storage.foo.id
   labels = ["test"]
@@ -134,10 +138,12 @@ resource "gridscale_snapshot" "foo" {
 func testAccCheckDataSourceGridscaleSnapshotConfig_forcenew_update() string {
 	return fmt.Sprintf(`
 resource "gridscale_storage" "new" {
+  project = "default"
   name   = "storage"
   capacity = 1
 }
 resource "gridscale_snapshot" "foo" {
+  project = "default"
   name = "newname"
   storage_uuid = gridscale_storage.new.id
 }

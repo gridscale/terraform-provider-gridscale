@@ -32,10 +32,12 @@ func testAccCheckDataSourceNetworkConfig_basic(name string) string {
 	return fmt.Sprintf(`
 
 resource "gridscale_network" "foo" {
+  project = "default"
   name   = "%s"
 }
 
 data "gridscale_network" "foo" {
+	project = gridscale_network.foo.project
 	resource_id   = gridscale_network.foo.id
 }`, name)
 }

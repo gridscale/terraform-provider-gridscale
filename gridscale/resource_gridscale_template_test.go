@@ -99,16 +99,19 @@ func testAccCheckGridscaleTemplateDestroyCheck(s *terraform.State) error {
 func testAccCheckResourceGridscaleTemplateConfig_basic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_storage" "foo" {
+  project = "default"
   name   = "%s"
   capacity = 1
 }
 
 resource "gridscale_snapshot" "foo" {
+  project = "default"
   name = "%s"
   storage_uuid = gridscale_storage.foo.id
 }
 
 resource "gridscale_template" "foo" {
+  project = "default"
   name   = "%s"
   snapshot_uuid = gridscale_snapshot.foo.id
 }
@@ -118,16 +121,19 @@ resource "gridscale_template" "foo" {
 func testAccCheckResourceGridscaleTemplateConfig_basic_update() string {
 	return fmt.Sprintf(`
 resource "gridscale_storage" "foo" {
+  project = "default"
   name   = "newname"
   capacity = 1
 }
 
 resource "gridscale_snapshot" "foo" {
+  project = "default"
   name = "newname"
   storage_uuid = gridscale_storage.foo.id
 }
 
 resource "gridscale_template" "foo" {
+  project = "default"
   name   = "newname"
   labels = ["test"]
   snapshot_uuid = gridscale_snapshot.foo.id

@@ -98,10 +98,12 @@ func testAccCheckDataSourceGridscaleSnapshotScheduleDestroyCheck(s *terraform.St
 func testAccCheckDataSourceGridscaleSnapshotScheduleConfig_basic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_storage" "foo" {
+  project = "default"
   name   = "storage"
   capacity = 1
 }
 resource "gridscale_snapshotschedule" "foo" {
+  project = "default"
   name = "%s"
   storage_uuid = gridscale_storage.foo.id
   keep_snapshots = 1
@@ -114,10 +116,12 @@ resource "gridscale_snapshotschedule" "foo" {
 func testAccCheckDataSourceGridscaleSnapshotScheduleConfig_basic_update() string {
 	return fmt.Sprintf(`
 resource "gridscale_storage" "foo" {
+  project = "default"
   name   = "storage"
   capacity = 1
 }
 resource "gridscale_snapshotschedule" "foo" {
+  project = "default"
   name = "newname"
   storage_uuid = gridscale_storage.foo.id
   labels = ["test"]
@@ -130,10 +134,12 @@ resource "gridscale_snapshotschedule" "foo" {
 func testAccCheckDataSourceGridscaleSnapshotScheduleConfig_forcenew_update() string {
 	return fmt.Sprintf(`
 resource "gridscale_storage" "new" {
+  project = "default"
   name   = "storage"
   capacity = 1
 }
 resource "gridscale_snapshotschedule" "foo" {
+  project = "default"
   name = "newname"
   storage_uuid = gridscale_storage.new.id
   keep_snapshots = 1

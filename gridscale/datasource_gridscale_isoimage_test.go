@@ -2,8 +2,9 @@ package gridscale
 
 import (
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 )
@@ -31,11 +32,13 @@ func TestAccDataSourceISOImage_basic(t *testing.T) {
 func testAccCheckDataSourceGridscaleISOImageConfig_basic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_isoimage" "foo" {
+  project = "default"
   name   = "%s"
   source_url = "http://tinycorelinux.net/10.x/x86/release/TinyCore-current.iso"
 }
 
 resource "gridscale_server" "foo" {
+  project = gridscale_isoimage.foo.project
   name   = "%s"
   cores = 1
   memory = 1
@@ -43,6 +46,7 @@ resource "gridscale_server" "foo" {
 }
 
 data "gridscale_isoimage" "foo" {
+	project = gridscale_isoimage.foo.project
 	resource_id   = gridscale_isoimage.foo.id
 }
 `, name, name)

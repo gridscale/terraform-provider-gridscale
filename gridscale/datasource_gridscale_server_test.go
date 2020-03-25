@@ -32,12 +32,14 @@ func TestAccdataSourceGridscaleServer_basic(t *testing.T) {
 func testAccCheckDataSourceServerConfig_basic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_server" "foo" {
+  project = "default"
   name   = "%s"
   cores = 1
   memory = 1
 }
 
 data "gridscale_server" "foo" {
+	project = gridscale_server.foo.project
 	resource_id   = gridscale_server.foo.id
 }
 

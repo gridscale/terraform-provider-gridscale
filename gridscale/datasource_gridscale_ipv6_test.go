@@ -32,10 +32,12 @@ func testAccCheckDataSourceIPv6Config_basic(name string) string {
 	return fmt.Sprintf(`
 
 resource "gridscale_ipv6" "foo" {
+	project = "default"
 	name   = "%s"
 }
 
 data "gridscale_ipv6" "foo" {
+	project = gridscale_ipv6.foo.project
 	resource_id   = gridscale_ipv6.foo.id
 }
 `, name)

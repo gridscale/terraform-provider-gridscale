@@ -33,10 +33,12 @@ func testAccCheckDataSourceSnapshotScheduleConfig_basic(name string) string {
 	return fmt.Sprintf(`
 
 resource "gridscale_storage" "foo" {
+  project = "default"
   name   = "storage"
   capacity = 1
 }
 resource "gridscale_snapshotschedule" "foo" {
+  project = gridscale_storage.foo.project
   name = "%s"
   storage_uuid = gridscale_storage.foo.id
   keep_snapshots = 1
@@ -44,6 +46,7 @@ resource "gridscale_snapshotschedule" "foo" {
   next_runtime = "2025-12-30 15:04:05"
 }
 data "gridscale_snapshotschedule" "foo" {
+	project   = gridscale_snapshotschedule.foo.project
 	resource_id   = gridscale_snapshotschedule.foo.id
 	storage_uuid   = gridscale_storage.foo.id
 }

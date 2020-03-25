@@ -103,6 +103,7 @@ func testAccCheckGridscaleIpv6DestroyCheck(s *terraform.State) error {
 func testAccCheckResourceGridscaleIpv6Config_basic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_ipv6" "foo" {
+  project = "default"
   name   = "%s"
 }
 `, name)
@@ -111,6 +112,7 @@ resource "gridscale_ipv6" "foo" {
 func testAccCheckResourceGridscaleIpv6Config_basic_update() string {
 	return fmt.Sprintf(`
 resource "gridscale_ipv6" "foo" {
+  project = "default"
   name   = "newname"
   failover = true
   reverse_dns = "test.test"

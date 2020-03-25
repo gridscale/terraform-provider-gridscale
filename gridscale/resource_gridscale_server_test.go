@@ -111,16 +111,20 @@ func testAccCheckResourceGridscaleServerDestroyCheck(s *terraform.State) error {
 func testAccCheckResourceGridscaleServerConfig_basic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_ipv4" "foo" {
+  project = "default"
   name   = "ip-%s"
 }
 resource "gridscale_network" "foo" {
+  project = "default"
   name   = "net-%s"
 }
 resource "gridscale_storage" "foo" {
+  project = "default"
   name   = "storage- %s"
   capacity = 1
 }
 resource "gridscale_server" "foo" {
+  project = "default"
   name   = "%s"
   cores = 2
   memory = 2
@@ -160,16 +164,20 @@ resource "gridscale_server" "foo" {
 func testAccCheckResourceGridscaleServerConfig_basic_update() string {
 	return fmt.Sprintf(`
 resource "gridscale_ipv4" "foo1" {
+  project = "default"
   name   = "newname"
 }
 resource "gridscale_network" "foo" {
+  project = "default"
   name   = "newname"
 }
 resource "gridscale_storage" "foo1" {
+  project = "default"
   name   = "newname"
   capacity = 1
 }
 resource "gridscale_server" "foo" {
+  project = "default"
   name   = "newname"
   cores = 1
   memory = 1

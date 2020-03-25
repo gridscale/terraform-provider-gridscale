@@ -32,11 +32,13 @@ func testAccCheckDataSourceSSHKeyConfig_basic(name string) string {
 	return fmt.Sprintf(`
 
 resource "gridscale_sshkey" "foo" {
+  project = "default"
   name   = "%s"
   sshkey = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDKea3u6cuJ/2ZoMA4fpnXRK8ZIZWQz8ddXJv+iul9gTAc4fbm30IjZNnBBxiFOETc5ev1mcxvi6XvW99gLmxJAGwUrHylxYODXl1fLhc2G5czwQS9Qk57ED+IYb7AGOWPxGYeDaDka6gxJal/aaUx0C42fQErpUiJj2mJlF8yUOqyygtQOZhT2XUBU5UBZd50r8die8oRgdKJrbcn48q1Eu60vpx4S4JgH+krrHoXuCRydQ31KfOXmD8Y3/oGlZQ40luhfnj6g1jpm6PIQEBehGyZl6Dyh0MeeJsePWAGmXMEA33FcDkUiQPLoaalr4QQZdAUS74/irf+mgRcSRPvL root@475d4232363a"
 }
 
 data "gridscale_sshkey" "foo" {
+	project = gridscale_sshkey.foo.project
 	resource_id   = gridscale_sshkey.foo.id
 }`, name)
 }

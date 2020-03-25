@@ -79,16 +79,20 @@ func testAccCheckResourceGridscaleLoadBalancerExists(n string, object *gsclient.
 func testAccCheckResourceGridscaleLoadBalancerConfig_basic(name string, algorithm string) string {
 	return fmt.Sprintf(`
 resource "gridscale_ipv4" "lb" {
-	name   = "ipv4-%s"
+  project = "default"
+  name   = "ipv4-%s"
 }
 resource "gridscale_ipv6" "lb" {
-	name   = "ipv6-%s"
+  project = "default"
+  name   = "ipv6-%s"
 }
 resource "gridscale_ipv4" "server" {
-	name   = "server-%s"
+  project = "default"
+  name   = "server-%s"
 }
 resource "gridscale_loadbalancer" "foo" {
-	name   = "%s"
+  project = "default"
+  name   = "%s"
 	algorithm = "%s"
 	redirect_http_to_https = false
 	listen_ipv4_uuid = gridscale_ipv4.lb.id
@@ -109,16 +113,20 @@ resource "gridscale_loadbalancer" "foo" {
 func testAccCheckResourceGridscaleLoadBalancerConfig_update(name string, algorithm string) string {
 	return fmt.Sprintf(`
 resource "gridscale_ipv4" "lb" {
-	name   = "ipv4-%s"
+  project = "default"
+  name   = "ipv4-%s"
 }
 resource "gridscale_ipv6" "lb" {
-	name   = "ipv6-%s"
+  project = "default"
+  name   = "ipv6-%s"
 }
 resource "gridscale_ipv4" "server" {
-	name   = "server-%s"
+  project = "default"
+  name   = "server-%s"
 }
 resource "gridscale_loadbalancer" "foo" {
-	name   = "%s"
+  project = "default"
+  name   = "%s"
 	algorithm = "%s"
 	redirect_http_to_https = false
 	listen_ipv4_uuid = gridscale_ipv4.lb.id
