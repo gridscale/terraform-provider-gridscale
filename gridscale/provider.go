@@ -18,7 +18,7 @@ func Provider() terraform.ResourceProvider {
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("GRIDSCALE_PROJECTS_TOKENS", nil),
-				Description: "Projects' API-tokens for the gridscale API.",
+				Description: `Projects' API-tokens for the gridscale API. Format: ""project1:token1,project2:token1,project3:token1""`,
 			},
 			"api_url": {
 				Type:        schema.TypeString,
