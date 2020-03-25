@@ -128,7 +128,7 @@ func getProjectClientFromMeta(projectName string, meta interface{}) (*gsclient.C
 	}
 	client, ok := projectsClients[projectName]
 	if !ok {
-		return nil, fmt.Errorf("project %s's client has not configured", projectName)
+		return nil, fmt.Errorf("project %s's client has not been configured", projectName)
 	}
 	return client, nil
 }
