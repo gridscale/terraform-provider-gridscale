@@ -14,10 +14,12 @@ Gets data of a storage snapshot schedule.
 
 ```terraform
 resource "gridscale_storage" "foo" {
+  project = "default"
   name   = "storage"
   capacity = 1
 }
 resource "gridscale_snapshotschedule" "foo" {
+  project = gridscale_storage.foo.project
   name = "snapshotschedule"
   storage_uuid = gridscale_storage.foo.id
   keep_snapshots = 1
@@ -25,6 +27,7 @@ resource "gridscale_snapshotschedule" "foo" {
   next_runtime = "2025-12-30 15:04:05"
 }
 data "gridscale_snapshotschedule" "foo" {
+	project   = gridscale_snapshotschedule.foo.project
 	resource_id   = gridscale_snapshotschedule.foo.id
 	storage_uuid   = gridscale_storage.foo.id
 }
@@ -34,6 +37,8 @@ data "gridscale_snapshotschedule" "foo" {
 
 The following arguments are supported:
 
+* `project` - (Required) The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
+
 * `resource_id` - (Required) UUID of the snapshot schedule.
 
 * `storage_uuid` - (Required) UUID of the storage that the snapshot schedule belongs to.
@@ -42,6 +47,7 @@ The following arguments are supported:
 
 The following attributes are exported:
 
+* `project` - The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 * `id` - The UUID of the snapshot schedule.
 * `storage_uuid` - UUID of the storage that the snapshot schedule belongs to.
 * `status` - The status of the snapshot schedule.

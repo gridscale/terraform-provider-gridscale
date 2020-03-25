@@ -18,6 +18,7 @@ Get the template:
 
 ```terraform
    data "gridscale_template" "ubuntu" {
+	 project = "default"
      name = "Ubuntu 18.04 LTS"
    }
 ```
@@ -26,6 +27,7 @@ Using the template datasource for the creation of a storage:
 
 ```terraform
 resource "gridscale_storage" "storage-test"{
+	project = "default"
 	name = "terra-storage-test"
 	capacity = 10
 	template {
@@ -39,12 +41,15 @@ resource "gridscale_storage" "storage-test"{
 
 The following arguments are supported:
 
+* `project` - (Required) The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
+
 * `name` - (Required) The exact name of the template as show in [the expert panel of gridscale](https://my.gridscale.io/Expert/Template).
 
 ## Attributes Reference
 
 The following attributes are exported:
 
+* `project` - The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 * `name` - The name of the template.
 * `id` - The UUID of the template.
 * `location_uuid` - Helps to identify which datacenter an object belongs to.

@@ -16,6 +16,7 @@ The following example shows how one might use this resource to add a server to g
 
 ```terraform
 resource "gridscale_server" "terra-server-test"{
+    project = "default"
 	name = "terra-server-test"
 	cores = 2
 	memory = 1
@@ -41,6 +42,8 @@ resource "gridscale_server" "terra-server-test"{
 ## Argument Reference
 
 The following arguments are supported:
+
+* `project` - (Required) The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 
 * `name` - (Required) The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
 
@@ -152,6 +155,7 @@ The following arguments are supported:
 
 This resource exports the following attributes:
 
+* `project` - The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 * `id` - UUID of the server.
 * `name` - The name of the server.
 * `cores` - The number of server cores.

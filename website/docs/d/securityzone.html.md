@@ -16,12 +16,14 @@ Using the security zone datasource for the creation of a paas:
 
 ```terraform
 data "gridscale_paas_securityzone" "foo"{
+  project = "default"
 	resource_id = "xxxx-xxxx-xxxx-xxxx"
 }
 
 
 resource "gridscale_paas" "foo"{
-	name = "terra-paas-test"
+    project = data.gridscale_paas_securityzone.foo.project
+	  name = "terra-paas-test"
     service_template_uuid = "f9625726-5ca8-4d5c-b9bd-3257e1e2211a"
     security_zone_uuid = data.gridscale_paas_securityzone.foo.id
 }
@@ -31,12 +33,15 @@ resource "gridscale_paas" "foo"{
 
 The following arguments are supported:
 
+* `project` - (Required) The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
+
 * `resource_id` - (Required) The UUID of the security zone.
 
 ## Attributes Reference
 
 The following attributes are exported:
 
+* `project` - The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 * `id` - The UUID of the security zone.
 * `name` - The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
 * `location_uuid` - Helps to identify which datacenter an object belongs to.

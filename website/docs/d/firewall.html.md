@@ -14,6 +14,7 @@ Get data of a firewall by its UUID.
 
 ```terraform
 resource "gridscale_firewall" "foo" {
+  project = "default"
   name   = "example-firewall"
   rules_v4_in {
 	order = 0
@@ -32,6 +33,7 @@ resource "gridscale_firewall" "foo" {
 }
 
 data "gridscale_firewall" "foo" {
+  project = gridscale_firewall.foo.project
 	resource_id   = gridscale_firewall.foo.id
 }
 ```
@@ -41,12 +43,15 @@ data "gridscale_firewall" "foo" {
 
 The following arguments are supported:
 
+* `project` - (Required) The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
+
 * `resource_id` - (Required) The UUID of the firewall.
 
 ## Attributes Reference
 
 The following attributes are exported:
 
+* `project` - The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 * `id` - The UUID of the firewall.
 * `name` - The name of the firewall.
 * `rules_v4_in` - Firewall template rules for inbound traffic - covers ipv4 addresses.

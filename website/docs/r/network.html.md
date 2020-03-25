@@ -16,6 +16,7 @@ The following example shows how one might use this resource to add a network to 
 
 ```terraform
 resource "gridscale_network" "networkname"{
+  project = "default"
 	name = "terraform-network"
 }
 ```
@@ -23,6 +24,8 @@ resource "gridscale_network" "networkname"{
 ## Argument Reference
 
 The following arguments are supported:
+
+* `project` - (Required) The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 
 * `name` - (Required) The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
 
@@ -35,6 +38,8 @@ The following arguments are supported:
 
 This resource exports the following attributes:
 
+* `project` - The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
+* `id` - The UUID of the network.
 * `name` - See Argument Reference above.
 * `location_uuid` - Helps to identify which datacenter an object belongs to. The location of the resource depends on the location of the project.
 * `l2security` - See Argument Reference above.

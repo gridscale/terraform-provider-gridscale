@@ -16,6 +16,7 @@ The following example shows how one might use this resource to add a storage to 
 
 ```terraform
 resource "gridscale_storage" "storage-john"{
+	project = "default"
 	name = "john's storage"
 	capacity = 10
 	storage_type = "storage_high"
@@ -31,6 +32,8 @@ resource "gridscale_storage" "storage-john"{
 ## Argument Reference
 
 The following arguments are supported:
+
+* `project` - (Required) The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 
 * `name` - (Required) The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
 
@@ -58,6 +61,7 @@ The following arguments are supported:
 
 This resource exports the following attributes:
 
+* `project` - The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 * `name` - See Argument Reference above.
 * `capacity` - See Argument Reference above.
 * `storage_type` - See Argument Reference above.

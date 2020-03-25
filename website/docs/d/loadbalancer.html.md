@@ -14,6 +14,7 @@ Get the data of a Load Balancer.
 
 ```terraform
 data "gridscale_loadbalancer" "foo" {
+  project = "default"
 	resource_id   = "xxxx-xxxx-xxxx-xxxx"
 }
 ```
@@ -22,12 +23,15 @@ data "gridscale_loadbalancer" "foo" {
 
 The following arguments are supported:
 
+* `project` - (Required) The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
+
 * `resource_id` - (Required) The UUID of the loadbalancer.
 
 ## Attributes Reference
 
 The following attributes are exported:
 
+* `project` - The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 * `id` - The UUID of the loadbalancer.
 * `name` - The human-readable name of the loadbalancer.
 * `algorithm` - The algorithm used to process requests.

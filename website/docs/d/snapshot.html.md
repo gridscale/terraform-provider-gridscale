@@ -14,16 +14,19 @@ Get data of a storage snapshot resource.
 
 ```terraform
 resource "gridscale_storage" "foo" {
+  project = "default"
   name   = "storage"
   capacity = 1
 }
 resource "gridscale_snapshot" "foo" {
+  project = gridscale_storage.foo.project
   name = "snapshot"
   storage_uuid = gridscale_storage.foo.id
 }
 
 data "gridscale_snapshot" "foo" {
-	resource_id   = gridscale_snapshot.foo.id
+	  project   = gridscale_snapshot.foo.project
+	  resource_id   = gridscale_snapshot.foo.id
   	storage_uuid = gridscale_storage.foo.id
 }
 ```
@@ -31,6 +34,8 @@ data "gridscale_snapshot" "foo" {
 ## Argument Reference
 
 The following arguments are supported:
+
+* `project` - (Required) The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 
 * `resource_id` - (Required) ID of a resource (UUID of snapshot).
 

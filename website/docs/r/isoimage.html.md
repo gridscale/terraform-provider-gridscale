@@ -14,6 +14,7 @@ Provides an ISO Image resource. This can be used to create, modify and delete IS
 
 ```terraform
 resource "gridscale_isoimage" "foo" {
+  project = "default"
   name   = "newname"
   source_url = "http://tinycorelinux.net/10.x/x86/release/TinyCore-current.iso"
 }
@@ -23,6 +24,8 @@ resource "gridscale_isoimage" "foo" {
 ## Argument Reference
 
 The following arguments are supported:
+
+* `project` - (Required) The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 
 * `name` - (Required) The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
 
@@ -34,6 +37,7 @@ The following arguments are supported:
 
 The following attributes are exported:
 
+* `project` - The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 * `name` - The name of the ISO Image.
 * `source_url` - Contains the source URL of the ISO Image that it was originally fetched from.
 * `server` - The information about servers which are related to this ISO Image.

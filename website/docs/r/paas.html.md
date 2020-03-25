@@ -16,6 +16,7 @@ The following example shows how one might use this resource to add a PaaS to gri
 
 ```terraform
 resource "gridscale_paas" "terra-paas-test" {
+  project = "default"
   name = "terra-paas-test"
   service_template_uuid = "f9625726-5ca8-4d5c-b9bd-3257e1e2211a"
 }
@@ -24,6 +25,8 @@ resource "gridscale_paas" "terra-paas-test" {
 ## Argument Reference
 
 The following arguments are supported:
+
+* `project` - (Required) The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 
 * `name` - (Required) The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
 
@@ -51,6 +54,7 @@ The following arguments are supported:
 
 This resource exports the following attributes:
 
+* `project` - The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 * `name` - See Argument Reference above.
 * `username` - Username for PaaS service.
 * `password` - Password for PaaS service.

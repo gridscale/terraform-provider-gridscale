@@ -14,13 +14,22 @@ Provides an access key resource of an object storage. This can be used to create
 
 ```terraform
 resource "gridscale_object_storage_accesskey" "foo" {
+  project = "default"
 }
 ```
+
+
+## Argument Reference
+
+The following arguments are supported:
+
+* `project` - (Required) The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 
 ## Attributes Reference
 
 The following attributes are exported:
 
+* `project` - The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 * `id` - The access key of the object storage.
 * `access_key` - Access key of an object storage.
 * `secret_key` - Secret key of an object storage.

@@ -14,16 +14,20 @@ Get data of a server by its UUID.
 
 ```terraform
 resource "gridscale_ipv4" "foo1" {
+  project = "default"
   name   = "newname"
 }
 resource "gridscale_network" "foo" {
+  project = "default"
   name   = "newname"
 }
 resource "gridscale_storage" "foo1" {
+  project = "default"
   name   = "newname"
   capacity = 1
 }
 resource "gridscale_server" "foo" {
+  project = "default"
   name   = "newname"
   cores = 1
   memory = 1
@@ -53,6 +57,7 @@ resource "gridscale_server" "foo" {
 
 
 data "gridscale_server" "foo" {
+  project = gridscale_server.foo.project
 	resource_id   = gridscale_server.foo.id
 }
 ```
@@ -61,12 +66,15 @@ data "gridscale_server" "foo" {
 
 The following arguments are supported:
 
+* `project` - (Required) The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
+
 * `resource_id` - (Required) The UUID of the firewall.
 
 ## Attributes Reference
 
 This resource exports the following attributes:
 
+* `project` - The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 * `id` - UUID of the server.
 * `name` - The name of the server.
 * `cores` - The number of server cores.

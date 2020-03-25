@@ -14,10 +14,12 @@ Provides a storage snapshot schedule resource. This can be used to create, modif
 
 ```terraform
 resource "gridscale_storage" "foo" {
+  project = "default"
   name   = "storage"
   capacity = 1
 }
 resource "gridscale_snapshotschedule" "foo" {
+  project = gridscale_storage.foo.project
   name = "snapshotschedule"
   storage_uuid = gridscale_storage.foo.id
   keep_snapshots = 1
@@ -29,6 +31,8 @@ resource "gridscale_snapshotschedule" "foo" {
 ## Argument Reference
 
 The following arguments are supported:
+
+* `project` - (Required) The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 
 * `name` - (Required) UUID of the snapshot schedule.
 
@@ -46,6 +50,7 @@ The following arguments are supported:
 
 The following attributes are exported:
 
+* `project` - The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 * `id` - The UUID of the snapshot schedule.
 * `storage_uuid` - See Argument Reference above.
 * `status` - The status of the snapshot schedule.

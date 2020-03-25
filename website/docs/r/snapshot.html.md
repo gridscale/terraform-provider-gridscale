@@ -14,10 +14,12 @@ Provides a storage snapshot resource. This can be used to create, modify and del
 
 ```terraform
 resource "gridscale_storage" "foo" {
+  project = "default"
   name   = "storage"
   capacity = 1
 }
 resource "gridscale_snapshot" "foo" {
+  project = gridscale_storage.foo.project
   name = "snapshot"
   storage_uuid = gridscale_storage.foo.id
 }
@@ -26,6 +28,8 @@ resource "gridscale_snapshot" "foo" {
 ## Argument Reference
 
 The following arguments are supported:
+
+* `project` - (Required) The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 
 * `name` - (Required) The name of the snapshot.
 
@@ -41,6 +45,7 @@ The following arguments are supported:
 
 The following attributes are exported:
 
+* `project` - The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 * `id` - The UUID of the snapshot.
 * `storage_uuid` - See Argument Reference above.
 * `name` - See Argument Reference above.

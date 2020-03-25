@@ -16,14 +16,17 @@ Using the sshkey datasource for the creation of a storage:
 
 ```terraform
 data "gridscale_sshkey" "sshkey-john"{
+	project = "default"
 	resource_id = "xxxx-xxxx-xxxx-xxxx"
 }
 
 data "gridscale_sshkey" "sshkey-jane"{
+	project = "default"
 	resource_id = "xxxx-xxxx-xxxx-xxxx"
 }
 
 resource "gridscale_storage" "storagename"{
+	project = "default"
 	name = "terraform-storage"
 	capacity = 10
 	template {
@@ -40,12 +43,15 @@ resource "gridscale_storage" "storagename"{
 
 The following arguments are supported:
 
+* `project` - (Required) The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
+
 * `resource_id` - (Required) The UUID of the SSH key.
 
 ## Attributes Reference
 
 The following attributes are exported:
 
+* `project` - The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 * `id` - The UUID of the sshkey.
 * `name` - The human-readable name of the sshkey.
 * `sshkey` - The OpenSSH public key string of the sshkey.

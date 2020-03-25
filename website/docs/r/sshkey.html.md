@@ -16,6 +16,7 @@ The following example shows how one might use this resource to add an SSH public
 
 ```terraform
 resource "gridscale_sshkey" "sshkey-john"{
+	project = "default"
 	name = "john's computer"
 	sshkey = "an ssh public key"
 }
@@ -24,6 +25,8 @@ resource "gridscale_sshkey" "sshkey-john"{
 ## Argument Reference
 
 The following arguments are supported:
+
+* `project` - (Required) The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 
 * `name` - (Required) The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
 
@@ -35,6 +38,7 @@ The following arguments are supported:
 
 This resource exports the following attributes:
 
+* `project` - The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 * `name` - See Argument Reference above.
 * `sshkey` - See Argument Reference above.
 * `labels` - See Argument Reference above.

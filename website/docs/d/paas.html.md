@@ -16,11 +16,13 @@ Retrieving the PaaS datasource:
 
 ```terraform
 resource "gridscale_paas" "foo" {
+  project = "default"
   name = "foo"
   service_template_uuid = "f9625726-5ca8-4d5c-b9bd-3257e1e2211a"
 }
 
 data "gridscale_paas" "foo" {
+  project = gridscale_paas.foo.project
 	resource_id   = gridscale_paas.foo.id
 }
 ```
@@ -29,12 +31,15 @@ data "gridscale_paas" "foo" {
 
 The following arguments are supported:
 
+* `project` - (Required) The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
+
 * `resource_id` - (Required) The UUID of the PaaS service.
 
 ## Attributes Reference
 
 The following attributes are exported:
 
+* `project` - The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 * `name` - The human-readable name of the object.
 * `username` - Username for PaaS service.
 * `password` - Password for PaaS service.

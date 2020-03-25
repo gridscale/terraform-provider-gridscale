@@ -16,6 +16,7 @@ The following example shows how one might use this resource to add an IPv6 addre
 
 ```terraform
 resource "gridscale_ipv6" "terra-ipv6-test" {
+  project = "default"
 	name = "terra-test"
 }
 ```
@@ -23,6 +24,8 @@ resource "gridscale_ipv6" "terra-ipv6-test" {
 ## Argument Reference
 
 The following arguments are supported:
+
+* `project` - (Required) The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 
 * `name` - (Optional) The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
 
@@ -36,6 +39,8 @@ The following arguments are supported:
 
 This resource exports the following attributes:
 
+* `project` - The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
+* `id` - The UUID of the IPv6.
 * `name` - See Argument Reference above.
 * `location_uuid` - Helps to identify which datacenter an object belongs to. The location of the resource depends on the location of the project.
 * `failover` - See Argument Reference above.

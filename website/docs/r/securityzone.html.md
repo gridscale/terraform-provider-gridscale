@@ -16,6 +16,7 @@ The following example shows how one might use this resource to add a security zo
 
 ```terraform
 resource "gridscale_paas_securityzone" "foo" {
+  project = "default"
   name = "test"
 }
 ```
@@ -24,13 +25,17 @@ resource "gridscale_paas_securityzone" "foo" {
 
 The following arguments are supported:
 
+* `project` - (Required) The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
+
 * `name` - (Required) The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+
 * `location_uuid` - (Optional) Helps to identify which datacenter an object belongs to.
 
 ## Attributes
 
 This resource exports the following attributes:
 
+* `project` - The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 * `id` - The UUID of the security zone.
 * `name` - The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
 * `location_uuid` - Helps to identify which datacenter an object belongs to.

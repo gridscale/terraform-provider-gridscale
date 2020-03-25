@@ -16,10 +16,12 @@ Using the network datasource for the creation of a server:
 
 ```terraform
 data "gridscale_network" "networkname"{
+  	project = "default"
 	resource_id = "xxxx-xxxx-xxxx-xxxx"
 }
 
 resource "gridscale_server" "servername"{
+	project = "default"
 	name = "terra-server"
 	cores = 2
 	memory = 4
@@ -34,12 +36,15 @@ resource "gridscale_server" "servername"{
 
 The following arguments are supported:
 
+* `project` - (Required) The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
+
 * `resource_id` - (Required) The UUID of the network.
 
 ## Attributes Reference
 
 The following attributes are exported:
 
+* `project` - The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 * `id` - The UUID of the network.
 * `name` - The UUID of the network.
 * `location_uuid` - The UUID of the location, that helps to identify which datacenter the network belongs to.

@@ -28,12 +28,15 @@ data "gridscale_isoimage" "foo" {
 
 The following arguments are supported:
 
+* `project` - (Required) The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
+
 * `resource_id` - (Required) The UUID of the ISO Image.
 
 ## Attributes Reference
 
 The following attributes are exported:
 
+* `project` - The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 * `name` - The name of the ISO Image.
 * `source_url` - Contains the source URL of the ISO Image that it was originally fetched from.
 * `server` - The information about servers which are related to this ISO Image.

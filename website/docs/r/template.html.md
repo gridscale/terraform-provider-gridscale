@@ -16,16 +16,19 @@ The following example shows how one might use this resource to add a template to
 
 ```terraform
 resource "gridscale_storage" "foo" {
+  project = "default"
   name   = "newname"
   capacity = 1
 }
 
 resource "gridscale_snapshot" "foo" {
+  project = gridscale_storage.foo.project
   name = "newname"
   storage_uuid = gridscale_storage.foo.id
 }
 
 resource "gridscale_template" "foo" {
+  project = gridscale_snapshot.foo.project
   name   = "newname"
   snapshot_uuid = gridscale_snapshot.foo.id
 }
@@ -34,6 +37,8 @@ resource "gridscale_template" "foo" {
 ## Argument Reference
 
 The following arguments are supported:
+
+* `project` - (Required) The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 
 * `name` - (Required) The exact name of the template as show in [the expert panel of gridscale](https://my.gridscale.io/Expert/Template).
 
@@ -45,6 +50,7 @@ The following arguments are supported:
 
 The following attributes are exported:
 
+* `project` - The name of project which is set in GRIDSCALE_PROJECTS_TOKENS env variable.
 * `name` - The name of the template.
 * `id` - The UUID of the template.
 * `location_uuid` - Helps to identify which datacenter an object belongs to.
