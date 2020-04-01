@@ -3,10 +3,11 @@ package gridscale
 import (
 	"context"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"log"
 	"strings"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 
 	"github.com/gridscale/gsclient-go/v2"
 )
@@ -273,6 +274,21 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 
 	//since only one template can be used, we can just look at index 0
 	if _, ok := d.GetOk("template"); ok {
+		_, okPwd := d.GetOk("template.0.password")
+		_, okPwdType := d.GetOk("template.0.password_type")
+		_, okSSH := d.GetOk("template.0.sshkeys")
+		//return error when both password and sshkey are not set
+		if !okPwd && !okSSH {
+			return fmt.Errorf("password or SSH key must be set")
+		}
+		//return error when both password and sshkey are set
+		if okPwd && okSSH {
+			return fmt.Errorf("you must choose either a password or a SSH key")
+		}
+		//return error when a password is chosen but a password type is not set
+		if okPwd && !okPwdType {
+			return fmt.Errorf("you must set password_type to either \"plain\" or \"crypt\"")
+		}
 		template := gsclient.StorageTemplate{
 			Password:     d.Get("template.0.password").(string),
 			Hostname:     d.Get("template.0.hostname").(string),
