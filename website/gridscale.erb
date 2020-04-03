@@ -13,14 +13,23 @@
         <li<%= sidebar_current("docs-gridscale-datasource") %>>
           <a href="#">Data Sources</a>
           <ul class="nav nav-visible">
+            <li<%= sidebar_current("docs-gridscale-datasource-firewall") %>>
+              <a href="/docs/providers/gridscale/d/firewall.html">gridscale_firewall</a>
+            </li>
             <li<%= sidebar_current("docs-gridscale-datasource-ip") %>>
               <a href="/docs/providers/gridscale/d/ip.html">gridscale_ip</a>
+            </li>
+            <li<%= sidebar_current("docs-gridscale-datasource-isoimage") %>>
+              <a href="/docs/providers/gridscale/d/isoimage.html">gridscale_isoimage</a>
+            </li>
+            <li<%= sidebar_current("docs-gridscale-datasource-loadbalancer") %>>
+              <a href="/docs/providers/gridscale/d/loadbalancer.html">gridscale_loadbalancer</a>
             </li>
             <li<%= sidebar_current("docs-gridscale-datasource-network") %>>
               <a href="/docs/providers/gridscale/d/network.html">gridscale_network</a>
             </li>
-            <li<%= sidebar_current("docs-gridscale-datasource-loadbalancer") %>>
-              <a href="/docs/providers/gridscale/d/loadbalancer.html">gridscale_loadbalancer</a>
+            <li<%= sidebar_current("docs-gridscale-datasource-object-storage") %>>
+              <a href="/docs/providers/gridscale/d/objectstorage.html">gridscale_object_storage_accesskey</a>
             </li>
             <li<%= sidebar_current("docs-gridscale-datasource-paas") %>>
               <a href="/docs/providers/gridscale/d/paas.html">gridscale_paas</a>
@@ -28,17 +37,11 @@
             <li<%= sidebar_current("docs-gridscale-datasource-securityzone") %>>
               <a href="/docs/providers/gridscale/d/securityzone.html">gridscale_paas_securityzone</a>
             </li>
-            <li<%= sidebar_current("docs-gridscale-datasource-server") %>>
-              <a href="/docs/providers/gridscale/d/server.html">gridscale_server</a>
-            </li>
             <li<%= sidebar_current("docs-gridscale-datasource-public-network") %>>
               <a href="/docs/providers/gridscale/d/publicnetwork.html">gridscale_public_network</a>
             </li>
-            <li<%= sidebar_current("docs-gridscale-datasource-sshkey") %>>
-              <a href="/docs/providers/gridscale/d/sshkey.html">gridscale_sshkey</a>
-            </li>
-            <li<%= sidebar_current("docs-gridscale-datasource-storage") %>>
-              <a href="/docs/providers/gridscale/d/storage.html">gridscale_storage</a>
+            <li<%= sidebar_current("docs-gridscale-datasource-server") %>>
+              <a href="/docs/providers/gridscale/d/server.html">gridscale_server</a>
             </li>
             <li<%= sidebar_current("docs-gridscale-datasource-snapshot") %>>
               <a href="/docs/providers/gridscale/d/snapshot.html">gridscale_snapshot</a>
@@ -46,17 +49,15 @@
             <li<%= sidebar_current("docs-gridscale-datasource-snapshotschedule") %>>
               <a href="/docs/providers/gridscale/d/snapshotschedule.html">gridscale_snapshotschedule</a>
             </li>
+            <li<%= sidebar_current("docs-gridscale-datasource-sshkey") %>>
+              <a href="/docs/providers/gridscale/d/sshkey.html">gridscale_sshkey</a>
+            </li>
+            <li<%= sidebar_current("docs-gridscale-datasource-storage") %>>
+              <a href="/docs/providers/gridscale/d/storage.html">gridscale_storage</a>
+            </li>
+
             <li<%= sidebar_current("docs-gridscale-datasource-template") %>>
               <a href="/docs/providers/gridscale/d/template.html">gridscale_template</a>
-            </li>
-            <li<%= sidebar_current("docs-gridscale-datasource-object-storage") %>>
-              <a href="/docs/providers/gridscale/d/objectstorage.html">gridscale_object_storage_accesskey</a>
-            </li>
-            <li<%= sidebar_current("docs-gridscale-datasource-isoimage") %>>
-              <a href="/docs/providers/gridscale/d/isoimage.html">gridscale_isoimage</a>
-            </li>
-            <li<%= sidebar_current("docs-gridscale-datasource-firewall") %>>
-              <a href="/docs/providers/gridscale/d/firewall.html">gridscale_firewall</a>
             </li>
           </ul>
         </li>
@@ -64,17 +65,26 @@
         <li<%= sidebar_current("docs-gridscale-resource") %>>
           <a href="#">Resources</a>
           <ul class="nav nav-visible">
+            <li<%= sidebar_current("docs-gridscale-resource-firewall") %>>
+              <a href="/docs/providers/gridscale/r/firewall.html">gridscale_firewall</a>
+            </li>
             <li<%= sidebar_current("docs-gridscale-resource-ipv4") %>>
               <a href="/docs/providers/gridscale/r/ipv4.html">gridscale_ipv4</a>
             </li>
             <li<%= sidebar_current("docs-gridscale-resource-ipv6") %>>
               <a href="/docs/providers/gridscale/r/ipv6.html">gridscale_ipv6</a>
             </li>
+            <li<%= sidebar_current("docs-gridscale-resource-isoimage") %>>
+              <a href="/docs/providers/gridscale/r/isoimage.html">gridscale_isoimage</a>
+            </li>
             <li<%= sidebar_current("docs-gridscale-resource-loadbalancer") %>>
               <a href="/docs/providers/gridscale/r/loadbalancer.html">gridscale_loadbalancer</a>
             </li>
             <li<%= sidebar_current("docs-gridscale-resource-network") %>>
               <a href="/docs/providers/gridscale/r/network.html">gridscale_network</a>
+            </li>
+            <li<%= sidebar_current("docs-gridscale-resource-object-storage") %>>
+              <a href="/docs/providers/gridscale/r/objectstorage.html">gridscale_object_storage_accesskey</a>
             </li>
             <li<%= sidebar_current("docs-gridscale-resource-paas") %>>
               <a href="/docs/providers/gridscale/r/paas.html">gridscale_paas</a>
@@ -85,29 +95,20 @@
             <li<%= sidebar_current("docs-gridscale-resource-server") %>>
               <a href="/docs/providers/gridscale/r/server.html">gridscale_server</a>
             </li>
+            <li<%= sidebar_current("docs-gridscale-resource-snapshot") %>>
+              <a href="/docs/providers/gridscale/r/snapshot.html">gridscale_snapshot</a>
+            </li>
+           <li<%= sidebar_current("docs-gridscale-resource-snapshotschedule") %>>
+              <a href="/docs/providers/gridscale/r/snapshotschedule.html">gridscale_snapshotschedule</a>
+            </li>
             <li<%= sidebar_current("docs-gridscale-resource-sshkey") %>>
               <a href="/docs/providers/gridscale/r/sshkey.html">gridscale_sshkey</a>
             </li>
             <li<%= sidebar_current("docs-gridscale-resource-storage") %>>
               <a href="/docs/providers/gridscale/r/storage.html">gridscale_storage</a>
             </li>
-            <li<%= sidebar_current("docs-gridscale-resource-snapshot") %>>
-              <a href="/docs/providers/gridscale/r/snapshot.html">gridscale_snapshot</a>
-            </li>
-            <li<%= sidebar_current("docs-gridscale-resource-snapshotschedule") %>>
-              <a href="/docs/providers/gridscale/r/snapshotschedule.html">gridscale_snapshotschedule</a>
-            </li>
             <li<%= sidebar_current("docs-gridscale-resource-template") %>>
               <a href="/docs/providers/gridscale/r/template.html">gridscale_template</a>
-            </li>
-            <li<%= sidebar_current("docs-gridscale-resource-object-storage") %>>
-              <a href="/docs/providers/gridscale/r/objectstorage.html">gridscale_object_storage_accesskey</a>
-            </li>
-            <li<%= sidebar_current("docs-gridscale-resource-isoimage") %>>
-              <a href="/docs/providers/gridscale/r/isoimage.html">gridscale_isoimage</a>
-            </li>
-            <li<%= sidebar_current("docs-gridscale-resource-firewall") %>>
-              <a href="/docs/providers/gridscale/r/firewall.html">gridscale_firewall</a>
             </li>
           </ul>
         </li>
