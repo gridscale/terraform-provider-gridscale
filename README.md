@@ -64,7 +64,7 @@ Available Features
 | Snapshot to S3 | :x: |  
 | Snapshot schedule (CRUD) | :heavy_check_mark: |  
 | Template (CRUD) | :heavy_check_mark: |  
-| Multiple project support | :x: |
+| Multiple project support ([Workaround](https://github.com/gridscale/terraform-examples/tree/master/multi-project)) | :x: |
 
 Developing the Provider
 ---------------------------
