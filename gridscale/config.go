@@ -2,8 +2,10 @@ package gridscale
 
 import (
 	"context"
-	"github.com/gridscale/gsclient-go/v2"
 	"log"
+	"os"
+
+	"github.com/gridscale/gsclient-go/v2"
 )
 
 //Arrays can't be constants in Go, but these will be used as constants
@@ -17,18 +19,51 @@ var firewallRuleProtocols = []string{"udp", "tcp"}
 var emptyCtx = context.Background()
 
 const timeLayout = "2006-01-02 15:04:05"
+const (
+	defaultAPIURL                    = "https://api.gridscale.io"
+	defaultGSCTimeoutSecs            = 120
+	defaultGSCDelayIntervalMilliSecs = 1000
+	defaultGSCMaxNumberOfRetries     = 5
+)
 
 type Config struct {
-	UserUUID string
-	APIToken string
-	APIUrl   string
+	UserUUID    string
+	APIToken    string
+	APIUrl      string
+	TimeoutSecs int
 }
 
 func (c *Config) Client() (*gsclient.Client, error) {
-	config := gsclient.DefaultConfiguration(
-		c.UserUUID,
-		c.APIToken,
-	)
+	var config *gsclient.Config
+	if c.APIUrl != "" || c.TimeoutSecs != 0 {
+		// if api URL is configured, set the url in gsc
+		apiURL := defaultAPIURL
+		if c.APIUrl != "" {
+			apiURL = c.APIUrl
+		}
+
+		//if timeout is configured, set the timeout in gsc
+		timeoutSecs := defaultGSCTimeoutSecs
+		if c.TimeoutSecs != 0 {
+			timeoutSecs = c.TimeoutSecs
+		}
+		config = gsclient.NewConfiguration(
+			apiURL,
+			c.UserUUID,
+			c.APIToken,
+			os.Getenv("TF_LOG") != "",
+			true,
+			timeoutSecs,
+			defaultGSCDelayIntervalMilliSecs,
+			defaultGSCMaxNumberOfRetries,
+		)
+	} else {
+		config = gsclient.DefaultConfiguration(
+			c.UserUUID,
+			c.APIToken,
+		)
+	}
+
 	client := gsclient.NewClient(config)
 
 	log.Print("[INFO] gridscale client configured")
