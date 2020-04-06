@@ -1,4 +1,10 @@
 ## 1.5.1 (Unreleased)
+
+IMPROVEMENTS:
+* Fix documentation (wrong navigation, reorder the side menu).
+* Add link to multi-project example.
+* Add configurable timeout.
+
 ## 1.5.0 (January 24, 2020)
 
 FEATURES:
