@@ -34,7 +34,6 @@ type Config struct {
 }
 
 func (c *Config) Client() (*gsclient.Client, error) {
-	var config *gsclient.Config
 	// if api URL is configured, set the url in gsc
 	apiURL := defaultAPIURL
 	if c.APIUrl != "" {
@@ -46,7 +45,7 @@ func (c *Config) Client() (*gsclient.Client, error) {
 	if c.TimeoutSecs != 0 {
 		timeoutSecs = c.TimeoutSecs
 	}
-	config = gsclient.NewConfiguration(
+	config := gsclient.NewConfiguration(
 		apiURL,
 		c.UserUUID,
 		c.APIToken,
