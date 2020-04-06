@@ -26,11 +26,11 @@ func Provider() terraform.ResourceProvider {
 				DefaultFunc: schema.EnvDefaultFunc("GRIDSCALE_URL", nil),
 				Description: "the url for the gridscale API.",
 			},
-			"gsc_timeout_secs": {
+			"timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("GRIDSCALE_TIMEOUT_SECONDS", nil),
-				Description: "The timeout of the gridscale client",
+				Description: "The timeout of the gridscale client in seconds",
 			},
 		},
 		DataSourcesMap: map[string]*schema.Resource{
@@ -78,7 +78,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		UserUUID:    d.Get("uuid").(string),
 		APIToken:    d.Get("token").(string),
 		APIUrl:      d.Get("api_url").(string),
-		TimeoutSecs: d.Get("gsc_timeout_secs").(int),
+		TimeoutSecs: d.Get("timeout").(int),
 	}
 
 	return config.Client()
