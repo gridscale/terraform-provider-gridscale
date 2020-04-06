@@ -23,13 +23,13 @@ func Provider() terraform.ResourceProvider {
 			"api_url": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				DefaultFunc: schema.EnvDefaultFunc("GRIDSCALE_URL", ""),
+				DefaultFunc: schema.EnvDefaultFunc("GRIDSCALE_URL", nil),
 				Description: "the url for the gridscale API.",
 			},
 			"gsc_timeout": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				DefaultFunc: schema.EnvDefaultFunc("GRIDSCALE_TIMEOUT", 0),
+				DefaultFunc: schema.EnvDefaultFunc("GRIDSCALE_TIMEOUT", nil),
 				Description: "The timeout of the gridscale client",
 			},
 		},
