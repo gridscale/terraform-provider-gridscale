@@ -35,34 +35,27 @@ type Config struct {
 
 func (c *Config) Client() (*gsclient.Client, error) {
 	var config *gsclient.Config
-	if c.APIUrl != "" || c.TimeoutSecs != 0 {
-		// if api URL is configured, set the url in gsc
-		apiURL := defaultAPIURL
-		if c.APIUrl != "" {
-			apiURL = c.APIUrl
-		}
-
-		//if timeout is configured, set the timeout in gsc
-		timeoutSecs := defaultGSCTimeoutSecs
-		if c.TimeoutSecs != 0 {
-			timeoutSecs = c.TimeoutSecs
-		}
-		config = gsclient.NewConfiguration(
-			apiURL,
-			c.UserUUID,
-			c.APIToken,
-			os.Getenv("TF_LOG") != "",
-			true,
-			timeoutSecs,
-			defaultGSCDelayIntervalMilliSecs,
-			defaultGSCMaxNumberOfRetries,
-		)
-	} else {
-		config = gsclient.DefaultConfiguration(
-			c.UserUUID,
-			c.APIToken,
-		)
+	// if api URL is configured, set the url in gsc
+	apiURL := defaultAPIURL
+	if c.APIUrl != "" {
+		apiURL = c.APIUrl
 	}
+
+	//if timeout is configured, set the timeout in gsc
+	timeoutSecs := defaultGSCTimeoutSecs
+	if c.TimeoutSecs != 0 {
+		timeoutSecs = c.TimeoutSecs
+	}
+	config = gsclient.NewConfiguration(
+		apiURL,
+		c.UserUUID,
+		c.APIToken,
+		os.Getenv("TF_LOG") != "",
+		true,
+		timeoutSecs,
+		defaultGSCDelayIntervalMilliSecs,
+		defaultGSCMaxNumberOfRetries,
+	)
 
 	client := gsclient.NewClient(config)
 
