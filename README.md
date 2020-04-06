@@ -65,6 +65,7 @@ Available Features
 | Snapshot schedule (CRUD) | :heavy_check_mark: |  
 | Template (CRUD) | :heavy_check_mark: |  
 | Multiple project support ([Workaround](https://github.com/gridscale/terraform-examples/tree/master/multi-project)) | :x: |
+| Marketplace | :x: |
 
 Developing the Provider
 ---------------------------
