@@ -1,4 +1,4 @@
-## 1.5.1 (Unreleased)
+## 1.5.1 (April 06, 2020)
 
 IMPROVEMENTS:
 * Fix documentation (wrong navigation, reorder the side menu).
