@@ -20,10 +20,11 @@ var firewallRuleProtocols = []string{"udp", "tcp"}
 const timeLayout = "2006-01-02 15:04:05"
 const (
 	defaultAPIURL                    = "https://api.gridscale.io"
-	defaultGSCTimeoutSecs            = 120
 	defaultGSCDelayIntervalMilliSecs = 1000
 	defaultGSCMaxNumberOfRetries     = 5
 )
+
+var GSCTimeoutSecs = 120
 
 type Config struct {
 	UserUUID    string
@@ -40,9 +41,8 @@ func (c *Config) Client() (*gsclient.Client, error) {
 	}
 
 	//if timeout is configured, set the timeout in gsc
-	timeoutSecs := defaultGSCTimeoutSecs
 	if c.TimeoutSecs != 0 {
-		timeoutSecs = c.TimeoutSecs
+		GSCTimeoutSecs = c.TimeoutSecs
 	}
 	config := gsclient.NewConfiguration(
 		apiURL,
@@ -50,7 +50,7 @@ func (c *Config) Client() (*gsclient.Client, error) {
 		c.APIToken,
 		os.Getenv("TF_LOG") != "",
 		true,
-		timeoutSecs,
+		GSCTimeoutSecs,
 		defaultGSCDelayIntervalMilliSecs,
 		defaultGSCMaxNumberOfRetries,
 	)
