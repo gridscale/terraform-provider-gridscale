@@ -1,7 +1,9 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
+
 	"github.com/gridscale/gsclient-go/v2"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
@@ -37,7 +39,7 @@ func dataSourceGridscaleObjectStorageRead(d *schema.ResourceData, meta interface
 	id := d.Get("resource_id").(string)
 	errorPrefix := fmt.Sprintf("read object storage (%s) datasource-", id)
 
-	objectStorage, err := client.GetObjectStorageAccessKey(emptyCtx, id)
+	objectStorage, err := client.GetObjectStorageAccessKey(context.Background(), id)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

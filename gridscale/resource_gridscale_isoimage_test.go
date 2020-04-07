@@ -1,6 +1,7 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
@@ -56,7 +57,7 @@ func testAccCheckResourceGridscaleISOImageExists(n string, object *gsclient.ISOI
 
 		id := rs.Primary.ID
 
-		foundObject, err := client.GetISOImage(emptyCtx, id)
+		foundObject, err := client.GetISOImage(context.Background(), id)
 
 		if err != nil {
 			return err
@@ -79,7 +80,7 @@ func testAccCheckGridscaleISOImageDestroyCheck(s *terraform.State) error {
 			continue
 		}
 
-		_, err := client.GetISOImage(emptyCtx, rs.Primary.ID)
+		_, err := client.GetISOImage(context.Background(), rs.Primary.ID)
 		if err != nil {
 			if requestError, ok := err.(gsclient.RequestError); ok {
 				if requestError.StatusCode != 404 {

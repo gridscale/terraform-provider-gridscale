@@ -1,6 +1,7 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
@@ -60,7 +61,7 @@ func testAccCheckResourceGridscaleIpv4Exists(n string, object *gsclient.IP) reso
 
 		id := rs.Primary.ID
 
-		foundObject, err := client.GetIP(emptyCtx, id)
+		foundObject, err := client.GetIP(context.Background(), id)
 
 		if err != nil {
 			return err
@@ -83,7 +84,7 @@ func testAccCheckGridscaleIpv4DestroyCheck(s *terraform.State) error {
 			continue
 		}
 
-		_, err := client.GetIP(emptyCtx, rs.Primary.ID)
+		_, err := client.GetIP(context.Background(), rs.Primary.ID)
 		if err != nil {
 			if requestError, ok := err.(gsclient.RequestError); ok {
 				if requestError.StatusCode != 404 {

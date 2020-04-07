@@ -1,12 +1,14 @@
 package gridscale
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"log"
+
 	"github.com/gridscale/gsclient-go/v2"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	"log"
 )
 
 func resourceGridscaleFirewall() *schema.Resource {
@@ -125,7 +127,7 @@ func resourceGridscaleFirewall() *schema.Resource {
 func resourceGridscaleFirewallRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("read firewall (%s) resource -", d.Id())
-	template, err := client.GetFirewall(emptyCtx, d.Id())
+	template, err := client.GetFirewall(context.Background(), d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
@@ -236,7 +238,7 @@ func resourceGridscaleFirewallCreate(d *schema.ResourceData, meta interface{}) e
 		},
 	}
 
-	response, err := client.CreateFirewall(emptyCtx, requestBody)
+	response, err := client.CreateFirewall(context.Background(), requestBody)
 	if err != nil {
 		return err
 	}
@@ -280,7 +282,7 @@ func resourceGridscaleFirewallUpdate(d *schema.ResourceData, meta interface{}) e
 		RulesV4In:  rulesV4In,
 		RulesV4Out: rulesV4Out,
 	}
-	err := client.UpdateFirewall(emptyCtx, d.Id(), requestBody)
+	err := client.UpdateFirewall(context.Background(), d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -291,7 +293,7 @@ func resourceGridscaleFirewallUpdate(d *schema.ResourceData, meta interface{}) e
 func resourceGridscaleFirewallDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete firewall (%s) resource -", d.Id())
-	err := client.DeleteFirewall(emptyCtx, d.Id())
+	err := client.DeleteFirewall(context.Background(), d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

@@ -1,6 +1,7 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
 	"log"
 
@@ -137,7 +138,7 @@ func dataSourceGridscaleISOImageRead(d *schema.ResourceData, meta interface{}) e
 	id := d.Get("resource_id").(string)
 	errorPrefix := fmt.Sprintf("read ISO-Image (%s) datasource -", id)
 
-	isoimage, err := client.GetISOImage(emptyCtx, id)
+	isoimage, err := client.GetISOImage(context.Background(), id)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

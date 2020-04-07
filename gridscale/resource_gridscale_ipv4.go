@@ -112,7 +112,7 @@ func resourceGridscaleIpv4() *schema.Resource {
 func resourceGridscaleIpRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("read IP (%s) resource -", d.Id())
-	ip, err := client.GetIP(emptyCtx, d.Id())
+	ip, err := client.GetIP(context.Background(), d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
@@ -185,7 +185,7 @@ func resourceGridscaleIpUpdate(d *schema.ResourceData, meta interface{}) error {
 		Labels:     &labels,
 	}
 
-	err := client.UpdateIP(emptyCtx, d.Id(), requestBody)
+	err := client.UpdateIP(context.Background(), d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -204,7 +204,7 @@ func resourceGridscaleIpv4Create(d *schema.ResourceData, meta interface{}) error
 		Labels:     convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
-	response, err := client.CreateIP(emptyCtx, requestBody)
+	response, err := client.CreateIP(context.Background(), requestBody)
 	if err != nil {
 		return err
 	}
@@ -220,7 +220,7 @@ func resourceGridscaleIpDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete IP (%s) resource -", d.Id())
 
-	ip, err := client.GetIP(emptyCtx, d.Id())
+	ip, err := client.GetIP(context.Background(), d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -233,12 +233,12 @@ func resourceGridscaleIpDelete(d *schema.ResourceData, meta interface{}) error {
 			return err
 		}
 		//DeleteIP requires the server to be off
-		err = globalServerStatusList.runActionRequireServerOff(emptyCtx, client, server.ServerUUID, false, unlinkIPAction)
+		err = globalServerStatusList.runActionRequireServerOff(context.Background(), client, server.ServerUUID, false, unlinkIPAction)
 		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
 	}
-	err = client.DeleteIP(emptyCtx, d.Id())
+	err = client.DeleteIP(context.Background(), d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

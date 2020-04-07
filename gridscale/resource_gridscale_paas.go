@@ -1,11 +1,13 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
+	"strings"
+
 	"github.com/gridscale/gsclient-go/v2"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	"strings"
 
 	"log"
 )
@@ -161,7 +163,7 @@ func resourceGridscalePaaS() *schema.Resource {
 func resourceGridscalePaaSServiceRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("read paas (%s) resource -", d.Id())
-	paas, err := client.GetPaaSService(emptyCtx, d.Id())
+	paas, err := client.GetPaaSService(context.Background(), d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
@@ -259,7 +261,7 @@ func resourceGridscalePaaSServiceRead(d *schema.ResourceData, meta interface{}) 
 	}
 
 	//Get all available networks
-	networks, err := client.GetNetworkList(emptyCtx)
+	networks, err := client.GetNetworkList(context.Background())
 	if err != nil {
 		return fmt.Errorf("%s error getting networks: %v", errorPrefix, err)
 	}
@@ -313,7 +315,7 @@ func resourceGridscalePaaSServiceCreate(d *schema.ResourceData, meta interface{}
 	}
 	requestBody.ResourceLimits = limits
 
-	response, err := client.CreatePaaSService(emptyCtx, requestBody)
+	response, err := client.CreatePaaSService(context.Background(), requestBody)
 	if err != nil {
 		return err
 	}
@@ -358,7 +360,7 @@ func resourceGridscalePaaSServiceUpdate(d *schema.ResourceData, meta interface{}
 	}
 	requestBody.ResourceLimits = limits
 
-	err := client.UpdatePaaSService(emptyCtx, d.Id(), requestBody)
+	err := client.UpdatePaaSService(context.Background(), d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -368,7 +370,7 @@ func resourceGridscalePaaSServiceUpdate(d *schema.ResourceData, meta interface{}
 func resourceGridscalePaaSServiceDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete paas (%s) resource -", d.Id())
-	err := client.DeletePaaSService(emptyCtx, d.Id())
+	err := client.DeletePaaSService(context.Background(), d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

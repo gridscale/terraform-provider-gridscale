@@ -1,10 +1,12 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
+	"log"
+
 	"github.com/gridscale/gsclient-go/v2"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"log"
 )
 
 func resourceGridscaleObjectStorage() *schema.Resource {
@@ -33,7 +35,7 @@ func resourceGridscaleObjectStorage() *schema.Resource {
 func resourceGridscaleObjectStorageRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("read object storage (%s) resource -", d.Id())
-	objectStorage, err := client.GetObjectStorageAccessKey(emptyCtx, d.Id())
+	objectStorage, err := client.GetObjectStorageAccessKey(context.Background(), d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
@@ -56,7 +58,7 @@ func resourceGridscaleObjectStorageRead(d *schema.ResourceData, meta interface{}
 func resourceGridscaleObjectStorageCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 
-	response, err := client.CreateObjectStorageAccessKey(emptyCtx)
+	response, err := client.CreateObjectStorageAccessKey(context.Background())
 	if err != nil {
 		return err
 	}
@@ -70,7 +72,7 @@ func resourceGridscaleObjectStorageCreate(d *schema.ResourceData, meta interface
 func resourceGridscaleObjectStorageDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete object storage (%s) resource -", d.Id())
-	err := client.DeleteObjectStorageAccessKey(emptyCtx, d.Id())
+	err := client.DeleteObjectStorageAccessKey(context.Background(), d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

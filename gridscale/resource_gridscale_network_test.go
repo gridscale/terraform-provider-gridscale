@@ -1,6 +1,7 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
@@ -58,7 +59,7 @@ func testAccCheckResourceGridscaleNetworkExists(n string, object *gsclient.Netwo
 
 		id := rs.Primary.ID
 
-		foundObject, err := client.GetNetwork(emptyCtx, id)
+		foundObject, err := client.GetNetwork(context.Background(), id)
 
 		if err != nil {
 			return err
@@ -81,7 +82,7 @@ func testAccCheckGridscaleNetworkDestroyCheck(s *terraform.State) error {
 			continue
 		}
 
-		_, err := client.GetNetwork(emptyCtx, rs.Primary.ID)
+		_, err := client.GetNetwork(context.Background(), rs.Primary.ID)
 		if err != nil {
 			if requestError, ok := err.(gsclient.RequestError); ok {
 				if requestError.StatusCode != 404 {

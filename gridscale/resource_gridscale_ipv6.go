@@ -1,6 +1,7 @@
 package gridscale
 
 import (
+	"context"
 	"log"
 	"time"
 
@@ -117,7 +118,7 @@ func resourceGridscaleIpv6Create(d *schema.ResourceData, meta interface{}) error
 		Labels:     convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
-	response, err := client.CreateIP(emptyCtx, requestBody)
+	response, err := client.CreateIP(context.Background(), requestBody)
 	if err != nil {
 		return err
 	}

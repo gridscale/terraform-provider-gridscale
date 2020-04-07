@@ -1,6 +1,7 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/gridscale/gsclient-go/v2"
@@ -57,7 +58,7 @@ func dataSourceGridscaleSshkeyRead(d *schema.ResourceData, meta interface{}) err
 	id := d.Get("resource_id").(string)
 	errorPrefix := fmt.Sprintf("read SSH key (%s) datasource -", id)
 
-	sshkey, err := client.GetSshkey(emptyCtx, id)
+	sshkey, err := client.GetSshkey(context.Background(), id)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

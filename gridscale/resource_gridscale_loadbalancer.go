@@ -1,6 +1,7 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -147,7 +148,7 @@ func resourceGridscaleLoadBalancerCreate(d *schema.ResourceData, meta interface{
 	if forwardingRules, ok := d.GetOk("forwarding_rule"); ok {
 		requestBody.ForwardingRules = expandLoadbalancerForwardingRules(forwardingRules)
 	}
-	response, err := client.CreateLoadBalancer(emptyCtx, requestBody)
+	response, err := client.CreateLoadBalancer(context.Background(), requestBody)
 
 	if err != nil {
 		return fmt.Errorf(
@@ -160,7 +161,7 @@ func resourceGridscaleLoadBalancerCreate(d *schema.ResourceData, meta interface{
 func resourceGridscaleLoadBalancerRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("read loadbalancer (%s) resource -", d.Id())
-	loadbalancer, err := client.GetLoadBalancer(emptyCtx, d.Id())
+	loadbalancer, err := client.GetLoadBalancer(context.Background(), d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
@@ -231,7 +232,7 @@ func resourceGridscaleLoadBalancerUpdate(d *schema.ResourceData, meta interface{
 	if forwardingRules, ok := d.GetOk("forwarding_rule"); ok {
 		requestBody.ForwardingRules = expandLoadbalancerForwardingRules(forwardingRules)
 	}
-	err := client.UpdateLoadBalancer(emptyCtx, d.Id(), requestBody)
+	err := client.UpdateLoadBalancer(context.Background(), d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 
@@ -242,7 +243,7 @@ func resourceGridscaleLoadBalancerUpdate(d *schema.ResourceData, meta interface{
 func resourceGridscaleLoadBalancerDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete loadbalancer (%s) resource-", d.Id())
-	err := client.DeleteLoadBalancer(emptyCtx, d.Id())
+	err := client.DeleteLoadBalancer(context.Background(), d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

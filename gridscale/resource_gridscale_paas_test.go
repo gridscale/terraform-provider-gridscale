@@ -1,7 +1,9 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
+
 	"github.com/gridscale/gsclient-go/v2"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
@@ -58,7 +60,7 @@ func testAccCheckResourceGridscalePaaSExists(n string, object *gsclient.PaaSServ
 		}
 		client := testAccProvider.Meta().(*gsclient.Client)
 		id := rs.Primary.ID
-		foundObject, err := client.GetPaaSService(emptyCtx, id)
+		foundObject, err := client.GetPaaSService(context.Background(), id)
 		if err != nil {
 			return err
 		}
@@ -77,7 +79,7 @@ func testAccCheckResourceGridscalePaaSDestroyCheck(s *terraform.State) error {
 			continue
 		}
 
-		_, err := client.GetPaaSService(emptyCtx, rs.Primary.ID)
+		_, err := client.GetPaaSService(context.Background(), rs.Primary.ID)
 		if err != nil {
 			if requestError, ok := err.(gsclient.RequestError); ok {
 				if requestError.StatusCode != 404 {

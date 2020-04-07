@@ -1,6 +1,7 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
 	"log"
 
@@ -116,7 +117,7 @@ func dataSourceGridscaleTemplateRead(d *schema.ResourceData, meta interface{}) e
 	name := d.Get("name").(string)
 	errorPrefix := fmt.Sprintf("read template (%s) datasource -", name)
 
-	template, err := client.GetTemplateByName(emptyCtx, name)
+	template, err := client.GetTemplateByName(context.Background(), name)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

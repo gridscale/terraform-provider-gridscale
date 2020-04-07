@@ -1,6 +1,7 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/gridscale/gsclient-go/v2"
@@ -102,7 +103,7 @@ func dataSourceGridscaleSnapshotRead(d *schema.ResourceData, meta interface{}) e
 	id := d.Get("resource_id").(string)
 	errorPrefix := fmt.Sprintf("read snapshot (%s) datasource of storage (%s)-", id, storageUuid)
 
-	snapshot, err := client.GetStorageSnapshot(emptyCtx, storageUuid, id)
+	snapshot, err := client.GetStorageSnapshot(context.Background(), storageUuid, id)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

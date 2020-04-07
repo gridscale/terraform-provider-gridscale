@@ -16,7 +16,6 @@ var loadbalancerAlgs = []string{"roundrobin", "leastconn"}
 var passwordTypes = []string{"plain", "crypt"}
 var firewallActionTypes = []string{"accept", "drop"}
 var firewallRuleProtocols = []string{"udp", "tcp"}
-var emptyCtx = context.Background()
 
 const timeLayout = "2006-01-02 15:04:05"
 const (
@@ -62,7 +61,7 @@ func (c *Config) Client() (*gsclient.Client, error) {
 
 	//Make sure the credentials are correct by getting the server list
 	//and init `globalServerStatusList` from fetched server list
-	err := initGlobalServerStatusList(emptyCtx, client)
+	err := initGlobalServerStatusList(context.Background(), client)
 
 	return client, err
 }

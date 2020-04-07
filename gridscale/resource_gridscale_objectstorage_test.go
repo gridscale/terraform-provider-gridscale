@@ -1,6 +1,7 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
@@ -47,7 +48,7 @@ func testAccCheckResourceGridscaleObjectStorageExists(n string, object *gsclient
 
 		id := rs.Primary.ID
 
-		foundObject, err := client.GetObjectStorageAccessKey(emptyCtx, id)
+		foundObject, err := client.GetObjectStorageAccessKey(context.Background(), id)
 
 		if err != nil {
 			return err
@@ -70,7 +71,7 @@ func testAccCheckGridscaleObjectStorageDestroyCheck(s *terraform.State) error {
 			continue
 		}
 
-		_, err := client.GetObjectStorageAccessKey(emptyCtx, rs.Primary.ID)
+		_, err := client.GetObjectStorageAccessKey(context.Background(), rs.Primary.ID)
 		if err != nil {
 			if requestError, ok := err.(gsclient.RequestError); ok {
 				if requestError.StatusCode != 404 {

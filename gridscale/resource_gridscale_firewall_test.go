@@ -1,6 +1,7 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
@@ -56,7 +57,7 @@ func testAccCheckResourceGridscaleFirewallExists(n string, object *gsclient.Fire
 
 		id := rs.Primary.ID
 
-		foundObject, err := client.GetFirewall(emptyCtx, id)
+		foundObject, err := client.GetFirewall(context.Background(), id)
 
 		if err != nil {
 			return err
@@ -79,7 +80,7 @@ func testAccCheckGridscaleFirewallDestroyCheck(s *terraform.State) error {
 			continue
 		}
 
-		_, err := client.GetIP(emptyCtx, rs.Primary.ID)
+		_, err := client.GetIP(context.Background(), rs.Primary.ID)
 		if err != nil {
 			if requestError, ok := err.(gsclient.RequestError); ok {
 				if requestError.StatusCode != 404 {

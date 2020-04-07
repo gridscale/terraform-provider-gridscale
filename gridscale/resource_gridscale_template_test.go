@@ -1,6 +1,7 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
@@ -56,7 +57,7 @@ func testAccCheckResourceGridscaleTemplateExists(n string, object *gsclient.Temp
 
 		id := rs.Primary.ID
 
-		foundObject, err := client.GetTemplate(emptyCtx, id)
+		foundObject, err := client.GetTemplate(context.Background(), id)
 
 		if err != nil {
 			return err
@@ -79,7 +80,7 @@ func testAccCheckGridscaleTemplateDestroyCheck(s *terraform.State) error {
 			continue
 		}
 
-		_, err := client.GetTemplate(emptyCtx, rs.Primary.ID)
+		_, err := client.GetTemplate(context.Background(), rs.Primary.ID)
 		if err != nil {
 			if requestError, ok := err.(gsclient.RequestError); ok {
 				if requestError.StatusCode != 404 {

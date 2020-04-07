@@ -94,7 +94,7 @@ func resourceGridscaleNetwork() *schema.Resource {
 func resourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("read network (%s) resource -", d.Id())
-	network, err := client.GetNetwork(emptyCtx, d.Id())
+	network, err := client.GetNetwork(context.Background(), d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
@@ -157,7 +157,7 @@ func resourceGridscaleNetworkUpdate(d *schema.ResourceData, meta interface{}) er
 		Labels:     &labels,
 	}
 
-	err := client.UpdateNetwork(emptyCtx, d.Id(), requestBody)
+	err := client.UpdateNetwork(context.Background(), d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -174,7 +174,7 @@ func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) er
 		Labels:     convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
-	response, err := client.CreateNetwork(emptyCtx, requestBody)
+	response, err := client.CreateNetwork(context.Background(), requestBody)
 	if err != nil {
 		return err
 	}
@@ -189,7 +189,7 @@ func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) er
 func resourceGridscaleNetworkDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete network (%s) resource -", d.Id())
-	net, err := client.GetNetwork(emptyCtx, d.Id())
+	net, err := client.GetNetwork(context.Background(), d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -201,13 +201,13 @@ func resourceGridscaleNetworkDelete(d *schema.ResourceData, meta interface{}) er
 			return err
 		}
 		//UnlinkNetwork requires the server to be off
-		err = globalServerStatusList.runActionRequireServerOff(emptyCtx, client, server.ObjectUUID, false, unlinkNetAction)
+		err = globalServerStatusList.runActionRequireServerOff(context.Background(), client, server.ObjectUUID, false, unlinkNetAction)
 		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
 	}
 
-	err = client.DeleteNetwork(emptyCtx, d.Id())
+	err = client.DeleteNetwork(context.Background(), d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

@@ -1,10 +1,12 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
+	"log"
+
 	"github.com/gridscale/gsclient-go/v2"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"log"
 )
 
 func resourceGridscaleTemplate() *schema.Resource {
@@ -121,7 +123,7 @@ func resourceGridscaleTemplate() *schema.Resource {
 func resourceGridscaleTemplateRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("read template (%s) resource -", d.Id())
-	template, err := client.GetTemplate(emptyCtx, d.Id())
+	template, err := client.GetTemplate(context.Background(), d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
@@ -200,7 +202,7 @@ func resourceGridscaleTemplateCreate(d *schema.ResourceData, meta interface{}) e
 		Labels:       convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
-	response, err := client.CreateTemplate(emptyCtx, requestBody)
+	response, err := client.CreateTemplate(context.Background(), requestBody)
 	if err != nil {
 		return err
 	}
@@ -222,7 +224,7 @@ func resourceGridscaleTemplateUpdate(d *schema.ResourceData, meta interface{}) e
 		Labels: &labels,
 	}
 
-	err := client.UpdateTemplate(emptyCtx, d.Id(), requestBody)
+	err := client.UpdateTemplate(context.Background(), d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -233,7 +235,7 @@ func resourceGridscaleTemplateUpdate(d *schema.ResourceData, meta interface{}) e
 func resourceGridscaleTemplateDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete template (%s) resource -", d.Id())
-	err := client.DeleteTemplate(emptyCtx, d.Id())
+	err := client.DeleteTemplate(context.Background(), d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

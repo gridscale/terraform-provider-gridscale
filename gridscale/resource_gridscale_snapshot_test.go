@@ -1,6 +1,7 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
@@ -60,7 +61,7 @@ func testAccCheckDataSourceGridscaleSnapshotExists(n string, object *gsclient.St
 		client := testAccProvider.Meta().(*gsclient.Client)
 		id := rs.Primary.ID
 		storageID := rs.Primary.Attributes["storage_uuid"]
-		foundObject, err := client.GetStorageSnapshot(emptyCtx, storageID, id)
+		foundObject, err := client.GetStorageSnapshot(context.Background(), storageID, id)
 		if err != nil {
 			return err
 		}
@@ -79,7 +80,7 @@ func testAccCheckDataSourceGridscaleSnapshotDestroyCheck(s *terraform.State) err
 			continue
 		}
 
-		_, err := client.GetStorageSnapshot(emptyCtx, rs.Primary.Attributes["storage_uuid"], rs.Primary.ID)
+		_, err := client.GetStorageSnapshot(context.Background(), rs.Primary.Attributes["storage_uuid"], rs.Primary.ID)
 		if err != nil {
 			if requestError, ok := err.(gsclient.RequestError); ok {
 				if requestError.StatusCode != 404 {

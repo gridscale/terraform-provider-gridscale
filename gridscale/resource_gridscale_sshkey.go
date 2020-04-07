@@ -1,6 +1,7 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
 	"log"
 
@@ -57,7 +58,7 @@ func resourceGridscaleSshkey() *schema.Resource {
 func resourceGridscaleSshkeyRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("read SSH key (%s) resource -", d.Id())
-	sshkey, err := client.GetSshkey(emptyCtx, d.Id())
+	sshkey, err := client.GetSshkey(context.Background(), d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
@@ -102,7 +103,7 @@ func resourceGridscaleSshkeyUpdate(d *schema.ResourceData, meta interface{}) err
 		Labels: &labels,
 	}
 
-	err := client.UpdateSshkey(emptyCtx, d.Id(), requestBody)
+	err := client.UpdateSshkey(context.Background(), d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -119,7 +120,7 @@ func resourceGridscaleSshkeyCreate(d *schema.ResourceData, meta interface{}) err
 		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
-	response, err := client.CreateSshkey(emptyCtx, requestBody)
+	response, err := client.CreateSshkey(context.Background(), requestBody)
 	if err != nil {
 		return err
 	}
@@ -134,7 +135,7 @@ func resourceGridscaleSshkeyCreate(d *schema.ResourceData, meta interface{}) err
 func resourceGridscaleSshkeyDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete SSH key (%s) resource -", d.Id())
-	err := client.DeleteSshkey(emptyCtx, d.Id())
+	err := client.DeleteSshkey(context.Background(), d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

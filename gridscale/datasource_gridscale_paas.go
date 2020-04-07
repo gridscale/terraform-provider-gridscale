@@ -1,7 +1,9 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
+
 	"github.com/gridscale/gsclient-go/v2"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
@@ -144,7 +146,7 @@ func dataSourceGridscalePaaSRead(d *schema.ResourceData, meta interface{}) error
 	id := d.Get("resource_id").(string)
 	errorPrefix := fmt.Sprintf("read paas (%s) datasource -", id)
 
-	paas, err := client.GetPaaSService(emptyCtx, id)
+	paas, err := client.GetPaaSService(context.Background(), id)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -237,7 +239,7 @@ func dataSourceGridscalePaaSRead(d *schema.ResourceData, meta interface{}) error
 	}
 
 	//Get all available networks
-	networks, err := client.GetNetworkList(emptyCtx)
+	networks, err := client.GetNetworkList(context.Background())
 	if err != nil {
 		return fmt.Errorf("%s error getting networks: %v", errorPrefix, err)
 	}

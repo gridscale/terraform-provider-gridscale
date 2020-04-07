@@ -1,6 +1,7 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
@@ -60,7 +61,7 @@ func testAccCheckResourceGridscaleSshkeyExists(n string, object *gsclient.Sshkey
 
 		id := rs.Primary.ID
 
-		foundObject, err := client.GetSshkey(emptyCtx, id)
+		foundObject, err := client.GetSshkey(context.Background(), id)
 
 		if err != nil {
 			return err
@@ -83,7 +84,7 @@ func testAccCheckGridscaleSshkeyDestroyCheck(s *terraform.State) error {
 			continue
 		}
 
-		_, err := client.GetSshkey(emptyCtx, rs.Primary.ID)
+		_, err := client.GetSshkey(context.Background(), rs.Primary.ID)
 		if err != nil {
 			if requestError, ok := err.(gsclient.RequestError); ok {
 				if requestError.StatusCode != 404 {

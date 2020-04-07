@@ -1,11 +1,13 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
+	"log"
+
 	"github.com/gridscale/gsclient-go/v2"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	"log"
 )
 
 func resourceGridscalePaaSSecurityZone() *schema.Resource {
@@ -79,7 +81,7 @@ func resourceGridscalePaaSSecurityZone() *schema.Resource {
 func resourceGridscalePaaSSecurityZoneRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("read paas security zone (%s) resource -", d.Id())
-	secZone, err := client.GetPaaSSecurityZone(emptyCtx, d.Id())
+	secZone, err := client.GetPaaSSecurityZone(context.Background(), d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
@@ -136,7 +138,7 @@ func resourceGridscalePaaSSecurityZoneCreate(d *schema.ResourceData, meta interf
 	requestBody := gsclient.PaaSSecurityZoneCreateRequest{
 		Name: d.Get("name").(string),
 	}
-	response, err := client.CreatePaaSSecurityZone(emptyCtx, requestBody)
+	response, err := client.CreatePaaSSecurityZone(context.Background(), requestBody)
 	if err != nil {
 		return err
 	}
@@ -151,7 +153,7 @@ func resourceGridscalePaaSSecurityZoneUpdate(d *schema.ResourceData, meta interf
 	requestBody := gsclient.PaaSSecurityZoneUpdateRequest{
 		Name: d.Get("name").(string),
 	}
-	err := client.UpdatePaaSSecurityZone(emptyCtx, d.Id(), requestBody)
+	err := client.UpdatePaaSSecurityZone(context.Background(), d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -161,7 +163,7 @@ func resourceGridscalePaaSSecurityZoneUpdate(d *schema.ResourceData, meta interf
 func resourceGridscalePaaSSecurityZoneDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete paas security zone (%s) resource -", d.Id())
-	err := client.DeletePaaSSecurityZone(emptyCtx, d.Id())
+	err := client.DeletePaaSSecurityZone(context.Background(), d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

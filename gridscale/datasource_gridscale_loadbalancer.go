@@ -1,6 +1,7 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/gridscale/gsclient-go/v2"
@@ -110,7 +111,7 @@ func dataSourceGridscaleLoadBalancerRead(d *schema.ResourceData, meta interface{
 	client := meta.(*gsclient.Client)
 	id := d.Get("resource_id").(string)
 	errorPrefix := fmt.Sprintf("read loadbalancer (%s) datasource-", id)
-	loadbalancer, err := client.GetLoadBalancer(emptyCtx, id)
+	loadbalancer, err := client.GetLoadBalancer(context.Background(), id)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

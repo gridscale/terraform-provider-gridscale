@@ -1,6 +1,7 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strings"
@@ -101,7 +102,7 @@ func resourceGridscaleSnapshotScheduleRead(d *schema.ResourceData, meta interfac
 	client := meta.(*gsclient.Client)
 	storageUUID := d.Get("storage_uuid").(string)
 	errorPrefix := fmt.Sprintf("read snapshot schedule (%s) resource of storage (%s)-", d.Id(), storageUUID)
-	scheduler, err := client.GetStorageSnapshotSchedule(emptyCtx, storageUUID, d.Id())
+	scheduler, err := client.GetStorageSnapshotSchedule(context.Background(), storageUUID, d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
@@ -172,7 +173,7 @@ func resourceGridscaleSnapshotScheduleCreate(d *schema.ResourceData, meta interf
 		}
 		requestBody.NextRuntime = &gsclient.GSTime{Time: nextRuntime}
 	}
-	response, err := client.CreateStorageSnapshotSchedule(emptyCtx, d.Get("storage_uuid").(string), requestBody)
+	response, err := client.CreateStorageSnapshotSchedule(context.Background(), d.Get("storage_uuid").(string), requestBody)
 	if err != nil {
 		return err
 	}
@@ -200,7 +201,7 @@ func resourceGridscaleSnapshotScheduleUpdate(d *schema.ResourceData, meta interf
 		}
 		requestBody.NextRuntime = &gsclient.GSTime{Time: nextRuntime}
 	}
-	err := client.UpdateStorageSnapshotSchedule(emptyCtx, storageUUID, d.Id(), requestBody)
+	err := client.UpdateStorageSnapshotSchedule(context.Background(), storageUUID, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -211,7 +212,7 @@ func resourceGridscaleSnapshotScheduleDelete(d *schema.ResourceData, meta interf
 	client := meta.(*gsclient.Client)
 	storageUUID := d.Get("storage_uuid").(string)
 	errorPrefix := fmt.Sprintf("delete snapshot schedule (%s) resource of storage (%s)-", d.Id(), storageUUID)
-	err := client.DeleteStorageSnapshotSchedule(emptyCtx, storageUUID, d.Id())
+	err := client.DeleteStorageSnapshotSchedule(context.Background(), storageUUID, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
