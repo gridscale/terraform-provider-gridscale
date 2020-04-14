@@ -41,6 +41,14 @@ The following arguments are supported:
 
 * `labels` - (Optional) List of labels.
 
+## Timeouts
+
+Timeouts configuration options (in seconds):
+
+* `create` - (Default value is the value of global `timeout`) Used for Creating resource.
+* `update` - (Default value is the value of global `timeout`) Used for Updating resource.
+* `delete` - (Default value is the value of global `timeout`) Used for Deleteing resource.
+
 ## Attributes Reference
 
 The following attributes are exported:

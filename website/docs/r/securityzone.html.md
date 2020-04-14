@@ -27,6 +27,14 @@ The following arguments are supported:
 * `name` - (Required) The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
 * `location_uuid` - (Optional) Helps to identify which datacenter an object belongs to.
 
+## Timeouts
+
+Timeouts configuration options (in seconds):
+
+* `create` - (Default value is the value of global `timeout`) Used for Creating resource.
+* `update` - (Default value is the value of global `timeout`) Used for Updating resource.
+* `delete` - (Default value is the value of global `timeout`) Used for Deleteing resource.
+
 ## Attributes
 
 This resource exports the following attributes:

@@ -54,6 +54,15 @@ The following arguments are supported:
 
 ~> **Note** When using official templates using either a password and password_type or at least one SSH public key is required. This is not the case when using custom templates. For official templates password authentication for SSH is enabled by default, so be sure to pick a strong password.
 
+
+## Timeouts
+
+Timeouts configuration options (in seconds):
+
+* `create` - (Default value is the value of global `timeout`) Used for Creating resource.
+* `update` - (Default value is the value of global `timeout`) Used for Updating resource.
+* `delete` - (Default value is the value of global `timeout`) Used for Deleteing resource.
+
 ## Attributes
 
 This resource exports the following attributes:

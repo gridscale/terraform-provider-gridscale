@@ -47,6 +47,14 @@ The following arguments are supported:
 
     * `type` - (Required) Primitive type of the parameter: bool, int (better use float for int case), float, string.
 
+## Timeouts
+
+Timeouts configuration options (in seconds):
+
+* `create` - (Default value is the value of global `timeout`) Used for Creating resource.
+* `update` - (Default value is the value of global `timeout`) Used for Updating resource.
+* `delete` - (Default value is the value of global `timeout`) Used for Deleteing resource.
+
 ## Attributes
 
 This resource exports the following attributes:

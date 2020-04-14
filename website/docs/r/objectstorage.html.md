@@ -17,6 +17,13 @@ resource "gridscale_object_storage_accesskey" "foo" {
 }
 ```
 
+## Timeouts
+
+Timeouts configuration options (in seconds):
+
+* `create` - (Default value is the value of global `timeout`) Used for Creating resource.
+* `delete` - (Default value is the value of global `timeout`) Used for Deleteing resource.
+
 ## Attributes Reference
 
 The following attributes are exported:
