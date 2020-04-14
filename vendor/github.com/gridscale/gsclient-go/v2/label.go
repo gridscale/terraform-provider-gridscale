@@ -2,9 +2,7 @@ package gsclient
 
 import (
 	"context"
-	"errors"
 	"net/http"
-	"path"
 )
 
 //LabelList JSON struct of a list of labels
@@ -59,32 +57,4 @@ func (c *Client) GetLabelList(ctx context.Context) ([]Label, error) {
 		labels = append(labels, Label{Properties: properties})
 	}
 	return labels, err
-}
-
-//CreateLabel creates a new label
-//
-//See: https://gridscale.io/en//api-documentation/index.html#operation/CreateLabel
-func (c *Client) CreateLabel(ctx context.Context, body LabelCreateRequest) (CreateResponse, error) {
-	r := request{
-		uri:    apiLabelBase,
-		method: http.MethodPost,
-		body:   body,
-	}
-	var response CreateResponse
-	err := r.execute(ctx, *c, &response)
-	return response, err
-}
-
-//DeleteLabel deletes a label
-//
-//See: https://gridscale.io/en//api-documentation/index.html#operation/DeleteLabel
-func (c *Client) DeleteLabel(ctx context.Context, label string) error {
-	if label == "" {
-		return errors.New("'label' is required")
-	}
-	r := request{
-		uri:    path.Join(apiLabelBase, label),
-		method: http.MethodDelete,
-	}
-	return r.execute(ctx, *c, nil)
 }

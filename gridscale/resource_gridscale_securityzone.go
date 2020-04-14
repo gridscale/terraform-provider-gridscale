@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/gridscale/gsclient-go/v2"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -75,6 +76,11 @@ func resourceGridscalePaaSSecurityZone() *schema.Resource {
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 		},
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
+			Update: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
+			Delete: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
+		},
 	}
 }
 
@@ -138,7 +144,9 @@ func resourceGridscalePaaSSecurityZoneCreate(d *schema.ResourceData, meta interf
 	requestBody := gsclient.PaaSSecurityZoneCreateRequest{
 		Name: d.Get("name").(string),
 	}
-	response, err := client.CreatePaaSSecurityZone(context.Background(), requestBody)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate)*time.Second)
+	defer cancel()
+	response, err := client.CreatePaaSSecurityZone(ctx, requestBody)
 	if err != nil {
 		return err
 	}
@@ -153,7 +161,9 @@ func resourceGridscalePaaSSecurityZoneUpdate(d *schema.ResourceData, meta interf
 	requestBody := gsclient.PaaSSecurityZoneUpdateRequest{
 		Name: d.Get("name").(string),
 	}
-	err := client.UpdatePaaSSecurityZone(context.Background(), d.Id(), requestBody)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate)*time.Second)
+	defer cancel()
+	err := client.UpdatePaaSSecurityZone(ctx, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -163,7 +173,9 @@ func resourceGridscalePaaSSecurityZoneUpdate(d *schema.ResourceData, meta interf
 func resourceGridscalePaaSSecurityZoneDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete paas security zone (%s) resource -", d.Id())
-	err := client.DeletePaaSSecurityZone(context.Background(), d.Id())
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete)*time.Second)
+	defer cancel()
+	err := client.DeletePaaSSecurityZone(ctx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

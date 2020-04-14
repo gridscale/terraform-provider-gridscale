@@ -118,6 +118,11 @@ the product_no of the license (see the /prices endpoint for more details)`,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 		},
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
+			Update: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
+			Delete: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
+		},
 	}
 }
 
@@ -186,7 +191,9 @@ func resourceGridscaleSnapshotCreate(d *schema.ResourceData, meta interface{}) e
 		Name:   d.Get("name").(string),
 		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
-	response, err := client.CreateStorageSnapshot(context.Background(), storageUUID, requestBody)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate)*time.Second)
+	defer cancel()
+	response, err := client.CreateStorageSnapshot(ctx, storageUUID, requestBody)
 	if err != nil {
 		return err
 	}
@@ -200,7 +207,7 @@ func resourceGridscaleSnapshotCreate(d *schema.ResourceData, meta interface{}) e
 			//Rollback
 			log.Printf("Start rolling back storage %s with snapshot %s", storageUUID, response.ObjectUUID)
 			err = client.RollbackStorage(
-				context.Background(),
+				ctx,
 				storageUUID,
 				response.ObjectUUID,
 				gsclient.StorageRollbackRequest{
@@ -238,7 +245,9 @@ func resourceGridscaleSnapshotUpdate(d *schema.ResourceData, meta interface{}) e
 		Name:   d.Get("name").(string),
 		Labels: &labels,
 	}
-	err := client.UpdateStorageSnapshot(context.Background(), storageUUID, d.Id(), requestBody)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate)*time.Second)
+	defer cancel()
+	err := client.UpdateStorageSnapshot(ctx, storageUUID, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -252,7 +261,7 @@ func resourceGridscaleSnapshotUpdate(d *schema.ResourceData, meta interface{}) e
 				//Rollback
 				log.Printf("Start rolling back storage %s with snapshot %s", storageUUID, d.Id())
 				err = client.RollbackStorage(
-					context.Background(),
+					ctx,
 					storageUUID,
 					d.Id(),
 					gsclient.StorageRollbackRequest{
@@ -283,7 +292,9 @@ func resourceGridscaleSnapshotDelete(d *schema.ResourceData, meta interface{}) e
 	client := meta.(*gsclient.Client)
 	storageUUID := d.Get("storage_uuid").(string)
 	errorPrefix := fmt.Sprintf("delete snapshot (%s) resource of storage (%s) -", d.Id(), storageUUID)
-	err := client.DeleteStorageSnapshot(context.Background(), storageUUID, d.Id())
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete)*time.Second)
+	defer cancel()
+	err := client.DeleteStorageSnapshot(ctx, storageUUID, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

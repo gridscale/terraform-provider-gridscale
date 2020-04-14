@@ -14,7 +14,7 @@ First the Go programming language will need to be installed. This can be done by
 Downloading the gridscale Go client can be done with the following go command:
 
 ```
-go get "github.com/gridscale/gsclient-go"
+go get github.com/gridscale/gsclient-go/v2
 ```
 
 ## Using the gridscale Client
@@ -37,7 +37,7 @@ config := gsclient.DefaultConfiguration("User-UUID", "API-token")
 config := gsclient.NewConfiguration(
             "API-URL", 
             "User-UUID", 
-            "API-token"), 
+            "API-token", 
             false, //Set debug mode
             true, //Set sync mode 
             120, //Timeout (in seconds) of checking requests
@@ -56,20 +56,56 @@ Make sure to replace the user-UUID and API-token strings with valid credentials 
 After having created a Client type, as shown above, it will be possible to interact with the API. An example would be the [Servers Get endpoint](https://gridscale.io/en/api-documentation/index.html#servers-get):
 
 ```go
-cxt := context.Background()
+ctx := context.Background()
 servers := client.GetServerList(ctx)
 ```
 
-For creating and updating/patching objects in gridscale, it will be required to use the respective CreateRequest and UpdateRequest types. For creating an SSH-key that would be SshkeyCreateRequest and SshkeyUpdateRequest. Here an example:
+For creating and updating/patching objects in gridscale, it will be required to use the respective CreateRequest and UpdateRequest types. For creating an IP that would be IPCreateRequest and IPUpdateRequest. Here an example:
 
 ```go
-cxt := context.Background()
-requestBody := gsclient.IPCreateRequest {
-	Family: gsclient.IPv6Type,
-	Name:   "IPTest",
+ctx := context.Background()
+requestBody := gsclient.IPCreateRequest{
+	Name:       "IPTest",
+	Family:     gsclient.IPv6Type,
+	Failover:   false,
+	ReverseDNS: "my-reverse-dns-entry.tld",
+	Labels:     []string{"MyLabel"},
 }
 
 client.CreateIP(ctx, requestBody)
+```
+
+For updating/scaling server resources you could use:
+
+```go
+myServerUuid := "[Server UUID]"
+backgroundContext := context.Background()
+
+// No hotplug available for scaling resources down, shutdown server first via ACPI
+shutdownErr := client.ShutdownServer(backgroundContext, myServerUuid)
+if shutdownErr != nil{
+	log.Error("Shutdown server failed", shutdownErr)
+	return
+}
+
+// Update servers resources
+requestBody := gsclient.ServerUpdateRequest{
+	Memory:          12,
+	Cores:           4,
+}
+
+updateErr := client.UpdateServer(backgroundContext, myServerUuid, requestBody)
+if updateErr != nil{
+	log.Error("Serverupdate failed", updateErr)
+	return
+}
+
+// Start server again
+poweronErr := client.StartServer(backgroundContext, myServerUuid)
+if poweronErr != nil{
+	log.Error("Start server failed", poweronErr)
+	return
+}
 ```
 
 What options are available for each create and update request can be found in the source code. After installing it should be located in: 
@@ -230,8 +266,6 @@ Not all endpoints have been implemented in this client, but new ones will be add
     * Events Get (GetEventList)
 * Label
     * Labels Get (GetLabelList)
-    * Label Create (CreateLabel)
-    * Label Delete (DeleteLabel)
 * Location
     * Locations Get (GetLocationList)
     * Location Get (GetLocation)

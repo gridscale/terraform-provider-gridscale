@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	relation_manager "github.com/terraform-providers/terraform-provider-gridscale/gridscale/relation-manager"
 
@@ -280,6 +281,11 @@ func resourceGridscaleServer() *schema.Resource {
 				Optional:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
+		},
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
+			Update: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
+			Delete: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
 		},
 	}
 }
@@ -603,7 +609,10 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	} else {
 		requestBody.HardwareProfile = gsclient.DefaultServerHardware
 	}
-	response, err := gsc.CreateServer(context.Background(), requestBody)
+
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate)*time.Second)
+	defer cancel()
+	response, err := gsc.CreateServer(ctx, requestBody)
 	if err != nil {
 		return fmt.Errorf(
 			"Error waiting for server (%s) to be created: %s", requestBody.Name, err)
@@ -619,31 +628,31 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	//Link storages
-	err = serverRelMan.LinkStorages(context.Background())
+	err = serverRelMan.LinkStorages(ctx)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
 	//Link IPv4
-	err = serverRelMan.LinkIPv4(context.Background())
+	err = serverRelMan.LinkIPv4(ctx)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
 	//Link IPv6
-	err = serverRelMan.LinkIPv6(context.Background())
+	err = serverRelMan.LinkIPv6(ctx)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
 	//Link ISO Image
-	err = serverRelMan.LinkISOImage(context.Background())
+	err = serverRelMan.LinkISOImage(ctx)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
 	//Link networks
-	err = serverRelMan.LinkNetworks(context.Background())
+	err = serverRelMan.LinkNetworks(ctx)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -651,7 +660,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	//Set the power state if needed
 	power := d.Get("power").(bool)
 	if power {
-		err = globalServerStatusList.startServerSynchronously(context.Background(), gsc, d.Id())
+		err = globalServerStatusList.startServerSynchronously(ctx, gsc, d.Id())
 		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
@@ -663,8 +672,10 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 func resourceGridscaleServerDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete server (%s) resource -", d.Id())
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete)*time.Second)
+	defer cancel()
 	//remove the server
-	err := globalServerStatusList.removeServerSynchronously(context.Background(), client, d.Id())
+	err := globalServerStatusList.removeServerSynchronously(ctx, client, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -674,7 +685,9 @@ func resourceGridscaleServerDelete(d *schema.ResourceData, meta interface{}) err
 func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) error {
 	gsc := meta.(*gsclient.Client)
 	serverDepClient := relation_manager.NewServerRelationManger(gsc, d)
-	shutdownRequired := serverDepClient.IsShutdownRequired(context.Background())
+	ctxWTimeout, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate)*time.Second)
+	defer cancel()
+	shutdownRequired := serverDepClient.IsShutdownRequired(ctxWTimeout)
 	var err error
 	errorPrefix := fmt.Sprintf("update server (%s) resource -", d.Id())
 
@@ -715,21 +728,21 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 			err = serverDepClient.UpdateStoragesRel(ctx)
 			return err
 		}
-		err = globalServerStatusList.runActionRequireServerOff(context.Background(), gsc, d.Id(), true, updateSequence)
+		err = globalServerStatusList.runActionRequireServerOff(ctxWTimeout, gsc, d.Id(), true, updateSequence)
 		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 
 		}
 	} else {
 		//Execute the update request
-		err = gsc.UpdateServer(context.Background(), d.Id(), requestBody)
+		err = gsc.UpdateServer(ctxWTimeout, d.Id(), requestBody)
 		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
 	}
 
 	//Update relationship between the server and an ISO image
-	err = serverDepClient.UpdateISOImageRel(context.Background())
+	err = serverDepClient.UpdateISOImageRel(ctxWTimeout)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 
@@ -738,12 +751,12 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 	// Make sure the server in is the expected power state.
 	// The StartServer and ShutdownServer functions do a check to see if the server isn't already running, so we don't need to do that here.
 	if d.Get("power").(bool) {
-		err = globalServerStatusList.startServerSynchronously(context.Background(), gsc, d.Id())
+		err = globalServerStatusList.startServerSynchronously(ctxWTimeout, gsc, d.Id())
 		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
 	} else {
-		err = globalServerStatusList.shutdownServerSynchronously(context.Background(), gsc, d.Id())
+		err = globalServerStatusList.shutdownServerSynchronously(ctxWTimeout, gsc, d.Id())
 		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}

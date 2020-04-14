@@ -86,7 +86,9 @@ func resourceGridscaleNetwork() *schema.Resource {
 			},
 		},
 		Timeouts: &schema.ResourceTimeout{
-			Delete: schema.DefaultTimeout(time.Minute * 3),
+			Create: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
+			Update: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
+			Delete: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
 		},
 	}
 }
@@ -157,7 +159,9 @@ func resourceGridscaleNetworkUpdate(d *schema.ResourceData, meta interface{}) er
 		Labels:     &labels,
 	}
 
-	err := client.UpdateNetwork(context.Background(), d.Id(), requestBody)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate)*time.Second)
+	defer cancel()
+	err := client.UpdateNetwork(ctx, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -174,7 +178,9 @@ func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) er
 		Labels:     convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
-	response, err := client.CreateNetwork(context.Background(), requestBody)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate)*time.Second)
+	defer cancel()
+	response, err := client.CreateNetwork(ctx, requestBody)
 	if err != nil {
 		return err
 	}
@@ -189,7 +195,9 @@ func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) er
 func resourceGridscaleNetworkDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete network (%s) resource -", d.Id())
-	net, err := client.GetNetwork(context.Background(), d.Id())
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete)*time.Second)
+	defer cancel()
+	net, err := client.GetNetwork(ctx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -201,13 +209,13 @@ func resourceGridscaleNetworkDelete(d *schema.ResourceData, meta interface{}) er
 			return err
 		}
 		//UnlinkNetwork requires the server to be off
-		err = globalServerStatusList.runActionRequireServerOff(context.Background(), client, server.ObjectUUID, false, unlinkNetAction)
+		err = globalServerStatusList.runActionRequireServerOff(ctx, client, server.ObjectUUID, false, unlinkNetAction)
 		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
 	}
 
-	err = client.DeleteNetwork(context.Background(), d.Id())
+	err = client.DeleteNetwork(ctx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

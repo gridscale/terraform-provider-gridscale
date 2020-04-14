@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/gridscale/gsclient-go/v2"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -117,6 +118,11 @@ func resourceGridscaleTemplate() *schema.Resource {
 				Computed:    true,
 			},
 		},
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
+			Update: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
+			Delete: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
+		},
 	}
 }
 
@@ -202,7 +208,9 @@ func resourceGridscaleTemplateCreate(d *schema.ResourceData, meta interface{}) e
 		Labels:       convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
-	response, err := client.CreateTemplate(context.Background(), requestBody)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate)*time.Second)
+	defer cancel()
+	response, err := client.CreateTemplate(ctx, requestBody)
 	if err != nil {
 		return err
 	}
@@ -224,7 +232,9 @@ func resourceGridscaleTemplateUpdate(d *schema.ResourceData, meta interface{}) e
 		Labels: &labels,
 	}
 
-	err := client.UpdateTemplate(context.Background(), d.Id(), requestBody)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate)*time.Second)
+	defer cancel()
+	err := client.UpdateTemplate(ctx, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -235,7 +245,9 @@ func resourceGridscaleTemplateUpdate(d *schema.ResourceData, meta interface{}) e
 func resourceGridscaleTemplateDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete template (%s) resource -", d.Id())
-	err := client.DeleteTemplate(context.Background(), d.Id())
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete)*time.Second)
+	defer cancel()
+	err := client.DeleteTemplate(ctx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/gridscale/gsclient-go/v2"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -120,6 +121,11 @@ func resourceGridscaleFirewall() *schema.Resource {
 				Optional:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
+		},
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
+			Update: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
+			Delete: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
 		},
 	}
 }
@@ -238,7 +244,9 @@ func resourceGridscaleFirewallCreate(d *schema.ResourceData, meta interface{}) e
 		},
 	}
 
-	response, err := client.CreateFirewall(context.Background(), requestBody)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate)*time.Second)
+	defer cancel()
+	response, err := client.CreateFirewall(ctx, requestBody)
 	if err != nil {
 		return err
 	}
@@ -282,7 +290,9 @@ func resourceGridscaleFirewallUpdate(d *schema.ResourceData, meta interface{}) e
 		RulesV4In:  rulesV4In,
 		RulesV4Out: rulesV4Out,
 	}
-	err := client.UpdateFirewall(context.Background(), d.Id(), requestBody)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate)*time.Second)
+	defer cancel()
+	err := client.UpdateFirewall(ctx, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -293,7 +303,9 @@ func resourceGridscaleFirewallUpdate(d *schema.ResourceData, meta interface{}) e
 func resourceGridscaleFirewallDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete firewall (%s) resource -", d.Id())
-	err := client.DeleteFirewall(context.Background(), d.Id())
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete)*time.Second)
+	defer cancel()
+	err := client.DeleteFirewall(ctx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

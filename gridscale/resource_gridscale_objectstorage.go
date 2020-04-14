@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/gridscale/gsclient-go/v2"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -28,6 +29,10 @@ func resourceGridscaleObjectStorage() *schema.Resource {
 				Description: "The object storage access_key.",
 				Computed:    true,
 			},
+		},
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
+			Delete: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
 		},
 	}
 }
@@ -57,8 +62,9 @@ func resourceGridscaleObjectStorageRead(d *schema.ResourceData, meta interface{}
 
 func resourceGridscaleObjectStorageCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-
-	response, err := client.CreateObjectStorageAccessKey(context.Background())
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate)*time.Second)
+	defer cancel()
+	response, err := client.CreateObjectStorageAccessKey(ctx)
 	if err != nil {
 		return err
 	}
@@ -72,7 +78,9 @@ func resourceGridscaleObjectStorageCreate(d *schema.ResourceData, meta interface
 func resourceGridscaleObjectStorageDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete object storage (%s) resource -", d.Id())
-	err := client.DeleteObjectStorageAccessKey(context.Background(), d.Id())
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete)*time.Second)
+	defer cancel()
+	err := client.DeleteObjectStorageAccessKey(ctx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

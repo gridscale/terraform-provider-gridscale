@@ -104,7 +104,9 @@ func resourceGridscaleIpv4() *schema.Resource {
 			},
 		},
 		Timeouts: &schema.ResourceTimeout{
-			Delete: schema.DefaultTimeout(time.Minute * 3),
+			Create: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
+			Update: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
+			Delete: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
 		},
 	}
 }
@@ -184,8 +186,9 @@ func resourceGridscaleIpUpdate(d *schema.ResourceData, meta interface{}) error {
 		ReverseDNS: d.Get("reverse_dns").(string),
 		Labels:     &labels,
 	}
-
-	err := client.UpdateIP(context.Background(), d.Id(), requestBody)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate)*time.Second)
+	defer cancel()
+	err := client.UpdateIP(ctx, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -204,7 +207,9 @@ func resourceGridscaleIpv4Create(d *schema.ResourceData, meta interface{}) error
 		Labels:     convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
-	response, err := client.CreateIP(context.Background(), requestBody)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate)*time.Second)
+	defer cancel()
+	response, err := client.CreateIP(ctx, requestBody)
 	if err != nil {
 		return err
 	}
@@ -220,7 +225,10 @@ func resourceGridscaleIpDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete IP (%s) resource -", d.Id())
 
-	ip, err := client.GetIP(context.Background(), d.Id())
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete)*time.Second)
+	defer cancel()
+
+	ip, err := client.GetIP(ctx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -233,12 +241,13 @@ func resourceGridscaleIpDelete(d *schema.ResourceData, meta interface{}) error {
 			return err
 		}
 		//DeleteIP requires the server to be off
-		err = globalServerStatusList.runActionRequireServerOff(context.Background(), client, server.ServerUUID, false, unlinkIPAction)
+		err = globalServerStatusList.runActionRequireServerOff(ctx, client, server.ServerUUID, false, unlinkIPAction)
 		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
 	}
-	err = client.DeleteIP(context.Background(), d.Id())
+
+	err = client.DeleteIP(ctx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

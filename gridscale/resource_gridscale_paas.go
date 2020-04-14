@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/gridscale/gsclient-go/v2"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -156,6 +157,11 @@ func resourceGridscalePaaS() *schema.Resource {
 				Optional:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
+		},
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
+			Update: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
+			Delete: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
 		},
 	}
 }
@@ -315,7 +321,9 @@ func resourceGridscalePaaSServiceCreate(d *schema.ResourceData, meta interface{}
 	}
 	requestBody.ResourceLimits = limits
 
-	response, err := client.CreatePaaSService(context.Background(), requestBody)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate)*time.Second)
+	defer cancel()
+	response, err := client.CreatePaaSService(ctx, requestBody)
 	if err != nil {
 		return err
 	}
@@ -360,7 +368,9 @@ func resourceGridscalePaaSServiceUpdate(d *schema.ResourceData, meta interface{}
 	}
 	requestBody.ResourceLimits = limits
 
-	err := client.UpdatePaaSService(context.Background(), d.Id(), requestBody)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate)*time.Second)
+	defer cancel()
+	err := client.UpdatePaaSService(ctx, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -370,7 +380,9 @@ func resourceGridscalePaaSServiceUpdate(d *schema.ResourceData, meta interface{}
 func resourceGridscalePaaSServiceDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete paas (%s) resource -", d.Id())
-	err := client.DeletePaaSService(context.Background(), d.Id())
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete)*time.Second)
+	defer cancel()
+	err := client.DeletePaaSService(ctx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

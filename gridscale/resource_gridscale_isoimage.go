@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gridscale/gsclient-go/v2"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -129,6 +130,11 @@ func resourceGridscaleISOImage() *schema.Resource {
 				Computed:    true,
 			},
 		},
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
+			Update: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
+			Delete: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
+		},
 	}
 }
 
@@ -222,7 +228,9 @@ func resourceGridscaleISOImageCreate(d *schema.ResourceData, meta interface{}) e
 		Labels:    convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
-	response, err := client.CreateISOImage(context.Background(), requestBody)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate)*time.Second)
+	defer cancel()
+	response, err := client.CreateISOImage(ctx, requestBody)
 	if err != nil {
 		return err
 	}
@@ -244,7 +252,9 @@ func resourceGridscaleISOImageUpdate(d *schema.ResourceData, meta interface{}) e
 		Labels: &labels,
 	}
 
-	err := client.UpdateISOImage(context.Background(), d.Id(), requestBody)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate)*time.Second)
+	defer cancel()
+	err := client.UpdateISOImage(ctx, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -256,14 +266,17 @@ func resourceGridscaleISOImageDelete(d *schema.ResourceData, meta interface{}) e
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete ISO-Image (%s) resource -", d.Id())
 
-	isoimage, err := client.GetISOImage(context.Background(), d.Id())
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete)*time.Second)
+	defer cancel()
+
+	isoimage, err := client.GetISOImage(ctx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
 	//Remove all links between this ISO-Image and all servers.
 	for _, server := range isoimage.Properties.Relations.Servers {
-		err = client.UnlinkIsoImage(context.Background(), server.ObjectUUID, d.Id())
+		err = client.UnlinkIsoImage(ctx, server.ObjectUUID, d.Id())
 		if err != nil {
 			//If error is an instance of `gsclient.RequestError`
 			if requestError, ok := err.(gsclient.RequestError); ok {
@@ -277,7 +290,7 @@ func resourceGridscaleISOImageDelete(d *schema.ResourceData, meta interface{}) e
 			}
 		}
 	}
-	err = client.DeleteISOImage(context.Background(), d.Id())
+	err = client.DeleteISOImage(ctx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

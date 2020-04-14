@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/gridscale/gsclient-go/v2"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -122,6 +123,11 @@ func resourceGridscaleLoadBalancer() *schema.Resource {
 				Required:    true,
 			},
 		},
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
+			Update: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
+			Delete: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
+		},
 	}
 }
 
@@ -148,7 +154,10 @@ func resourceGridscaleLoadBalancerCreate(d *schema.ResourceData, meta interface{
 	if forwardingRules, ok := d.GetOk("forwarding_rule"); ok {
 		requestBody.ForwardingRules = expandLoadbalancerForwardingRules(forwardingRules)
 	}
-	response, err := client.CreateLoadBalancer(context.Background(), requestBody)
+
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate)*time.Second)
+	defer cancel()
+	response, err := client.CreateLoadBalancer(ctx, requestBody)
 
 	if err != nil {
 		return fmt.Errorf(
@@ -232,7 +241,10 @@ func resourceGridscaleLoadBalancerUpdate(d *schema.ResourceData, meta interface{
 	if forwardingRules, ok := d.GetOk("forwarding_rule"); ok {
 		requestBody.ForwardingRules = expandLoadbalancerForwardingRules(forwardingRules)
 	}
-	err := client.UpdateLoadBalancer(context.Background(), d.Id(), requestBody)
+
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate)*time.Second)
+	defer cancel()
+	err := client.UpdateLoadBalancer(ctx, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 
@@ -243,7 +255,9 @@ func resourceGridscaleLoadBalancerUpdate(d *schema.ResourceData, meta interface{
 func resourceGridscaleLoadBalancerDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete loadbalancer (%s) resource-", d.Id())
-	err := client.DeleteLoadBalancer(context.Background(), d.Id())
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete)*time.Second)
+	defer cancel()
+	err := client.DeleteLoadBalancer(ctx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

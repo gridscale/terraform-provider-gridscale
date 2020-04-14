@@ -95,6 +95,11 @@ func resourceGridscaleStorageSnapshotSchedule() *schema.Resource {
 				},
 			},
 		},
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
+			Update: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
+			Delete: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
+		},
 	}
 }
 
@@ -173,7 +178,9 @@ func resourceGridscaleSnapshotScheduleCreate(d *schema.ResourceData, meta interf
 		}
 		requestBody.NextRuntime = &gsclient.GSTime{Time: nextRuntime}
 	}
-	response, err := client.CreateStorageSnapshotSchedule(context.Background(), d.Get("storage_uuid").(string), requestBody)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate)*time.Second)
+	defer cancel()
+	response, err := client.CreateStorageSnapshotSchedule(ctx, d.Get("storage_uuid").(string), requestBody)
 	if err != nil {
 		return err
 	}
@@ -201,7 +208,9 @@ func resourceGridscaleSnapshotScheduleUpdate(d *schema.ResourceData, meta interf
 		}
 		requestBody.NextRuntime = &gsclient.GSTime{Time: nextRuntime}
 	}
-	err := client.UpdateStorageSnapshotSchedule(context.Background(), storageUUID, d.Id(), requestBody)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate)*time.Second)
+	defer cancel()
+	err := client.UpdateStorageSnapshotSchedule(ctx, storageUUID, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -212,7 +221,9 @@ func resourceGridscaleSnapshotScheduleDelete(d *schema.ResourceData, meta interf
 	client := meta.(*gsclient.Client)
 	storageUUID := d.Get("storage_uuid").(string)
 	errorPrefix := fmt.Sprintf("delete snapshot schedule (%s) resource of storage (%s)-", d.Id(), storageUUID)
-	err := client.DeleteStorageSnapshotSchedule(context.Background(), storageUUID, d.Id())
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete)*time.Second)
+	defer cancel()
+	err := client.DeleteStorageSnapshotSchedule(ctx, storageUUID, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
