@@ -610,7 +610,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		requestBody.HardwareProfile = gsclient.DefaultServerHardware
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
 	defer cancel()
 	response, err := gsc.CreateServer(ctx, requestBody)
 	if err != nil {
@@ -672,7 +672,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 func resourceGridscaleServerDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete server (%s) resource -", d.Id())
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
 	defer cancel()
 	//remove the server
 	err := globalServerStatusList.removeServerSynchronously(ctx, client, d.Id())
@@ -685,7 +685,7 @@ func resourceGridscaleServerDelete(d *schema.ResourceData, meta interface{}) err
 func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) error {
 	gsc := meta.(*gsclient.Client)
 	serverDepClient := relation_manager.NewServerRelationManger(gsc, d)
-	ctxWTimeout, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate)*time.Second)
+	ctxWTimeout, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
 	defer cancel()
 	shutdownRequired := serverDepClient.IsShutdownRequired(ctxWTimeout)
 	var err error

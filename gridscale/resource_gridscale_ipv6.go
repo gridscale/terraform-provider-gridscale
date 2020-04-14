@@ -120,7 +120,7 @@ func resourceGridscaleIpv6Create(d *schema.ResourceData, meta interface{}) error
 		Labels:     convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
 	defer cancel()
 	response, err := client.CreateIP(ctx, requestBody)
 	if err != nil {

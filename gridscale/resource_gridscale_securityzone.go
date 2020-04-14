@@ -144,7 +144,7 @@ func resourceGridscalePaaSSecurityZoneCreate(d *schema.ResourceData, meta interf
 	requestBody := gsclient.PaaSSecurityZoneCreateRequest{
 		Name: d.Get("name").(string),
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
 	defer cancel()
 	response, err := client.CreatePaaSSecurityZone(ctx, requestBody)
 	if err != nil {
@@ -161,7 +161,7 @@ func resourceGridscalePaaSSecurityZoneUpdate(d *schema.ResourceData, meta interf
 	requestBody := gsclient.PaaSSecurityZoneUpdateRequest{
 		Name: d.Get("name").(string),
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
 	defer cancel()
 	err := client.UpdatePaaSSecurityZone(ctx, d.Id(), requestBody)
 	if err != nil {
@@ -173,7 +173,7 @@ func resourceGridscalePaaSSecurityZoneUpdate(d *schema.ResourceData, meta interf
 func resourceGridscalePaaSSecurityZoneDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete paas security zone (%s) resource -", d.Id())
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
 	defer cancel()
 	err := client.DeletePaaSSecurityZone(ctx, d.Id())
 	if err != nil {

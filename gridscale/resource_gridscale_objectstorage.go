@@ -62,7 +62,7 @@ func resourceGridscaleObjectStorageRead(d *schema.ResourceData, meta interface{}
 
 func resourceGridscaleObjectStorageCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
 	defer cancel()
 	response, err := client.CreateObjectStorageAccessKey(ctx)
 	if err != nil {
@@ -78,7 +78,7 @@ func resourceGridscaleObjectStorageCreate(d *schema.ResourceData, meta interface
 func resourceGridscaleObjectStorageDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete object storage (%s) resource -", d.Id())
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
 	defer cancel()
 	err := client.DeleteObjectStorageAccessKey(ctx, d.Id())
 	if err != nil {

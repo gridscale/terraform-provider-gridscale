@@ -109,7 +109,7 @@ func resourceGridscaleSshkeyUpdate(d *schema.ResourceData, meta interface{}) err
 		Labels: &labels,
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
 	defer cancel()
 	err := client.UpdateSshkey(ctx, d.Id(), requestBody)
 	if err != nil {
@@ -128,7 +128,7 @@ func resourceGridscaleSshkeyCreate(d *schema.ResourceData, meta interface{}) err
 		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
 	defer cancel()
 	response, err := client.CreateSshkey(ctx, requestBody)
 	if err != nil {
@@ -145,7 +145,7 @@ func resourceGridscaleSshkeyCreate(d *schema.ResourceData, meta interface{}) err
 func resourceGridscaleSshkeyDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete SSH key (%s) resource -", d.Id())
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
 	defer cancel()
 	err := client.DeleteSshkey(ctx, d.Id())
 	if err != nil {

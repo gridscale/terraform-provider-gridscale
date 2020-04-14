@@ -159,7 +159,7 @@ func resourceGridscaleNetworkUpdate(d *schema.ResourceData, meta interface{}) er
 		Labels:     &labels,
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
 	defer cancel()
 	err := client.UpdateNetwork(ctx, d.Id(), requestBody)
 	if err != nil {
@@ -178,7 +178,7 @@ func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) er
 		Labels:     convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
 	defer cancel()
 	response, err := client.CreateNetwork(ctx, requestBody)
 	if err != nil {
@@ -195,7 +195,7 @@ func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) er
 func resourceGridscaleNetworkDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete network (%s) resource -", d.Id())
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
 	defer cancel()
 	net, err := client.GetNetwork(ctx, d.Id())
 	if err != nil {

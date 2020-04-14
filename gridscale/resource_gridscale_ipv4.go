@@ -186,7 +186,7 @@ func resourceGridscaleIpUpdate(d *schema.ResourceData, meta interface{}) error {
 		ReverseDNS: d.Get("reverse_dns").(string),
 		Labels:     &labels,
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
 	defer cancel()
 	err := client.UpdateIP(ctx, d.Id(), requestBody)
 	if err != nil {
@@ -207,7 +207,7 @@ func resourceGridscaleIpv4Create(d *schema.ResourceData, meta interface{}) error
 		Labels:     convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
 	defer cancel()
 	response, err := client.CreateIP(ctx, requestBody)
 	if err != nil {
@@ -225,7 +225,7 @@ func resourceGridscaleIpDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete IP (%s) resource -", d.Id())
 
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
 	defer cancel()
 
 	ip, err := client.GetIP(ctx, d.Id())

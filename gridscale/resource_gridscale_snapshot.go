@@ -191,7 +191,7 @@ func resourceGridscaleSnapshotCreate(d *schema.ResourceData, meta interface{}) e
 		Name:   d.Get("name").(string),
 		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
 	defer cancel()
 	response, err := client.CreateStorageSnapshot(ctx, storageUUID, requestBody)
 	if err != nil {
@@ -245,7 +245,7 @@ func resourceGridscaleSnapshotUpdate(d *schema.ResourceData, meta interface{}) e
 		Name:   d.Get("name").(string),
 		Labels: &labels,
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
 	defer cancel()
 	err := client.UpdateStorageSnapshot(ctx, storageUUID, d.Id(), requestBody)
 	if err != nil {
@@ -292,7 +292,7 @@ func resourceGridscaleSnapshotDelete(d *schema.ResourceData, meta interface{}) e
 	client := meta.(*gsclient.Client)
 	storageUUID := d.Get("storage_uuid").(string)
 	errorPrefix := fmt.Sprintf("delete snapshot (%s) resource of storage (%s) -", d.Id(), storageUUID)
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
 	defer cancel()
 	err := client.DeleteStorageSnapshot(ctx, storageUUID, d.Id())
 	if err != nil {

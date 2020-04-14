@@ -252,7 +252,7 @@ func resourceGridscaleStorageUpdate(d *schema.ResourceData, meta interface{}) er
 		Labels: &labels,
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
 	defer cancel()
 	err := client.UpdateStorage(ctx, d.Id(), requestBody)
 	if err != nil {
@@ -302,7 +302,7 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 		requestBody.Template = &template
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
 	defer cancel()
 	response, err := client.CreateStorage(ctx, requestBody)
 	if err != nil {
@@ -319,7 +319,7 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 func resourceGridscaleStorageDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete storage (%s) resource -", d.Id())
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
 	defer cancel()
 	storage, err := client.GetStorage(ctx, d.Id())
 	if err != nil {

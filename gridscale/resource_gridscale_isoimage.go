@@ -228,7 +228,7 @@ func resourceGridscaleISOImageCreate(d *schema.ResourceData, meta interface{}) e
 		Labels:    convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
 	defer cancel()
 	response, err := client.CreateISOImage(ctx, requestBody)
 	if err != nil {
@@ -252,7 +252,7 @@ func resourceGridscaleISOImageUpdate(d *schema.ResourceData, meta interface{}) e
 		Labels: &labels,
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
 	defer cancel()
 	err := client.UpdateISOImage(ctx, d.Id(), requestBody)
 	if err != nil {
@@ -266,7 +266,7 @@ func resourceGridscaleISOImageDelete(d *schema.ResourceData, meta interface{}) e
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete ISO-Image (%s) resource -", d.Id())
 
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
 	defer cancel()
 
 	isoimage, err := client.GetISOImage(ctx, d.Id())

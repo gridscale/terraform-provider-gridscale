@@ -155,7 +155,7 @@ func resourceGridscaleLoadBalancerCreate(d *schema.ResourceData, meta interface{
 		requestBody.ForwardingRules = expandLoadbalancerForwardingRules(forwardingRules)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
 	defer cancel()
 	response, err := client.CreateLoadBalancer(ctx, requestBody)
 
@@ -242,7 +242,7 @@ func resourceGridscaleLoadBalancerUpdate(d *schema.ResourceData, meta interface{
 		requestBody.ForwardingRules = expandLoadbalancerForwardingRules(forwardingRules)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
 	defer cancel()
 	err := client.UpdateLoadBalancer(ctx, d.Id(), requestBody)
 	if err != nil {
@@ -255,7 +255,7 @@ func resourceGridscaleLoadBalancerUpdate(d *schema.ResourceData, meta interface{
 func resourceGridscaleLoadBalancerDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete loadbalancer (%s) resource-", d.Id())
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
 	defer cancel()
 	err := client.DeleteLoadBalancer(ctx, d.Id())
 	if err != nil {
