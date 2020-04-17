@@ -27,10 +27,10 @@ const (
 var GSCTimeoutSecs = 120
 
 type Config struct {
-	UserUUID    string
-	APIToken    string
-	APIUrl      string
-	TimeoutSecs int
+	UserUUID                string
+	APIToken                string
+	APIUrl                  string
+	RequestCheckTimeoutSecs int
 }
 
 func (c *Config) Client() (*gsclient.Client, error) {
@@ -41,8 +41,8 @@ func (c *Config) Client() (*gsclient.Client, error) {
 	}
 
 	//if timeout is configured, set the timeout in gsc
-	if c.TimeoutSecs != 0 {
-		GSCTimeoutSecs = c.TimeoutSecs
+	if c.RequestCheckTimeoutSecs != 0 {
+		GSCTimeoutSecs = c.RequestCheckTimeoutSecs
 	}
 	config := gsclient.NewConfiguration(
 		apiURL,
