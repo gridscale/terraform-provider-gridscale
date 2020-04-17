@@ -78,7 +78,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		UserUUID:                d.Get("uuid").(string),
 		APIToken:                d.Get("token").(string),
 		APIUrl:                  d.Get("api_url").(string),
-		RequestCheckTimeoutSecs: d.Get("request_timeout").(int),
+		RequestCheckTimeoutSecs: d.Get("request_check_timeout").(int),
 	}
 
 	return config.Client()
