@@ -22,9 +22,8 @@ const (
 	defaultAPIURL                    = "https://api.gridscale.io"
 	defaultGSCDelayIntervalMilliSecs = 1000
 	defaultGSCMaxNumberOfRetries     = 5
+	defaultGSCTimeoutSecs            = 120
 )
-
-var GSCTimeoutSecs = 120
 
 type Config struct {
 	UserUUID                string
@@ -40,6 +39,7 @@ func (c *Config) Client() (*gsclient.Client, error) {
 		apiURL = c.APIUrl
 	}
 
+	GSCTimeoutSecs := defaultGSCTimeoutSecs
 	//if timeout is configured, set the timeout in gsc
 	if c.RequestCheckTimeoutSecs != 0 {
 		GSCTimeoutSecs = c.RequestCheckTimeoutSecs
