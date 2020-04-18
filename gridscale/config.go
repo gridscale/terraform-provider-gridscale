@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"os"
+	"time"
 
 	"github.com/gridscale/gsclient-go/v2"
 )
@@ -24,6 +25,8 @@ const (
 	defaultGSCMaxNumberOfRetries     = 5
 	defaultGSCTimeoutSecs            = 120
 )
+
+var zeroDuration = time.Duration(0 * time.Second)
 
 type Config struct {
 	UserUUID                string

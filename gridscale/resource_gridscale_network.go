@@ -86,9 +86,9 @@ func resourceGridscaleNetwork() *schema.Resource {
 			},
 		},
 		Timeouts: &schema.ResourceTimeout{
-			Create: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
-			Update: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
-			Delete: schema.DefaultTimeout(time.Duration(GSCTimeoutSecs) * time.Second),
+			Create: schema.DefaultTimeout(0 * time.Second),
+			Update: schema.DefaultTimeout(0 * time.Second),
+			Delete: schema.DefaultTimeout(0 * time.Second),
 		},
 	}
 }
@@ -159,8 +159,13 @@ func resourceGridscaleNetworkUpdate(d *schema.ResourceData, meta interface{}) er
 		Labels:     &labels,
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
-	defer cancel()
+	//set context with timeout when timeout is set
+	ctx := context.Background()
+	if d.Timeout(schema.TimeoutUpdate) > zeroDuration {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
+		defer cancel()
+	}
 	err := client.UpdateNetwork(ctx, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
@@ -178,8 +183,13 @@ func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) er
 		Labels:     convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
-	defer cancel()
+	//set context with timeout when timeout is set
+	ctx := context.Background()
+	if d.Timeout(schema.TimeoutCreate) > zeroDuration {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
+		defer cancel()
+	}
 	response, err := client.CreateNetwork(ctx, requestBody)
 	if err != nil {
 		return err
@@ -195,8 +205,13 @@ func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) er
 func resourceGridscaleNetworkDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete network (%s) resource -", d.Id())
-	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
-	defer cancel()
+	//set context with timeout when timeout is set
+	ctx := context.Background()
+	if d.Timeout(schema.TimeoutDelete) > zeroDuration {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
+		defer cancel()
+	}
 	net, err := client.GetNetwork(ctx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
