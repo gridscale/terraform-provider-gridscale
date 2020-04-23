@@ -482,7 +482,6 @@ func (c *Client) StopServer(ctx context.Context, id string) error {
 
 //ShutdownServer shutdowns a specific server
 func (c *Client) ShutdownServer(ctx context.Context, id string) error {
-	logger := c.Logger()
 	//Make sure the server exists and that it isn't already in the state we need it to be
 	server, err := c.GetServer(ctx, id)
 	if err != nil {
@@ -499,12 +498,6 @@ func (c *Client) ShutdownServer(ctx context.Context, id string) error {
 
 	err = r.execute(ctx, *c, nil)
 	if err != nil {
-		if requestError, ok := err.(RequestError); ok {
-			if requestError.StatusCode == 500 {
-				logger.Debugf("Graceful shutdown for server %s has failed. power-off will be used", id)
-				return c.StopServer(ctx, id)
-			}
-		}
 		return err
 	}
 
@@ -512,8 +505,7 @@ func (c *Client) ShutdownServer(ctx context.Context, id string) error {
 		//If we get an error, which includes a timeout, power off the server instead
 		err = c.waitForServerPowerStatus(ctx, id, false)
 		if err != nil {
-			logger.Debugf("Graceful shutdown for server %s has failed. power-off will be used", id)
-			return c.StopServer(ctx, id)
+			return err
 		}
 	}
 	return nil
@@ -560,8 +552,8 @@ func (c *Client) GetDeletedServers(ctx context.Context) ([]Server, error) {
 
 //waitForServerPowerStatus  allows to wait for a server changing its power status.
 func (c *Client) waitForServerPowerStatus(ctx context.Context, id string, status bool) error {
-	return retryWithTimeout(func() (bool, error) {
+	return retryWithContext(ctx, func() (bool, error) {
 		server, err := c.GetServer(ctx, id)
 		return server.Properties.Power != status, err
-	}, c.RequestCheckTimeout(), c.DelayInterval())
+	}, c.DelayInterval())
 }

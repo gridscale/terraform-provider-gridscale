@@ -4,10 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"path"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -57,11 +58,6 @@ func (c *Client) Synchronous() bool {
 	return c.cfg.sync
 }
 
-//RequestCheckTimeout returns request check timeout
-func (c *Client) RequestCheckTimeout() time.Duration {
-	return c.cfg.requestCheckTimeoutSecs
-}
-
 //DelayInterval returns request delay interval
 func (c *Client) DelayInterval() time.Duration {
 	return c.cfg.delayInterval
@@ -97,7 +93,7 @@ func (c *Client) waitForRequestCompleted(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	return retryWithTimeout(func() (bool, error) {
+	return retryWithContext(ctx, func() (bool, error) {
 		r := request{
 			uri:                 path.Join(requestBase, id),
 			method:              "GET",
@@ -115,5 +111,5 @@ func (c *Client) waitForRequestCompleted(ctx context.Context, id string) error {
 			return false, errors.New(errMessage)
 		}
 		return true, nil
-	}, c.RequestCheckTimeout(), c.DelayInterval())
+	}, c.DelayInterval())
 }

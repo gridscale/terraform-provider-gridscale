@@ -52,7 +52,7 @@ var timeoutTestCases []bool = []bool{true, false}
 func setupTestClient(sync bool) (*httptest.Server, *Client, *http.ServeMux) {
 	mux := http.NewServeMux()
 	server := httptest.NewServer(mux)
-	config := NewConfiguration(server.URL, "uuid", "token", true, sync, 1, 100, 5)
+	config := NewConfiguration(server.URL, "uuid", "token", true, sync, 100, 5)
 
 	httpResponse := fmt.Sprintf(`{"%s": {"status":"done"}}`, dummyRequestUUID)
 	mux.HandleFunc(requestBase, func(w http.ResponseWriter, r *http.Request) {
