@@ -25,6 +25,8 @@ const (
 	defaultGSCMaxNumberOfRetries     = 5
 )
 
+const serverShutdownTimeoutSecs = 120
+
 var zeroDuration = time.Duration(0 * time.Second)
 
 type Config struct {

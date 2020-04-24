@@ -3,10 +3,12 @@ package gridscale
 import (
 	"context"
 	"fmt"
-	"github.com/gridscale/gsclient-go/v2"
 	"log"
 	"net/http"
 	"sync"
+	"time"
+
+	"github.com/gridscale/gsclient-go/v2"
 )
 
 type serverStatus struct {
@@ -68,9 +70,28 @@ func (l *serverStatusList) removeServerSynchronously(ctx context.Context, c *gsc
 			log.Printf("[DEBUG] LOCK RELEASED! Server (%v) is removed", id)
 		}()
 		if !s.deleted {
-			err := c.ShutdownServer(ctx, id)
-			if err != nil {
+			//set the shutdown timeout specifically
+			shutdownCtx, cancel := context.WithTimeout(context.Background(), serverShutdownTimeoutSecs*time.Second)
+			defer cancel()
+			err := c.ShutdownServer(shutdownCtx, id)
+			//if error is returned and it is not caused by an expired context, returns error
+			if err != nil && err != shutdownCtx.Err() {
 				return err
+			}
+			// if the server cannot be shutdown gracefully, try to turn it off
+			if err == shutdownCtx.Err() {
+				//check if the main context is done
+				select {
+				//return context's error when it is done
+				case <-ctx.Done():
+					return ctx.Err()
+				default:
+				}
+				//force the sever to stop
+				err = c.StopServer(ctx, id)
+				if err != nil {
+					return err
+				}
 			}
 			//Delete server
 			err = c.DeleteServer(ctx, id)
@@ -124,9 +145,25 @@ func (l *serverStatusList) shutdownServerSynchronously(ctx context.Context, c *g
 			log.Printf("[DEBUG] LOCK RELEASED! Shutting down server (%v) is done", id)
 		}()
 		if !s.deleted {
-			err := c.ShutdownServer(ctx, id)
-			if err != nil {
+			//set the shutdown timeout specifically
+			shutdownCtx, cancel := context.WithTimeout(context.Background(), serverShutdownTimeoutSecs*time.Second)
+			defer cancel()
+			err := c.ShutdownServer(shutdownCtx, id)
+			//if error is returned and it is not caused by an expired context, returns error
+			if err != nil && err != shutdownCtx.Err() {
 				return err
+			}
+			// if the server cannot be shutdown gracefully, try to turn it off
+			if err == shutdownCtx.Err() {
+				//check if the main context is done
+				select {
+				//return context's error when it is done
+				case <-ctx.Done():
+					return ctx.Err()
+				default:
+				}
+				//force the sever to stop
+				return c.StopServer(ctx, id)
 			}
 			return nil
 		}
