@@ -72,8 +72,8 @@ github.com/googleapis/gax-go/v2 v2.0.5 h1:sjZBwGj9Jlw33ImPtvFviGYvseOtDM7hkSKB7+
 github.com/googleapis/gax-go/v2 v2.0.5/go.mod h1:DWXyrwAJ9X0FpwwEdw+IPEYBICEFu5mhpdKc/us6bOk=
 github.com/gridscale/gsclient-go v2.1.0+incompatible h1:RO7nWtt355F2OY86erFD0qVLrRJSCxGT/GLM5eHXm7E=
 github.com/gridscale/gsclient-go v2.1.0+incompatible/go.mod h1:GqJohyXKzDhL7XBgOz3+sycVXeF8lXVdZSDcK5y8AIM=
-github.com/gridscale/gsclient-go/v2 v2.1.1-0.20200423114154-7b7d3d3e64ab h1:r+iIW2eTfcAqDBB1AmMs6LPy8PgXUbqPF0wWNBtTSBs=
-github.com/gridscale/gsclient-go/v2 v2.1.1-0.20200423114154-7b7d3d3e64ab/go.mod h1:IVfEUzx2+Vjv4doN5VlZJMxstPPfWp561aFzcDVc5Lw=
+github.com/gridscale/gsclient-go/v3 v3.0.0 h1:lDx6xew9HPfUOpvQ/TZ5HXsE4XZA+FB4SNlbub60tCA=
+github.com/gridscale/gsclient-go/v3 v3.0.0/go.mod h1:9IzXusXY152+UWEPE4Fc6pTZJzem8VDcFjxDk4otn3s=
 github.com/hashicorp/errwrap v0.0.0-20180715044906-d6c0cd880357/go.mod h1:YH+1FKiLXxHSkmPseP+kNlulaMuP3n2brvKWEqk/Jc4=
 github.com/hashicorp/errwrap v1.0.0 h1:hLrqtEDnRye3+sgx6z4qVLNuviH3MR5aQ0ykNJa/UYA=
 github.com/hashicorp/errwrap v1.0.0/go.mod h1:YH+1FKiLXxHSkmPseP+kNlulaMuP3n2brvKWEqk/Jc4=

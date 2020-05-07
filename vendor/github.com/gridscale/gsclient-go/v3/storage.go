@@ -386,3 +386,18 @@ func (c *Client) GetDeletedStorages(ctx context.Context) ([]Storage, error) {
 	}
 	return storages, err
 }
+
+//CloneStorage clones a specific storage
+//
+func (c *Client) CloneStorage(ctx context.Context, id string) (CreateResponse, error) {
+	var response CreateResponse
+	if !isValidUUID(id) {
+		return response, errors.New("'id' is invalid")
+	}
+	r := request{
+		uri:    path.Join(apiStorageBase, id, "clone"),
+		method: http.MethodPost,
+	}
+	err := r.execute(ctx, *c, &response)
+	return response, err
+}

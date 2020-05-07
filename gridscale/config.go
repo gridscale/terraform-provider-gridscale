@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/gridscale/gsclient-go/v2"
+	"github.com/gridscale/gsclient-go/v3"
 )
 
 //Arrays can't be constants in Go, but these will be used as constants

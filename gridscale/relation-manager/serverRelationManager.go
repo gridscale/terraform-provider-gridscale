@@ -3,9 +3,10 @@ package relation_manager
 import (
 	"context"
 	"fmt"
-	"github.com/gridscale/gsclient-go/v2"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"net/http"
+
+	"github.com/gridscale/gsclient-go/v3"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 //firewallRuleTypes defines all types of firewall rules

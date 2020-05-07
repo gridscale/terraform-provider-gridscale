@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gridscale/gsclient-go/v2"
+	"github.com/gridscale/gsclient-go/v3"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 

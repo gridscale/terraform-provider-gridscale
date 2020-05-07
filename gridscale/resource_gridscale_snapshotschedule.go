@@ -10,7 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 
-	"github.com/gridscale/gsclient-go/v2"
+	"github.com/gridscale/gsclient-go/v3"
 )
 
 func resourceGridscaleStorageSnapshotSchedule() *schema.Resource {
