@@ -19,7 +19,7 @@ Requirements
 ------------
 
 - [Terraform](https://www.terraform.io/downloads.html) 0.12.x
-- [Go](https://golang.org/doc/install) 1.13.x (to build the provider plugin)
+- [Go](https://golang.org/doc/install) ≥ 1.13 (to build the provider plugin)
 
 Building the Provider
 ---------------------
@@ -50,23 +50,23 @@ Available Features
 
 | Feature | Availability |
 |---|:---:|
-| Server (CRUD) | :heavy_check_mark: |  
-| Server dependency (Link/Unlink) | :heavy_check_mark: |  
-| Loadbalancer (CRUD) | :heavy_check_mark: |  
-| PaaS (CRUD) | :heavy_check_mark: |  
-| Storage (CRUD) | :heavy_check_mark: |  
-| Object Storage (CRUD) | :heavy_check_mark: |  
-| IP address (CRUD) | :heavy_check_mark: |  
-| Network (CRUD) | :heavy_check_mark: |  
-| Security zone (PaaS) (CRUD) | :heavy_check_mark: |  
-| Firewall (CRUD) | :heavy_check_mark: |  
-| SSH key (CRUD) | :heavy_check_mark: |  
-| ISO Image (CRUD) | :heavy_check_mark: |  
-| Snapshot (CRUD) | :heavy_check_mark: |  
-| Snapshot rollback | :heavy_check_mark: |  
-| Snapshot to S3 | :x: |  
-| Snapshot schedule (CRUD) | :heavy_check_mark: |  
-| Template (CRUD) | :heavy_check_mark: |  
+| Server (CRUD) | :heavy_check_mark: |
+| Server dependency (link/unlink) | :heavy_check_mark: |
+| Load balancer (CRUD) | :heavy_check_mark: |
+| PaaS (CRUD) | :heavy_check_mark: |
+| Storage (CRUD) | :heavy_check_mark: |
+| Object storage (CRUD) | :heavy_check_mark: |
+| IP address (CRUD) | :heavy_check_mark: |
+| Network (CRUD) | :heavy_check_mark: |
+| Security zone (PaaS) (CRUD) | :heavy_check_mark: |
+| Firewall (CRUD) | :heavy_check_mark: |
+| SSH key (CRUD) | :heavy_check_mark: |
+| ISO Image (CRUD) | :heavy_check_mark: |
+| Snapshot (CRUD) | :heavy_check_mark: |
+| Snapshot rollback | :heavy_check_mark: |
+| Snapshot to S3 | :x: |
+| Snapshot schedule (CRUD) | :heavy_check_mark: |
+| Template (CRUD) | :heavy_check_mark: |
 | Multiple project support ([Workaround](https://github.com/gridscale/terraform-examples/tree/master/multi-project)) | :x: |
 | Marketplace | :x: |
 
@@ -79,9 +79,9 @@ To compile the provider, run `make build`. This will build the provider and put 
 
 ```sh
 $ make build
-...
+…
 $ $GOPATH/bin/terraform-provider-gridscale
-...
+…
 ```
 
 In order to test the provider, you can simply run `make test`.
