@@ -1,9 +1,12 @@
 Terraform gridscale Provider
+[![Build Status](https://travis-ci.org/terraform-providers/terraform-provider-gridscale.svg?branch=master)](https://travis-ci.org/terraform-providers/terraform-provider-gridscale)
+[![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/terraform-providers/terraform-provider-gridscale?label=release)](https://github.com/terraform-providers/terraform-provider-gridscale/releases)
+[![Gitter chat](https://badges.gitter.im/hashicorp-terraform/Lobby.png)](https://gitter.im/hashicorp-terraform/Lobby)
 ==================
 
-- Website: https://www.terraform.io
-- [![Gitter chat](https://badges.gitter.im/hashicorp-terraform/Lobby.png)](https://gitter.im/hashicorp-terraform/Lobby)
-- Mailing list: [Google Groups](http://groups.google.com/group/terraform-tool)
+Website: https://www.terraform.io
+
+Mailing list: [Google Groups](http://groups.google.com/group/terraform-tool)
 
 <img src="https://cdn.rawgit.com/hashicorp/terraform-website/master/content/source/assets/images/logo-hashicorp.svg" width="600px">
 
