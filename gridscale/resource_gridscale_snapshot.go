@@ -119,9 +119,9 @@ the product_no of the license (see the /prices endpoint for more details)`,
 			},
 		},
 		Timeouts: &schema.ResourceTimeout{
-			Create: schema.DefaultTimeout(0 * time.Second),
-			Update: schema.DefaultTimeout(0 * time.Second),
-			Delete: schema.DefaultTimeout(0 * time.Second),
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
 		},
 	}
 }

@@ -159,9 +159,9 @@ func resourceGridscalePaaS() *schema.Resource {
 			},
 		},
 		Timeouts: &schema.ResourceTimeout{
-			Create: schema.DefaultTimeout(0 * time.Second),
-			Update: schema.DefaultTimeout(0 * time.Second),
-			Delete: schema.DefaultTimeout(0 * time.Second),
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
 		},
 	}
 }
