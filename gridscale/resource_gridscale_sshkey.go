@@ -109,13 +109,8 @@ func resourceGridscaleSshkeyUpdate(d *schema.ResourceData, meta interface{}) err
 		Labels: &labels,
 	}
 
-	//set context with timeout when timeout is set
-	ctx := context.Background()
-	if d.Timeout(schema.TimeoutUpdate) > zeroDuration {
-		var cancel context.CancelFunc
-		ctx, cancel = context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
-		defer cancel()
-	}
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
+	defer cancel()
 	err := client.UpdateSshkey(ctx, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
@@ -133,13 +128,8 @@ func resourceGridscaleSshkeyCreate(d *schema.ResourceData, meta interface{}) err
 		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
-	//set context with timeout when timeout is set
-	ctx := context.Background()
-	if d.Timeout(schema.TimeoutCreate) > zeroDuration {
-		var cancel context.CancelFunc
-		ctx, cancel = context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
-		defer cancel()
-	}
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
+	defer cancel()
 	response, err := client.CreateSshkey(ctx, requestBody)
 	if err != nil {
 		return err
@@ -155,13 +145,9 @@ func resourceGridscaleSshkeyCreate(d *schema.ResourceData, meta interface{}) err
 func resourceGridscaleSshkeyDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete SSH key (%s) resource -", d.Id())
-	//set context with timeout when timeout is set
-	ctx := context.Background()
-	if d.Timeout(schema.TimeoutDelete) > zeroDuration {
-		var cancel context.CancelFunc
-		ctx, cancel = context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
-		defer cancel()
-	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
+	defer cancel()
 	err := client.DeleteSshkey(ctx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)

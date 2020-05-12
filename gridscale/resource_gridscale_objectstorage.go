@@ -62,13 +62,9 @@ func resourceGridscaleObjectStorageRead(d *schema.ResourceData, meta interface{}
 
 func resourceGridscaleObjectStorageCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	//set context with timeout when timeout is set
-	ctx := context.Background()
-	if d.Timeout(schema.TimeoutCreate) > zeroDuration {
-		var cancel context.CancelFunc
-		ctx, cancel = context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
-		defer cancel()
-	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
+	defer cancel()
 	response, err := client.CreateObjectStorageAccessKey(ctx)
 	if err != nil {
 		return err
@@ -83,13 +79,9 @@ func resourceGridscaleObjectStorageCreate(d *schema.ResourceData, meta interface
 func resourceGridscaleObjectStorageDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete object storage (%s) resource -", d.Id())
-	//set context with timeout when timeout is set
-	ctx := context.Background()
-	if d.Timeout(schema.TimeoutDelete) > zeroDuration {
-		var cancel context.CancelFunc
-		ctx, cancel = context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
-		defer cancel()
-	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
+	defer cancel()
 	err := client.DeleteObjectStorageAccessKey(ctx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
