@@ -52,9 +52,9 @@ The following arguments are supported:
 
 Timeouts configuration options (in seconds):
 
-* `create` - (Default value is 0, it means the operation runs without a timeout) Used for Creating resource.
-* `update` - (Default value is 0, it means the operation runs without a timeout) Used for Updating resource.
-* `delete` - (Default value is 0, it means the operation runs without a timeout) Used for Deleteing resource.
+* `create` - (Default value is "5m" - 5 minutes) Used for Creating resource.
+* `update` - (Default value is "5m" - 5 minutes) Used for Updating resource.
+* `delete` - (Default value is "5m" - 5 minutes) Used for Deleteing resource.
 
 ## Attributes
 
