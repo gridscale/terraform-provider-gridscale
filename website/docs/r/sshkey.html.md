@@ -18,6 +18,9 @@ The following example shows how one might use this resource to add an SSH public
 resource "gridscale_sshkey" "sshkey-john"{
 	name = "john's computer"
 	sshkey = "an ssh public key"
+	timeouts {
+      create="10m"
+  	}
 }
 ```
 
@@ -34,6 +37,7 @@ The following arguments are supported:
 ## Timeouts
 
 Timeouts configuration options (in seconds):
+More info: https://www.terraform.io/docs/configuration/resources.html#operation-timeouts
 
 * `create` - (Default value is "5m" - 5 minutes) Used for Creating resource.
 * `update` - (Default value is "5m" - 5 minutes) Used for Updating resource.

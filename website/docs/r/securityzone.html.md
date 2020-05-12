@@ -17,6 +17,9 @@ The following example shows how one might use this resource to add a security zo
 ```terraform
 resource "gridscale_paas_securityzone" "foo" {
   name = "test"
+  timeouts {
+      create="10m"
+  }
 }
 ```
 
@@ -30,6 +33,7 @@ The following arguments are supported:
 ## Timeouts
 
 Timeouts configuration options (in seconds):
+More info: https://www.terraform.io/docs/configuration/resources.html#operation-timeouts
 
 * `create` - (Default value is "5m" - 5 minutes) Used for Creating resource.
 * `update` - (Default value is "5m" - 5 minutes) Used for Updating resource.

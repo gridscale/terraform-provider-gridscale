@@ -35,6 +35,9 @@ resource "gridscale_server" "terra-server-test"{
 	ipv4 = gridscale_ipv4.terra-ipv4-test.id}
 	ipv6 = "UUID of ipv6 address"
 	isoimage = "9be3e0a3-42ac-4207-8887-3383c405724d"
+    timeouts {
+      create="10m"
+  }
 }
 ```
 
@@ -151,6 +154,7 @@ The following arguments are supported:
 ## Timeouts
 
 Timeouts configuration options (in seconds):
+More info: https://www.terraform.io/docs/configuration/resources.html#operation-timeouts
 
 * `create` - (Default value is "5m" - 5 minutes) Used for Creating resource.
 * `update` - (Default value is "5m" - 5 minutes) Used for Updating resource.

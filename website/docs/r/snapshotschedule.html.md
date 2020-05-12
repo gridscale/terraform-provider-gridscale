@@ -23,6 +23,9 @@ resource "gridscale_snapshotschedule" "foo" {
   keep_snapshots = 1
   run_interval = 60
   next_runtime = "2025-12-30 15:04:05"
+  timeouts {
+      create="10m"
+  }
 }
 ```
 
@@ -45,6 +48,7 @@ The following arguments are supported:
 ## Timeouts
 
 Timeouts configuration options (in seconds):
+More info: https://www.terraform.io/docs/configuration/resources.html#operation-timeouts
 
 * `create` - (Default value is "5m" - 5 minutes) Used for Creating resource.
 * `update` - (Default value is "5m" - 5 minutes) Used for Updating resource.
