@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 
 	"github.com/gridscale/gsclient-go/v3"
+	errHandler "github.com/terraform-providers/terraform-provider-gridscale/gridscale/error_handler"
 )
 
 func resourceGridscaleIpv4() *schema.Resource {
@@ -238,7 +240,12 @@ func resourceGridscaleIpDelete(d *schema.ResourceData, meta interface{}) error {
 	if len(ip.Properties.Relations.Servers) == 1 {
 		server := ip.Properties.Relations.Servers[0]
 		unlinkIPAction := func(ctx context.Context) error {
-			err := client.UnlinkIP(ctx, server.ServerUUID, d.Id())
+			//No need to unlink when server returns 409 or 404
+			err := errHandler.RemoveErrorContainsHTTPCodes(
+				client.UnlinkIP(ctx, server.ServerUUID, d.Id()),
+				http.StatusConflict,
+				http.StatusNotFound,
+			)
 			return err
 		}
 		//DeleteIP requires the server to be off
@@ -248,7 +255,10 @@ func resourceGridscaleIpDelete(d *schema.ResourceData, meta interface{}) error {
 		}
 	}
 
-	err = client.DeleteIP(ctx, d.Id())
+	err = errHandler.RemoveErrorContainsHTTPCodes(
+		client.DeleteIP(ctx, d.Id()),
+		http.StatusNotFound,
+	)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

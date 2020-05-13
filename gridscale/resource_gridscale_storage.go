@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/http"
 	"strings"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	errHandler "github.com/terraform-providers/terraform-provider-gridscale/gridscale/error_handler"
 
 	"github.com/gridscale/gsclient-go/v3"
 )
@@ -330,7 +332,12 @@ func resourceGridscaleStorageDelete(d *schema.ResourceData, meta interface{}) er
 	//Stop all server relating to this IP address if there is one
 	for _, server := range storage.Properties.Relations.Servers {
 		unlinkStorageAction := func(ctx context.Context) error {
-			err := client.UnlinkStorage(ctx, server.ObjectUUID, d.Id())
+			//No need to unlink when server returns 409 or 404
+			err := errHandler.RemoveErrorContainsHTTPCodes(
+				client.UnlinkStorage(ctx, server.ObjectUUID, d.Id()),
+				http.StatusConflict,
+				http.StatusNotFound,
+			)
 			return err
 		}
 		//UnlinkStorage requires the server to be off
@@ -340,7 +347,10 @@ func resourceGridscaleStorageDelete(d *schema.ResourceData, meta interface{}) er
 		}
 	}
 
-	err = client.DeleteStorage(ctx, d.Id())
+	err = errHandler.RemoveErrorContainsHTTPCodes(
+		client.DeleteStorage(ctx, d.Id()),
+		http.StatusNotFound,
+	)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

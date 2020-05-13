@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	errHandler "github.com/terraform-providers/terraform-provider-gridscale/gridscale/error_handler"
 
 	"github.com/gridscale/gsclient-go/v3"
 )
@@ -206,7 +208,12 @@ func resourceGridscaleNetworkDelete(d *schema.ResourceData, meta interface{}) er
 	//Stop all servers relating to this network address if there is one
 	for _, server := range net.Properties.Relations.Servers {
 		unlinkNetAction := func(ctx context.Context) error {
-			err := client.UnlinkNetwork(ctx, server.ObjectUUID, d.Id())
+			//No need to unlink when server returns 409 or 404
+			err := errHandler.RemoveErrorContainsHTTPCodes(
+				client.UnlinkNetwork(ctx, server.ObjectUUID, d.Id()),
+				http.StatusConflict,
+				http.StatusNotFound,
+			)
 			return err
 		}
 		//UnlinkNetwork requires the server to be off
@@ -216,7 +223,10 @@ func resourceGridscaleNetworkDelete(d *schema.ResourceData, meta interface{}) er
 		}
 	}
 
-	err = client.DeleteNetwork(ctx, d.Id())
+	err = errHandler.RemoveErrorContainsHTTPCodes(
+		client.DeleteNetwork(ctx, d.Id()),
+		http.StatusNotFound,
+	)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

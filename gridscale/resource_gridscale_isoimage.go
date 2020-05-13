@@ -9,6 +9,7 @@ import (
 
 	"github.com/gridscale/gsclient-go/v3"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	errHandler "github.com/terraform-providers/terraform-provider-gridscale/gridscale/error_handler"
 )
 
 func resourceGridscaleISOImage() *schema.Resource {
@@ -276,21 +277,20 @@ func resourceGridscaleISOImageDelete(d *schema.ResourceData, meta interface{}) e
 
 	//Remove all links between this ISO-Image and all servers.
 	for _, server := range isoimage.Properties.Relations.Servers {
-		err = client.UnlinkIsoImage(ctx, server.ObjectUUID, d.Id())
+		//No need to unlink when server returns 409 or 404
+		err = errHandler.RemoveErrorContainsHTTPCodes(
+			client.UnlinkIsoImage(ctx, server.ObjectUUID, d.Id()),
+			http.StatusConflict,
+			http.StatusNotFound,
+		)
 		if err != nil {
-			//If error is an instance of `gsclient.RequestError`
-			if requestError, ok := err.(gsclient.RequestError); ok {
-				//If 404 or 409, that means the server is already deleted
-				//=> the relation between ISO image and server is already deleted
-				if requestError.StatusCode != http.StatusNotFound && requestError.StatusCode != http.StatusConflict {
-					return fmt.Errorf("%s error: %v", errorPrefix, err)
-				}
-			} else {
-				return fmt.Errorf("%s error: %v", errorPrefix, err)
-			}
+			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
 	}
-	err = client.DeleteISOImage(ctx, d.Id())
+	err = errHandler.RemoveErrorContainsHTTPCodes(
+		client.DeleteISOImage(ctx, d.Id()),
+		http.StatusNotFound,
+	)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

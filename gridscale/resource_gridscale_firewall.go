@@ -5,11 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/gridscale/gsclient-go/v3"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	errHandler "github.com/terraform-providers/terraform-provider-gridscale/gridscale/error_handler"
 )
 
 func resourceGridscaleFirewall() *schema.Resource {
@@ -307,7 +309,10 @@ func resourceGridscaleFirewallDelete(d *schema.ResourceData, meta interface{}) e
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
 	defer cancel()
-	err := client.DeleteFirewall(ctx, d.Id())
+	err := errHandler.RemoveErrorContainsHTTPCodes(
+		client.DeleteFirewall(ctx, d.Id()),
+		http.StatusNotFound,
+	)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

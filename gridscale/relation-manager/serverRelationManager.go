@@ -1,4 +1,4 @@
-package relation_manager
+package relationManager
 
 import (
 	"context"
@@ -7,6 +7,7 @@ import (
 
 	"github.com/gridscale/gsclient-go/v3"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	errHandler "github.com/terraform-providers/terraform-provider-gridscale/gridscale/error_handler"
 )
 
 //firewallRuleTypes defines all types of firewall rules
@@ -236,7 +237,7 @@ func (c *ServerRelationManger) UpdateISOImageRel(ctx context.Context) error {
 		//Unlink it
 		if oldIso != "" {
 			//If 404 or 409, that means ISO image is already deleted => the relation between ISO image and server is deleted automatically
-			err = removeErrorContainsHttpCodes(
+			err = errHandler.RemoveErrorContainsHTTPCodes(
 				client.UnlinkIsoImage(ctx, d.Id(), oldIso.(string)),
 				http.StatusConflict,
 				http.StatusNotFound,
@@ -263,7 +264,7 @@ func (c *ServerRelationManger) UpdateIPv4Rel(ctx context.Context) error {
 		//Unlink it
 		if oldIp != "" {
 			//If 404 or 409, that means IP is already deleted => the relation between IP and server is deleted automatically
-			err = removeErrorContainsHttpCodes(
+			err = errHandler.RemoveErrorContainsHTTPCodes(
 				client.UnlinkIP(ctx, d.Id(), oldIp.(string)),
 				http.StatusConflict,
 				http.StatusNotFound,
@@ -289,7 +290,7 @@ func (c *ServerRelationManger) UpdateIPv6Rel(ctx context.Context) error {
 		//Unlink it
 		if oldIp != "" {
 			//If 404 or 409, that means IP is already deleted => the relation between IP and server is deleted automatically
-			err = removeErrorContainsHttpCodes(
+			err = errHandler.RemoveErrorContainsHTTPCodes(
 				client.UnlinkIP(ctx, d.Id(), oldIp.(string)),
 				http.StatusConflict,
 				http.StatusNotFound,
@@ -316,7 +317,7 @@ func (c *ServerRelationManger) UpdateNetworksRel(ctx context.Context) error {
 			network := value.(map[string]interface{})
 			if network["object_uuid"].(string) != "" {
 				//If 404 or 409, that means network is already deleted => the relation between network and server is deleted automatically
-				err = removeErrorContainsHttpCodes(
+				err = errHandler.RemoveErrorContainsHTTPCodes(
 					client.UnlinkNetwork(ctx, d.Id(), network["object_uuid"].(string)),
 					http.StatusConflict,
 					http.StatusNotFound,
@@ -343,7 +344,7 @@ func (c *ServerRelationManger) UpdateStoragesRel(ctx context.Context) error {
 			storage := value.(map[string]interface{})
 			if storage["object_uuid"].(string) != "" {
 				//If 404 or 409, that means storage is already deleted => the relation between storage and server is deleted automatically
-				err = removeErrorContainsHttpCodes(
+				err = errHandler.RemoveErrorContainsHTTPCodes(
 					client.UnlinkStorage(ctx, d.Id(), storage["object_uuid"].(string)),
 					http.StatusConflict,
 					http.StatusNotFound,
@@ -357,25 +358,4 @@ func (c *ServerRelationManger) UpdateStoragesRel(ctx context.Context) error {
 		err = c.LinkStorages(ctx)
 	}
 	return err
-}
-
-//removeErrorContainsHttpCodes returns nil, if the error of HTTP error
-//has status code that is in the given list of http status codes
-func removeErrorContainsHttpCodes(err error, errorCodes ...int) error {
-	if requestError, ok := err.(gsclient.RequestError); ok {
-		if containsInt(errorCodes, requestError.StatusCode) {
-			err = nil
-		}
-	}
-	return err
-}
-
-//containsInt check if an int array contains a specific int.
-func containsInt(arr []int, target int) bool {
-	for _, a := range arr {
-		if a == target {
-			return true
-		}
-	}
-	return false
 }
