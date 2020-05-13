@@ -64,7 +64,7 @@ Available Features
 | ISO Image (CRUD) | :heavy_check_mark: |
 | Snapshot (CRUD) | :heavy_check_mark: |
 | Snapshot rollback | :heavy_check_mark: |
-| Snapshot to S3 | :x: |
+| Snapshot to S3 | :heavy_check_mark: |
 | Snapshot schedule (CRUD) | :heavy_check_mark: |
 | Template (CRUD) | :heavy_check_mark: |
 | Multiple project support ([Workaround](https://github.com/gridscale/terraform-examples/tree/master/multi-project)) | :x: |
