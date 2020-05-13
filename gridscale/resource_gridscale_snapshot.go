@@ -92,7 +92,7 @@ the product_no of the license (see the /prices endpoint for more details)`,
 				ForceNew:    true,
 				Description: "Uuid of the storage used to create this snapshot",
 			},
-			"export": {
+			"s3_export": {
 				Type:        schema.TypeSet,
 				Optional:    true,
 				Description: "Export snapshot to a s3 storage",
@@ -277,7 +277,7 @@ func resourceGridscaleSnapshotCreate(d *schema.ResourceData, meta interface{}) e
 		}
 	}
 	//Start exporting the snapshot to s3 storage if s3 storage data is set
-	if attr, ok := d.GetOk("export"); ok {
+	if attr, ok := d.GetOk("s3_export"); ok {
 		requests := make([]interface{}, 0)
 		for _, requestProps := range attr.(*schema.Set).List() {
 			exportReqData := requestProps.(map[string]interface{})
@@ -308,7 +308,7 @@ func resourceGridscaleSnapshotCreate(d *schema.ResourceData, meta interface{}) e
 			requests = append(requests, exportReqData)
 		}
 		//Apply value back to schema
-		if err = d.Set("export", requests); err != nil {
+		if err = d.Set("s3_export", requests); err != nil {
 			return fmt.Errorf("%s error setting export: %v", errorPrefix, err)
 		}
 	}
@@ -369,7 +369,7 @@ func resourceGridscaleSnapshotUpdate(d *schema.ResourceData, meta interface{}) e
 		}
 	}
 	//Start exporting the snapshot to s3 storage if s3 storage data is set
-	if attr, ok := d.GetOk("export"); ok {
+	if attr, ok := d.GetOk("s3_export"); ok {
 		requests := make([]interface{}, 0)
 		for _, requestProps := range attr.(*schema.Set).List() {
 			exportReqData := requestProps.(map[string]interface{})
@@ -402,7 +402,7 @@ func resourceGridscaleSnapshotUpdate(d *schema.ResourceData, meta interface{}) e
 			requests = append(requests, exportReqData)
 		}
 		//Apply value back to schema
-		if err = d.Set("export", requests); err != nil {
+		if err = d.Set("s3_export", requests); err != nil {
 			return fmt.Errorf("%s error setting export: %v", errorPrefix, err)
 		}
 	}
