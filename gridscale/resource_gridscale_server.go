@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/http"
 	"strings"
 	"time"
 
+	errHandler "github.com/terraform-providers/terraform-provider-gridscale/gridscale/error_handler"
 	relation_manager "github.com/terraform-providers/terraform-provider-gridscale/gridscale/relation-manager"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -676,7 +678,10 @@ func resourceGridscaleServerDelete(d *schema.ResourceData, meta interface{}) err
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
 	defer cancel()
 	//remove the server
-	err := globalServerStatusList.removeServerSynchronously(ctx, client, d.Id())
+	err := errHandler.RemoveErrorContainsHTTPCodes(
+		globalServerStatusList.removeServerSynchronously(ctx, client, d.Id()),
+		http.StatusNotFound,
+	)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

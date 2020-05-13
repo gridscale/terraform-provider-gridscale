@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/http"
 	"strings"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	errHandler "github.com/terraform-providers/terraform-provider-gridscale/gridscale/error_handler"
 
 	"github.com/gridscale/gsclient-go/v3"
 )
@@ -226,7 +228,10 @@ func resourceGridscaleSnapshotScheduleDelete(d *schema.ResourceData, meta interf
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
 	defer cancel()
-	err := client.DeleteStorageSnapshotSchedule(ctx, storageUUID, d.Id())
+	err := errHandler.RemoveErrorContainsHTTPCodes(
+		client.DeleteStorageSnapshotSchedule(ctx, storageUUID, d.Id()),
+		http.StatusNotFound,
+	)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

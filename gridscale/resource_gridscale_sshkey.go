@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	errHandler "github.com/terraform-providers/terraform-provider-gridscale/gridscale/error_handler"
 
 	"github.com/gridscale/gsclient-go/v3"
 )
@@ -148,7 +150,10 @@ func resourceGridscaleSshkeyDelete(d *schema.ResourceData, meta interface{}) err
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
 	defer cancel()
-	err := client.DeleteSshkey(ctx, d.Id())
+	err := errHandler.RemoveErrorContainsHTTPCodes(
+		client.DeleteSshkey(ctx, d.Id()),
+		http.StatusNotFound,
+	)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
