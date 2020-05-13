@@ -25,6 +25,9 @@ resource "gridscale_storage" "storage-john"{
 	    password_type = "plain"
 	    hostname = "Ubuntu"
 	}
+	timeouts {
+      create="10m"
+  	}
 }
 ```
 
@@ -53,6 +56,16 @@ The following arguments are supported:
     * `hostname` - (Optional) The hostname of the installed server (ignored for private templates and public windows templates).
 
 ~> **Note** When using official templates using either a password and password_type or at least one SSH public key is required. This is not the case when using custom templates. For official templates password authentication for SSH is enabled by default, so be sure to pick a strong password.
+
+
+## Timeouts
+
+Timeouts configuration options (in seconds):
+More info: https://www.terraform.io/docs/configuration/resources.html#operation-timeouts
+
+* `create` - (Default value is "5m" - 5 minutes) Used for Creating resource.
+* `update` - (Default value is "5m" - 5 minutes) Used for Updating resource.
+* `delete` - (Default value is "5m" - 5 minutes) Used for Deleteing resource.
 
 ## Attributes
 

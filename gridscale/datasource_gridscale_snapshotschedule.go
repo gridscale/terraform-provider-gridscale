@@ -1,9 +1,10 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
 
-	"github.com/gridscale/gsclient-go/v2"
+	"github.com/gridscale/gsclient-go/v3"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
@@ -97,7 +98,7 @@ func dataSourceGridscaleSnapshotScheduleRead(d *schema.ResourceData, meta interf
 	storageUUID := d.Get("storage_uuid").(string)
 	errorPrefix := fmt.Sprintf("read snapshot schedule (%s) datasource of storage (%s) -", id, storageUUID)
 
-	scheduler, err := client.GetStorageSnapshotSchedule(emptyCtx, storageUUID, id)
+	scheduler, err := client.GetStorageSnapshotSchedule(context.Background(), storageUUID, id)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

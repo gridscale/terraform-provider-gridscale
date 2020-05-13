@@ -17,6 +17,9 @@ The following example shows how one might use this resource to add a network to 
 ```terraform
 resource "gridscale_network" "networkname"{
 	name = "terraform-network"
+  timeouts {
+      create="10m"
+  }
 }
 ```
 
@@ -30,6 +33,14 @@ The following arguments are supported:
 
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
 
+## Timeouts
+
+Timeouts configuration options (in seconds):
+More info: https://www.terraform.io/docs/configuration/resources.html#operation-timeouts
+
+* `create` - (Default value is "5m" - 5 minutes) Used for Creating resource.
+* `update` - (Default value is "5m" - 5 minutes) Used for Updating resource.
+* `delete` - (Default value is "5m" - 5 minutes) Used for Deleteing resource.
 
 ## Attributes
 

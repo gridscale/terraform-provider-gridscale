@@ -1,11 +1,14 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
-	"github.com/gridscale/gsclient-go/v2"
+	"strings"
+	"time"
+
+	"github.com/gridscale/gsclient-go/v3"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	"strings"
 
 	"log"
 )
@@ -155,13 +158,18 @@ func resourceGridscalePaaS() *schema.Resource {
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 		},
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
 	}
 }
 
 func resourceGridscalePaaSServiceRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("read paas (%s) resource -", d.Id())
-	paas, err := client.GetPaaSService(emptyCtx, d.Id())
+	paas, err := client.GetPaaSService(context.Background(), d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
@@ -259,7 +267,7 @@ func resourceGridscalePaaSServiceRead(d *schema.ResourceData, meta interface{}) 
 	}
 
 	//Get all available networks
-	networks, err := client.GetNetworkList(emptyCtx)
+	networks, err := client.GetNetworkList(context.Background())
 	if err != nil {
 		return fmt.Errorf("%s error getting networks: %v", errorPrefix, err)
 	}
@@ -313,7 +321,9 @@ func resourceGridscalePaaSServiceCreate(d *schema.ResourceData, meta interface{}
 	}
 	requestBody.ResourceLimits = limits
 
-	response, err := client.CreatePaaSService(emptyCtx, requestBody)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
+	defer cancel()
+	response, err := client.CreatePaaSService(ctx, requestBody)
 	if err != nil {
 		return err
 	}
@@ -358,7 +368,9 @@ func resourceGridscalePaaSServiceUpdate(d *schema.ResourceData, meta interface{}
 	}
 	requestBody.ResourceLimits = limits
 
-	err := client.UpdatePaaSService(emptyCtx, d.Id(), requestBody)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
+	defer cancel()
+	err := client.UpdatePaaSService(ctx, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -368,7 +380,10 @@ func resourceGridscalePaaSServiceUpdate(d *schema.ResourceData, meta interface{}
 func resourceGridscalePaaSServiceDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete paas (%s) resource -", d.Id())
-	err := client.DeletePaaSService(emptyCtx, d.Id())
+
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
+	defer cancel()
+	err := client.DeletePaaSService(ctx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

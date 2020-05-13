@@ -20,6 +20,9 @@ resource "gridscale_storage" "foo" {
 resource "gridscale_snapshot" "foo" {
   name = "snapshot"
   storage_uuid = gridscale_storage.foo.id
+  timeouts {
+      create="10m"
+  }
 }
 ```
 
@@ -36,6 +39,15 @@ The following arguments are supported:
 * `rollback` - (Optional) Returns a storage to the state of the selected Snapshot. 
 
     * `id` - (Required) ID of the rollback request. It can be any string value. Each rollback request has to have a UNIQUE id. 
+
+## Timeouts
+
+Timeouts configuration options (in seconds):
+More info: https://www.terraform.io/docs/configuration/resources.html#operation-timeouts
+
+* `create` - (Default value is "5m" - 5 minutes) Used for Creating resource.
+* `update` - (Default value is "5m" - 5 minutes) Used for Updating resource.
+* `delete` - (Default value is "5m" - 5 minutes) Used for Deleteing resource.
 
 ## Attributes Reference
 

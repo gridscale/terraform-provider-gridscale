@@ -8,7 +8,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 
-	"github.com/gridscale/gsclient-go/v2"
+	"github.com/gridscale/gsclient-go/v3"
 )
 
 func resourceGridscaleIpv4() *schema.Resource {
@@ -104,7 +104,9 @@ func resourceGridscaleIpv4() *schema.Resource {
 			},
 		},
 		Timeouts: &schema.ResourceTimeout{
-			Delete: schema.DefaultTimeout(time.Minute * 3),
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
 		},
 	}
 }
@@ -112,7 +114,7 @@ func resourceGridscaleIpv4() *schema.Resource {
 func resourceGridscaleIpRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("read IP (%s) resource -", d.Id())
-	ip, err := client.GetIP(emptyCtx, d.Id())
+	ip, err := client.GetIP(context.Background(), d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
@@ -185,7 +187,9 @@ func resourceGridscaleIpUpdate(d *schema.ResourceData, meta interface{}) error {
 		Labels:     &labels,
 	}
 
-	err := client.UpdateIP(emptyCtx, d.Id(), requestBody)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
+	defer cancel()
+	err := client.UpdateIP(ctx, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -204,7 +208,9 @@ func resourceGridscaleIpv4Create(d *schema.ResourceData, meta interface{}) error
 		Labels:     convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
-	response, err := client.CreateIP(emptyCtx, requestBody)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
+	defer cancel()
+	response, err := client.CreateIP(ctx, requestBody)
 	if err != nil {
 		return err
 	}
@@ -220,7 +226,10 @@ func resourceGridscaleIpDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete IP (%s) resource -", d.Id())
 
-	ip, err := client.GetIP(emptyCtx, d.Id())
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
+	defer cancel()
+
+	ip, err := client.GetIP(ctx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -233,12 +242,13 @@ func resourceGridscaleIpDelete(d *schema.ResourceData, meta interface{}) error {
 			return err
 		}
 		//DeleteIP requires the server to be off
-		err = globalServerStatusList.runActionRequireServerOff(emptyCtx, client, server.ServerUUID, false, unlinkIPAction)
+		err = globalServerStatusList.runActionRequireServerOff(ctx, client, server.ServerUUID, false, unlinkIPAction)
 		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
 	}
-	err = client.DeleteIP(emptyCtx, d.Id())
+
+	err = client.DeleteIP(ctx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

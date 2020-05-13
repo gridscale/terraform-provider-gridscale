@@ -1,13 +1,14 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 
-	"github.com/gridscale/gsclient-go/v2"
+	"github.com/gridscale/gsclient-go/v3"
 )
 
 func dataSourceGridscaleISOImage() *schema.Resource {
@@ -137,7 +138,7 @@ func dataSourceGridscaleISOImageRead(d *schema.ResourceData, meta interface{}) e
 	id := d.Get("resource_id").(string)
 	errorPrefix := fmt.Sprintf("read ISO-Image (%s) datasource -", id)
 
-	isoimage, err := client.GetISOImage(emptyCtx, id)
+	isoimage, err := client.GetISOImage(context.Background(), id)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

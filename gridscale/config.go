@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/gridscale/gsclient-go/v2"
+	"github.com/gridscale/gsclient-go/v3"
 )
 
 //Arrays can't be constants in Go, but these will be used as constants
@@ -16,21 +16,20 @@ var loadbalancerAlgs = []string{"roundrobin", "leastconn"}
 var passwordTypes = []string{"plain", "crypt"}
 var firewallActionTypes = []string{"accept", "drop"}
 var firewallRuleProtocols = []string{"udp", "tcp"}
-var emptyCtx = context.Background()
 
 const timeLayout = "2006-01-02 15:04:05"
 const (
 	defaultAPIURL                    = "https://api.gridscale.io"
-	defaultGSCTimeoutSecs            = 120
 	defaultGSCDelayIntervalMilliSecs = 1000
 	defaultGSCMaxNumberOfRetries     = 5
 )
 
+const serverShutdownTimeoutSecs = 120
+
 type Config struct {
-	UserUUID    string
-	APIToken    string
-	APIUrl      string
-	TimeoutSecs int
+	UserUUID string
+	APIToken string
+	APIUrl   string
 }
 
 func (c *Config) Client() (*gsclient.Client, error) {
@@ -40,18 +39,12 @@ func (c *Config) Client() (*gsclient.Client, error) {
 		apiURL = c.APIUrl
 	}
 
-	//if timeout is configured, set the timeout in gsc
-	timeoutSecs := defaultGSCTimeoutSecs
-	if c.TimeoutSecs != 0 {
-		timeoutSecs = c.TimeoutSecs
-	}
 	config := gsclient.NewConfiguration(
 		apiURL,
 		c.UserUUID,
 		c.APIToken,
 		os.Getenv("TF_LOG") != "",
 		true,
-		timeoutSecs,
 		defaultGSCDelayIntervalMilliSecs,
 		defaultGSCMaxNumberOfRetries,
 	)
@@ -62,7 +55,7 @@ func (c *Config) Client() (*gsclient.Client, error) {
 
 	//Make sure the credentials are correct by getting the server list
 	//and init `globalServerStatusList` from fetched server list
-	err := initGlobalServerStatusList(emptyCtx, client)
+	err := initGlobalServerStatusList(context.Background(), client)
 
 	return client, err
 }

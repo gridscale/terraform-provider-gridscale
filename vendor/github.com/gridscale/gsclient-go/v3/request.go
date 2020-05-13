@@ -95,11 +95,22 @@ func (r *request) execute(ctx context.Context, c Client, output interface{}) err
 	var responseBodyBytes []byte
 	//
 	err = retryWithLimitedNumOfRetries(func() (bool, error) {
+		// no need to run when context is already expired
+		select {
+		case <-ctx.Done():
+			return false, ctx.Err()
+		default:
+		}
 		//execute the request
 		resp, err := httpClient.Do(request)
 		if err != nil {
+			//If the error is caused by expired context, return context error and no need to retry
+			if ctx.Err() != nil {
+				return false, ctx.Err()
+			}
+
 			if err, ok := err.(net.Error); ok {
-				// exclude retry request with none GET method (write operations) in case of a request timeout
+				// exclude retry request with none GET method (write operations) in case of a request timeout or a context error
 				if err.Timeout() && r.method != http.MethodGet {
 					return false, err
 				}

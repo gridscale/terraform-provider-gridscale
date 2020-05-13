@@ -1,9 +1,10 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
 
-	"github.com/gridscale/gsclient-go/v2"
+	"github.com/gridscale/gsclient-go/v3"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
@@ -78,7 +79,7 @@ func dataSourceGridscalePaaSSecurityZoneRead(d *schema.ResourceData, meta interf
 	client := meta.(*gsclient.Client)
 	id := d.Get("resource_id").(string)
 	errorPrefix := fmt.Sprintf("read paas security zone (%s) datasource -", id)
-	secZone, err := client.GetPaaSSecurityZone(emptyCtx, id)
+	secZone, err := client.GetPaaSSecurityZone(context.Background(), id)
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {

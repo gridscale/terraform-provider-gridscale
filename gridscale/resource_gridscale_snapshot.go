@@ -1,12 +1,14 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
 	"time"
 
-	"github.com/gridscale/gsclient-go/v2"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+
+	"github.com/gridscale/gsclient-go/v3"
 )
 
 func resourceGridscaleStorageSnapshot() *schema.Resource {
@@ -116,6 +118,11 @@ the product_no of the license (see the /prices endpoint for more details)`,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 		},
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
 	}
 }
 
@@ -123,7 +130,7 @@ func resourceGridscaleSnapshotRead(d *schema.ResourceData, meta interface{}) err
 	storageUuid := d.Get("storage_uuid").(string)
 	errorPrefix := fmt.Sprintf("read snapshot (%s) resource of storage (%s)-", d.Id(), storageUuid)
 	client := meta.(*gsclient.Client)
-	snapshot, err := client.GetStorageSnapshot(emptyCtx, storageUuid, d.Id())
+	snapshot, err := client.GetStorageSnapshot(context.Background(), storageUuid, d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
@@ -184,7 +191,10 @@ func resourceGridscaleSnapshotCreate(d *schema.ResourceData, meta interface{}) e
 		Name:   d.Get("name").(string),
 		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
-	response, err := client.CreateStorageSnapshot(emptyCtx, storageUUID, requestBody)
+
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
+	defer cancel()
+	response, err := client.CreateStorageSnapshot(ctx, storageUUID, requestBody)
 	if err != nil {
 		return err
 	}
@@ -198,7 +208,7 @@ func resourceGridscaleSnapshotCreate(d *schema.ResourceData, meta interface{}) e
 			//Rollback
 			log.Printf("Start rolling back storage %s with snapshot %s", storageUUID, response.ObjectUUID)
 			err = client.RollbackStorage(
-				emptyCtx,
+				ctx,
 				storageUUID,
 				response.ObjectUUID,
 				gsclient.StorageRollbackRequest{
@@ -236,7 +246,10 @@ func resourceGridscaleSnapshotUpdate(d *schema.ResourceData, meta interface{}) e
 		Name:   d.Get("name").(string),
 		Labels: &labels,
 	}
-	err := client.UpdateStorageSnapshot(emptyCtx, storageUUID, d.Id(), requestBody)
+
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
+	defer cancel()
+	err := client.UpdateStorageSnapshot(ctx, storageUUID, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -250,7 +263,7 @@ func resourceGridscaleSnapshotUpdate(d *schema.ResourceData, meta interface{}) e
 				//Rollback
 				log.Printf("Start rolling back storage %s with snapshot %s", storageUUID, d.Id())
 				err = client.RollbackStorage(
-					emptyCtx,
+					ctx,
 					storageUUID,
 					d.Id(),
 					gsclient.StorageRollbackRequest{
@@ -281,7 +294,10 @@ func resourceGridscaleSnapshotDelete(d *schema.ResourceData, meta interface{}) e
 	client := meta.(*gsclient.Client)
 	storageUUID := d.Get("storage_uuid").(string)
 	errorPrefix := fmt.Sprintf("delete snapshot (%s) resource of storage (%s) -", d.Id(), storageUUID)
-	err := client.DeleteStorageSnapshot(emptyCtx, storageUUID, d.Id())
+
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
+	defer cancel()
+	err := client.DeleteStorageSnapshot(ctx, storageUUID, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

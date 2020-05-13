@@ -3,12 +3,14 @@ package gridscale
 import (
 	"context"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"log"
 	"strings"
+	"time"
 
-	"github.com/gridscale/gsclient-go/v2"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+
+	"github.com/gridscale/gsclient-go/v3"
 )
 
 func resourceGridscaleStorage() *schema.Resource {
@@ -166,13 +168,18 @@ func resourceGridscaleStorage() *schema.Resource {
 				},
 			},
 		},
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
 	}
 }
 
 func resourceGridscaleStorageRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("read storage (%s) resource -", d.Id())
-	storage, err := client.GetStorage(emptyCtx, d.Id())
+	storage, err := client.GetStorage(context.Background(), d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
@@ -245,7 +252,9 @@ func resourceGridscaleStorageUpdate(d *schema.ResourceData, meta interface{}) er
 		Labels: &labels,
 	}
 
-	err := client.UpdateStorage(emptyCtx, d.Id(), requestBody)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
+	defer cancel()
+	err := client.UpdateStorage(ctx, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -293,7 +302,9 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 		requestBody.Template = &template
 	}
 
-	response, err := client.CreateStorage(emptyCtx, requestBody)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
+	defer cancel()
+	response, err := client.CreateStorage(ctx, requestBody)
 	if err != nil {
 		return err
 	}
@@ -308,7 +319,10 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 func resourceGridscaleStorageDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete storage (%s) resource -", d.Id())
-	storage, err := client.GetStorage(emptyCtx, d.Id())
+
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
+	defer cancel()
+	storage, err := client.GetStorage(ctx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -320,13 +334,13 @@ func resourceGridscaleStorageDelete(d *schema.ResourceData, meta interface{}) er
 			return err
 		}
 		//UnlinkStorage requires the server to be off
-		err = globalServerStatusList.runActionRequireServerOff(emptyCtx, client, server.ObjectUUID, false, unlinkStorageAction)
+		err = globalServerStatusList.runActionRequireServerOff(ctx, client, server.ObjectUUID, false, unlinkStorageAction)
 		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
 	}
 
-	err = client.DeleteStorage(emptyCtx, d.Id())
+	err = client.DeleteStorage(ctx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

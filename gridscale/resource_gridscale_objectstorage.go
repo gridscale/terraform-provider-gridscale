@@ -1,10 +1,13 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
-	"github.com/gridscale/gsclient-go/v2"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"log"
+	"time"
+
+	"github.com/gridscale/gsclient-go/v3"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 func resourceGridscaleObjectStorage() *schema.Resource {
@@ -27,13 +30,17 @@ func resourceGridscaleObjectStorage() *schema.Resource {
 				Computed:    true,
 			},
 		},
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
 	}
 }
 
 func resourceGridscaleObjectStorageRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("read object storage (%s) resource -", d.Id())
-	objectStorage, err := client.GetObjectStorageAccessKey(emptyCtx, d.Id())
+	objectStorage, err := client.GetObjectStorageAccessKey(context.Background(), d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
@@ -56,7 +63,9 @@ func resourceGridscaleObjectStorageRead(d *schema.ResourceData, meta interface{}
 func resourceGridscaleObjectStorageCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 
-	response, err := client.CreateObjectStorageAccessKey(emptyCtx)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
+	defer cancel()
+	response, err := client.CreateObjectStorageAccessKey(ctx)
 	if err != nil {
 		return err
 	}
@@ -70,7 +79,10 @@ func resourceGridscaleObjectStorageCreate(d *schema.ResourceData, meta interface
 func resourceGridscaleObjectStorageDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete object storage (%s) resource -", d.Id())
-	err := client.DeleteObjectStorageAccessKey(emptyCtx, d.Id())
+
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
+	defer cancel()
+	err := client.DeleteObjectStorageAccessKey(ctx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

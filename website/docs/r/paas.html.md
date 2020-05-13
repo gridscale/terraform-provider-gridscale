@@ -18,6 +18,9 @@ The following example shows how one might use this resource to add a PaaS to gri
 resource "gridscale_paas" "terra-paas-test" {
   name = "terra-paas-test"
   service_template_uuid = "f9625726-5ca8-4d5c-b9bd-3257e1e2211a"
+  timeouts {
+      create="10m"
+  }
 }
 ```
 
@@ -46,6 +49,15 @@ The following arguments are supported:
     * `limit` - (Required) The maximum number of the specific resource your service can use.
 
     * `type` - (Required) Primitive type of the parameter: bool, int (better use float for int case), float, string.
+
+## Timeouts
+
+Timeouts configuration options (in seconds):
+More info: https://www.terraform.io/docs/configuration/resources.html#operation-timeouts
+
+* `create` - (Default value is "5m" - 5 minutes) Used for Creating resource.
+* `update` - (Default value is "5m" - 5 minutes) Used for Updating resource.
+* `delete` - (Default value is "5m" - 5 minutes) Used for Deleteing resource.
 
 ## Attributes
 

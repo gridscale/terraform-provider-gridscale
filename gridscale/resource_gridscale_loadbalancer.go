@@ -1,10 +1,12 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
 	"strings"
+	"time"
 
-	"github.com/gridscale/gsclient-go/v2"
+	"github.com/gridscale/gsclient-go/v3"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
@@ -121,6 +123,11 @@ func resourceGridscaleLoadBalancer() *schema.Resource {
 				Required:    true,
 			},
 		},
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
 	}
 }
 
@@ -147,7 +154,10 @@ func resourceGridscaleLoadBalancerCreate(d *schema.ResourceData, meta interface{
 	if forwardingRules, ok := d.GetOk("forwarding_rule"); ok {
 		requestBody.ForwardingRules = expandLoadbalancerForwardingRules(forwardingRules)
 	}
-	response, err := client.CreateLoadBalancer(emptyCtx, requestBody)
+
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
+	defer cancel()
+	response, err := client.CreateLoadBalancer(ctx, requestBody)
 
 	if err != nil {
 		return fmt.Errorf(
@@ -160,7 +170,7 @@ func resourceGridscaleLoadBalancerCreate(d *schema.ResourceData, meta interface{
 func resourceGridscaleLoadBalancerRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("read loadbalancer (%s) resource -", d.Id())
-	loadbalancer, err := client.GetLoadBalancer(emptyCtx, d.Id())
+	loadbalancer, err := client.GetLoadBalancer(context.Background(), d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
@@ -231,7 +241,10 @@ func resourceGridscaleLoadBalancerUpdate(d *schema.ResourceData, meta interface{
 	if forwardingRules, ok := d.GetOk("forwarding_rule"); ok {
 		requestBody.ForwardingRules = expandLoadbalancerForwardingRules(forwardingRules)
 	}
-	err := client.UpdateLoadBalancer(emptyCtx, d.Id(), requestBody)
+
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
+	defer cancel()
+	err := client.UpdateLoadBalancer(ctx, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 
@@ -242,7 +255,10 @@ func resourceGridscaleLoadBalancerUpdate(d *schema.ResourceData, meta interface{
 func resourceGridscaleLoadBalancerDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete loadbalancer (%s) resource-", d.Id())
-	err := client.DeleteLoadBalancer(emptyCtx, d.Id())
+
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
+	defer cancel()
+	err := client.DeleteLoadBalancer(ctx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

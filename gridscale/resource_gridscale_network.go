@@ -8,7 +8,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 
-	"github.com/gridscale/gsclient-go/v2"
+	"github.com/gridscale/gsclient-go/v3"
 )
 
 func resourceGridscaleNetwork() *schema.Resource {
@@ -86,7 +86,9 @@ func resourceGridscaleNetwork() *schema.Resource {
 			},
 		},
 		Timeouts: &schema.ResourceTimeout{
-			Delete: schema.DefaultTimeout(time.Minute * 3),
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
 		},
 	}
 }
@@ -94,7 +96,7 @@ func resourceGridscaleNetwork() *schema.Resource {
 func resourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("read network (%s) resource -", d.Id())
-	network, err := client.GetNetwork(emptyCtx, d.Id())
+	network, err := client.GetNetwork(context.Background(), d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
@@ -157,7 +159,9 @@ func resourceGridscaleNetworkUpdate(d *schema.ResourceData, meta interface{}) er
 		Labels:     &labels,
 	}
 
-	err := client.UpdateNetwork(emptyCtx, d.Id(), requestBody)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
+	defer cancel()
+	err := client.UpdateNetwork(ctx, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -174,7 +178,9 @@ func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) er
 		Labels:     convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
-	response, err := client.CreateNetwork(emptyCtx, requestBody)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
+	defer cancel()
+	response, err := client.CreateNetwork(ctx, requestBody)
 	if err != nil {
 		return err
 	}
@@ -189,7 +195,10 @@ func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) er
 func resourceGridscaleNetworkDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete network (%s) resource -", d.Id())
-	net, err := client.GetNetwork(emptyCtx, d.Id())
+
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
+	defer cancel()
+	net, err := client.GetNetwork(ctx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -201,13 +210,13 @@ func resourceGridscaleNetworkDelete(d *schema.ResourceData, meta interface{}) er
 			return err
 		}
 		//UnlinkNetwork requires the server to be off
-		err = globalServerStatusList.runActionRequireServerOff(emptyCtx, client, server.ObjectUUID, false, unlinkNetAction)
+		err = globalServerStatusList.runActionRequireServerOff(ctx, client, server.ObjectUUID, false, unlinkNetAction)
 		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
 	}
 
-	err = client.DeleteNetwork(emptyCtx, d.Id())
+	err = client.DeleteNetwork(ctx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

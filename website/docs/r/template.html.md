@@ -28,6 +28,9 @@ resource "gridscale_snapshot" "foo" {
 resource "gridscale_template" "foo" {
   name   = "newname"
   snapshot_uuid = gridscale_snapshot.foo.id
+  timeouts {
+      create="10m"
+  }
 }
 ```
 
@@ -40,6 +43,15 @@ The following arguments are supported:
 * `snapshot_uuid` - (Required) Snapshot uuid for template.
 
 * `labels` - (Optional) List of labels.
+
+## Timeouts
+
+Timeouts configuration options (in seconds):
+More info: https://www.terraform.io/docs/configuration/resources.html#operation-timeouts
+
+* `create` - (Default value is "5m" - 5 minutes) Used for Creating resource.
+* `update` - (Default value is "5m" - 5 minutes) Used for Updating resource.
+* `delete` - (Default value is "5m" - 5 minutes) Used for Deleteing resource.
 
 ## Attributes Reference
 

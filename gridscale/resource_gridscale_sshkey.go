@@ -1,12 +1,14 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 
-	"github.com/gridscale/gsclient-go/v2"
+	"github.com/gridscale/gsclient-go/v3"
 )
 
 func resourceGridscaleSshkey() *schema.Resource {
@@ -51,13 +53,18 @@ func resourceGridscaleSshkey() *schema.Resource {
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 		},
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
 	}
 }
 
 func resourceGridscaleSshkeyRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("read SSH key (%s) resource -", d.Id())
-	sshkey, err := client.GetSshkey(emptyCtx, d.Id())
+	sshkey, err := client.GetSshkey(context.Background(), d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
@@ -102,7 +109,9 @@ func resourceGridscaleSshkeyUpdate(d *schema.ResourceData, meta interface{}) err
 		Labels: &labels,
 	}
 
-	err := client.UpdateSshkey(emptyCtx, d.Id(), requestBody)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
+	defer cancel()
+	err := client.UpdateSshkey(ctx, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -119,7 +128,9 @@ func resourceGridscaleSshkeyCreate(d *schema.ResourceData, meta interface{}) err
 		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
-	response, err := client.CreateSshkey(emptyCtx, requestBody)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
+	defer cancel()
+	response, err := client.CreateSshkey(ctx, requestBody)
 	if err != nil {
 		return err
 	}
@@ -134,7 +145,10 @@ func resourceGridscaleSshkeyCreate(d *schema.ResourceData, meta interface{}) err
 func resourceGridscaleSshkeyDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete SSH key (%s) resource -", d.Id())
-	err := client.DeleteSshkey(emptyCtx, d.Id())
+
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
+	defer cancel()
+	err := client.DeleteSshkey(ctx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

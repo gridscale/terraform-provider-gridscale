@@ -17,6 +17,9 @@ The following example shows how one might use this resource to add a security zo
 ```terraform
 resource "gridscale_paas_securityzone" "foo" {
   name = "test"
+  timeouts {
+      create="10m"
+  }
 }
 ```
 
@@ -26,6 +29,15 @@ The following arguments are supported:
 
 * `name` - (Required) The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
 * `location_uuid` - (Optional) Helps to identify which datacenter an object belongs to.
+
+## Timeouts
+
+Timeouts configuration options (in seconds):
+More info: https://www.terraform.io/docs/configuration/resources.html#operation-timeouts
+
+* `create` - (Default value is "5m" - 5 minutes) Used for Creating resource.
+* `update` - (Default value is "5m" - 5 minutes) Used for Updating resource.
+* `delete` - (Default value is "5m" - 5 minutes) Used for Deleteing resource.
 
 ## Attributes
 

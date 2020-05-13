@@ -16,6 +16,9 @@ Provides an ISO Image resource. This can be used to create, modify and delete IS
 resource "gridscale_isoimage" "foo" {
   name   = "newname"
   source_url = "http://tinycorelinux.net/10.x/x86/release/TinyCore-current.iso"
+  timeouts {
+      create="10m"
+  }
 }
 ```
 
@@ -29,6 +32,15 @@ The following arguments are supported:
 * `source_url` - (Required) Contains the source URL of the ISO Image that it was originally fetched from.
 
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
+
+## Timeouts
+
+Timeouts configuration options (in seconds):
+More info: https://www.terraform.io/docs/configuration/resources.html#operation-timeouts
+
+* `create` - (Default value is "5m" - 5 minutes) Used for Creating resource.
+* `update` - (Default value is "5m" - 5 minutes) Used for Updating resource.
+* `delete` - (Default value is "5m" - 5 minutes) Used for Deleteing resource.
 
 ## Attributes Reference
 

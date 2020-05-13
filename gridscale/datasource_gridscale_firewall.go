@@ -1,9 +1,10 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
 
-	"github.com/gridscale/gsclient-go/v2"
+	"github.com/gridscale/gsclient-go/v3"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
@@ -126,7 +127,7 @@ func dataSourceGridscaleFirewallRead(d *schema.ResourceData, meta interface{}) e
 	id := d.Get("resource_id").(string)
 	errorPrefix := fmt.Sprintf("read firewall (%s) datasource -", id)
 
-	fw, err := client.GetFirewall(emptyCtx, id)
+	fw, err := client.GetFirewall(context.Background(), id)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

@@ -1,9 +1,10 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
 
-	"github.com/gridscale/gsclient-go/v2"
+	"github.com/gridscale/gsclient-go/v3"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
@@ -107,7 +108,7 @@ func dataSourceGridscaleIpv4Read(d *schema.ResourceData, meta interface{}) error
 	id := d.Get("resource_id").(string)
 	errorPrefix := fmt.Sprintf("read IPv4 (%s) datasource -", id)
 
-	ip, err := client.GetIP(emptyCtx, id)
+	ip, err := client.GetIP(context.Background(), id)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

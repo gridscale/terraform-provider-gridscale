@@ -1,6 +1,7 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
@@ -8,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 
-	"github.com/gridscale/gsclient-go/v2"
+	"github.com/gridscale/gsclient-go/v3"
 )
 
 func TestAccResourceGridscaleLoadBalancerBasic(t *testing.T) {
@@ -60,7 +61,7 @@ func testAccCheckResourceGridscaleLoadBalancerExists(n string, object *gsclient.
 
 		id := rs.Primary.ID
 
-		foundObject, err := client.GetLoadBalancer(emptyCtx, id)
+		foundObject, err := client.GetLoadBalancer(context.Background(), id)
 
 		if err != nil {
 			return err
@@ -143,7 +144,7 @@ func testAccCheckGridscaleLoadBalancerDestroyCheck(s *terraform.State) error {
 			continue
 		}
 
-		_, err := client.GetLoadBalancer(emptyCtx, rs.Primary.ID)
+		_, err := client.GetLoadBalancer(context.Background(), rs.Primary.ID)
 		if err != nil {
 			if requestError, ok := err.(gsclient.RequestError); ok {
 				if requestError.StatusCode != 404 {

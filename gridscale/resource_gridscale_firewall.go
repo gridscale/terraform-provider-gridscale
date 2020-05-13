@@ -1,12 +1,15 @@
 package gridscale
 
 import (
+	"context"
 	"errors"
 	"fmt"
-	"github.com/gridscale/gsclient-go/v2"
+	"log"
+	"time"
+
+	"github.com/gridscale/gsclient-go/v3"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	"log"
 )
 
 func resourceGridscaleFirewall() *schema.Resource {
@@ -119,13 +122,18 @@ func resourceGridscaleFirewall() *schema.Resource {
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 		},
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
 	}
 }
 
 func resourceGridscaleFirewallRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("read firewall (%s) resource -", d.Id())
-	template, err := client.GetFirewall(emptyCtx, d.Id())
+	template, err := client.GetFirewall(context.Background(), d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
@@ -236,7 +244,9 @@ func resourceGridscaleFirewallCreate(d *schema.ResourceData, meta interface{}) e
 		},
 	}
 
-	response, err := client.CreateFirewall(emptyCtx, requestBody)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
+	defer cancel()
+	response, err := client.CreateFirewall(ctx, requestBody)
 	if err != nil {
 		return err
 	}
@@ -280,7 +290,10 @@ func resourceGridscaleFirewallUpdate(d *schema.ResourceData, meta interface{}) e
 		RulesV4In:  rulesV4In,
 		RulesV4Out: rulesV4Out,
 	}
-	err := client.UpdateFirewall(emptyCtx, d.Id(), requestBody)
+
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
+	defer cancel()
+	err := client.UpdateFirewall(ctx, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -291,7 +304,10 @@ func resourceGridscaleFirewallUpdate(d *schema.ResourceData, meta interface{}) e
 func resourceGridscaleFirewallDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete firewall (%s) resource -", d.Id())
-	err := client.DeleteFirewall(emptyCtx, d.Id())
+
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
+	defer cancel()
+	err := client.DeleteFirewall(ctx, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

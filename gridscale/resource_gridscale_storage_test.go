@@ -1,6 +1,7 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
 	"testing"
 	"time"
@@ -9,7 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 
-	"github.com/gridscale/gsclient-go/v2"
+	"github.com/gridscale/gsclient-go/v3"
 )
 
 func TestAccResourceGridscaleStorage_Basic(t *testing.T) {
@@ -84,7 +85,7 @@ func testAccCheckResourceGridscaleStorageExists(n string, object *gsclient.Stora
 
 		id := rs.Primary.ID
 
-		foundObject, err := client.GetStorage(emptyCtx, id)
+		foundObject, err := client.GetStorage(context.Background(), id)
 
 		if err != nil {
 			return err
@@ -110,7 +111,7 @@ func testAccCheckGridscaleStorageDestroyCheck(s *terraform.State) error {
 		//We wait a while for the storage to delete, since it is not instant
 		time.Sleep(time.Second * 5)
 
-		_, err := client.GetStorage(emptyCtx, rs.Primary.ID)
+		_, err := client.GetStorage(context.Background(), rs.Primary.ID)
 		if err != nil {
 			if requestError, ok := err.(gsclient.RequestError); ok {
 				if requestError.StatusCode != 404 {

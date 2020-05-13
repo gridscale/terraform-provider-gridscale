@@ -1,6 +1,7 @@
 package gridscale
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strings"
@@ -9,7 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 
-	"github.com/gridscale/gsclient-go/v2"
+	"github.com/gridscale/gsclient-go/v3"
 )
 
 func resourceGridscaleStorageSnapshotSchedule() *schema.Resource {
@@ -94,6 +95,11 @@ func resourceGridscaleStorageSnapshotSchedule() *schema.Resource {
 				},
 			},
 		},
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
+		},
 	}
 }
 
@@ -101,7 +107,7 @@ func resourceGridscaleSnapshotScheduleRead(d *schema.ResourceData, meta interfac
 	client := meta.(*gsclient.Client)
 	storageUUID := d.Get("storage_uuid").(string)
 	errorPrefix := fmt.Sprintf("read snapshot schedule (%s) resource of storage (%s)-", d.Id(), storageUUID)
-	scheduler, err := client.GetStorageSnapshotSchedule(emptyCtx, storageUUID, d.Id())
+	scheduler, err := client.GetStorageSnapshotSchedule(context.Background(), storageUUID, d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
 			if requestError.StatusCode == 404 {
@@ -172,7 +178,10 @@ func resourceGridscaleSnapshotScheduleCreate(d *schema.ResourceData, meta interf
 		}
 		requestBody.NextRuntime = &gsclient.GSTime{Time: nextRuntime}
 	}
-	response, err := client.CreateStorageSnapshotSchedule(emptyCtx, d.Get("storage_uuid").(string), requestBody)
+
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
+	defer cancel()
+	response, err := client.CreateStorageSnapshotSchedule(ctx, d.Get("storage_uuid").(string), requestBody)
 	if err != nil {
 		return err
 	}
@@ -200,7 +209,10 @@ func resourceGridscaleSnapshotScheduleUpdate(d *schema.ResourceData, meta interf
 		}
 		requestBody.NextRuntime = &gsclient.GSTime{Time: nextRuntime}
 	}
-	err := client.UpdateStorageSnapshotSchedule(emptyCtx, storageUUID, d.Id(), requestBody)
+
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
+	defer cancel()
+	err := client.UpdateStorageSnapshotSchedule(ctx, storageUUID, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -211,7 +223,10 @@ func resourceGridscaleSnapshotScheduleDelete(d *schema.ResourceData, meta interf
 	client := meta.(*gsclient.Client)
 	storageUUID := d.Get("storage_uuid").(string)
 	errorPrefix := fmt.Sprintf("delete snapshot schedule (%s) resource of storage (%s)-", d.Id(), storageUUID)
-	err := client.DeleteStorageSnapshotSchedule(emptyCtx, storageUUID, d.Id())
+
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
+	defer cancel()
+	err := client.DeleteStorageSnapshotSchedule(ctx, storageUUID, d.Id())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}

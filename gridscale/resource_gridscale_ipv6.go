@@ -1,10 +1,11 @@
 package gridscale
 
 import (
+	"context"
 	"log"
 	"time"
 
-	"github.com/gridscale/gsclient-go/v2"
+	"github.com/gridscale/gsclient-go/v3"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
@@ -101,7 +102,9 @@ func resourceGridscaleIpv6() *schema.Resource {
 			},
 		},
 		Timeouts: &schema.ResourceTimeout{
-			Delete: schema.DefaultTimeout(time.Minute * 3),
+			Create: schema.DefaultTimeout(5 * time.Minute),
+			Update: schema.DefaultTimeout(5 * time.Minute),
+			Delete: schema.DefaultTimeout(5 * time.Minute),
 		},
 	}
 }
@@ -117,7 +120,9 @@ func resourceGridscaleIpv6Create(d *schema.ResourceData, meta interface{}) error
 		Labels:     convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
-	response, err := client.CreateIP(emptyCtx, requestBody)
+	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
+	defer cancel()
+	response, err := client.CreateIP(ctx, requestBody)
 	if err != nil {
 		return err
 	}
