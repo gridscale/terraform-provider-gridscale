@@ -1,4 +1,4 @@
-package relationManager
+package relationmanager
 
 import (
 	"context"

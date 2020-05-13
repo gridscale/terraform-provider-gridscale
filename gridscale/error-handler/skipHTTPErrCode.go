@@ -1,4 +1,4 @@
-package error_handler
+package errorhandler
 
 import "github.com/gridscale/gsclient-go/v3"
 
