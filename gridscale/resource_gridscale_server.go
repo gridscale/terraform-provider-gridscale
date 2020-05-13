@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	errHandler "github.com/terraform-providers/terraform-provider-gridscale/gridscale/error_handler"
+	errHandler "github.com/terraform-providers/terraform-provider-gridscale/gridscale/error-handler"
 	relation_manager "github.com/terraform-providers/terraform-provider-gridscale/gridscale/relation-manager"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"

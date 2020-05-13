@@ -7,7 +7,7 @@ import (
 
 	"github.com/gridscale/gsclient-go/v3"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	errHandler "github.com/terraform-providers/terraform-provider-gridscale/gridscale/error_handler"
+	errHandler "github.com/terraform-providers/terraform-provider-gridscale/gridscale/error-handler"
 )
 
 //firewallRuleTypes defines all types of firewall rules
