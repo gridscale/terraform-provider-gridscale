@@ -11,7 +11,7 @@ import (
 	"github.com/gridscale/gsclient-go/v3"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	errHandler "github.com/terraform-providers/terraform-provider-gridscale/gridscale/error_handler"
+	errHandler "github.com/terraform-providers/terraform-provider-gridscale/gridscale/error-handler"
 )
 
 func resourceGridscaleFirewall() *schema.Resource {
