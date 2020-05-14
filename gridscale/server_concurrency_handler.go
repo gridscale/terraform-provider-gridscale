@@ -103,7 +103,8 @@ func (l *serverStatusList) removeServerSynchronously(ctx context.Context, c *gsc
 		}
 		return fmt.Errorf("server (%s) is already deleted", id)
 	}
-	return fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
+	log.Printf("server (%s) does not exist in current list of servers in terraform", id)
+	return nil
 }
 
 //startServerSynchronously starts the servers synchronously. That means the server
