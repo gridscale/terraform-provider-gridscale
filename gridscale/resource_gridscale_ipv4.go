@@ -232,7 +232,8 @@ func resourceGridscaleIpDelete(d *schema.ResourceData, meta interface{}) error {
 	defer cancel()
 
 	ip, err := client.GetIP(ctx, d.Id())
-	if err != nil {
+	//In case of 404, don't catch the error
+	if errHandler.RemoveErrorContainsHTTPCodes(err, http.StatusNotFound) != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 	//Stop the server relating to this IP address if there is one

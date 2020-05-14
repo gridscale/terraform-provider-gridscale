@@ -201,7 +201,8 @@ func resourceGridscaleNetworkDelete(d *schema.ResourceData, meta interface{}) er
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
 	defer cancel()
 	net, err := client.GetNetwork(ctx, d.Id())
-	if err != nil {
+	//In case of 404, don't catch the error
+	if errHandler.RemoveErrorContainsHTTPCodes(err, http.StatusNotFound) != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
