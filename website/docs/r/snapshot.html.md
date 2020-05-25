@@ -36,9 +36,9 @@ The following arguments are supported:
 
 * `labels` - (Optional) The list of labels.
 
-* `s3_export` - (Optional) Export snapshot to a s3 storage.
+* `object_storage_export` - (Optional) Export snapshot to a object storage.
 
-    * `host` - (Required) Host of s3 storage. Must be of URL type. E.g: https://gos3.io
+    * `host` - (Required) Host of object storage. Must be of URL type. E.g: https://gos3.io
 
     * `access_key` - (Required) Access key.
 
@@ -81,7 +81,7 @@ The following attributes are exported:
 * `current_price` - The price for the current period since the last bill.
 * `capacity` - The capacity of the snapshot in GB.
 * `license_product_no` - If a template has been used that requires a license key (e.g. Windows Servers) this shows the product_no of the license (see the /prices endpoint for more details).
-* `s3_export` - See Argument Reference above.
+* `object_storage_export` - See Argument Reference above.
     * `host` - See Argument Reference above.
     * `access_key` - See Argument Reference above.
     * `secret_key` - See Argument Reference above.
