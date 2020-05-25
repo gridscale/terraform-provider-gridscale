@@ -118,7 +118,7 @@ the product_no of the license (see the /prices endpoint for more details)`,
 							Required:    true,
 							Description: "Bucket name",
 						},
-						"filename": {
+						"object": {
 							Type:        schema.TypeString,
 							Required:    true,
 							Description: "Name of file (include file path)",
@@ -295,7 +295,7 @@ func resourceGridscaleSnapshotCreate(d *schema.ResourceData, meta interface{}) e
 				S3data: gsclient.S3data{
 					Host:     objStorageHost,
 					Bucket:   exportReqData["bucket"].(string),
-					Filename: exportReqData["filename"].(string),
+					Filename: exportReqData["object"].(string),
 					Private:  exportReqData["private"].(bool),
 				},
 			}
@@ -388,7 +388,7 @@ func resourceGridscaleSnapshotUpdate(d *schema.ResourceData, meta interface{}) e
 					S3data: gsclient.S3data{
 						Host:     objStorageHost,
 						Bucket:   exportReqData["bucket"].(string),
-						Filename: exportReqData["filename"].(string),
+						Filename: exportReqData["object"].(string),
 						Private:  exportReqData["private"].(bool),
 					},
 				}
