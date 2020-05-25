@@ -92,16 +92,16 @@ the product_no of the license (see the /prices endpoint for more details)`,
 				ForceNew:    true,
 				Description: "Uuid of the storage used to create this snapshot",
 			},
-			"s3_export": {
+			"object_storage_export": {
 				Type:        schema.TypeSet,
 				Optional:    true,
-				Description: "Export snapshot to a s3 storage",
+				Description: "Export snapshot to a object storage",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"host": {
 							Type:        schema.TypeString,
 							Required:    true,
-							Description: "Host of s3 storage. Must be of URL type. E.g: https://gos3.io",
+							Description: "Host of object storage. Must be of URL type. E.g: https://gos3.io",
 						},
 						"access_key": {
 							Type:        schema.TypeString,
@@ -276,24 +276,24 @@ func resourceGridscaleSnapshotCreate(d *schema.ResourceData, meta interface{}) e
 			return fmt.Errorf("%s error setting rollback: %v", errorPrefix, err)
 		}
 	}
-	//Start exporting the snapshot to s3 storage if s3 storage data is set
-	if attr, ok := d.GetOk("s3_export"); ok {
+	//Start exporting the snapshot to object storage if object storage data is set
+	if attr, ok := d.GetOk("object_storage_export"); ok {
 		requests := make([]interface{}, 0)
 		for _, requestProps := range attr.(*schema.Set).List() {
 			exportReqData := requestProps.(map[string]interface{})
-			s3host := exportReqData["host"].(string)
-			s3hostURL, err := url.Parse(s3host)
+			objStorageHost := exportReqData["host"].(string)
+			objStorageHostURL, err := url.Parse(objStorageHost)
 			if err != nil {
 				return err
 			}
 			exportReqBody := gsclient.StorageSnapshotExportToS3Request{
 				S3auth: gsclient.S3auth{
-					Host:      s3hostURL.Host,
+					Host:      objStorageHostURL.Host,
 					AccessKey: exportReqData["access_key"].(string),
 					SecretKey: exportReqData["secret_key"].(string),
 				},
 				S3data: gsclient.S3data{
-					Host:     s3host,
+					Host:     objStorageHost,
 					Bucket:   exportReqData["bucket"].(string),
 					Filename: exportReqData["filename"].(string),
 					Private:  exportReqData["private"].(bool),
@@ -308,7 +308,7 @@ func resourceGridscaleSnapshotCreate(d *schema.ResourceData, meta interface{}) e
 			requests = append(requests, exportReqData)
 		}
 		//Apply value back to schema
-		if err = d.Set("s3_export", requests); err != nil {
+		if err = d.Set("object_storage_export", requests); err != nil {
 			return fmt.Errorf("%s error setting export: %v", errorPrefix, err)
 		}
 	}
@@ -368,25 +368,25 @@ func resourceGridscaleSnapshotUpdate(d *schema.ResourceData, meta interface{}) e
 			return fmt.Errorf("%s error setting rollback: %v", errorPrefix, err)
 		}
 	}
-	//Start exporting the snapshot to s3 storage if s3 storage data is set
-	if attr, ok := d.GetOk("s3_export"); ok {
+	//Start exporting the snapshot to object storage if object storage data is set
+	if attr, ok := d.GetOk("object_storage_export"); ok {
 		requests := make([]interface{}, 0)
 		for _, requestProps := range attr.(*schema.Set).List() {
 			exportReqData := requestProps.(map[string]interface{})
 			if exportReqData["status"] == "" {
-				s3host := exportReqData["host"].(string)
-				s3hostURL, err := url.Parse(s3host)
+				objStorageHost := exportReqData["host"].(string)
+				objStorageHostURL, err := url.Parse(objStorageHost)
 				if err != nil {
 					return err
 				}
 				exportReqBody := gsclient.StorageSnapshotExportToS3Request{
 					S3auth: gsclient.S3auth{
-						Host:      s3hostURL.Host,
+						Host:      objStorageHostURL.Host,
 						AccessKey: exportReqData["access_key"].(string),
 						SecretKey: exportReqData["secret_key"].(string),
 					},
 					S3data: gsclient.S3data{
-						Host:     s3host,
+						Host:     objStorageHost,
 						Bucket:   exportReqData["bucket"].(string),
 						Filename: exportReqData["filename"].(string),
 						Private:  exportReqData["private"].(bool),
@@ -402,7 +402,7 @@ func resourceGridscaleSnapshotUpdate(d *schema.ResourceData, meta interface{}) e
 			requests = append(requests, exportReqData)
 		}
 		//Apply value back to schema
-		if err = d.Set("s3_export", requests); err != nil {
+		if err = d.Set("object_storage_export", requests); err != nil {
 			return fmt.Errorf("%s error setting export: %v", errorPrefix, err)
 		}
 	}
