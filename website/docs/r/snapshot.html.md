@@ -46,7 +46,7 @@ The following arguments are supported:
 
     * `bucket` - (Required) Bucket name.
 
-    * `filename` - (Required) Name of file (include file path).
+    * `object` - (Required) Name of file (include file path).
 
     * `private` - (Required) Privacy.
 
@@ -86,7 +86,7 @@ The following attributes are exported:
     * `access_key` - See Argument Reference above.
     * `secret_key` - See Argument Reference above.
     * `bucket` - See Argument Reference above.
-    * `filename` - See Argument Reference above.
+    * `object` - See Argument Reference above.
     * `private` - See Argument Reference above.
     * `status` - Status of the export request.
 * `rollback` - See Argument Reference above.
