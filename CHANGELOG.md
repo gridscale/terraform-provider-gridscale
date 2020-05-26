@@ -1,4 +1,19 @@
 ## 1.6.0 (Unreleased)
+
+FEATURES:
+
+* Support exporting snapshot to object storage.
+* Support specific timeouts.
+
+IMPROVEMENTS:
+
+* Update gsclient-go package to v3.0.0
+* Update and tidy the vendor directory.
+* Remove unnecessary/dummy variables.
+* Skip 404 when deleting a resource (and 409 when deleting a server-related resource).
+* Recontruct some internal packages (rename/create).
+* Increase default timeouts of PaaS operations to 15 minutes.
+
 ## 1.5.1 (April 06, 2020)
 
 IMPROVEMENTS:
