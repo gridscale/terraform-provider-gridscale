@@ -12,10 +12,9 @@ enhancement requests, bug reports, or code contributions!
 ## Reporting Bugs or Enhancement Requests
 
 Please submit bugs or enhancement requests through the public bug tracker within the
-github project.
+GitHub project.
 
 ## Submitting Patches
 
-The gsclient-go source code is managed using the git distributed source control 
+The gsclient-go source code is managed using the git distributed source control
 management tool <https://www.git-scm.org/>. Please submit patches accordingly.
-

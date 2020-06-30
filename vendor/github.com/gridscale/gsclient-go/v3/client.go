@@ -7,8 +7,6 @@ import (
 	"net/http"
 	"path"
 	"time"
-
-	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -41,11 +39,6 @@ func NewClient(c *Config) *Client {
 		cfg: c,
 	}
 	return client
-}
-
-//Logger returns logger
-func (c *Client) Logger() logrus.Logger {
-	return c.cfg.logger
 }
 
 //HttpClient returns http client
@@ -88,13 +81,18 @@ func (c *Client) APIToken() string {
 	return c.cfg.apiToken
 }
 
+//WithHTTPHeaders adds custom HTTP headers to Client
+func (c *Client) WithHTTPHeaders(headers map[string]string) {
+	c.cfg.httpHeaders = headers
+}
+
 //waitForRequestCompleted allows to wait for a request to complete
 func (c *Client) waitForRequestCompleted(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
 	return retryWithContext(ctx, func() (bool, error) {
-		r := request{
+		r := gsRequest{
 			uri:                 path.Join(requestBase, id),
 			method:              "GET",
 			skipCheckingRequest: true,

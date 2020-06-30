@@ -4,14 +4,17 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
+	"strconv"
+	"time"
 )
 
-//request gridscale's custom request struct
-type request struct {
+//gsRequest gridscale's custom gsRequest struct
+type gsRequest struct {
 	uri                 string
 	method              string
 	body                interface{}
@@ -58,51 +61,95 @@ func (r RequestError) Error() string {
 	return fmt.Sprintf(errorMessageFormat, r.StatusCode, message, r.RequestUUID)
 }
 
-const requestUUIDHeaderParam = "X-Request-Id"
+const (
+	requestUUIDHeaderParam           = "X-Request-Id"
+	requestRateLimitResetHeaderParam = "ratelimit-reset"
+)
 
 //This function takes the client and a struct and then adds the result to the given struct if possible
-func (r *request) execute(ctx context.Context, c Client, output interface{}) error {
-	url := c.cfg.apiURL + r.uri
-	logger := c.Logger()
-	httpClient := c.HttpClient()
+func (r *gsRequest) execute(ctx context.Context, c Client, output interface{}) error {
 
-	logger.Debugf("%v request sent to URL: %v", r.method, url)
+	//Prepare http request (including HTTP headers preparation, etc.)
+	httpReq, err := r.prepareHTTPRequest(ctx, c.cfg)
+	logger.Debugf("Request body: %v", httpReq.Body)
+	logger.Debugf("Request headers: %v", httpReq.Header)
+
+	//Execute the request (including retrying when needed)
+	requestUUID, responseBodyBytes, err := r.retryHTTPRequest(ctx, c.HttpClient(), httpReq, c.MaxNumberOfRetries(), c.DelayInterval())
+	if err != nil {
+		return err
+	}
+
+	//if output is set
+	if output != nil {
+		//Unmarshal body bytes to the given struct
+		err = json.Unmarshal(responseBodyBytes, output)
+		if err != nil {
+			logger.Errorf("Error while marshaling JSON: %v", err)
+			return err
+		}
+	}
+
+	//If the client is synchronous, and the request does not skip
+	//checking a request, wait until the request completes
+	if c.Synchronous() && !r.skipCheckingRequest {
+		return c.waitForRequestCompleted(ctx, requestUUID)
+	}
+	return nil
+}
+
+//prepareHTTPRequest prepares a http request
+func (r *gsRequest) prepareHTTPRequest(ctx context.Context, cfg *Config) (*http.Request, error) {
+	url := cfg.apiURL + r.uri
+	logger.Debugf("Preparing %v request sent to URL: %v", r.method, url)
 
 	//Convert the body of the request to json
 	jsonBody := new(bytes.Buffer)
 	if r.body != nil {
 		err := json.NewEncoder(jsonBody).Encode(r.body)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
 	//Add authentication headers and content type
 	request, err := http.NewRequest(r.method, url, jsonBody)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	request = request.WithContext(ctx)
-	request.Header.Set("User-Agent", c.UserAgent())
-	request.Header.Add("X-Auth-UserID", c.UserUUID())
-	request.Header.Add("X-Auth-Token", c.APIToken())
-	request.Header.Add("Content-Type", bodyType)
-	logger.Debugf("Request body: %v", request.Body)
+	request.Header.Set("User-Agent", cfg.userAgent)
+	request.Header.Set("X-Auth-UserID", cfg.userUUID)
+	request.Header.Set("X-Auth-Token", cfg.apiToken)
+	request.Header.Set("Content-Type", bodyType)
 
+	//Set headers based on a given list of custom headers
+	//Use Header.Set() instead of Header.Add() because we want to
+	//override the headers' values if they are already set.
+	for k, v := range cfg.httpHeaders {
+		request.Header.Set(k, v)
+	}
+
+	return request, nil
+}
+
+//retryHTTPRequest runs & retries a HTTP request
+//returns UUID (string), response body ([]byte), error
+func (r *gsRequest) retryHTTPRequest(
+	ctx context.Context,
+	httpClient *http.Client,
+	httpReq *http.Request,
+	maxNoOfRetries int,
+	delayInterval time.Duration,
+) (string, []byte, error) {
 	//Init request UUID variable
 	var requestUUID string
 	//Init empty response body
 	var responseBodyBytes []byte
 	//
-	err = retryWithLimitedNumOfRetries(func() (bool, error) {
-		// no need to run when context is already expired
-		select {
-		case <-ctx.Done():
-			return false, ctx.Err()
-		default:
-		}
+	err := retryWithLimitedNumOfRetries(func() (bool, error) {
 		//execute the request
-		resp, err := httpClient.Do(request)
+		resp, err := httpClient.Do(httpReq)
 		if err != nil {
 			//If the error is caused by expired context, return context error and no need to retry
 			if ctx.Err() != nil {
@@ -133,20 +180,35 @@ func (r *request) execute(ctx context.Context, c Client, output interface{}) err
 			return false, err
 		}
 
-		logger.Debugf("Status code: %v. Request UUID: %v.", statusCode, requestUUID)
+		logger.Debugf("Status code: %v. Request UUID: %v. Headers: %v", statusCode, requestUUID, resp.Header)
 
-		if resp.StatusCode >= 300 {
+		//If the status code is an error code
+		if statusCode >= 300 {
 			var errorMessage RequestError //error messages have a different structure, so they are read with a different struct
 			errorMessage.StatusCode = statusCode
 			errorMessage.RequestUUID = requestUUID
 			json.Unmarshal(responseBodyBytes, &errorMessage)
-			//if internal server error OR object is in status that does not allow the request, retry
-			if resp.StatusCode >= 500 || resp.StatusCode == 424 {
-				//retry (true) and accumulate error (in case that maximum number of retries is reached, and
-				//the latest error is still reported)
-				logger.Debugf("Retrying request: %v method sent to url %v with body %v", r.method, url, r.body)
+
+			//If the error is retryable
+			if isErrorHTTPCodeRetryable(statusCode) {
+				//If status code is 429, that means we reach the rate limit
+				if statusCode == 429 {
+					//Get the time that the rate limit will be reset
+					rateLimitResetTimestamp := resp.Header.Get(requestRateLimitResetHeaderParam)
+					//Get the delay time
+					delayMs, err := getDelayTimeInMsFromTimestampStr(rateLimitResetTimestamp)
+					if err != nil {
+						return false, err
+					}
+					//Delay the retry until the rate limit is reset
+					logger.Debugf("Delay request for %d ms: %v method sent to url %v with body %v", delayMs, r.method, httpReq.URL.RequestURI(), r.body)
+					time.Sleep(time.Duration(delayMs) * time.Millisecond)
+				}
+				logger.Debugf("Retrying request: %v method sent to url %v with body %v", r.method, httpReq.URL.RequestURI(), r.body)
 				return true, errorMessage
 			}
+
+			//If the error is not retryable
 			logger.Errorf(
 				"Error message: %v. Title: %v. Code: %v. Request UUID: %v.",
 				errorMessage.Description,
@@ -156,30 +218,44 @@ func (r *request) execute(ctx context.Context, c Client, output interface{}) err
 			)
 			//stop retrying (false) and return custom error
 			return false, errorMessage
+
 		}
 		logger.Debugf("Response body: %v", string(responseBodyBytes))
 		//stop retrying (false) as no more errors
 		return false, nil
-	}, c.MaxNumberOfRetries(), c.DelayInterval())
-	//if retry fails
+	}, maxNoOfRetries, delayInterval)
+	//No need to return when the context is already expired.
+	select {
+	case <-ctx.Done():
+		return "", nil, ctx.Err()
+	default:
+	}
+	return requestUUID, responseBodyBytes, err
+}
+
+func isErrorHTTPCodeRetryable(statusCode int) bool {
+	//if internal server error (>=500)
+	//OR object is in status that does not allow the request (424)
+	//OR we reach the rate limit (429), retry
+	if statusCode >= 500 || statusCode == 424 || statusCode == 429 {
+		return true
+	}
+	//stop retrying (false) and return custom error
+	return false
+}
+
+//getDelayTimeInMsFromTimestampStr takes a unix timestamp (ms) string
+//and returns the amount of ms to delay the next HTTP request retry
+//return error if the input string is not a valid unix timestamp(ms)
+func getDelayTimeInMsFromTimestampStr(timestamp string) (int64, error) {
+	if timestamp == "" {
+		return 0, errors.New("timestamp is empty")
+	}
+	//convert timestamp from string to int
+	timestampInt, err := strconv.ParseInt(timestamp, 10, 64)
 	if err != nil {
-		return err
+		return 0, err
 	}
-
-	//if output is set
-	if output != nil {
-		//Unmarshal body bytes to the given struct
-		err = json.Unmarshal(responseBodyBytes, output)
-		if err != nil {
-			logger.Errorf("Error while marshaling JSON: %v", err)
-			return err
-		}
-	}
-
-	//If the client is synchronous, and the request does not skip
-	//checking a request, wait until the request completes
-	if c.Synchronous() && !r.skipCheckingRequest {
-		return c.waitForRequestCompleted(ctx, requestUUID)
-	}
-	return nil
+	currentTimestampMs := time.Now().UnixNano() / 1000000
+	return timestampInt - currentTimestampMs, nil
 }

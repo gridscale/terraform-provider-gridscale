@@ -81,6 +81,9 @@ type Credential struct {
 
 	//The type of Service.
 	Type string `json:"type"`
+
+	//If the PaaS service is a k8s cluster, this field will be set.
+	KubeConfig string `json:"kubeconfig"`
 }
 
 //PaaSServiceCreateRequest is JSON struct of a request for creating a PaaS service
@@ -361,7 +364,7 @@ type PaaSSecurityZoneUpdateRequest struct {
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getPaasServices
 func (c *Client) GetPaaSServiceList(ctx context.Context) ([]PaaSService, error) {
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiPaaSBase, "services"),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
@@ -381,7 +384,7 @@ func (c *Client) GetPaaSServiceList(ctx context.Context) ([]PaaSService, error) 
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/createPaasService
 func (c *Client) CreatePaaSService(ctx context.Context, body PaaSServiceCreateRequest) (PaaSServiceCreateResponse, error) {
-	r := request{
+	r := gsRequest{
 		uri:    path.Join(apiPaaSBase, "services"),
 		method: http.MethodPost,
 		body:   body,
@@ -398,7 +401,7 @@ func (c *Client) GetPaaSService(ctx context.Context, id string) (PaaSService, er
 	if !isValidUUID(id) {
 		return PaaSService{}, errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiPaaSBase, "services", id),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
@@ -415,7 +418,7 @@ func (c *Client) UpdatePaaSService(ctx context.Context, id string, body PaaSServ
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:    path.Join(apiPaaSBase, "services", id),
 		method: http.MethodPatch,
 		body:   body,
@@ -430,7 +433,7 @@ func (c *Client) DeletePaaSService(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:    path.Join(apiPaaSBase, "services", id),
 		method: http.MethodDelete,
 	}
@@ -444,7 +447,7 @@ func (c *Client) GetPaaSServiceMetrics(ctx context.Context, id string) ([]PaaSSe
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiPaaSBase, "services", id, "metrics"),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
@@ -460,11 +463,27 @@ func (c *Client) GetPaaSServiceMetrics(ctx context.Context, id string) ([]PaaSSe
 	return metrics, err
 }
 
+//RenewK8sCredentials renew credentials of a k8s cluster.
+//If the PaaS is not a k8s cluster, the function will return an error.
+//
+//See:
+func (c *Client) RenewK8sCredentials(ctx context.Context, id string) error {
+	if !isValidUUID(id) {
+		return errors.New("'id' is invalid")
+	}
+	r := gsRequest{
+		uri:    path.Join(apiPaaSBase, "services", id, "renew_credentials"),
+		method: http.MethodPatch,
+		body:   emptyStruct{},
+	}
+	return r.execute(ctx, *c, nil)
+}
+
 //GetPaaSTemplateList returns a list of PaaS service templates
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getPaasServiceTemplates
 func (c *Client) GetPaaSTemplateList(ctx context.Context) ([]PaaSTemplate, error) {
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiPaaSBase, "service_templates"),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
@@ -485,7 +504,7 @@ func (c *Client) GetPaaSTemplateList(ctx context.Context) ([]PaaSTemplate, error
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getPaasSecurityZones
 func (c *Client) GetPaaSSecurityZoneList(ctx context.Context) ([]PaaSSecurityZone, error) {
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiPaaSBase, "security_zones"),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
@@ -505,7 +524,7 @@ func (c *Client) GetPaaSSecurityZoneList(ctx context.Context) ([]PaaSSecurityZon
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/createPaasSecurityZone
 func (c *Client) CreatePaaSSecurityZone(ctx context.Context, body PaaSSecurityZoneCreateRequest) (PaaSSecurityZoneCreateResponse, error) {
-	r := request{
+	r := gsRequest{
 		uri:    path.Join(apiPaaSBase, "security_zones"),
 		method: http.MethodPost,
 		body:   body,
@@ -522,7 +541,7 @@ func (c *Client) GetPaaSSecurityZone(ctx context.Context, id string) (PaaSSecuri
 	if !isValidUUID(id) {
 		return PaaSSecurityZone{}, errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiPaaSBase, "security_zones", id),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
@@ -539,7 +558,7 @@ func (c *Client) UpdatePaaSSecurityZone(ctx context.Context, id string, body Paa
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:    path.Join(apiPaaSBase, "security_zones", id),
 		method: http.MethodPatch,
 		body:   body,
@@ -554,7 +573,7 @@ func (c *Client) DeletePaaSSecurityZone(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:    path.Join(apiPaaSBase, "security_zones", id),
 		method: http.MethodDelete,
 	}
@@ -565,7 +584,7 @@ func (c *Client) DeletePaaSSecurityZone(ctx context.Context, id string) error {
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedPaasServices
 func (c *Client) GetDeletedPaaSServices(ctx context.Context) ([]PaaSService, error) {
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiDeletedBase, "paas_services"),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,

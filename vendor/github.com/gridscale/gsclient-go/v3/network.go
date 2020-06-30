@@ -181,7 +181,7 @@ func (c *Client) GetNetwork(ctx context.Context, id string) (Network, error) {
 	if !isValidUUID(id) {
 		return Network{}, errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiNetworkBase, id),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
@@ -195,7 +195,7 @@ func (c *Client) GetNetwork(ctx context.Context, id string) (Network, error) {
 //
 //See: https://gridscale.io/en//api-documentation/index.html#tag/network
 func (c *Client) CreateNetwork(ctx context.Context, body NetworkCreateRequest) (NetworkCreateResponse, error) {
-	r := request{
+	r := gsRequest{
 		uri:    apiNetworkBase,
 		method: http.MethodPost,
 		body:   body,
@@ -212,7 +212,7 @@ func (c *Client) DeleteNetwork(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:    path.Join(apiNetworkBase, id),
 		method: http.MethodDelete,
 	}
@@ -226,7 +226,7 @@ func (c *Client) UpdateNetwork(ctx context.Context, id string, body NetworkUpdat
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:    path.Join(apiNetworkBase, id),
 		method: http.MethodPatch,
 		body:   body,
@@ -238,7 +238,7 @@ func (c *Client) UpdateNetwork(ctx context.Context, id string, body NetworkUpdat
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getNetworks
 func (c *Client) GetNetworkList(ctx context.Context) ([]Network, error) {
-	r := request{
+	r := gsRequest{
 		uri:                 apiNetworkBase,
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
@@ -261,7 +261,7 @@ func (c *Client) GetNetworkEventList(ctx context.Context, id string) ([]Event, e
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiNetworkBase, id, "events"),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
@@ -296,7 +296,7 @@ func (c *Client) GetNetworksByLocation(ctx context.Context, id string) ([]Networ
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiLocationBase, id, "networks"),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
@@ -314,7 +314,7 @@ func (c *Client) GetNetworksByLocation(ctx context.Context, id string) ([]Networ
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedNetworks
 func (c *Client) GetDeletedNetworks(ctx context.Context) ([]Network, error) {
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiDeletedBase, "networks"),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,

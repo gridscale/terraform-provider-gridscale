@@ -1,6 +1,26 @@
 # Changelog
 
-## 3.0.0 (Unreleased)
+## 3.1.0 (June 30, 2020)
+
+FEATURES:
+* Storage can be increased its speed via UpdateStorage.
+* Support custom HTTP headers.
+* Be able to deal with gridscale API rate limiting. 
+
+IMPROVEMENTS:
+* Refactor `execute()` function.
+* Global Logger.
+
+## 3.0.1 (May 19, 2020)
+
+FEATURES:
+* Add K8S support (get k8s config, renew k8s cluster's credentials).
+
+BUG FIXES:
+* Fixed wrong import path in exmaples.
+* Fixed wrong import path in README.
+
+## 3.0.0 (May 6, 2020)
 
 FEATURES:
 * Add storage cloning.
@@ -16,7 +36,7 @@ IMPROVEMENTS:
 ## 2.2.2 (April 8, 2020)
 
 DEPRECATED FEATURES:
-* Deprecated and removed labels create/delete options. 
+* Deprecated and removed labels create/delete options.
 
 BUG FIXES:
 * Fixed "context is expired but still retrying".
@@ -25,7 +45,7 @@ BUG FIXES:
 ## 2.2.1 (January 21, 2020)
 
 BUG FIXES:
-* (Hot fix) Fix incompatible major version when using gomod due to missing `/v2` suffix in module path of `go.mod` file 
+* (Hot fix) Fix incompatible major version when using gomod due to missing `/v2` suffix in module path of `go.mod` file
 
 ## 2.2.0 (January 21, 2020)
 
@@ -86,7 +106,6 @@ IMPROVEMENTS:
 * Power-off server if graceful shutdown fails
 * Backward compatibility for server creation API
 
-
 ## 0.2.0 (August 23, 2019)
 
 FEATURES:
@@ -108,4 +127,3 @@ IMPROVEMENTS:
 ## 0.1.0 (January 2, 2019)
 
 - Initial release of gsclient-go.
-

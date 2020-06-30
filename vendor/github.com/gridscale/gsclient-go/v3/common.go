@@ -9,6 +9,9 @@ import (
 	"github.com/google/uuid"
 )
 
+type emptyStruct struct {
+}
+
 //retryableFunc defines a function that can be retried
 type retryableFunc func() (bool, error)
 

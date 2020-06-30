@@ -44,7 +44,7 @@ type LocationProperties struct {
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getLocations
 func (c *Client) GetLocationList(ctx context.Context) ([]Location, error) {
-	r := request{
+	r := gsRequest{
 		uri:                 apiLocationBase,
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
@@ -65,7 +65,7 @@ func (c *Client) GetLocation(ctx context.Context, id string) (Location, error) {
 	if !isValidUUID(id) {
 		return Location{}, errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiLocationBase, id),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,

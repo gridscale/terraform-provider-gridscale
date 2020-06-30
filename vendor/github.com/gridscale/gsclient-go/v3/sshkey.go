@@ -78,7 +78,7 @@ func (c *Client) GetSshkey(ctx context.Context, id string) (Sshkey, error) {
 	if !isValidUUID(id) {
 		return Sshkey{}, errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiSshkeyBase, id),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
@@ -92,7 +92,7 @@ func (c *Client) GetSshkey(ctx context.Context, id string) (Sshkey, error) {
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getSshKeys
 func (c *Client) GetSshkeyList(ctx context.Context) ([]Sshkey, error) {
-	r := request{
+	r := gsRequest{
 		uri:                 apiSshkeyBase,
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
@@ -111,7 +111,7 @@ func (c *Client) GetSshkeyList(ctx context.Context) ([]Sshkey, error) {
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/createSshKey
 func (c *Client) CreateSshkey(ctx context.Context, body SshkeyCreateRequest) (CreateResponse, error) {
-	r := request{
+	r := gsRequest{
 		uri:    apiSshkeyBase,
 		method: "POST",
 		body:   body,
@@ -128,7 +128,7 @@ func (c *Client) DeleteSshkey(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:    path.Join(apiSshkeyBase, id),
 		method: http.MethodDelete,
 	}
@@ -142,7 +142,7 @@ func (c *Client) UpdateSshkey(ctx context.Context, id string, body SshkeyUpdateR
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:    path.Join(apiSshkeyBase, id),
 		method: http.MethodPatch,
 		body:   body,
@@ -157,7 +157,7 @@ func (c *Client) GetSshkeyEventList(ctx context.Context, id string) ([]Event, er
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiSshkeyBase, id, "events"),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,

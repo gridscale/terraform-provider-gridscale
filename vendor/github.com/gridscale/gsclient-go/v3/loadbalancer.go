@@ -182,7 +182,7 @@ var (
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getLoadbalancers
 func (c *Client) GetLoadBalancerList(ctx context.Context) ([]LoadBalancer, error) {
-	r := request{
+	r := gsRequest{
 		uri:                 apiLoadBalancerBase,
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
@@ -203,7 +203,7 @@ func (c *Client) GetLoadBalancer(ctx context.Context, id string) (LoadBalancer, 
 	if !isValidUUID(id) {
 		return LoadBalancer{}, errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiLoadBalancerBase, id),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
@@ -222,7 +222,7 @@ func (c *Client) CreateLoadBalancer(ctx context.Context, body LoadBalancerCreate
 	if body.Labels == nil {
 		body.Labels = make([]string, 0)
 	}
-	r := request{
+	r := gsRequest{
 		uri:    apiLoadBalancerBase,
 		method: http.MethodPost,
 		body:   body,
@@ -244,7 +244,7 @@ func (c *Client) UpdateLoadBalancer(ctx context.Context, id string, body LoadBal
 	if body.Labels == nil {
 		body.Labels = make([]string, 0)
 	}
-	r := request{
+	r := gsRequest{
 		uri:    path.Join(apiLoadBalancerBase, id),
 		method: http.MethodPatch,
 		body:   body,
@@ -259,7 +259,7 @@ func (c *Client) GetLoadBalancerEventList(ctx context.Context, id string) ([]Eve
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiLoadBalancerBase, id, "events"),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
@@ -280,7 +280,7 @@ func (c *Client) DeleteLoadBalancer(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:    path.Join(apiLoadBalancerBase, id),
 		method: http.MethodDelete,
 	}

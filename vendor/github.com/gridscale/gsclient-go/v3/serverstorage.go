@@ -37,7 +37,7 @@ type ServerStorageRelationProperties struct {
 	//The target ID is a device (e.g. disk).
 	Target int `json:"target"`
 
-	//Is the common SCSI abbreviation of the Logical Unit Number. A lun is a unique identifier for a single disk or a composite of disks.
+	//Is the common SCSI abbreviation of the Logical Unit Number. A LUN is a unique identifier for a single disk or a composite of disks.
 	Lun int `json:"lun"`
 
 	//Defines the SCSI controller id. The SCSI defines transmission routes such as Serial Attached SCSI (SAS), Fibre Channel and iSCSI.
@@ -96,7 +96,7 @@ func (c *Client) GetServerStorageList(ctx context.Context, id string) ([]ServerS
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiServerBase, id, "storages"),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
@@ -113,7 +113,7 @@ func (c *Client) GetServerStorage(ctx context.Context, serverID, storageID strin
 	if !isValidUUID(serverID) || !isValidUUID(storageID) {
 		return ServerStorageRelationProperties{}, errors.New("'serverID' or 'storageID' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiServerBase, serverID, "storages", storageID),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
@@ -130,7 +130,7 @@ func (c *Client) UpdateServerStorage(ctx context.Context, serverID, storageID st
 	if !isValidUUID(serverID) || !isValidUUID(storageID) {
 		return errors.New("'serverID' or 'storageID' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:    path.Join(apiServerBase, serverID, "storages", storageID),
 		method: http.MethodPatch,
 		body:   body,
@@ -145,7 +145,7 @@ func (c *Client) CreateServerStorage(ctx context.Context, id string, body Server
 	if !isValidUUID(id) || !isValidUUID(body.ObjectUUID) {
 		return errors.New("'server_id' or 'storage_id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:    path.Join(apiServerBase, id, "storages"),
 		method: http.MethodPost,
 		body:   body,
@@ -160,7 +160,7 @@ func (c *Client) DeleteServerStorage(ctx context.Context, serverID, storageID st
 	if !isValidUUID(serverID) || !isValidUUID(storageID) {
 		return errors.New("'serverID' or 'storageID' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:    path.Join(apiServerBase, serverID, "storages", storageID),
 		method: http.MethodDelete,
 	}

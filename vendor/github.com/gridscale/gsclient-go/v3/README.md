@@ -1,5 +1,7 @@
 # The gridscale Go Client
+
 [![Build Status](https://travis-ci.com/gridscale/gsclient-go.svg?branch=master)](https://travis-ci.com/gridscale/gsclient-go) [![Go Report Card](https://goreportcard.com/badge/github.com/gridscale/gsclient-go)](https://goreportcard.com/report/github.com/gridscale/gsclient-go)
+[![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/gridscale/gsclient-go?label=release)](https://github.com/gridscale/gsclient-go/releases)
 
 This is a client for the gridscale API. It can be used to make an application interact with the gridscale cloud platform to create and manage resources.
 
@@ -10,12 +12,10 @@ To be able to use this client a number of steps need to be taken. First a gridsc
 ## Installation
 
 First the Go programming language will need to be installed. This can be done by using [the official Go installation guide](https://golang.org/doc/install) or by using the packages provided by your distribution.
- 
+
 Downloading the gridscale Go client can be done with the following go command:
 
-```
-go get github.com/gridscale/gsclient-go/v3
-```
+    $ go get github.com/gridscale/gsclient-go/v3
 
 ## Using the gridscale Client
 
@@ -23,11 +23,11 @@ To be able to use the gridscale Go client in an application it can be imported i
 
 ```go
 import (
-	"github.com/gridscale/gsclient-go"
+	"github.com/gridscale/gsclient-go/v3"
 )
 ```
 
-To get access to the functions of the Go client, a Client type needs to be created. This requires a Config type. Both of these can be created with the following code: 
+To get access to the functions of the Go client, a Client type needs to be created. This requires a Config type. Both of these can be created with the following code:
 
 ```go
 //Using default config
@@ -35,11 +35,11 @@ config := gsclient.DefaultConfiguration("User-UUID", "API-token")
 
 //OR Custom config
 config := gsclient.NewConfiguration(
-            "API-URL", 
-            "User-UUID", 
-            "API-token", 
+            "API-URL",
+            "User-UUID",
+            "API-token",
             false, //Set debug mode
-            true, //Set sync mode 
+            true, //Set sync mode
             500, //Delay (in milliseconds) between requests
             100, //Maximum number of retries
         )
@@ -107,7 +107,7 @@ if poweronErr != nil{
 }
 ```
 
-What options are available for each create and update request can be found in the source code. After installing it should be located in: 
+What options are available for each create and update request can be found in the source code. After installing it should be located in:
 ```
 ~/go/src/github.com/gridscale/gsclient-go
 ```
@@ -261,7 +261,7 @@ Not all endpoints have been implemented in this client, but new ones will be add
     * Firewall Create (CreateFirewall)
     * Firewall Update (UpdateFirewall)
     * Firewall Delete (DeleteFirewall)
-    * Firewall Events Get (GetFirewallEventList) 
+    * Firewall Events Get (GetFirewallEventList)
 * Event
     * Events Get (GetEventList)
 * Label

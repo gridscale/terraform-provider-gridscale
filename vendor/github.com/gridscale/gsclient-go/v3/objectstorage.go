@@ -77,7 +77,7 @@ type ObjectStorageBucketProperties struct {
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getAccessKeys
 func (c *Client) GetObjectStorageAccessKeyList(ctx context.Context) ([]ObjectStorageAccessKey, error) {
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiObjectStorageBase, "access_keys"),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
@@ -98,7 +98,7 @@ func (c *Client) GetObjectStorageAccessKey(ctx context.Context, id string) (Obje
 	if strings.TrimSpace(id) == "" {
 		return ObjectStorageAccessKey{}, errors.New("'id' is required")
 	}
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiObjectStorageBase, "access_keys", id),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
@@ -112,7 +112,7 @@ func (c *Client) GetObjectStorageAccessKey(ctx context.Context, id string) (Obje
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/createAccessKey
 func (c *Client) CreateObjectStorageAccessKey(ctx context.Context) (ObjectStorageAccessKeyCreateResponse, error) {
-	r := request{
+	r := gsRequest{
 		uri:    path.Join(apiObjectStorageBase, "access_keys"),
 		method: http.MethodPost,
 	}
@@ -128,7 +128,7 @@ func (c *Client) DeleteObjectStorageAccessKey(ctx context.Context, id string) er
 	if strings.TrimSpace(id) == "" {
 		return errors.New("'id' is required")
 	}
-	r := request{
+	r := gsRequest{
 		uri:    path.Join(apiObjectStorageBase, "access_keys", id),
 		method: http.MethodDelete,
 	}
@@ -139,7 +139,7 @@ func (c *Client) DeleteObjectStorageAccessKey(ctx context.Context, id string) er
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getBuckets
 func (c *Client) GetObjectStorageBucketList(ctx context.Context) ([]ObjectStorageBucket, error) {
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiObjectStorageBase, "buckets"),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,

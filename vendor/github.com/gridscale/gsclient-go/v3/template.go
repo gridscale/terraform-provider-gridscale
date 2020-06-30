@@ -116,7 +116,7 @@ func (c *Client) GetTemplate(ctx context.Context, id string) (Template, error) {
 	if !isValidUUID(id) {
 		return Template{}, errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiTemplateBase, id),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
@@ -130,7 +130,7 @@ func (c *Client) GetTemplate(ctx context.Context, id string) (Template, error) {
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getTemplates
 func (c *Client) GetTemplateList(ctx context.Context) ([]Template, error) {
-	r := request{
+	r := gsRequest{
 		uri:                 apiTemplateBase,
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
@@ -167,7 +167,7 @@ func (c *Client) GetTemplateByName(ctx context.Context, name string) (Template, 
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/createTemplate
 func (c *Client) CreateTemplate(ctx context.Context, body TemplateCreateRequest) (CreateResponse, error) {
-	r := request{
+	r := gsRequest{
 		uri:    apiTemplateBase,
 		method: http.MethodPost,
 		body:   body,
@@ -184,7 +184,7 @@ func (c *Client) UpdateTemplate(ctx context.Context, id string, body TemplateUpd
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:    path.Join(apiTemplateBase, id),
 		method: http.MethodPatch,
 		body:   body,
@@ -199,7 +199,7 @@ func (c *Client) DeleteTemplate(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:    path.Join(apiTemplateBase, id),
 		method: http.MethodDelete,
 	}
@@ -213,7 +213,7 @@ func (c *Client) GetTemplateEventList(ctx context.Context, id string) ([]Event, 
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiTemplateBase, id, "events"),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
@@ -234,7 +234,7 @@ func (c *Client) GetTemplatesByLocation(ctx context.Context, id string) ([]Templ
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiLocationBase, id, "templates"),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
@@ -252,7 +252,7 @@ func (c *Client) GetTemplatesByLocation(ctx context.Context, id string) ([]Templ
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedTemplates
 func (c *Client) GetDeletedTemplates(ctx context.Context) ([]Template, error) {
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiDeletedBase, "templates"),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,

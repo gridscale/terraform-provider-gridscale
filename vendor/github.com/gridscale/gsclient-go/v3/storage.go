@@ -226,6 +226,9 @@ type StorageUpdateRequest struct {
 
 	//The Capacity of the Storage in GB. Optional.
 	Capacity int `json:"capacity,omitempty"`
+
+	//Storage type. Allowed values: nil, DefaultStorageType, HighStorageType, InsaneStorageType. Optional. Downgrading is not supported
+	StorageType *storageType `json:"storage_type,omitempty"`
 }
 
 //All allowed storage type's values
@@ -248,7 +251,7 @@ func (c *Client) GetStorage(ctx context.Context, id string) (Storage, error) {
 	if !isValidUUID(id) {
 		return Storage{}, errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiStorageBase, id),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
@@ -262,7 +265,7 @@ func (c *Client) GetStorage(ctx context.Context, id string) (Storage, error) {
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getStorages
 func (c *Client) GetStorageList(ctx context.Context) ([]Storage, error) {
-	r := request{
+	r := gsRequest{
 		uri:                 apiStorageBase,
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
@@ -288,7 +291,7 @@ func (c *Client) GetStorageList(ctx context.Context) ([]Storage, error) {
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/createStorage
 func (c *Client) CreateStorage(ctx context.Context, body StorageCreateRequest) (CreateResponse, error) {
-	r := request{
+	r := gsRequest{
 		uri:    apiStorageBase,
 		method: http.MethodPost,
 		body:   body,
@@ -305,7 +308,7 @@ func (c *Client) DeleteStorage(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:    path.Join(apiStorageBase, id),
 		method: http.MethodDelete,
 	}
@@ -319,7 +322,7 @@ func (c *Client) UpdateStorage(ctx context.Context, id string, body StorageUpdat
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:    path.Join(apiStorageBase, id),
 		method: http.MethodPatch,
 		body:   body,
@@ -334,7 +337,7 @@ func (c *Client) GetStorageEventList(ctx context.Context, id string) ([]Event, e
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiStorageBase, id, "events"),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
@@ -355,7 +358,7 @@ func (c *Client) GetStoragesByLocation(ctx context.Context, id string) ([]Storag
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiLocationBase, id, "storages"),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
@@ -373,7 +376,7 @@ func (c *Client) GetStoragesByLocation(ctx context.Context, id string) ([]Storag
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedStorages
 func (c *Client) GetDeletedStorages(ctx context.Context) ([]Storage, error) {
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiDeletedBase, "storages"),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
@@ -394,7 +397,7 @@ func (c *Client) CloneStorage(ctx context.Context, id string) (CreateResponse, e
 	if !isValidUUID(id) {
 		return response, errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:    path.Join(apiStorageBase, id, "clone"),
 		method: http.MethodPost,
 	}

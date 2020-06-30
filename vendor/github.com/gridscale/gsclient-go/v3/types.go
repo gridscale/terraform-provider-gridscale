@@ -7,7 +7,7 @@ import (
 
 const gsTimeLayout = "2006-01-02T15:04:05Z"
 
-//GSTime is custom time type of Gridscale
+//GSTime is custom time type of gridscale
 type GSTime struct {
 	time.Time
 }

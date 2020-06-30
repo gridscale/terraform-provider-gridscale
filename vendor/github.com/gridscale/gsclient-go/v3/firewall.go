@@ -168,7 +168,7 @@ var (
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getFirewalls
 func (c *Client) GetFirewallList(ctx context.Context) ([]Firewall, error) {
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiFirewallBase),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
@@ -189,7 +189,7 @@ func (c *Client) GetFirewall(ctx context.Context, id string) (Firewall, error) {
 	if !isValidUUID(id) {
 		return Firewall{}, errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiFirewallBase, id),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
@@ -203,7 +203,7 @@ func (c *Client) GetFirewall(ctx context.Context, id string) (Firewall, error) {
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/createFirewall
 func (c *Client) CreateFirewall(ctx context.Context, body FirewallCreateRequest) (FirewallCreateResponse, error) {
-	r := request{
+	r := gsRequest{
 		uri:    path.Join(apiFirewallBase),
 		method: http.MethodPost,
 		body:   body,
@@ -220,7 +220,7 @@ func (c *Client) UpdateFirewall(ctx context.Context, id string, body FirewallUpd
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:    path.Join(apiFirewallBase, id),
 		method: http.MethodPatch,
 		body:   body,
@@ -235,7 +235,7 @@ func (c *Client) DeleteFirewall(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:    path.Join(apiFirewallBase, id),
 		method: http.MethodDelete,
 	}
@@ -249,7 +249,7 @@ func (c *Client) GetFirewallEventList(ctx context.Context, id string) ([]Event, 
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
 	}
-	r := request{
+	r := gsRequest{
 		uri:                 path.Join(apiFirewallBase, id, "events"),
 		method:              http.MethodGet,
 		skipCheckingRequest: true,
