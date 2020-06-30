@@ -1,4 +1,10 @@
-## 1.7.0 (Unreleased)
+## 1.6.1 (Unreleased)
+
+IMPROVEMENTS:
+
+* Update gsclient-go package to v3.1.0
+* Update and tidy the vendor directory.
+
 ## 1.6.0 (June 02, 2020)
 
 FEATURES:
