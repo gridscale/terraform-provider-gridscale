@@ -1,4 +1,4 @@
-## 1.6.1 (Unreleased)
+## 1.6.1 (June 30, 2020)
 
 IMPROVEMENTS:
 
