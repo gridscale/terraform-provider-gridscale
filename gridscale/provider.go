@@ -1,7 +1,6 @@
 package gridscale
 
 import (
-	"os"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -28,6 +27,12 @@ func Provider() terraform.ResourceProvider {
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("GRIDSCALE_URL", nil),
 				Description: "the url for the gridscale API.",
+			},
+			"http_headers": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("GRIDSCALE_TF_HEADERS", nil),
+				Description: "Custom HTTP headers",
 			},
 		},
 		DataSourcesMap: map[string]*schema.Resource{
@@ -75,7 +80,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		UserUUID:    d.Get("uuid").(string),
 		APIToken:    d.Get("token").(string),
 		APIUrl:      d.Get("api_url").(string),
-		HTTPHeaders: convertStrToHeaderMap(os.Getenv("GRIDSCALE_TF_HEADERS")),
+		HTTPHeaders: convertStrToHeaderMap(d.Get("http_headers").(string)),
 	}
 
 	return config.Client()
