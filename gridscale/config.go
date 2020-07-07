@@ -27,9 +27,10 @@ const (
 const serverShutdownTimeoutSecs = 120
 
 type Config struct {
-	UserUUID string
-	APIToken string
-	APIUrl   string
+	UserUUID    string
+	APIToken    string
+	APIUrl      string
+	HTTPHeaders map[string]string
 }
 
 func (c *Config) Client() (*gsclient.Client, error) {
@@ -50,6 +51,8 @@ func (c *Config) Client() (*gsclient.Client, error) {
 	)
 
 	client := gsclient.NewClient(config)
+	//Add HTTP headers to gs client
+	client.WithHTTPHeaders(c.HTTPHeaders)
 
 	log.Print("[INFO] gridscale client configured")
 

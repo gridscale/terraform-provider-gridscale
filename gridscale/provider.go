@@ -1,6 +1,9 @@
 package gridscale
 
 import (
+	"os"
+	"strings"
+
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
@@ -69,10 +72,29 @@ func Provider() terraform.ResourceProvider {
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	config := Config{
-		UserUUID: d.Get("uuid").(string),
-		APIToken: d.Get("token").(string),
-		APIUrl:   d.Get("api_url").(string),
+		UserUUID:    d.Get("uuid").(string),
+		APIToken:    d.Get("token").(string),
+		APIUrl:      d.Get("api_url").(string),
+		HTTPHeaders: convertStrToHeaderMap(os.Getenv("GRIDSCALE_TF_HEADERS")),
 	}
 
 	return config.Client()
+}
+
+// getHeaderMapFromStr converts string (format: "key1:val1,key2:val2")
+// to a HTTP header map
+func convertStrToHeaderMap(str string) map[string]string {
+	result := make(map[string]string)
+	// split string into comma separated headers
+	headers := strings.Split(str, ",")
+	for _, header := range headers {
+		if header != "" {
+			// split each header into a key and a value
+			kv := strings.Split(header, ":")
+			if len(kv) == 2 {
+				result[kv[0]] = kv[1]
+			}
+		}
+	}
+	return result
 }
