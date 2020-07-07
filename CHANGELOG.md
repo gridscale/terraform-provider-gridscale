@@ -1,4 +1,9 @@
-## 1.7.0 (Unreleased)
+## 1.6.2 (Unreleased)
+
+IMPROVEMENTS:
+
+* Custom HTTP headers are supported.)
+
 ## 1.6.1 (June 30, 2020)
 
 IMPROVEMENTS:
