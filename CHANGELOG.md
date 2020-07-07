@@ -2,7 +2,7 @@
 
 IMPROVEMENTS:
 
-* Custom HTTP headers are supported.)
+* Custom HTTP headers are supported.
 
 ## 1.6.1 (June 30, 2020)
 
