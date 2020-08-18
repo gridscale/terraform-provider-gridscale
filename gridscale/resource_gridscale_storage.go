@@ -46,7 +46,6 @@ func resourceGridscaleStorage() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "(one of storage, storage_high, storage_insane)",
 				Optional:    true,
-				ForceNew:    true,
 				Default:     "storage",
 				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
 					valid := false
