@@ -35,7 +35,6 @@ func resourceGridscaleStorage() *schema.Resource {
 				Type:         schema.TypeInt,
 				Description:  "The capacity of a storage in GB.",
 				Required:     true,
-				ForceNew:     true,
 				ValidateFunc: validation.IntAtLeast(1),
 			},
 			"location_uuid": {
