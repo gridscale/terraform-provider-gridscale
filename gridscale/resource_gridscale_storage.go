@@ -250,8 +250,18 @@ func resourceGridscaleStorageUpdate(d *schema.ResourceData, meta interface{}) er
 
 	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
 	requestBody := gsclient.StorageUpdateRequest{
-		Name:   d.Get("name").(string),
-		Labels: &labels,
+		Name:     d.Get("name").(string),
+		Capacity: d.Get("capacity").(int),
+		Labels:   &labels,
+	}
+
+	storageType := d.Get("storage_type").(string)
+	if storageType == "storage" {
+		requestBody.StorageType = gsclient.DefaultStorageType
+	} else if storageType == "storage_high" {
+		requestBody.StorageType = gsclient.HighStorageType
+	} else if storageType == "storage_insane" {
+		requestBody.StorageType = gsclient.InsaneStorageType
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
