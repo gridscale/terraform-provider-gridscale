@@ -1,4 +1,16 @@
-## 1.7.0 (Unreleased)
+## 1.6.3 (Aug 18, 2020)
+
+Prepare publishing to Terraform Registry.
+
+IMPROVEMENTS:
+
+* Remove redundant types in data sources.
+* Size and type of a storage can be modified.
+
+BUG FIXES:
+
+* Update of storage type won't force to create new storage.
+
 ## 1.6.2 (July 07, 2020)
 
 IMPROVEMENTS:
@@ -25,12 +37,13 @@ IMPROVEMENTS:
 * Update and tidy the vendor directory.
 * Remove unnecessary/dummy variables.
 * Skip 404 when deleting a resource (and 409 when deleting a server-related resource).
-* Recontruct some internal packages (rename/create).
+* Reconstruct some internal packages (rename/create).
 * Increase default timeouts of PaaS operations to 15 minutes.
 
 ## 1.5.1 (April 06, 2020)
 
 IMPROVEMENTS:
+
 * Fix documentation (wrong navigation, reorder the side menu).
 * Add link to multi-project example.
 * Add configurable timeout.
@@ -45,13 +58,13 @@ FEATURES:
 
 IMPROVEMENTS:
 
-* Switch to gsclient-go v2.2.1 from github (better connection error handling)
+* Switch to gsclient-go v2.2.1 from GitHub (better connection error handling)
 * Handle all errors when setting values
 * Robust error reporting
 * Fix bugs caused by:
-    * Missing properties
-    * Type mismatch
-    * Weak error handling
+  * Missing properties
+  * Type mismatch
+  * Weak error handling
 
 ## 1.4.0 (October 31, 2019)
 
@@ -61,7 +74,7 @@ FEATURES:
 
 IMPROVEMENTS:
 
-* Turn off server synchronously when removing resource attached to it 
+* Turn off server synchronously when removing resource attached to it
 * Bootdevice attribute has become `computed`
 * firewall_template_uuid has become `optional`
 * Server dependency manager features: Create/Update/Remove server's relations.
@@ -74,7 +87,7 @@ FEATURES:
 
 IMPROVEMENTS:
 
-* Switch to gsclient-go v2.0.0 from github
+* Switch to gsclient-go v2.0.0 from GitHub
 * Fix issue #13: Terraform destroy raises error when instances powered up (https://github.com/terraform-providers/terraform-provider-gridscale/issues/13)
 * Fix issue #12: Reducing cores / memory does not cause server shutdown (https://github.com/terraform-providers/terraform-provider-gridscale/issues/12)
 * Add tests for all available datasource
@@ -97,7 +110,7 @@ FEATURES:
 
 IMPROVEMENTS:
 
-* Switch to gsclient-go from github ([#14](https://github.com/terraform-providers/terraform-provider-template/issues/14))
+* Switch to gsclient-go from GitHub ([#14](https://github.com/terraform-providers/terraform-provider-template/issues/14))
 
 ## 1.0.0 (April 30, 2019)
 
