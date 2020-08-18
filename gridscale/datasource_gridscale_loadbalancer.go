@@ -14,7 +14,7 @@ func dataSourceGridscaleLoadBalancer() *schema.Resource {
 		Read: dataSourceGridscaleLoadBalancerRead,
 
 		Schema: map[string]*schema.Schema{
-			"resource_id": &schema.Schema{
+			"resource_id": {
 				Type:         schema.TypeString,
 				Required:     true,
 				Description:  "ID of a resource",

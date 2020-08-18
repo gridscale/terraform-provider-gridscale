@@ -14,7 +14,7 @@ func dataSourceGridscaleIpv6() *schema.Resource {
 		Read: dataSourceGridscaleIpv6Read,
 
 		Schema: map[string]*schema.Schema{
-			"resource_id": &schema.Schema{
+			"resource_id": {
 				Type:         schema.TypeString,
 				Required:     true,
 				Description:  "ID of a resource",

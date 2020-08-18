@@ -16,7 +16,7 @@ func dataSourceGridscaleTemplate() *schema.Resource {
 		Read: dataSourceGridscaleTemplateRead,
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:         schema.TypeString,
 				Required:     true,
 				Description:  "name of the domain",
