@@ -41,7 +41,7 @@ $ make build
 Using the Provider
 ------------------
 
-See the [gridscale provider documentation](https://www.terraform.io/docs/providers/gridscale) to get started on using the gridscale provider.
+See the [gridscale provider documentation](https://registry.terraform.io/providers/gridscale/gridscale/latest/docs) to get started on using the gridscale provider.
 
 Alternatively, this documentation can also be found within this repository. Check out [`website/docs/index.html.markdown`](website/docs/index.html.markdown) to get started. Documentation on how to create resources like servers, storages and networks can be found in [`website/docs/r`](website/docs/r). Documentation on how to add resources like storages, networks and IP addresses to servers, check out the documentation on datasources found in [`website/docs/d`](website/docs/d).
 
@@ -73,36 +73,32 @@ Available Features
 Developing the Provider
 ---------------------------
 
-If you wish to work on the provider, you'll first need [Go](http://www.golang.org) installed on your machine (version 1.8+ is *required*). You'll also need to correctly setup a [GOPATH](http://golang.org/doc/code.html#GOPATH), as well as adding `$GOPATH/bin` to your `$PATH`.
+If you wish to work on the provider, you'll first need [Go](http://www.golang.org) installed on your machine (version 1.13+ is *required*). You'll also need to correctly setup a [GOPATH](http://golang.org/doc/code.html#GOPATH), as well as adding `$GOPATH/bin` to your `$PATH`.
 
 To compile the provider, run `make build`. This will build the provider and put the provider binary in the `$GOPATH/bin` directory.
 
-```sh
-$ make build
-…
-$ $GOPATH/bin/terraform-provider-gridscale
-…
-```
+    $ make build
 
-In order to test the provider, you can simply run `make test`.
+To test the provider, simply run
 
-```sh
-$ make test
-```
+    $ make test
 
-In order to run the full suite of Acceptance tests, run `make testacc`.
+In order to run the full suite of acceptance tests, run `make testacc`. You will need to set `GRIDSCALE_UUID`, `GRIDSCALE_TOKEN`, and `GRIDSCALE_URL` environment variables to point to an existing project when running acceptance tests.
 
-*Note:* Acceptance tests create real resources, and often cost money to run.
+*Note:* acceptance tests create real resources, and often cost money to run.
 
-```sh
-$ make testacc
-```
+    $ make testacc
 
-In order to run a specific Acceptance test.
+To run a specific acceptance test, use `TESTARGS`.
 
-```sh
-$ make testacc TEST=./gridscale/ TESTARGS='-run=TestAccResourceGridscaleLoadBalancerBasic'
-```
+    $ make testacc TEST=./gridscale/ TESTARGS='-run=TestAccResourceGridscaleLoadBalancerBasic'
+
+Releasing the Provider
+----------------------
+
+A [GoReleaser](https://goreleaser.com/) configuration is provided that produces build artifacts matching the [layout required](https://www.terraform.io/docs/registry/providers/publishing.html#manually-preparing-a-release) to publish the provider in the Terraform Registry.
+
+Releases will appear as drafts. Once marked as published on the GitHub Releases page, they will become available via the Terraform Registry. Releases are signed with key ID (long) `4841EC2F6BC7BD4515F60C10047EC899C2DC3656`.
 
 Known Issues
 ---------------------------
