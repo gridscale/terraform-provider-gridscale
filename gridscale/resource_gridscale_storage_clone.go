@@ -28,7 +28,7 @@ func resourceGridscaleStorageClone() *schema.Resource {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
-				Description:  "ID of a storage client which will be cloned",
+				Description:  "ID of a storage instance which will be cloned",
 				ValidateFunc: validation.NoZeroValues,
 			},
 			"name": {
