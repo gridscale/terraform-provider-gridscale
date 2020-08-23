@@ -56,6 +56,7 @@ func Provider() terraform.ResourceProvider {
 		ResourcesMap: map[string]*schema.Resource{
 			"gridscale_server":                   resourceGridscaleServer(),
 			"gridscale_storage":                  resourceGridscaleStorage(),
+			"gridscale_storage_clone":            resourceGridscaleStorageClone(),
 			"gridscale_network":                  resourceGridscaleNetwork(),
 			"gridscale_ipv4":                     resourceGridscaleIpv4(),
 			"gridscale_ipv6":                     resourceGridscaleIpv6(),
