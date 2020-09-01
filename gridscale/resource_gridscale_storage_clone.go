@@ -28,7 +28,7 @@ func resourceGridscaleStorageClone() *schema.Resource {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
-				Description:  "ID of a storage instance which will be cloned",
+				Description:  "ID of the storage instance that will be cloned.",
 				ValidateFunc: validation.NoZeroValues,
 			},
 			"name": {
@@ -45,7 +45,7 @@ func resourceGridscaleStorageClone() *schema.Resource {
 			},
 			"location_uuid": {
 				Type:        schema.TypeString,
-				Description: "Helps to identify which datacenter an object belongs to.",
+				Description: "Identifies the data center this object belongs to.",
 				Computed:    true,
 			},
 			"storage_type": {
@@ -147,7 +147,7 @@ func resourceGridscaleStorageCloneCreate(d *schema.ResourceData, meta interface{
 
 	log.Printf("A new storage %s has been created by cloning storage %s", response.ObjectUUID, srcStorageID)
 
-	// If the user wants a new name and new capcatity for the storage clone
+	// If the user wants a new name and new capacity for the storage clone
 	// instead of the default values inherited from the source storage,
 	// change name and capacity of the storage clone to the desired ones.
 	sourceStorage, err := client.GetStorage(ctx, srcStorageID)
