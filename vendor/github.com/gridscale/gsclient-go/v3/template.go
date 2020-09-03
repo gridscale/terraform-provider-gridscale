@@ -8,6 +8,18 @@ import (
 	"path"
 )
 
+//TemplateOperator is an interface defining API of a template operator
+type TemplateOperator interface {
+	GetTemplate(ctx context.Context, id string) (Template, error)
+	GetTemplateByName(ctx context.Context, name string) (Template, error)
+	GetTemplateList(ctx context.Context) ([]Template, error)
+	CreateTemplate(ctx context.Context, body TemplateCreateRequest) (CreateResponse, error)
+	UpdateTemplate(ctx context.Context, id string, body TemplateUpdateRequest) error
+	DeleteTemplate(ctx context.Context, id string) error
+	GetDeletedTemplates(ctx context.Context) ([]Template, error)
+	GetTemplateEventList(ctx context.Context, id string) ([]Event, error)
+}
+
 //TemplateList JSON struct of a list of templates
 type TemplateList struct {
 	//Array of templates

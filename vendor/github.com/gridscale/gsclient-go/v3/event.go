@@ -5,6 +5,11 @@ import (
 	"net/http"
 )
 
+//EventOperator is an interface defining API of an event operator
+type EventOperator interface {
+	GetEventList(ctx context.Context) ([]Event, error)
+}
+
 //EventList is JSON struct of a list of events
 type EventList struct {
 	//Array of events

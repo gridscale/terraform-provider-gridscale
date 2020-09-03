@@ -7,6 +7,19 @@ import (
 	"path"
 )
 
+//StorageOperator is an interface defining API of a storage operator
+type StorageOperator interface {
+	GetStorage(ctx context.Context, id string) (Storage, error)
+	GetStorageList(ctx context.Context) ([]Storage, error)
+	GetStoragesByLocation(ctx context.Context, id string) ([]Storage, error)
+	CreateStorage(ctx context.Context, body StorageCreateRequest) (CreateResponse, error)
+	UpdateStorage(ctx context.Context, id string, body StorageUpdateRequest) error
+	CloneStorage(ctx context.Context, id string) (CreateResponse, error)
+	DeleteStorage(ctx context.Context, id string) error
+	GetDeletedStorages(ctx context.Context) ([]Storage, error)
+	GetStorageEventList(ctx context.Context, id string) ([]Event, error)
+}
+
 //StorageList JSON struct of a list of storages
 type StorageList struct {
 	//Array of storages
@@ -188,8 +201,8 @@ type StorageTemplate struct {
 	//The password has to be either plaintext or a crypt string (modular crypt format - MCF). Optional.
 	Password string `json:"password,omitempty"`
 
-	//Password type. Allowed values: nil, PlainPasswordType, CryptPasswordType. Optional.
-	PasswordType *passwordType `json:"password_type,omitempty"`
+	//Password type. Allowed values: not-set, PlainPasswordType, CryptPasswordType. Optional.
+	PasswordType PasswordType `json:"password_type,omitempty"`
 
 	//Hostname to set for the installed storage. The running server will use this as its hostname.
 	//Valid only for public Linux and Windows templates. Optional.
@@ -205,7 +218,7 @@ type StorageCreateRequest struct {
 	Name string `json:"name"`
 
 	//Storage type. Allowed values: nil, DefaultStorageType, HighStorageType, InsaneStorageType. Optional.
-	StorageType *storageType `json:"storage_type,omitempty"`
+	StorageType StorageType `json:"storage_type,omitempty"`
 
 	//An object holding important values such as hostnames, passwords, and SSH keys.
 	//Creating a storage with a template is required either sshkey or password.
@@ -228,20 +241,24 @@ type StorageUpdateRequest struct {
 	Capacity int `json:"capacity,omitempty"`
 
 	//Storage type. Allowed values: nil, DefaultStorageType, HighStorageType, InsaneStorageType. Optional. Downgrading is not supported
-	StorageType *storageType `json:"storage_type,omitempty"`
+	StorageType StorageType `json:"storage_type,omitempty"`
 }
 
+type StorageType string
+
 //All allowed storage type's values
-var (
-	DefaultStorageType = &storageType{"storage"}
-	HighStorageType    = &storageType{"storage_high"}
-	InsaneStorageType  = &storageType{"storage_insane"}
+const (
+	DefaultStorageType StorageType = "storage"
+	HighStorageType    StorageType = "storage_high"
+	InsaneStorageType  StorageType = "storage_insane"
 )
 
+type PasswordType string
+
 //All allowed password type's values
-var (
-	PlainPasswordType = &passwordType{"plain"}
-	CryptPasswordType = &passwordType{"crypt"}
+const (
+	PlainPasswordType PasswordType = "plain"
+	CryptPasswordType PasswordType = "crypt"
 )
 
 //GetStorage get a storage

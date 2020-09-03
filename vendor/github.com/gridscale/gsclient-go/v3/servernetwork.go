@@ -7,6 +7,17 @@ import (
 	"path"
 )
 
+//ServerNetworkRelationOperator is an interface defining API of a server-network relation operator
+type ServerNetworkRelationOperator interface {
+	GetServerNetworkList(ctx context.Context, id string) ([]ServerNetworkRelationProperties, error)
+	GetServerNetwork(ctx context.Context, serverID, networkID string) (ServerNetworkRelationProperties, error)
+	CreateServerNetwork(ctx context.Context, id string, body ServerNetworkRelationCreateRequest) error
+	UpdateServerNetwork(ctx context.Context, serverID, networkID string, body ServerNetworkRelationUpdateRequest) error
+	DeleteServerNetwork(ctx context.Context, serverID, networkID string) error
+	LinkNetwork(ctx context.Context, serverID, networkID, firewallTemplate string, bootdevice bool, order int, l3security []string, firewall *FirewallRules) error
+	UnlinkNetwork(ctx context.Context, serverID string, networkID string) error
+}
+
 //ServerNetworkRelationList JSON struct of a list of relations between a server and networks
 type ServerNetworkRelationList struct {
 	//Array of relations between a server and networks

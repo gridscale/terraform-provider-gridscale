@@ -7,6 +7,17 @@ import (
 	"path"
 )
 
+//ServerStorageRelationOperator is an interface defining API of a server-storage relation operator
+type ServerStorageRelationOperator interface {
+	GetServerStorageList(ctx context.Context, id string) ([]ServerStorageRelationProperties, error)
+	GetServerStorage(ctx context.Context, serverID, storageID string) (ServerStorageRelationProperties, error)
+	CreateServerStorage(ctx context.Context, id string, body ServerStorageRelationCreateRequest) error
+	UpdateServerStorage(ctx context.Context, serverID, storageID string, body ServerStorageRelationUpdateRequest) error
+	DeleteServerStorage(ctx context.Context, serverID, storageID string) error
+	LinkStorage(ctx context.Context, serverID string, storageID string, bootdevice bool) error
+	UnlinkStorage(ctx context.Context, serverID string, storageID string) error
+}
+
 //ServerStorageRelationList JSON struct of a list of relations between a server and storages
 type ServerStorageRelationList struct {
 	//Array of relations between a server and storages

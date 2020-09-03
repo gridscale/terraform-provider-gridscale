@@ -7,6 +7,16 @@ import (
 	"path"
 )
 
+//SSHKeyOperator is an interface defining API of a SSH-key operator
+type SSHKeyOperator interface {
+	GetSshkey(ctx context.Context, id string) (Sshkey, error)
+	GetSshkeyList(ctx context.Context) ([]Sshkey, error)
+	CreateSshkey(ctx context.Context, body SshkeyCreateRequest) (CreateResponse, error)
+	DeleteSshkey(ctx context.Context, id string) error
+	UpdateSshkey(ctx context.Context, id string, body SshkeyUpdateRequest) error
+	GetSshkeyEventList(ctx context.Context, id string) ([]Event, error)
+}
+
 //SshkeyList JSON struct of a list of SSH-keys
 type SshkeyList struct {
 	//Array of SSH-keys

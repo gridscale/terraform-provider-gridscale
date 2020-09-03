@@ -7,6 +7,16 @@ import (
 	"path"
 )
 
+//FirewallOperator is an interface defining API of a firewall operator
+type FirewallOperator interface {
+	GetFirewallList(ctx context.Context) ([]Firewall, error)
+	GetFirewall(ctx context.Context, id string) (Firewall, error)
+	CreateFirewall(ctx context.Context, body FirewallCreateRequest) (FirewallCreateResponse, error)
+	UpdateFirewall(ctx context.Context, id string, body FirewallUpdateRequest) error
+	DeleteFirewall(ctx context.Context, id string) error
+	GetFirewallEventList(ctx context.Context, id string) ([]Event, error)
+}
+
 //FirewallList is JSON structure of a list of firewalls
 type FirewallList struct {
 	//Array of firewalls
@@ -73,7 +83,7 @@ type FirewallRules struct {
 //FirewallRuleProperties is JSON struct of a firewall's rule properties
 type FirewallRuleProperties struct {
 	//Enum:"udp" "tcp". Allowed values: `TCPTransport`, `UDPTransport`
-	Protocol transportLayerProtocol `json:"protocol"`
+	Protocol TransportLayerProtocol `json:"protocol"`
 
 	//A Number between 1 and 65535, port ranges are seperated by a colon for FTP.
 	DstPort string `json:"dst_port,omitempty"`
@@ -158,10 +168,12 @@ type FirewallUpdateRequest struct {
 	Rules *FirewallRules `json:"rules,omitempty"`
 }
 
+type TransportLayerProtocol string
+
 //All available transport protocol
 var (
-	TCPTransport = transportLayerProtocol{"tcp"}
-	UDPTransport = transportLayerProtocol{"udp"}
+	TCPTransport TransportLayerProtocol = "tcp"
+	UDPTransport TransportLayerProtocol = "udp"
 )
 
 //GetFirewallList gets a list of available firewalls

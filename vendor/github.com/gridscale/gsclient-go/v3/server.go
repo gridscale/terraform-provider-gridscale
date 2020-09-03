@@ -7,6 +7,23 @@ import (
 	"path"
 )
 
+//ServerOperator is an interface defining API of a server operator
+type ServerOperator interface {
+	GetServer(ctx context.Context, id string) (Server, error)
+	GetServerList(ctx context.Context) ([]Server, error)
+	GetServersByLocation(ctx context.Context, id string) ([]Server, error)
+	CreateServer(ctx context.Context, body ServerCreateRequest) (ServerCreateResponse, error)
+	UpdateServer(ctx context.Context, id string, body ServerUpdateRequest) error
+	DeleteServer(ctx context.Context, id string) error
+	StartServer(ctx context.Context, id string) error
+	StopServer(ctx context.Context, id string) error
+	ShutdownServer(ctx context.Context, id string) error
+	IsServerOn(ctx context.Context, id string) (bool, error)
+	GetServerMetricList(ctx context.Context, id string) ([]ServerMetric, error)
+	GetServerEventList(ctx context.Context, id string) ([]Event, error)
+	GetDeletedServers(ctx context.Context) ([]Server, error)
+}
+
 //ServerList JSON struct of a list of servers
 type ServerList struct {
 	//Array of servers
@@ -115,10 +132,10 @@ type ServerCreateRequest struct {
 	Cores int `json:"cores"`
 
 	//Specifies the hardware settings for the virtual machine.
-	//Allowed values: nil, DefaultServerHardware, NestedServerHardware, LegacyServerHardware, CiscoCSRServerHardware,
+	//Allowed values: DefaultServerHardware, NestedServerHardware, LegacyServerHardware, CiscoCSRServerHardware,
 	//SophosUTMServerHardware, F5BigipServerHardware, Q35ServerHardware, Q35NestedServerHardware.
-	//HardwareProfile = nil => server hardware is normal type
-	HardwareProfile *serverHardwareProfile `json:"hardware_profile,omitempty"`
+	//HardwareProfile is not set => server hardware is normal type
+	HardwareProfile ServerHardwareProfile `json:"hardware_profile,omitempty"`
 
 	//Defines which Availability-Zone the Server is placed. Can be empty
 	AvailablityZone string `json:"availability_zone,omitempty"`
@@ -275,16 +292,18 @@ type ServerMetricProperties struct {
 	} `json:"storage_size"`
 }
 
+type ServerHardwareProfile string
+
 //All available server's hardware types
-var (
-	DefaultServerHardware   = &serverHardwareProfile{"default"}
-	NestedServerHardware    = &serverHardwareProfile{"nested"}
-	LegacyServerHardware    = &serverHardwareProfile{"legacy"}
-	CiscoCSRServerHardware  = &serverHardwareProfile{"cisco_csr"}
-	SophosUTMServerHardware = &serverHardwareProfile{"sophos_utm"}
-	F5BigipServerHardware   = &serverHardwareProfile{"f5_bigip"}
-	Q35ServerHardware       = &serverHardwareProfile{"q35"}
-	Q35NestedServerHardware = &serverHardwareProfile{"q35_nested"}
+const (
+	DefaultServerHardware   ServerHardwareProfile = "default"
+	NestedServerHardware    ServerHardwareProfile = "nested"
+	LegacyServerHardware    ServerHardwareProfile = "legacy"
+	CiscoCSRServerHardware  ServerHardwareProfile = "cisco_csr"
+	SophosUTMServerHardware ServerHardwareProfile = "sophos_utm"
+	F5BigipServerHardware   ServerHardwareProfile = "f5_bigip"
+	Q35ServerHardware       ServerHardwareProfile = "q35"
+	Q35NestedServerHardware ServerHardwareProfile = "q35_nested"
 )
 
 //GetServer gets a specific server based on given list

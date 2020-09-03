@@ -7,6 +7,24 @@ import (
 	"path"
 )
 
+//PaaSOperator is an interface defining API of a PaaS-related resource operator
+type PaaSOperator interface {
+	GetPaaSServiceList(ctx context.Context) ([]PaaSService, error)
+	GetPaaSService(ctx context.Context, id string) (PaaSService, error)
+	CreatePaaSService(ctx context.Context, body PaaSServiceCreateRequest) (PaaSServiceCreateResponse, error)
+	UpdatePaaSService(ctx context.Context, id string, body PaaSServiceUpdateRequest) error
+	DeletePaaSService(ctx context.Context, id string) error
+	GetPaaSServiceMetrics(ctx context.Context, id string) ([]PaaSServiceMetric, error)
+	GetPaaSTemplateList(ctx context.Context) ([]PaaSTemplate, error)
+	GetDeletedPaaSServices(ctx context.Context) ([]PaaSService, error)
+	RenewK8sCredentials(ctx context.Context, id string) error
+	GetPaaSSecurityZoneList(ctx context.Context) ([]PaaSSecurityZone, error)
+	GetPaaSSecurityZone(ctx context.Context, id string) (PaaSSecurityZone, error)
+	CreatePaaSSecurityZone(ctx context.Context, body PaaSSecurityZoneCreateRequest) (PaaSSecurityZoneCreateResponse, error)
+	UpdatePaaSSecurityZone(ctx context.Context, id string, body PaaSSecurityZoneUpdateRequest) error
+	DeletePaaSSecurityZone(ctx context.Context, id string) error
+}
+
 //PaaSServices is the JSON struct of a list of PaaS services
 type PaaSServices struct {
 	//Array of PaaS services
@@ -84,6 +102,9 @@ type Credential struct {
 
 	//If the PaaS service is a k8s cluster, this field will be set.
 	KubeConfig string `json:"kubeconfig"`
+
+	//Expiration time of k8s credential
+	ExpirationTime GSTime `json:"expiration_time"`
 }
 
 //PaaSServiceCreateRequest is JSON struct of a request for creating a PaaS service

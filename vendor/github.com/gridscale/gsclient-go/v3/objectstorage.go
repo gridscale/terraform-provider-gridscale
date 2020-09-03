@@ -8,6 +8,15 @@ import (
 	"strings"
 )
 
+//ObjectStorageOperator is an interface defining API of an object storage operator
+type ObjectStorageOperator interface {
+	GetObjectStorageAccessKeyList(ctx context.Context) ([]ObjectStorageAccessKey, error)
+	GetObjectStorageAccessKey(ctx context.Context, id string) (ObjectStorageAccessKey, error)
+	CreateObjectStorageAccessKey(ctx context.Context) (ObjectStorageAccessKeyCreateResponse, error)
+	DeleteObjectStorageAccessKey(ctx context.Context, id string) error
+	GetObjectStorageBucketList(ctx context.Context) ([]ObjectStorageBucket, error)
+}
+
 //ObjectStorageAccessKeyList is JSON structure of a list of Object Storage Access Keys
 type ObjectStorageAccessKeyList struct {
 	//Array of Object Storages' access keys
