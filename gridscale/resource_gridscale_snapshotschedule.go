@@ -33,8 +33,12 @@ func resourceGridscaleStorageSnapshotSchedule() *schema.Resource {
 			"next_runtime": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Computed:    true,
 				Description: "The date and time that the snapshot schedule will be run",
+			},
+			"next_runtime_computed": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The date and time that the snapshot schedule will be run. This date and time is computed by gridscale's server.",
 			},
 			"keep_snapshots": {
 				Type:         schema.TypeInt,
@@ -126,8 +130,8 @@ func resourceGridscaleSnapshotScheduleRead(d *schema.ResourceData, meta interfac
 	if err = d.Set("name", props.Name); err != nil {
 		return fmt.Errorf("%s error setting name: %v", errorPrefix, err)
 	}
-	if err = d.Set("next_runtime", props.NextRuntime.Format(timeLayout)); err != nil {
-		return fmt.Errorf("%s error setting next_runtime: %v", errorPrefix, err)
+	if err = d.Set("next_runtime_computed", props.NextRuntime.Format(timeLayout)); err != nil {
+		return fmt.Errorf("%s error setting next_runtime_computed: %v", errorPrefix, err)
 	}
 	if err = d.Set("keep_snapshots", props.KeepSnapshots); err != nil {
 		return fmt.Errorf("%s error setting keep_snapshots: %v", errorPrefix, err)

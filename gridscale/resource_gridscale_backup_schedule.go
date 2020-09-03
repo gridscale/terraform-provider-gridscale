@@ -34,6 +34,11 @@ func resourceGridscaleStorageBackupSchedule() *schema.Resource {
 				Required:    true,
 				Description: "The date and time that the storage backup schedule will be run. Format: \"2006-01-02 15:04:05\"",
 			},
+			"next_runtime_computed": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The date and time that the storage backup schedule will be run. This date and time is computed by gridscale's server.",
+			},
 			"keep_backups": {
 				Type:         schema.TypeInt,
 				Required:     true,
@@ -126,8 +131,8 @@ func resourceGridscaleBackupScheduleRead(d *schema.ResourceData, meta interface{
 	if err = d.Set("name", props.Name); err != nil {
 		return fmt.Errorf("%s error setting name: %v", errorPrefix, err)
 	}
-	if err = d.Set("next_runtime", props.NextRuntime.Format(timeLayout)); err != nil {
-		return fmt.Errorf("%s error setting next_runtime: %v", errorPrefix, err)
+	if err = d.Set("next_runtime_computed", props.NextRuntime.Format(timeLayout)); err != nil {
+		return fmt.Errorf("%s error setting next_runtime_computed: %v", errorPrefix, err)
 	}
 	if err = d.Set("keep_backups", props.KeepBackups); err != nil {
 		return fmt.Errorf("%s error setting keep_backups: %v", errorPrefix, err)
