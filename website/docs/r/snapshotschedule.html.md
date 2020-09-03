@@ -63,6 +63,7 @@ The following attributes are exported:
 * `status` - The status of the snapshot schedule.
 * `name` - See Argument Reference above.
 * `next_runtime` - See Argument Reference above.
+* `next_runtime_computed` - The date and time that the snapshot schedule will be run. This date and time is computed by gridscale's server.
 * `keep_snapshots` - See Argument Reference above.
 * `run_interval` - See Argument Reference above.
 * `create_time` - The date and time the snapshot schedule was initially created.
