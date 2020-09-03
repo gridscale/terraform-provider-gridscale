@@ -37,7 +37,7 @@ The following arguments are supported:
 
 * `storage_uuid` - (Required) UUID of the storage that the backup schedule belongs to.
 
-* `labels` - (Optional) The list of labels.
+* `active` - (Required) The status of the schedule active or not.
 
 * `next_runtime` - (Required) The date and time that the backup schedule will be run.
 
@@ -61,6 +61,7 @@ The following attributes are exported:
 * `id` - The UUID of the backup schedule.
 * `storage_uuid` - See Argument Reference above.
 * `status` - The status of the backup schedule.
+* `active` - See Argument Reference above.
 * `name` - See Argument Reference above.
 * `next_runtime` - See Argument Reference above.
 * `next_runtime_computed` - The date and time that the backup schedule will be run. This date and time is computed by gridscale's server.
@@ -68,7 +69,6 @@ The following attributes are exported:
 * `run_interval` - See Argument Reference above.
 * `create_time` - The date and time the backup schedule was initially created.
 * `change_time` - The date and time of the last backup schedule change.
-* `labels` - See Argument Reference above.
 * `backup` - Related backups.
     * `name` - Name of the backup.
     * `object_uuid` - UUID of the backup.
