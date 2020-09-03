@@ -22,6 +22,7 @@ resource "gridscale_backupschedule" "foo" {
   storage_uuid = gridscale_storage.foo.id
   keep_backups = 1
   run_interval = 60
+  active       = true
   next_runtime = "2025-12-30 15:04:05"
   timeouts {
       create="10m"
