@@ -7,6 +7,16 @@ import (
 	"path"
 )
 
+//LoadBalancerOperator an interface defining API of a loadbalancer operator
+type LoadBalancerOperator interface {
+	GetLoadBalancerList(ctx context.Context) ([]LoadBalancer, error)
+	GetLoadBalancer(ctx context.Context, id string) (LoadBalancer, error)
+	CreateLoadBalancer(ctx context.Context, body LoadBalancerCreateRequest) (LoadBalancerCreateResponse, error)
+	UpdateLoadBalancer(ctx context.Context, id string, body LoadBalancerUpdateRequest) error
+	DeleteLoadBalancer(ctx context.Context, id string) error
+	GetLoadBalancerEventList(ctx context.Context, id string) ([]Event, error)
+}
+
 //LoadBalancers is the JSON struct of a list of loadbalancers
 type LoadBalancers struct {
 	//Array of loadbalancers
@@ -115,7 +125,7 @@ type LoadBalancerCreateRequest struct {
 	ListenIPv4UUID string `json:"listen_ipv4_uuid"`
 
 	//The algorithm used to process requests. Allowed values: `LoadbalancerRoundrobinAlg`, `LoadbalancerLeastConnAlg`
-	Algorithm loadbalancerAlgorithm `json:"algorithm"`
+	Algorithm LoadbalancerAlgorithm `json:"algorithm"`
 
 	//An array of ForwardingRule objects containing the forwarding rules for the loadbalancer
 	ForwardingRules []ForwardingRule `json:"forwarding_rules"`
@@ -145,7 +155,7 @@ type LoadBalancerUpdateRequest struct {
 	ListenIPv4UUID string `json:"listen_ipv4_uuid"`
 
 	//The algorithm used to process requests. Allowed values: `LoadbalancerRoundrobinAlg`, `LoadbalancerLeastConnAlg`
-	Algorithm loadbalancerAlgorithm `json:"algorithm"`
+	Algorithm LoadbalancerAlgorithm `json:"algorithm"`
 
 	//An array of ForwardingRule objects containing the forwarding rules for the loadbalancer
 	ForwardingRules []ForwardingRule `json:"forwarding_rules"`
@@ -172,10 +182,12 @@ type LoadBalancerCreateResponse struct {
 	ObjectUUID string `json:"object_uuid"`
 }
 
+type LoadbalancerAlgorithm string
+
 //All available loadbalancer algorithms
 var (
-	LoadbalancerRoundrobinAlg = loadbalancerAlgorithm{"roundrobin"}
-	LoadbalancerLeastConnAlg  = loadbalancerAlgorithm{"leastconn"}
+	LoadbalancerRoundrobinAlg LoadbalancerAlgorithm = "roundrobin"
+	LoadbalancerLeastConnAlg  LoadbalancerAlgorithm = "leastconn"
 )
 
 //GetLoadBalancerList returns a list of loadbalancers

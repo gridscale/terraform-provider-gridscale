@@ -7,6 +7,19 @@ import (
 	"path"
 )
 
+//StorageSnapshotOperator is an interface defining API of a storage snapshot operator
+type StorageSnapshotOperator interface {
+	GetStorageSnapshotList(ctx context.Context, id string) ([]StorageSnapshot, error)
+	GetSnapshotsByLocation(ctx context.Context, id string) ([]StorageSnapshot, error)
+	GetStorageSnapshot(ctx context.Context, storageID, snapshotID string) (StorageSnapshot, error)
+	CreateStorageSnapshot(ctx context.Context, id string, body StorageSnapshotCreateRequest) (StorageSnapshotCreateResponse, error)
+	UpdateStorageSnapshot(ctx context.Context, storageID, snapshotID string, body StorageSnapshotUpdateRequest) error
+	DeleteStorageSnapshot(ctx context.Context, storageID, snapshotID string) error
+	GetDeletedSnapshots(ctx context.Context) ([]StorageSnapshot, error)
+	RollbackStorage(ctx context.Context, storageID, snapshotID string, body StorageRollbackRequest) error
+	ExportStorageSnapshotToS3(ctx context.Context, storageID, snapshotID string, body StorageSnapshotExportToS3Request) error
+}
+
 //StorageSnapshotList is JSON structure of a list of storage snapshots
 type StorageSnapshotList struct {
 	//Array of snapshots

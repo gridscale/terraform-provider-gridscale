@@ -5,6 +5,11 @@ import (
 	"net/http"
 )
 
+//LabelOperator is an interface defining API of a label operator
+type LabelOperator interface {
+	GetLabelList(ctx context.Context) ([]Label, error)
+}
+
 //LabelList JSON struct of a list of labels
 type LabelList struct {
 	//List of labels

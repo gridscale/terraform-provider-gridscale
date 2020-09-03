@@ -255,6 +255,16 @@ Not all endpoints have been implemented in this client, but new ones will be add
     * Storage Snapshot Delete (DeleteStorageSnapshot)
     * Storage Rollback (RollbackStorage)
     * Storage Snapshot Export to S3 (ExportStorageSnapshotToS3)
+* Storage Backup
+    * Storage Backups Get (GetStorageBackupList)
+    * Storage Backup Delete (DeleteStorageBackup)
+    * Storage Backup Rollback (RollbackStorageBackup)
+* Storage Backup Schedule
+    * Storage Backup Schedules Get (GetStorageBackupScheduleList)
+    * Storage Backup Schedule Get (GetStorageBackupSchedule)
+    * Storage Backup Schedule Create (CreateStorageBackupSchedule)
+    * Storage Backup Schedule Update (UpdateStorageBackupSchedule)
+    * Storage Backup Schedule Delete (DeleteStorageBackupSchedule)
 * Firewall
     * Firewalls Get (GetFirewallList)
     * Firewall Get (GetFirewall)
@@ -262,6 +272,14 @@ Not all endpoints have been implemented in this client, but new ones will be add
     * Firewall Update (UpdateFirewall)
     * Firewall Delete (DeleteFirewall)
     * Firewall Events Get (GetFirewallEventList)
+* Marketplace Application
+    * Marketplace Applications Get (GetMarketplaceApplicationList)
+    * Marketplace Application Get (GetMarketplaceApplication)
+    * Marketplace Application Create (CreateMarketplaceApplication)
+    * Marketplace Application Import (ImportMarketplaceApplication)
+    * Marketplace Application Update (UpdateMarketplaceApplication)
+    * Marketplace Application Delete (DeleteMarketplaceApplication)
+    * Marketplace Application Events Get (GetMarketplaceApplicationEventList)
 * Event
     * Events Get (GetEventList)
 * Label

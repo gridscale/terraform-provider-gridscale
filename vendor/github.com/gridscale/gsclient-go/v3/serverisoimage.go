@@ -7,6 +7,17 @@ import (
 	"path"
 )
 
+//ServerIsoImageRelationOperator is an interface defining API of a server-isoimage relation operator
+type ServerIsoImageRelationOperator interface {
+	GetServerIsoImageList(ctx context.Context, id string) ([]ServerIsoImageRelationProperties, error)
+	GetServerIsoImage(ctx context.Context, serverID, isoImageID string) (ServerIsoImageRelationProperties, error)
+	CreateServerIsoImage(ctx context.Context, id string, body ServerIsoImageRelationCreateRequest) error
+	UpdateServerIsoImage(ctx context.Context, serverID, isoImageID string, body ServerIsoImageRelationUpdateRequest) error
+	DeleteServerIsoImage(ctx context.Context, serverID, isoImageID string) error
+	LinkIsoImage(ctx context.Context, serverID string, isoimageID string) error
+	UnlinkIsoImage(ctx context.Context, serverID string, isoimageID string) error
+}
+
 //ServerIsoImageRelationList JSON struct of a list of relations between a server and ISO-Images
 type ServerIsoImageRelationList struct {
 	//Array of relations between a server and ISO-Images

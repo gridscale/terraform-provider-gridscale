@@ -8,6 +8,19 @@ import (
 	"path"
 )
 
+//NetworkOperator an interface defining API of a network operator
+type NetworkOperator interface {
+	GetNetwork(ctx context.Context, id string) (Network, error)
+	GetNetworkList(ctx context.Context) ([]Network, error)
+	CreateNetwork(ctx context.Context, body NetworkCreateRequest) (NetworkCreateResponse, error)
+	DeleteNetwork(ctx context.Context, id string) error
+	UpdateNetwork(ctx context.Context, id string, body NetworkUpdateRequest) error
+	GetNetworkEventList(ctx context.Context, id string) ([]Event, error)
+	GetNetworkPublic(ctx context.Context) (Network, error)
+	GetNetworksByLocation(ctx context.Context, id string) ([]Network, error)
+	GetDeletedNetworks(ctx context.Context) ([]Network, error)
+}
+
 //NetworkList is JSON struct of a list of networks
 type NetworkList struct {
 	//Array of networks

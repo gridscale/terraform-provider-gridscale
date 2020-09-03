@@ -1,5 +1,21 @@
 # Changelog
 
+## 3.2.0 (Unreleased)
+
+FEATURES:
+* Add storage backup functionalities.
+* Add storage backup schedule's functionalities.
+* Add marketplace application's functionalities.
+
+IMPROVEMENTS:
+* Add more examples.
+* Added APIs for easy development (can be used for mocking gsclient-go).
+
+BUG FIXES:
+* Fixed failed unit tests.
+* Added missing fields in some structs.
+* Fixed an error occurring when parsing an empty string to a GSTime variable.
+
 ## 3.1.0 (June 30, 2020)
 
 FEATURES:

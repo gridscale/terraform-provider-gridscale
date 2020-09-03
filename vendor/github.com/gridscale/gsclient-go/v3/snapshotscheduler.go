@@ -7,6 +7,15 @@ import (
 	"path"
 )
 
+//StorageSnapshotScheduleOperator is an interface defining API of a snapshot schedule operator
+type StorageSnapshotScheduleOperator interface {
+	GetStorageSnapshotScheduleList(ctx context.Context, id string) ([]StorageSnapshotSchedule, error)
+	GetStorageSnapshotSchedule(ctx context.Context, storageID, scheduleID string) (StorageSnapshotSchedule, error)
+	CreateStorageSnapshotSchedule(ctx context.Context, id string, body StorageSnapshotScheduleCreateRequest)
+	UpdateStorageSnapshotSchedule(ctx context.Context, storageID, scheduleID string, body StorageSnapshotScheduleUpdateRequest)
+	DeleteStorageSnapshotSchedule(ctx context.Context, storageID, scheduleID string) error
+}
+
 //StorageSnapshotScheduleList JSON of a list of storage snapshot schedules
 type StorageSnapshotScheduleList struct {
 	//Array of storage snapshot schedules

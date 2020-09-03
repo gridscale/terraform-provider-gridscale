@@ -7,6 +7,12 @@ import (
 	"path"
 )
 
+//LocationOperator an interface defining API of a location operator
+type LocationOperator interface {
+	GetLocationList(ctx context.Context) ([]Location, error)
+	GetLocation(ctx context.Context, id string) (Location, error)
+}
+
 //LocationList JSON struct of a list of locations
 type LocationList struct {
 	//Array of locations

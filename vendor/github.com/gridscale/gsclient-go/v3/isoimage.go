@@ -7,6 +7,18 @@ import (
 	"path"
 )
 
+//ISOImageOperator is an interface defining API of an ISO-image operator
+type ISOImageOperator interface {
+	GetISOImageList(ctx context.Context) ([]ISOImage, error)
+	GetISOImage(ctx context.Context, id string) (ISOImage, error)
+	CreateISOImage(ctx context.Context, body ISOImageCreateRequest) (ISOImageCreateResponse, error)
+	UpdateISOImage(ctx context.Context, id string, body ISOImageUpdateRequest) error
+	DeleteISOImage(ctx context.Context, id string) error
+	GetISOImageEventList(ctx context.Context, id string) ([]Event, error)
+	GetISOImagesByLocation(ctx context.Context, id string) ([]ISOImage, error)
+	GetDeletedISOImages(ctx context.Context) ([]ISOImage, error)
+}
+
 //ISOImageList is JSON struct of a list of ISO images
 type ISOImageList struct {
 	//List of ISO-images

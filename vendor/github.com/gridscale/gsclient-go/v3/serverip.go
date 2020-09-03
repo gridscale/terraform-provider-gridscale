@@ -7,6 +7,16 @@ import (
 	"path"
 )
 
+//ServerIPRelationOperator is an interface defining API of a Server-IP relation operator
+type ServerIPRelationOperator interface {
+	GetServerIPList(ctx context.Context, id string) ([]ServerIPRelationProperties, error)
+	GetServerIP(ctx context.Context, serverID, ipID string) (ServerIPRelationProperties, error)
+	CreateServerIP(ctx context.Context, id string, body ServerIPRelationCreateRequest) error
+	DeleteServerIP(ctx context.Context, serverID, ipID string) error
+	LinkIP(ctx context.Context, serverID string, ipID string) error
+	UnlinkIP(ctx context.Context, serverID string, ipID string) error
+}
+
 //ServerIPRelationList JSON struct of a list of relations between a server and IP addresses
 type ServerIPRelationList struct {
 	//Array of relations between a server and IP addresses
