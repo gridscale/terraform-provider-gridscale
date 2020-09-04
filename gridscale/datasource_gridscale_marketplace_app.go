@@ -34,11 +34,6 @@ func dataSourceGridscaleMarketplaceApplication() *schema.Resource {
 				Description: "Path to the images for the application, must be in .gz format and started with s3//",
 				Computed:    true,
 			},
-			"publish": {
-				Type:        schema.TypeBool,
-				Description: "Whether you want to publish your application or not",
-				Computed:    true,
-			},
 			"setup_cores": {
 				Type:        schema.TypeInt,
 				Description: "Number of server's cores",
