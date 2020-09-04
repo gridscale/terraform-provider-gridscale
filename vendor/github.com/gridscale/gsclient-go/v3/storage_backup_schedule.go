@@ -64,7 +64,7 @@ type StorageBackupScheduleProperties struct {
 //StorageBackupScheduleRelations JSON struct of a list of relations of a storage backup schedule
 type StorageBackupScheduleRelations struct {
 	//Array of all related backups (backups taken by this storage backup schedule)
-	StorageBackups []StorageBackupScheduleRelation `json:"storage_backups"`
+	StorageBackups []StorageBackupScheduleRelation `json:"storages_backups"`
 }
 
 //StorageBackupScheduleRelation JSON struct of a relation of a storage backup schedule
