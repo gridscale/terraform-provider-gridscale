@@ -46,6 +46,7 @@ func Provider() terraform.ResourceProvider {
 			"gridscale_template":                 dataSourceGridscaleTemplate(),
 			"gridscale_loadbalancer":             dataSourceGridscaleLoadBalancer(),
 			"gridscale_snapshot":                 dataSourceGridscaleStorageSnapshot(),
+			"gridscale_backup_list":              dataSourceGridscaleStorageBackupList(),
 			"gridscale_snapshotschedule":         dataSourceGridscaleStorageSnapshotSchedule(),
 			"gridscale_backupschedule":           dataSourceGridscaleStorageBackupSchedule(),
 			"gridscale_paas":                     dataSourceGridscalePaaS(),
