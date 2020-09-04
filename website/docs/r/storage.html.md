@@ -43,6 +43,8 @@ The following arguments are supported:
 
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
 
+* `rollback_from_backup_uuid` - (Optional) Rollback the storage from a specific storage backup.
+
 * `template` - (Optional) List of labels in the format [ "label1", "label2" ].
 
     * `template_uuid` - (Required) The UUID of a template. This can be found in the [expert panel](https://my.gridscale.io/Expert/Template) by clicking more on the template or by using a gridscale_template datasource.
@@ -76,6 +78,7 @@ This resource exports the following attributes:
 * `storage_type` - See Argument Reference above.
 * `location_uuid` - Helps to identify which datacenter an object belongs to. The location of the resource depends on the location of the project.
 * `labels` - See Argument Reference above.
+* `rollback_from_backup_uuid` - See Argument Reference above.
 * `status` - status indicates the status of the object.
 * `create_time` - The time the object was created.
 * `change_time` - Defines the date and time of the last object change.
