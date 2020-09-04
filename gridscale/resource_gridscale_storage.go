@@ -167,6 +167,11 @@ func resourceGridscaleStorage() *schema.Resource {
 					},
 				},
 			},
+			"rollback_from_backup_uuid": {
+				Type:        schema.TypeString,
+				Description: "Rollback the storage from a specific storage backup.",
+				Optional:    true,
+			},
 		},
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(5 * time.Minute),
@@ -268,6 +273,23 @@ func resourceGridscaleStorageUpdate(d *schema.ResourceData, meta interface{}) er
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
+	//If rollback_from_backup_uuid is updated and set, start rolling back process
+	if hasChanged := d.HasChange("rollback_from_backup_uuid"); hasChanged {
+		if attr, ok := d.GetOk("rollback_from_backup_uuid"); ok {
+			log.Printf("Start rolling back storage %s with backup %s", d.Id(), attr.(string))
+			err = client.RollbackStorageBackup(
+				ctx,
+				d.Id(),
+				attr.(string),
+				gsclient.StorageRollbackRequest{
+					Rollback: true,
+				},
+			)
+			if err != nil {
+				return err
+			}
+		}
+	}
 
 	return resourceGridscaleStorageRead(d, meta)
 }
@@ -320,9 +342,23 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 	}
 
 	d.SetId(response.ObjectUUID)
-
 	log.Printf("The id for storage %s has been set to %v", requestBody.Name, response.ObjectUUID)
 
+	//If rollback_from_backup_uuid is set, start rolling back process
+	if attr, ok := d.GetOk("rollback_from_backup_uuid"); ok {
+		log.Printf("Start rolling back storage %s with backup %s", response.ObjectUUID, attr.(string))
+		err = client.RollbackStorageBackup(
+			ctx,
+			response.ObjectUUID,
+			attr.(string),
+			gsclient.StorageRollbackRequest{
+				Rollback: true,
+			},
+		)
+		if err != nil {
+			return err
+		}
+	}
 	return resourceGridscaleStorageRead(d, meta)
 }
 
