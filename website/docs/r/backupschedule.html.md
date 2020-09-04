@@ -70,7 +70,7 @@ The following attributes are exported:
 * `run_interval` - See Argument Reference above.
 * `create_time` - The date and time the backup schedule was initially created.
 * `change_time` - The date and time of the last backup schedule change.
-* `backup` - Related backups.
+* `storage_backups` - Related backups.
     * `name` - Name of the backup.
     * `object_uuid` - UUID of the backup.
     * `create_time` - The date and time the backup was initially created.
