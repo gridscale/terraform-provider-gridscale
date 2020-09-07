@@ -35,7 +35,7 @@ jobs:
 
     - name: Acceptance test
       env: 
-        GRIDSCALE_UUID: ${{ secrets.gsUUID }}
-        GRIDSCALE_TOKEN: ${{ secrets.gsToken }}
-        GRIDSCALE_URL: ${{ secrets.gsURL }}
+        GRIDSCALE_UUID: ${{ secrets.USERUUID }}
+        GRIDSCALE_TOKEN: ${{ secrets.APIToken }}
+        GRIDSCALE_URL: ${{ secrets.APIURL }}
       run: make testacc
