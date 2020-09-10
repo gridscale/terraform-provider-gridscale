@@ -26,8 +26,8 @@ resource "gridscale_backupschedule" "foo" {
   active       = true
 }
 data "gridscale_backupschedule" "foo" {
-	resource_id   = gridscale_backupschedule.foo.id
-	storage_uuid   = gridscale_storage.foo.id
+  resource_id   = gridscale_backupschedule.foo.id
+  storage_uuid   = gridscale_storage.foo.id
 }
 ```
 
