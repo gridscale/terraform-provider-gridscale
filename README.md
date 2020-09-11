@@ -100,6 +100,8 @@ A [GoReleaser](https://goreleaser.com/) configuration is provided that produces 
 
 Releases will appear as drafts. Once marked as published on the GitHub Releases page, they will become available via the Terraform Registry. Releases are signed with key ID (long) `4841EC2F6BC7BD4515F60C10047EC899C2DC3656`.
 
+Jump to the [Release Checklist](release-checklist.md) for details.
+
 Known Issues
 ---------------------------
 
