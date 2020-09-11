@@ -1,3 +1,19 @@
+## 1.7.0 (Sept 11, 2020)
+
+FEATURES:
+
+* Support marketplace application features.
+* Support storage backup functionalities and schedule storage backup.
+
+IMPROVEMENTS:
+
+* Update gsclient-go package to v3.2.1.
+* Replace travis with github actions.
+
+BUG FIXES:
+
+* Fix bug causing `next_runtime` fields of snapshot schedule and backup schedule to be changed by gs server.
+
 ## 1.6.3 (Aug 18, 2020)
 
 Prepare publishing to Terraform Registry.
