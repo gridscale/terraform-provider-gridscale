@@ -12,7 +12,7 @@ IMPROVEMENTS:
 
 BUG FIXES:
 
-* Fix bug causing `next_runtime` fields of snapshot schedule and backup schedule to be changed by gs server.
+* Fix bug causing `next_runtime` fields of snapshot schedule and backup schedule to be changed by gs server unexpectedly.
 
 ## 1.6.3 (Aug 18, 2020)
 
