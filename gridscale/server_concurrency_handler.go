@@ -155,7 +155,7 @@ func (l *serverStatusList) shutdownServerSynchronously(ctx context.Context, c *g
 				return err
 			}
 			// if the server cannot be shutdown gracefully, try to turn it off
-			if err == shutdownCtx.Err() {
+			if err != nil && err == shutdownCtx.Err() {
 				//check if the main context is done
 				select {
 				//return context's error when it is done
