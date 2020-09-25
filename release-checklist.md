@@ -4,7 +4,7 @@
 
 You can only do this with a user that has access to the gridscale organization.
 
-Make sure you have the release signing private key installed (`4841EC2F6BC7BD4515F60C10047EC899C2DC3656`). You also need to following variables in your environment.
+Make sure you have the release signing private key installed (`4841EC2F6BC7BD4515F60C10047EC899C2DC3656`). You also need to export following variables in your environment.
 
     $ export GITHUB_TOKEN=
     $ export GPG_FINGERPRINT=oss@gridscale.io
