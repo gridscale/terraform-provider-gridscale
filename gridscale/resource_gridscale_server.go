@@ -302,7 +302,7 @@ func getFirewallRuleCommonSchema() map[string]*schema.Schema {
 			Description: `The order at which the firewall will compare packets against its rules, 
 a packet will be compared against the first rule, it will either allow it to pass or block it 
 and it won t be matched against any other rules. However, if it does no match the rule, 
-then it will proceed onto rule 2. Packets that do not match any rules are blocked by default.`,
+then it will proceed onto rule 2.`,
 			Required: true,
 		},
 		"action": {
