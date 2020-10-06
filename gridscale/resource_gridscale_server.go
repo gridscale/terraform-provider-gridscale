@@ -299,9 +299,9 @@ func getFirewallRuleCommonSchema() map[string]*schema.Schema {
 	commonSchema := map[string]schema.Schema{
 		"order": {
 			Type: schema.TypeInt,
-			Description: `The order at which the firewall will compare packets against its rules, 
-a packet will be compared against the first rule, it will either allow it to pass or block it 
-and it won t be matched against any other rules. However, if it does no match the rule, 
+			Description: `The order at which the firewall will compare packets against its rules. 
+A packet will be compared against the first rule, it will either allow it to pass or block it 
+and it won't be matched against any other rules. However, if it does no match the rule, 
 then it will proceed onto rule 2.`,
 			Required: true,
 		},

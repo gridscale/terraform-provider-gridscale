@@ -50,7 +50,7 @@ The following attributes are exported:
 * `id` - The UUID of the firewall.
 * `name` - The name of the firewall.
 * `rules_v4_in` - Firewall template rules for inbound traffic - covers ipv4 addresses.
-    * `order` - The order at which the firewall will compare packets against its rules, a packet will be compared against the first rule, it will either allow it to pass or block it and it won t be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2.
+    * `order` - The order at which the firewall will compare packets against its rules. A packet will be compared against the first rule, it will either allow it to pass or block it and it won't be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2.
     * `action` - This defines what the firewall will do. Either accept or drop.
     * `protocol` - Either 'udp' or 'tcp'.
     * `dst_port` - A Number between 1 and 65535, port ranges are separated by a colon for FTP.
@@ -59,7 +59,7 @@ The following attributes are exported:
     * `dst_cidr` - Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
     * `comment` - Comment.
 * `rules_v4_out` - Firewall template rules for outbound traffic - covers ipv4 addresses.
-    * `order` - The order at which the firewall will compare packets against its rules, a packet will be compared against the first rule, it will either allow it to pass or block it and it won t be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2.
+    * `order` - The order at which the firewall will compare packets against its rules. A packet will be compared against the first rule, it will either allow it to pass or block it and it won't be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2.
     * `action` - This defines what the firewall will do. Either accept or drop.
     * `protocol` - Either 'udp' or 'tcp'.
     * `dst_port` - A Number between 1 and 65535, port ranges are separated by a colon for FTP.
@@ -68,7 +68,7 @@ The following attributes are exported:
     * `dst_cidr` - Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
     * `comment` - Comment.
 * `rules_v6_in` - Firewall template rules for inbound traffic - covers ipv6 addresses.
-    * `order` - The order at which the firewall will compare packets against its rules, a packet will be compared against the first rule, it will either allow it to pass or block it and it won t be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2.
+    * `order` - The order at which the firewall will compare packets against its rules. A packet will be compared against the first rule, it will either allow it to pass or block it and it won't be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2.
     * `action` - This defines what the firewall will do. Either accept or drop.
     * `protocol` - Either 'udp' or 'tcp'.
     * `dst_port` - A Number between 1 and 65535, port ranges are separated by a colon for FTP.
@@ -77,7 +77,7 @@ The following attributes are exported:
     * `dst_cidr` - Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
     * `comment` - Comment.
 * `rules_v6_out` - Firewall template rules for outbound traffic - covers ipv6 addresses.
-    * `order` - The order at which the firewall will compare packets against its rules, a packet will be compared against the first rule, it will either allow it to pass or block it and it won t be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2.
+    * `order` - The order at which the firewall will compare packets against its rules. A packet will be compared against the first rule, it will either allow it to pass or block it and it won't be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2.
     * `action` - This defines what the firewall will do. Either accept or drop.
     * `protocol` - Either 'udp' or 'tcp'.
     * `dst_port` - A Number between 1 and 65535, port ranges are separated by a colon for FTP.
