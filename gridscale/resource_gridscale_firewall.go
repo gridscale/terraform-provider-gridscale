@@ -366,3 +366,69 @@ func convInterfaceSliceToFirewallRulesSlice(interfaceRules []interface{}) []gscl
 	}
 	return firewallRules
 }
+
+func addDefaultFirewallInboundRules(rules []gsclient.FirewallRuleProperties, forIPv6 bool) []gsclient.FirewallRuleProperties {
+	srcCidr := "0.0.0.0/0"
+	DHCPDstPort := "67:68"
+	DHCPComment := "DHCP IPv4"
+	nextOrder := len(rules)
+	if forIPv6 {
+		srcCidr = "::/0"
+		DHCPDstPort = "546:547"
+		DHCPComment = "DHCP IPv6"
+	}
+	defaultInboundRules := []gsclient.FirewallRuleProperties{
+		{
+			Protocol: gsclient.UDPTransport,
+			DstPort:  DHCPDstPort,
+			SrcPort:  "",
+			SrcCidr:  srcCidr,
+			Action:   "accept",
+			Comment:  DHCPComment,
+			DstCidr:  "",
+			Order:    nextOrder,
+		},
+		{
+			Protocol: gsclient.TCPTransport,
+			DstPort:  "32768:65535",
+			SrcPort:  "",
+			SrcCidr:  srcCidr,
+			Action:   "accept",
+			Comment:  "Highports TCP",
+			DstCidr:  "",
+			Order:    nextOrder + 1,
+		},
+		{
+			Protocol: gsclient.UDPTransport,
+			DstPort:  "32768:65535",
+			SrcPort:  "",
+			SrcCidr:  srcCidr,
+			Action:   "accept",
+			Comment:  "Highports UDP",
+			DstCidr:  "",
+			Order:    nextOrder + 2,
+		},
+		{
+			Protocol: gsclient.UDPTransport,
+			DstPort:  "1:65535",
+			SrcPort:  "",
+			SrcCidr:  srcCidr,
+			Action:   "drop",
+			Comment:  "Drop all other UDP",
+			DstCidr:  "",
+			Order:    nextOrder + 3,
+		},
+		{
+			Protocol: gsclient.TCPTransport,
+			DstPort:  "1:65535",
+			SrcPort:  "",
+			SrcCidr:  srcCidr,
+			Action:   "drop",
+			Comment:  "Drop all other TCP",
+			DstCidr:  "",
+			Order:    nextOrder + 4,
+		},
+	}
+	rules = append(rules, defaultInboundRules...)
+	return rules
+}
