@@ -3,11 +3,12 @@ package gridscale
 import (
 	"context"
 	"fmt"
-	fwu "github.com/terraform-providers/terraform-provider-gridscale/gridscale/firewall-utils"
 	"log"
 	"net/http"
 	"strings"
 	"time"
+
+	fwu "github.com/terraform-providers/terraform-provider-gridscale/gridscale/firewall-utils"
 
 	errHandler "github.com/terraform-providers/terraform-provider-gridscale/gridscale/error-handler"
 	relation_manager "github.com/terraform-providers/terraform-provider-gridscale/gridscale/relation-manager"
@@ -303,7 +304,7 @@ func getFirewallRuleCommonSchema() map[string]*schema.Schema {
 			Description: `The order at which the firewall will compare packets against its rules. 
 A packet will be compared against the first rule, it will either allow it to pass or block it 
 and it won't be matched against any other rules. However, if it does no match the rule, 
-then it will proceed onto rule 2.`,
+then it will proceed onto rule 2. Packets that do not match any rules are blocked by default (Only for inbound).`,
 			Required: true,
 		},
 		"action": {
