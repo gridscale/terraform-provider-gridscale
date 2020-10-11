@@ -3,6 +3,7 @@ package relationmanager
 import (
 	"context"
 	"fmt"
+	fwu "github.com/terraform-providers/terraform-provider-gridscale/gridscale/firewall-utils"
 	"net/http"
 
 	"github.com/gridscale/gsclient-go/v3"
@@ -188,11 +189,11 @@ func readCustomFirewallRules(netData map[string]interface{}) gsclient.FirewallRu
 
 		//Based on rule type to place the rules in the right property of fwRules variable
 		if ruleType == "rules_v4_in" {
-			fwRules.RulesV4In = rules
+			fwRules.RulesV4In = fwu.AddDefaultFirewallInboundRules(rules, false) // add default rules
 		} else if ruleType == "rules_v4_out" {
 			fwRules.RulesV4Out = rules
 		} else if ruleType == "rules_v6_in" {
-			fwRules.RulesV6In = rules
+			fwRules.RulesV6In = fwu.AddDefaultFirewallInboundRules(rules, true) // add default rules
 		} else if ruleType == "rules_v6_out" {
 			fwRules.RulesV6Out = rules
 		}
