@@ -2,6 +2,7 @@ package fwu
 
 import "github.com/gridscale/gsclient-go/v3"
 
+// AddDefaultFirewallInboundRules adds default fw rules
 func AddDefaultFirewallInboundRules(rules []gsclient.FirewallRuleProperties, forIPv6 bool) []gsclient.FirewallRuleProperties {
 	srcCidr := "0.0.0.0/0"
 	DHCPDstPort := "67:68"
@@ -78,6 +79,8 @@ func getNextFWRuleOrder(rules []gsclient.FirewallRuleProperties) int {
 	return max + 1
 }
 
+// RemoveDefaultFirewallInboundRules removes default fw rules
+// It is used when we don't want to display the default fw rules in tf
 func RemoveDefaultFirewallInboundRules(rules []gsclient.FirewallRuleProperties) []gsclient.FirewallRuleProperties {
 	defaultRulesNames := map[string]int{
 		"DHCP IPv4":          0,
