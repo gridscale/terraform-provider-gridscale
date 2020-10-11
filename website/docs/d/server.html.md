@@ -97,7 +97,7 @@ This resource exports the following attributes:
     * `mac` - network_mac defines the MAC address of the network interface.
     * `firewall_template_uuid` - The UUID of firewall template.
     * `rules_v4_in` - Firewall template rules for inbound traffic - covers ipv4 addresses.
-        * `order` - The order at which the firewall will compare packets against its rules. A packet will be compared against the first rule, it will either allow it to pass or block it and it won't be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2.
+        * `order` - The order at which the firewall will compare packets against its rules. A packet will be compared against the first rule, it will either allow it to pass or block it and it won't be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2. Packets that do not match any rules are blocked by default (Only for inbound).
         * `action` - This defines what the firewall will do. Either accept or drop.
         * `protocol` - Either 'udp' or 'tcp'.
         * `dst_port` - A Number between 1 and 65535, port ranges are separated by a colon for FTP.
@@ -115,7 +115,7 @@ This resource exports the following attributes:
         * `dst_cidr` - Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
         * `comment` - Comment.
     * `rules_v6_in` - Firewall template rules for inbound traffic - covers ipv6 addresses.
-        * `order` - The order at which the firewall will compare packets against its rules. A packet will be compared against the first rule, it will either allow it to pass or block it and it won't be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2.
+        * `order` - The order at which the firewall will compare packets against its rules. A packet will be compared against the first rule, it will either allow it to pass or block it and it won't be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2. Packets that do not match any rules are blocked by default (Only for inbound).
         * `action` - This defines what the firewall will do. Either accept or drop.
         * `protocol` - Either 'udp' or 'tcp'.
         * `dst_port` - A Number between 1 and 65535, port ranges are separated by a colon for FTP.
