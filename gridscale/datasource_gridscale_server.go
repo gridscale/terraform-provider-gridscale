@@ -3,6 +3,7 @@ package gridscale
 import (
 	"context"
 	"fmt"
+	fwu "github.com/terraform-providers/terraform-provider-gridscale/gridscale/firewall-utils"
 
 	"github.com/gridscale/gsclient-go/v3"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -331,7 +332,14 @@ func dataSourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) err
 	}
 
 	//Get networks
-	networks := readServerNetworkRels(server.Properties.Relations.Networks)
+	netWODefaultRules := server.Properties.Relations.Networks
+	for i := 0; i < len(netWODefaultRules); i++ { // Remove all default rules, we don't want to display them
+		netWODefaultRules[i].
+			Firewall.RulesV4In = fwu.RemoveDefaultFirewallInboundRules(netWODefaultRules[i].Firewall.RulesV4In)
+		netWODefaultRules[i].
+			Firewall.RulesV6In = fwu.RemoveDefaultFirewallInboundRules(netWODefaultRules[i].Firewall.RulesV6In)
+	}
+	networks := readServerNetworkRels(netWODefaultRules)
 	if err = d.Set("network", networks); err != nil {
 		return fmt.Errorf("%s error setting network: %v", errorPrefix, err)
 	}
