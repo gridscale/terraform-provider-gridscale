@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	fwu "github.com/terraform-providers/terraform-provider-gridscale/gridscale/firewall-utils"
 	"log"
 	"net/http"
 	"time"
@@ -34,6 +35,7 @@ func resourceGridscaleFirewall() *schema.Resource {
 			"rules_v4_in": {
 				Type:     schema.TypeList,
 				Optional: true,
+				Computed: true,
 				Elem: &schema.Resource{
 					Schema: getFirewallRuleCommonSchema(),
 				},
@@ -48,6 +50,7 @@ func resourceGridscaleFirewall() *schema.Resource {
 			"rules_v6_in": {
 				Type:     schema.TypeList,
 				Optional: true,
+				Computed: true,
 				Elem: &schema.Resource{
 					Schema: getFirewallRuleCommonSchema(),
 				},
@@ -185,7 +188,8 @@ func resourceGridscaleFirewallRead(d *schema.ResourceData, meta interface{}) err
 	}
 
 	//Get rules_v4_in
-	rulesV4In := convFirewallRuleSliceToInterfaceSlice(props.Rules.RulesV4In)
+	rulesV4InWODefaultRules := fwu.RemoveDefaultFirewallInboundRules(props.Rules.RulesV4In)
+	rulesV4In := convFirewallRuleSliceToInterfaceSlice(rulesV4InWODefaultRules)
 	if err = d.Set("rules_v4_in", rulesV4In); err != nil {
 		return fmt.Errorf("%s error setting rules_v4_in: %v", errorPrefix, err)
 	}
@@ -197,7 +201,8 @@ func resourceGridscaleFirewallRead(d *schema.ResourceData, meta interface{}) err
 	}
 
 	//Get rules_v6_in
-	rulesV6In := convFirewallRuleSliceToInterfaceSlice(props.Rules.RulesV6In)
+	rulesV6InWODefaultRules := fwu.RemoveDefaultFirewallInboundRules(props.Rules.RulesV6In)
+	rulesV6In := convFirewallRuleSliceToInterfaceSlice(rulesV6InWODefaultRules)
 	if err = d.Set("rules_v6_in", rulesV6In); err != nil {
 		return fmt.Errorf("%s error setting rules_v6_in: %v", errorPrefix, err)
 	}
@@ -239,9 +244,9 @@ func resourceGridscaleFirewallCreate(d *schema.ResourceData, meta interface{}) e
 		Name:   d.Get("name").(string),
 		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
 		Rules: gsclient.FirewallRules{
-			RulesV6In:  rulesV6In,
+			RulesV6In:  fwu.AddDefaultFirewallInboundRules(rulesV6In, true),
 			RulesV6Out: rulesV6Out,
-			RulesV4In:  rulesV4In,
+			RulesV4In:  fwu.AddDefaultFirewallInboundRules(rulesV4In, false),
 			RulesV4Out: rulesV4Out,
 		},
 	}
@@ -365,70 +370,4 @@ func convInterfaceSliceToFirewallRulesSlice(interfaceRules []interface{}) []gscl
 		firewallRules = append(firewallRules, fwRule)
 	}
 	return firewallRules
-}
-
-func addDefaultFirewallInboundRules(rules []gsclient.FirewallRuleProperties, forIPv6 bool) []gsclient.FirewallRuleProperties {
-	srcCidr := "0.0.0.0/0"
-	DHCPDstPort := "67:68"
-	DHCPComment := "DHCP IPv4"
-	nextOrder := len(rules)
-	if forIPv6 {
-		srcCidr = "::/0"
-		DHCPDstPort = "546:547"
-		DHCPComment = "DHCP IPv6"
-	}
-	defaultInboundRules := []gsclient.FirewallRuleProperties{
-		{
-			Protocol: gsclient.UDPTransport,
-			DstPort:  DHCPDstPort,
-			SrcPort:  "",
-			SrcCidr:  srcCidr,
-			Action:   "accept",
-			Comment:  DHCPComment,
-			DstCidr:  "",
-			Order:    nextOrder,
-		},
-		{
-			Protocol: gsclient.TCPTransport,
-			DstPort:  "32768:65535",
-			SrcPort:  "",
-			SrcCidr:  srcCidr,
-			Action:   "accept",
-			Comment:  "Highports TCP",
-			DstCidr:  "",
-			Order:    nextOrder + 1,
-		},
-		{
-			Protocol: gsclient.UDPTransport,
-			DstPort:  "32768:65535",
-			SrcPort:  "",
-			SrcCidr:  srcCidr,
-			Action:   "accept",
-			Comment:  "Highports UDP",
-			DstCidr:  "",
-			Order:    nextOrder + 2,
-		},
-		{
-			Protocol: gsclient.UDPTransport,
-			DstPort:  "1:65535",
-			SrcPort:  "",
-			SrcCidr:  srcCidr,
-			Action:   "drop",
-			Comment:  "Drop all other UDP",
-			DstCidr:  "",
-			Order:    nextOrder + 3,
-		},
-		{
-			Protocol: gsclient.TCPTransport,
-			DstPort:  "1:65535",
-			SrcPort:  "",
-			SrcCidr:  srcCidr,
-			Action:   "drop",
-			Comment:  "Drop all other TCP",
-			DstCidr:  "",
-			Order:    nextOrder + 4,
-		},
-	}
-	rules = append(rules, defaultInboundRules...)
-	return rules
 }

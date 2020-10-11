@@ -3,6 +3,7 @@ package gridscale
 import (
 	"context"
 	"fmt"
+	fwu "github.com/terraform-providers/terraform-provider-gridscale/gridscale/firewall-utils"
 
 	"github.com/gridscale/gsclient-go/v3"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -174,7 +175,8 @@ func dataSourceGridscaleFirewallRead(d *schema.ResourceData, meta interface{}) e
 	}
 
 	//Get rules_v4_in
-	rulesV4In := convFirewallRuleSliceToInterfaceSlice(props.Rules.RulesV4In)
+	rulesV4InWODefaultRules := fwu.RemoveDefaultFirewallInboundRules(props.Rules.RulesV4In)
+	rulesV4In := convFirewallRuleSliceToInterfaceSlice(rulesV4InWODefaultRules)
 	if err = d.Set("rules_v4_in", rulesV4In); err != nil {
 		return fmt.Errorf("%s error setting rules_v4_in: %v", errorPrefix, err)
 	}
@@ -186,7 +188,8 @@ func dataSourceGridscaleFirewallRead(d *schema.ResourceData, meta interface{}) e
 	}
 
 	//Get rules_v6_in
-	rulesV6In := convFirewallRuleSliceToInterfaceSlice(props.Rules.RulesV6In)
+	rulesV6InWODefaultRules := fwu.RemoveDefaultFirewallInboundRules(props.Rules.RulesV6In)
+	rulesV6In := convFirewallRuleSliceToInterfaceSlice(rulesV6InWODefaultRules)
 	if err = d.Set("rules_v6_in", rulesV6In); err != nil {
 		return fmt.Errorf("%s error setting rules_v6_in: %v", errorPrefix, err)
 	}
