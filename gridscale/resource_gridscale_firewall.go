@@ -4,10 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	fwu "github.com/terraform-providers/terraform-provider-gridscale/gridscale/firewall-utils"
 	"log"
 	"net/http"
 	"time"
+
+	fwu "github.com/terraform-providers/terraform-provider-gridscale/gridscale/firewall-utils"
 
 	"github.com/gridscale/gsclient-go/v3"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -292,9 +293,9 @@ func resourceGridscaleFirewallUpdate(d *schema.ResourceData, meta interface{}) e
 		Labels: &labels,
 	}
 	requestBody.Rules = &gsclient.FirewallRules{
-		RulesV6In:  rulesV6In,
+		RulesV6In:  fwu.AddDefaultFirewallInboundRules(rulesV6In, true),
 		RulesV6Out: rulesV6Out,
-		RulesV4In:  rulesV4In,
+		RulesV4In:  fwu.AddDefaultFirewallInboundRules(rulesV4In, false),
 		RulesV4Out: rulesV4Out,
 	}
 
