@@ -1,3 +1,10 @@
+## 1.7.1 (Oct 15, 2020)
+
+BUG FIXES:
+
+* The provider is now applying default inbound firewall rules. See [#89](https://github.com/gridscale/terraform-provider-gridscale/issues/89).
+* Fix turning off a server even when it is already shutdown.
+
 ## 1.7.0 (Sept 11, 2020)
 
 FEATURES:
