@@ -25,8 +25,8 @@ jobs:
 
     - name: Cache GPG passphrase
       env:
-        - GPG_PASSPHRASE = ${{ secrets.GPG_PASSPHRASE }}
-        - GPG_FINGERPRINT = ${{ secrets.GPG_FINGERPRINT }}
+        GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        GPG_FINGERPRINT: ${{ secrets.GPG_FINGERPRINT }}
       run: |
         gpg --pinentry-mode=loopback --passphrase $GPG_PASSPHRASE --armor --detach-sign --local-user "${GPG_FINGERPRINT}" README.md
         rm -f README.md.asc
