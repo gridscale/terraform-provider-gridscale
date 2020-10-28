@@ -222,7 +222,7 @@ func dataSourceGridscaleMarketplaceApplicationRead(d *schema.ResourceData, meta 
 	if err = d.Set("meta_features", marketApp.Properties.Metadata.Features); err != nil {
 		return fmt.Errorf("%s error setting meta_features: %v", errorPrefix, err)
 	}
-	if err = d.Set("meta_author", marketApp.Properties.Metadata.Authors); err != nil {
+	if err = d.Set("meta_author", marketApp.Properties.Metadata.Author); err != nil {
 		return fmt.Errorf("%s error setting meta_author: %v", errorPrefix, err)
 	}
 	if err = d.Set("meta_advices", marketApp.Properties.Metadata.Advices); err != nil {

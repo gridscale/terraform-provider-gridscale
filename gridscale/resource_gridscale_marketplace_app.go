@@ -253,7 +253,7 @@ func resourceGridscaleMarketplaceApplicationRead(d *schema.ResourceData, meta in
 	if err = d.Set("meta_features", marketApp.Properties.Metadata.Features); err != nil {
 		return fmt.Errorf("%s error setting meta_features: %v", errorPrefix, err)
 	}
-	if err = d.Set("meta_author", marketApp.Properties.Metadata.Authors); err != nil {
+	if err = d.Set("meta_author", marketApp.Properties.Metadata.Author); err != nil {
 		return fmt.Errorf("%s error setting meta_author: %v", errorPrefix, err)
 	}
 	if err = d.Set("meta_advices", marketApp.Properties.Metadata.Advices); err != nil {
@@ -334,7 +334,7 @@ func resourceGridscaleMarketplaceApplicationCreate(d *schema.ResourceData, meta 
 			TermsOfUse: d.Get("meta_terms_of_use").(string),
 			Icon:       d.Get("meta_icon").(string),
 			Features:   d.Get("meta_features").(string),
-			Authors:    d.Get("meta_author").(string),
+			Author:     d.Get("meta_author").(string),
 			Advices:    d.Get("meta_advices").(string),
 		},
 	}
@@ -391,7 +391,7 @@ func resourceGridscaleMarketplaceApplicationUpdate(d *schema.ResourceData, meta 
 			TermsOfUse: d.Get("meta_terms_of_use").(string),
 			Icon:       d.Get("meta_icon").(string),
 			Features:   d.Get("meta_features").(string),
-			Authors:    d.Get("meta_author").(string),
+			Author:     d.Get("meta_author").(string),
 			Advices:    d.Get("meta_advices").(string),
 		},
 	}
