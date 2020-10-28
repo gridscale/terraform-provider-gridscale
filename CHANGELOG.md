@@ -4,6 +4,7 @@ IMPROVEMENTS:
 
 * Update gsclient-go package to v3.2.2.
 * Allow to omit uuid and token when they are empty.
+* Update release checklist (No need to do pgp signing and build binary files).
 
 ## 1.7.1 (Oct 15, 2020)
 
