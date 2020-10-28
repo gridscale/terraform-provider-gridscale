@@ -69,7 +69,7 @@ type ObjectStorageBucket struct {
 
 //ObjectStorageBucketProperties is JSON struct of properties of a bucket
 type ObjectStorageBucketProperties struct {
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
 	//The current usage of the bucket.

@@ -51,15 +51,15 @@ type ServerNetworkRelationProperties struct {
 	//The UUID of firewall template.
 	FirewallTemplateUUID string `json:"firewall_template_uuid"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	ObjectName string `json:"object_name"`
 
 	//network_mac defines the MAC address of the network interface.
 	Mac string `json:"mac"`
 
-	//Defines if this object is the bootdevice. Storages, Networks and ISO-Images can have a bootdevice configured,
-	//but only one bootdevice per Storage, Network or ISO-Image.
-	//The boot order is as follows => Network > ISO-Image > Storage.
+	//Defines if this object is the boot device. Storages, Networks and ISO images can have a boot device configured,
+	//but only one boot device per Storage, Network or ISO image.
+	//The boot order is as follows => Network > ISO image > Storage.
 	BootDevice bool `json:"bootdevice"`
 
 	//PartnerUUID
@@ -87,7 +87,7 @@ type ServerNetworkRelationProperties struct {
 
 //ServerNetworkRelationCreateRequest JSON struct of a request for creating a relation between a server and a network
 type ServerNetworkRelationCreateRequest struct {
-	//The uuid of network you wish to add. Only 7 private networks are allowed to be attached to a server
+	//The UUID of network you wish to add. Only 7 private networks are allowed to be attached to a server
 	ObjectUUID string `json:"object_uuid"`
 
 	//The ordering of the network interfaces. Lower numbers have lower PCI-IDs. Can be empty.

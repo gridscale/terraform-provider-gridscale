@@ -40,13 +40,13 @@ type IP struct {
 
 //IPProperties is JSON struct of an IP's properties
 type IPProperties struct {
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
-	//The human-readable name of the location. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	LocationCountry string `json:"location_country"`
 
-	//Helps to identify which datacenter an object belongs to.
+	//Helps to identify which data center an object belongs to.
 	LocationUUID string `json:"location_uuid"`
 
 	//The UUID of an object is always unique, and refers to a specific object.
@@ -73,7 +73,7 @@ type IPProperties struct {
 	//Uses IATA airport code, which works as a location identifier.
 	LocationIata string `json:"location_iata"`
 
-	//The human-readable name of the location. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	LocationName string `json:"location_name"`
 
 	//The IP prefix.
@@ -94,7 +94,7 @@ type IPProperties struct {
 	//List of labels.
 	Labels []string `json:"labels"`
 
-	//The information about other object which are related to this IP. the object could be servers and/or loadbalancer.
+	//The information about other object which are related to this IP. the object could be servers and/or load balancer.
 	Relations IPRelations `json:"relations"`
 }
 
@@ -118,10 +118,10 @@ type IPLoadbalancer struct {
 	//Defines the date and time the object was initially created.
 	CreateTime GSTime `json:"create_time"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	LoadbalancerName string `json:"loadbalancer_name"`
 
-	//The UUID of loadbalancer.
+	//The UUID of load balancer.
 	LoadbalancerUUID string `json:"loadbalancer_uuid"`
 }
 
@@ -130,7 +130,7 @@ type IPServer struct {
 	//Defines the date and time the object was initially created.
 	CreateTime GSTime `json:"create_time"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	ServerName string `json:"server_name"`
 
 	//The UUID of the server.

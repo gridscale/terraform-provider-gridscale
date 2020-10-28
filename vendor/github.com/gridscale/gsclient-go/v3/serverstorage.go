@@ -35,10 +35,10 @@ type ServerStorageRelationProperties struct {
 	//The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	ObjectName string `json:"object_name"`
 
-	//The capacity of a storage/ISO-Image/template/snapshot in GB.
+	//The capacity of a storage/ISO image/template/snapshot in GB.
 	Capacity int `json:"capacity"`
 
 	//Indicates the speed of the storage. This may be (storage, storage_high or storage_insane).
@@ -57,9 +57,9 @@ type ServerStorageRelationProperties struct {
 	//Defines the date and time the object was initially created.
 	CreateTime GSTime `json:"create_time"`
 
-	//Defines if this object is the bootdevice. Storages, Networks and ISO-Images can have a bootdevice configured,
-	//but only one bootdevice per Storage, Network or ISO-Image.
-	//The boot order is as follows => Network > ISO-Image > Storage.
+	//Defines if this object is the boot device. Storages, Networks and ISO images can have a boot device configured,
+	//but only one boot device per Storage, Network or ISO image.
+	//The boot order is as follows => Network > ISO image > Storage.
 	BootDevice bool `json:"bootdevice"`
 
 	//The SCSI bus id. The SCSI defines transmission routes like Serial Attached SCSI (SAS), Fibre Channel and iSCSI.

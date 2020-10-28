@@ -41,10 +41,10 @@ type Network struct {
 
 //NetworkProperties is JSON struct of a network's properties
 type NetworkProperties struct {
-	//The human-readable name of the location. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	LocationCountry string `json:"location_country"`
 
-	//Helps to identify which datacenter an object belongs to.
+	//Helps to identify which data center an object belongs to.
 	LocationUUID string `json:"location_uuid"`
 
 	//True if the network is public. If private it will be false.
@@ -56,7 +56,7 @@ type NetworkProperties struct {
 	//One of 'network', 'network_high' or 'network_insane'.
 	NetworkType string `json:"network_type"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
 	//Status indicates the status of the object.
@@ -76,7 +76,7 @@ type NetworkProperties struct {
 	//Uses IATA airport code, which works as a location identifier.
 	LocationIata string `json:"location_iata"`
 
-	//The human-readable name of the location. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	LocationName string `json:"location_name"`
 
 	//Defines if the object is administratively blocked. If true, it can not be deleted by the user.
@@ -131,7 +131,7 @@ type NetworkServer struct {
 	//If empty, it allow no IPv4/IPv6 source traffic. If set to null, l3security is disabled (default).
 	L3security []string `json:"l3security"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	ObjectName string `json:"object_name"`
 
 	//The UUID of the network you're requesting.
@@ -145,7 +145,7 @@ type NetworkPaaSSecurityZone struct {
 	//IPv6 prefix of the PaaS service
 	IPv6Prefix string `json:"ipv6_prefix"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	ObjectName string `json:"object_name"`
 
 	//The UUID of an object is always unique, and refers to a specific object.
@@ -154,7 +154,7 @@ type NetworkPaaSSecurityZone struct {
 
 //NetworkCreateRequest is JSON of a request for creating a network
 type NetworkCreateRequest struct {
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
 	//List of labels. Can be empty.

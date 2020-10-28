@@ -46,7 +46,7 @@ type TemplateProperties struct {
 	//Status indicates the status of the object.
 	Ostype string `json:"ostype"`
 
-	//Helps to identify which datacenter an object belongs to.
+	//Helps to identify which data center an object belongs to.
 	LocationUUID string `json:"location_uuid"`
 
 	//Description of the Template.
@@ -74,13 +74,13 @@ type TemplateProperties struct {
 	//Total minutes the object has been running.
 	UsageInMinutes int `json:"usage_in_minutes"`
 
-	//The capacity of a storage/ISO-Image/template/snapshot in GB.
+	//The capacity of a storage/ISO image/template/snapshot in GB.
 	Capacity int `json:"capacity"`
 
-	//The human-readable name of the location. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	LocationName string `json:"location_name"`
 
-	//The OS distrobution that the Template contains.
+	//The OS distribution that the Template contains.
 	Distro string `json:"distro"`
 
 	//Description of the Template.
@@ -89,10 +89,10 @@ type TemplateProperties struct {
 	//The price for the current period since the last bill.
 	CurrentPrice float64 `json:"current_price"`
 
-	//The human-readable name of the location. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	LocationCountry string `json:"location_country"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
 	//List of labels.
@@ -101,7 +101,7 @@ type TemplateProperties struct {
 
 //TemplateCreateRequest JSON struct of a request for creating a template
 type TemplateCreateRequest struct {
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
 	//snapshot uuid for template
@@ -113,7 +113,7 @@ type TemplateCreateRequest struct {
 
 //TemplateUpdateRequest JSON struct of a request for updating a template
 type TemplateUpdateRequest struct {
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	//Optional.
 	Name string `json:"name,omitempty"`
 

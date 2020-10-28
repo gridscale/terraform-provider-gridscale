@@ -53,7 +53,7 @@ type StorageProperties struct {
 	//this shows the product_no of the license (see the /prices endpoint for more details).
 	LicenseProductNo int `json:"license_product_no"`
 
-	//The human-readable name of the location. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	LocationCountry string `json:"location_country"`
 
 	//Total minutes the object has been running.
@@ -65,10 +65,10 @@ type StorageProperties struct {
 	//The price for the current period since the last bill.
 	CurrentPrice float64 `json:"current_price"`
 
-	//The capacity of a storage/ISO-Image/template/snapshot in GB.
+	//The capacity of a storage/ISO image/template/snapshot in GB.
 	Capacity int `json:"capacity"`
 
-	//Helps to identify which datacenter an object belongs to.
+	//Helps to identify which data center an object belongs to.
 	LocationUUID string `json:"location_uuid"`
 
 	//(one of storage, storage_high, storage_insane).
@@ -77,10 +77,10 @@ type StorageProperties struct {
 	//The UUID of the Storage used to create this Snapshot.
 	ParentUUID string `json:"parent_uuid"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
-	//The human-readable name of the location. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	LocationName string `json:"location_name"`
 
 	//The UUID of an object is always unique, and refers to a specific object.
@@ -134,7 +134,7 @@ type StorageServerRelation struct {
 	//Defines the date and time the object was initially created.
 	CreateTime GSTime `json:"create_time"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	ObjectName string `json:"object_name"`
 }
 
@@ -149,7 +149,7 @@ type StorageSnapshotRelation struct {
 	//The UUID of an object is always unique, and refers to a specific object.
 	StorageUUID string `json:"storage_uuid"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	SchedulesSnapshotName string `json:"schedules_snapshot_name"`
 
 	//The UUID of an object is always unique, and refers to a specific object.
@@ -161,7 +161,7 @@ type StorageSnapshotRelation struct {
 	//Defines the date and time the object was initially created.
 	CreateTime GSTime `json:"create_time"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	ObjectName string `json:"object_name"`
 }
 
@@ -173,7 +173,7 @@ type StorageAndSnapshotScheduleRelation struct {
 	//The amount of Snapshots to keep before overwriting the last created Snapshot.
 	KeepSnapshots int `json:"keep_snapshots"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	ObjectName string `json:"object_name"`
 
 	//The date and time that the snapshot schedule will be run.
@@ -182,7 +182,7 @@ type StorageAndSnapshotScheduleRelation struct {
 	//The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
 	//Defines the date and time the object was initially created.
@@ -191,14 +191,14 @@ type StorageAndSnapshotScheduleRelation struct {
 
 //StorageTemplate JSON struct of a storage template
 type StorageTemplate struct {
-	//List of SSH Keys uuid. Optional
+	//List of SSH key UUIDs. Optional
 	Sshkeys []string `json:"sshkeys,omitempty"`
 
 	//The UUID of a template (public or private).
 	TemplateUUID string `json:"template_uuid"`
 
 	//The root (Linux) or Administrator (Windows) password to set for the installed storage. Valid only for public templates.
-	//The password has to be either plaintext or a crypt string (modular crypt format - MCF). Optional.
+	//The password has to be either plain-text or a crypt string (modular crypt format - MCF). Optional.
 	Password string `json:"password,omitempty"`
 
 	//Password type. Allowed values: not-set, PlainPasswordType, CryptPasswordType. Optional.
@@ -214,14 +214,14 @@ type StorageCreateRequest struct {
 	//Required (integer - minimum: 1 - maximum: 4096).
 	Capacity int `json:"capacity"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
 	//Storage type. Allowed values: nil, DefaultStorageType, HighStorageType, InsaneStorageType. Optional.
 	StorageType StorageType `json:"storage_type,omitempty"`
 
-	//An object holding important values such as hostnames, passwords, and SSH keys.
-	//Creating a storage with a template is required either sshkey or password.
+	//An object holding important values such as host names, passwords, and SSH keys.
+	//Creating a storage with a template is required either SSH key or password.
 	//Optional
 	Template *StorageTemplate `json:"template,omitempty"`
 
@@ -231,7 +231,7 @@ type StorageCreateRequest struct {
 
 //StorageUpdateRequest JSON struct of a request for updating a storage
 type StorageUpdateRequest struct {
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters. Optional.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters. Optional.
 	Name string `json:"name,omitempty"`
 
 	//List of labels. Optional.
@@ -244,6 +244,7 @@ type StorageUpdateRequest struct {
 	StorageType StorageType `json:"storage_type,omitempty"`
 }
 
+//StorageType represents a storages physical capabilities.
 type StorageType string
 
 //All allowed storage type's values
@@ -253,6 +254,7 @@ const (
 	InsaneStorageType  StorageType = "storage_insane"
 )
 
+//PasswordType denotes the representation of a password.
 type PasswordType string
 
 //All allowed password type's values

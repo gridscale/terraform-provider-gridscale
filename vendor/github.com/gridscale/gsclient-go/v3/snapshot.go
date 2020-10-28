@@ -46,19 +46,19 @@ type StorageSnapshotProperties struct {
 	//The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
 	//Status indicates the status of the object.
 	Status string `json:"status"`
 
-	//The human-readable name of the location. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	LocationCountry string `json:"location_country"`
 
 	//Total minutes the object has been running.
 	UsageInMinutes int `json:"usage_in_minutes"`
 
-	//Helps to identify which datacenter an object belongs to.
+	//Helps to identify which data center an object belongs to.
 	LocationUUID string `json:"location_uuid"`
 
 	//Defines the date and time of the last object change.
@@ -74,10 +74,10 @@ type StorageSnapshotProperties struct {
 	//Defines the date and time the object was initially created.
 	CreateTime GSTime `json:"create_time"`
 
-	//The capacity of a storage/ISO-Image/template/snapshot in GB.
+	//The capacity of a storage/ISO image/template/snapshot in GB.
 	Capacity int `json:"capacity"`
 
-	//The human-readable name of the location. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	LocationName string `json:"location_name"`
 
 	//Uses IATA airport code, which works as a location identifier.
@@ -89,7 +89,7 @@ type StorageSnapshotProperties struct {
 
 //StorageSnapshotCreateRequest JSON struct of a request for creating a storage snapshot
 type StorageSnapshotCreateRequest struct {
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	//Optional
 	Name string `json:"name,omitempty"`
 
@@ -108,7 +108,7 @@ type StorageSnapshotCreateResponse struct {
 
 //StorageSnapshotUpdateRequest JSON struct of a request for updating a storage snapshot
 type StorageSnapshotUpdateRequest struct {
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	//Optional
 	Name string `json:"name,omitempty"`
 

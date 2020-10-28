@@ -35,7 +35,7 @@ type StorageBackupScheduleProperties struct {
 	//value >= 1
 	KeepBackups int `json:"keep_backups"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
 	//The date and time that the storage backup schedule will be run.
@@ -72,7 +72,7 @@ type StorageBackupScheduleRelation struct {
 	//Defines the date and time the object was initially created.
 	CreateTime GSTime `json:"create_time"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
 	//The UUID of an object is always unique, and refers to a specific object.
@@ -81,7 +81,7 @@ type StorageBackupScheduleRelation struct {
 
 //StorageBackupScheduleCreateRequest JSON struct of a request for creating a storage backup schedule
 type StorageBackupScheduleCreateRequest struct {
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
 	//The interval at which the schedule will run (in minutes)
@@ -110,7 +110,7 @@ type StorageBackupScheduleCreateResponse struct {
 
 //StorageBackupScheduleUpdateRequest JSON struct of a request for updating a storage backup schedule
 type StorageBackupScheduleUpdateRequest struct {
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	//Optional.
 	Name string `json:"name,omitempty"`
 

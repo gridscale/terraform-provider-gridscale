@@ -55,28 +55,28 @@ type FirewallProperties struct {
 	//The information about other object which are related to this Firewall. The object could be Network.
 	Relations FirewallRelation `json:"relations"`
 
-	//Description of the ISO-Image release
+	//Description of the ISO image release
 	Description string `json:"description"`
 
-	//The human-readable name of the location. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	LocationName string `json:"location_name"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 }
 
 //FirewallRules is JSON struct of a list of firewall's rules
 type FirewallRules struct {
-	//Firewall template rules for inbound traffic - covers ipv6 addresses.
+	//Firewall template rules for inbound traffic - covers IPv6 addresses.
 	RulesV6In []FirewallRuleProperties `json:"rules-v6-in,omitempty"`
 
-	//Firewall template tules for outbound traffic - covers ipv6 addresses.
+	//Firewall template rules for outbound traffic - covers IPv6 addresses.
 	RulesV6Out []FirewallRuleProperties `json:"rules-v6-out,omitempty"`
 
-	//Firewall template rules for inbound traffic - covers ipv4 addresses.
+	//Firewall template rules for inbound traffic - covers IPv4 addresses.
 	RulesV4In []FirewallRuleProperties `json:"rules-v4-in,omitempty"`
 
-	//Firewall template rules for outbound traffic - covers ipv4 addresses.
+	//Firewall template rules for outbound traffic - covers IPv4 addresses.
 	RulesV4Out []FirewallRuleProperties `json:"rules-v4-out,omitempty"`
 }
 
@@ -85,13 +85,13 @@ type FirewallRuleProperties struct {
 	//Enum:"udp" "tcp". Allowed values: `TCPTransport`, `UDPTransport`
 	Protocol TransportLayerProtocol `json:"protocol"`
 
-	//A Number between 1 and 65535, port ranges are seperated by a colon for FTP.
+	//A Number between 1 and 65535, port ranges are separated by a colon for FTP.
 	DstPort string `json:"dst_port,omitempty"`
 
-	//A Number between 1 and 65535, port ranges are seperated by a colon for FTP.
+	//A Number between 1 and 65535, port ranges are separated by a colon for FTP.
 	SrcPort string `json:"src_port,omitempty"`
 
-	//A Number between 1 and 65535, port ranges are seperated by a colon for FTP.
+	//A Number between 1 and 65535, port ranges are separated by a colon for FTP.
 	SrcCidr string `json:"src_cidr,omitempty"`
 
 	//Enum:"accept" "drop". This defines what the firewall will do. Either accept or drop.
@@ -125,13 +125,13 @@ type NetworkInFirewall struct {
 	//The UUID of the network you're requesting.
 	NetworkUUID string `json:"network_uuid"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	NetworkName string `json:"network_name"`
 
 	//The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	ObjectName string `json:"object_name"`
 }
 
@@ -168,6 +168,7 @@ type FirewallUpdateRequest struct {
 	Rules *FirewallRules `json:"rules,omitempty"`
 }
 
+//TransportLayerProtocol represents a layer 4 protocol.
 type TransportLayerProtocol string
 
 //All available transport protocol

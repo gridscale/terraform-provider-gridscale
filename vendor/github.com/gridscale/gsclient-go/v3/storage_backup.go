@@ -26,6 +26,7 @@ type StorageBackup struct {
 	Properties StorageBackupProperties `json:"backup"`
 }
 
+//StorageBackupProperties hold the properties of a single backup.
 type StorageBackupProperties struct {
 	//The UUID of a backup is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
@@ -82,7 +83,7 @@ func (c *Client) RollbackStorageBackup(ctx context.Context, storageID, backupID 
 		return errors.New("'storageID' or 'backupID' is invalid")
 	}
 	r := gsRequest{
-		uri:    path.Join(apiStorageBase, storageID, "backups", backupID),
+		uri:    path.Join(apiStorageBase, storageID, "backups", backupID, "rollback"),
 		method: http.MethodPatch,
 		body:   body,
 	}

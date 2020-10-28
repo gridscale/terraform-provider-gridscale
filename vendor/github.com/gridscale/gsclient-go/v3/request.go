@@ -119,9 +119,16 @@ func (r *gsRequest) prepareHTTPRequest(ctx context.Context, cfg *Config) (*http.
 	}
 	request = request.WithContext(ctx)
 	request.Header.Set("User-Agent", cfg.userAgent)
-	request.Header.Set("X-Auth-UserID", cfg.userUUID)
-	request.Header.Set("X-Auth-Token", cfg.apiToken)
 	request.Header.Set("Content-Type", bodyType)
+
+	// Omit X-Auth-UserID when cfg.userUUID is empty
+	if cfg.userUUID != "" {
+		request.Header.Set("X-Auth-UserID", cfg.userUUID)
+	}
+	// Omit X-Auth-Token when cfg.apiToken is empty
+	if cfg.apiToken != "" {
+		request.Header.Set("X-Auth-Token", cfg.apiToken)
+	}
 
 	//Set headers based on a given list of custom headers
 	//Use Header.Set() instead of Header.Add() because we want to

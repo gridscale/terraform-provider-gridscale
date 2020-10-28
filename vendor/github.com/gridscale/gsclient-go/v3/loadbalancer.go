@@ -17,19 +17,19 @@ type LoadBalancerOperator interface {
 	GetLoadBalancerEventList(ctx context.Context, id string) ([]Event, error)
 }
 
-//LoadBalancers is the JSON struct of a list of loadbalancers
+//LoadBalancers is the JSON struct of a list of load balancers
 type LoadBalancers struct {
-	//Array of loadbalancers
+	//Array of load balancers
 	List map[string]LoadBalancerProperties `json:"loadbalancers"`
 }
 
-//LoadBalancer is the JSON struct of a loadbalancer
+//LoadBalancer is the JSON struct of a load balancer
 type LoadBalancer struct {
-	//Properties of a loadbalancer
+	//Properties of a load balancer
 	Properties LoadBalancerProperties `json:"loadbalancer"`
 }
 
-//LoadBalancerProperties is the properties of a loadbalancer
+//LoadBalancerProperties is the properties of a load balancer
 type LoadBalancerProperties struct {
 	//The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
@@ -37,16 +37,16 @@ type LoadBalancerProperties struct {
 	//Defines the numbering of the Data Centers on a given IATA location (e.g. where fra is the location_iata, the site is then 1, 2, 3, ...).
 	LocationSite string `json:"location_site"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
-	//Forwarding rules of a loadbalancer
+	//Forwarding rules of a load balancer
 	ForwardingRules []ForwardingRule `json:"forwarding_rules"`
 
 	//Uses IATA airport code, which works as a location identifier.
 	LocationIata string `json:"location_iata"`
 
-	//Helps to identify which datacenter an object belongs to.
+	//Helps to identify which data center an object belongs to.
 	LocationUUID string `json:"location_uuid"`
 
 	//The servers that this Load balancer can communicate with.
@@ -61,7 +61,7 @@ type LoadBalancerProperties struct {
 	//The price for the current period since the last bill.
 	CurrentPrice float64 `json:"current_price"`
 
-	//The human-readable name of the location. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	LocationCountry string `json:"location_country"`
 
 	//Whether the Load balancer is forced to redirect requests from HTTP to HTTPS.
@@ -70,7 +70,7 @@ type LoadBalancerProperties struct {
 	//List of labels.
 	Labels []string `json:"labels"`
 
-	//The human-readable name of the location. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	LocationName string `json:"location_name"`
 
 	//Total minutes of cores used
@@ -100,7 +100,7 @@ type BackendServer struct {
 
 //ForwardingRule is the JSON struct of forwarding rule
 type ForwardingRule struct {
-	//SSL from Letsencrypt
+	//SSL from LetsEncrypt
 	LetsencryptSSL interface{} `json:"letsencrypt_ssl"`
 
 	//Listen port
@@ -113,24 +113,24 @@ type ForwardingRule struct {
 	TargetPort int `json:"target_port"`
 }
 
-//LoadBalancerCreateRequest is the JSON struct for creating a loadbalancer request
+//LoadBalancerCreateRequest is the JSON struct for creating a load balancer request
 type LoadBalancerCreateRequest struct {
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	ListenIPv6UUID string `json:"listen_ipv6_uuid"`
 
-	//The UUID of the IPv4 address the loadbalancer will listen to for incoming requests.
+	//The UUID of the IPv4 address the load balancer will listen to for incoming requests.
 	ListenIPv4UUID string `json:"listen_ipv4_uuid"`
 
 	//The algorithm used to process requests. Allowed values: `LoadbalancerRoundrobinAlg`, `LoadbalancerLeastConnAlg`
 	Algorithm LoadbalancerAlgorithm `json:"algorithm"`
 
-	//An array of ForwardingRule objects containing the forwarding rules for the loadbalancer
+	//An array of ForwardingRule objects containing the forwarding rules for the load balancer
 	ForwardingRules []ForwardingRule `json:"forwarding_rules"`
 
-	//The servers that this loadbalancer can communicate with
+	//The servers that this load balancer can communicate with
 	BackendServers []BackendServer `json:"backend_servers"`
 
 	//List of labels.
@@ -143,12 +143,12 @@ type LoadBalancerCreateRequest struct {
 	Status string `json:"status,omitempty"`
 }
 
-//LoadBalancerUpdateRequest is the JSON struct for updating a loadbalancer request
+//LoadBalancerUpdateRequest is the JSON struct for updating a load balancer request
 type LoadBalancerUpdateRequest struct {
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	ListenIPv6UUID string `json:"listen_ipv6_uuid"`
 
 	//The UUID of the IPv4 address the loadbalancer will listen to for incoming requests.
@@ -157,10 +157,10 @@ type LoadBalancerUpdateRequest struct {
 	//The algorithm used to process requests. Allowed values: `LoadbalancerRoundrobinAlg`, `LoadbalancerLeastConnAlg`
 	Algorithm LoadbalancerAlgorithm `json:"algorithm"`
 
-	//An array of ForwardingRule objects containing the forwarding rules for the loadbalancer
+	//An array of ForwardingRule objects containing the forwarding rules for the load balancer
 	ForwardingRules []ForwardingRule `json:"forwarding_rules"`
 
-	//The servers that this loadbalancer can communicate with
+	//The servers that this load balancer can communicate with
 	BackendServers []BackendServer `json:"backend_servers"`
 
 	//List of labels.
@@ -173,24 +173,24 @@ type LoadBalancerUpdateRequest struct {
 	Status string `json:"status,omitempty"`
 }
 
-//LoadBalancerCreateResponse is the JSON struct for a loadbalancer response
+//LoadBalancerCreateResponse is the JSON struct for a load balancer response
 type LoadBalancerCreateResponse struct {
 	//Request's UUID
 	RequestUUID string `json:"request_uuid"`
 
-	//UUID of the loadbalancer being created
+	//UUID of the load balancer being created
 	ObjectUUID string `json:"object_uuid"`
 }
 
 type LoadbalancerAlgorithm string
 
-//All available loadbalancer algorithms
+//All available load balancer algorithms
 var (
 	LoadbalancerRoundrobinAlg LoadbalancerAlgorithm = "roundrobin"
 	LoadbalancerLeastConnAlg  LoadbalancerAlgorithm = "leastconn"
 )
 
-//GetLoadBalancerList returns a list of loadbalancers
+//GetLoadBalancerList returns a list of load balancers
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getLoadbalancers
 func (c *Client) GetLoadBalancerList(ctx context.Context) ([]LoadBalancer, error) {
@@ -208,7 +208,7 @@ func (c *Client) GetLoadBalancerList(ctx context.Context) ([]LoadBalancer, error
 	return loadBalancers, err
 }
 
-//GetLoadBalancer returns a loadbalancer of a given uuid
+//GetLoadBalancer returns a load balancer of a given UUID
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getLoadbalancer
 func (c *Client) GetLoadBalancer(ctx context.Context, id string) (LoadBalancer, error) {
@@ -225,9 +225,9 @@ func (c *Client) GetLoadBalancer(ctx context.Context, id string) (LoadBalancer, 
 	return response, err
 }
 
-//CreateLoadBalancer creates a new loadbalancer
+//CreateLoadBalancer creates a new load balancer
 //
-//Note: loadbalancer's algorithm can only be either `LoadbalancerRoundrobinAlg` or `LoadbalancerLeastConnAlg`
+//Note: A load balancer's algorithm can only be either `LoadbalancerRoundrobinAlg` or `LoadbalancerLeastConnAlg`
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/createLoadbalancer
 func (c *Client) CreateLoadBalancer(ctx context.Context, body LoadBalancerCreateRequest) (LoadBalancerCreateResponse, error) {
@@ -244,9 +244,9 @@ func (c *Client) CreateLoadBalancer(ctx context.Context, body LoadBalancerCreate
 	return response, err
 }
 
-//UpdateLoadBalancer update configuration of a loadbalancer
+//UpdateLoadBalancer update configuration of a load balancer
 //
-//Note: loadbalancer's algorithm can only be either `LoadbalancerRoundrobinAlg` or `LoadbalancerLeastConnAlg`
+//Note: A load balancer's algorithm can only be either `LoadbalancerRoundrobinAlg` or `LoadbalancerLeastConnAlg`
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/updateLoadbalancer
 func (c *Client) UpdateLoadBalancer(ctx context.Context, id string, body LoadBalancerUpdateRequest) error {
@@ -264,7 +264,7 @@ func (c *Client) UpdateLoadBalancer(ctx context.Context, id string, body LoadBal
 	return r.execute(ctx, *c, nil)
 }
 
-//GetLoadBalancerEventList retrieves events of a given uuid
+//GetLoadBalancerEventList retrieves events of a given UUID
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/getLoadbalancerEvents
 func (c *Client) GetLoadBalancerEventList(ctx context.Context, id string) ([]Event, error) {
@@ -285,7 +285,7 @@ func (c *Client) GetLoadBalancerEventList(ctx context.Context, id string) ([]Eve
 	return loadBalancerEvents, err
 }
 
-//DeleteLoadBalancer deletes a loadbalancer
+//DeleteLoadBalancer deletes a load balancer
 //
 //See: https://gridscale.io/en//api-documentation/index.html#operation/deleteLoadbalancer
 func (c *Client) DeleteLoadBalancer(ctx context.Context, id string) error {

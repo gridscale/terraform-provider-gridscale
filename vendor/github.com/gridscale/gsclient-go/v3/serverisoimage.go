@@ -18,27 +18,27 @@ type ServerIsoImageRelationOperator interface {
 	UnlinkIsoImage(ctx context.Context, serverID string, isoimageID string) error
 }
 
-//ServerIsoImageRelationList JSON struct of a list of relations between a server and ISO-Images
+//ServerIsoImageRelationList JSON struct of a list of relations between a server and ISO images
 type ServerIsoImageRelationList struct {
-	//Array of relations between a server and ISO-Images
+	//Array of relations between a server and ISO images
 	List []ServerIsoImageRelationProperties `json:"isoimage_relations"`
 }
 
-//ServerIsoImageRelation JSON struct of a single relation between a server and an ISO-Image
+//ServerIsoImageRelation JSON struct of a single relation between a server and an ISO image
 type ServerIsoImageRelation struct {
-	//Properties of a relation between a server and an ISO-Image
+	//Properties of a relation between a server and an ISO image
 	Properties ServerIsoImageRelationProperties `json:"isoimage_relation"`
 }
 
-//ServerIsoImageRelationProperties JSON struct of properties of a relation between a server and an ISO-Image
+//ServerIsoImageRelationProperties JSON struct of properties of a relation between a server and an ISO image
 type ServerIsoImageRelationProperties struct {
 	//The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	ObjectName string `json:"object_name"`
 
-	//Whether the ISO-Image is private or not.
+	//Whether the ISO image is private or not.
 	Private bool `json:"private"`
 
 	//Defines the date and time the object was initially created.
@@ -48,13 +48,13 @@ type ServerIsoImageRelationProperties struct {
 	Bootdevice bool `json:"bootdevice"`
 }
 
-//ServerIsoImageRelationCreateRequest JSON struct of a request for creating a relation between a server and an ISO-Image
+//ServerIsoImageRelationCreateRequest JSON struct of a request for creating a relation between a server and an ISO image
 type ServerIsoImageRelationCreateRequest struct {
 	//The UUID of the ISO-image you are requesting.
 	ObjectUUID string `json:"object_uuid"`
 }
 
-//ServerIsoImageRelationUpdateRequest JSON struct of a request for updating a relation between a server and an ISO-Image
+//ServerIsoImageRelationUpdateRequest JSON struct of a request for updating a relation between a server and an ISO image
 type ServerIsoImageRelationUpdateRequest struct {
 	//Whether the server boots from this ISO-image or not.
 	BootDevice bool   `json:"bootdevice"`

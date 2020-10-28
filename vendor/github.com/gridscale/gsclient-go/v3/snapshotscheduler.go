@@ -43,7 +43,7 @@ type StorageSnapshotScheduleProperties struct {
 	//List of labels.
 	Labels []string `json:"labels"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
 	//The date and time that the snapshot schedule will be run.
@@ -77,7 +77,7 @@ type StorageSnapshotScheduleRelation struct {
 	//Defines the date and time the object was initially created.
 	CreateTime GSTime `json:"create_time"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
 	//The UUID of an object is always unique, and refers to a specific object.
@@ -86,7 +86,7 @@ type StorageSnapshotScheduleRelation struct {
 
 //StorageSnapshotScheduleCreateRequest JSON struct of a request for creating a storage snapshot schedule
 type StorageSnapshotScheduleCreateRequest struct {
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
 	//List of labels. Optional.
@@ -115,7 +115,7 @@ type StorageSnapshotScheduleCreateResponse struct {
 
 //StorageSnapshotScheduleUpdateRequest JSON struct of a request for updating a storage snapshot schedule
 type StorageSnapshotScheduleUpdateRequest struct {
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	//Optional.
 	Name string `json:"name,omitempty"`
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.2.2 (October 27, 2020)
+
+IMPROVEMENTS:
+* Omit `X-Auth-UserID` and `X-Auth-Token` HTTP headers when they are empty.
+* Documentation fixes
+* StorageBackup and MarketPlaceApplication related schema fixes
+
 ## 3.2.1 (September 4, 2020)
 
 BUG FIXES:

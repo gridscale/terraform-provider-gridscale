@@ -79,7 +79,7 @@ type PaaSServiceProperties struct {
 	//Status indicates the status of the object.
 	Status string `json:"status"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
 	//A list of service resource limits.
@@ -109,7 +109,7 @@ type Credential struct {
 
 //PaaSServiceCreateRequest is JSON struct of a request for creating a PaaS service
 type PaaSServiceCreateRequest struct {
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
 	//The template used to create the service, you can find an available list at the /service_templates endpoint.
@@ -175,7 +175,7 @@ type PaaSTemplate struct {
 
 //PaaSTemplateProperties is JSOn struct of properties of a PaaS template
 type PaaSTemplateProperties struct {
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
 	//The UUID of an object is always unique, and refers to a specific object.
@@ -241,7 +241,7 @@ type Resource struct {
 
 //PaaSServiceUpdateRequest JSON of a request for updating a PaaS service
 type PaaSServiceUpdateRequest struct {
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	//Leave it if you do not want to update the name
 	Name string `json:"name,omitempty"`
 
@@ -308,7 +308,7 @@ type PaaSSecurityZone struct {
 
 //PaaSSecurityZoneProperties JSOn struct of properties of a PaaS security zone
 type PaaSSecurityZoneProperties struct {
-	//The human-readable name of the location. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	LocationCountry string `json:"location_country"`
 
 	//Defines the date and time the object was initially created.
@@ -323,19 +323,19 @@ type PaaSSecurityZoneProperties struct {
 	//List of labels.
 	Labels []string `json:"labels"`
 
-	//The human-readable name of the location. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	LocationName string `json:"location_name"`
 
 	//Status indicates the status of the object.
 	Status string `json:"status"`
 
-	//Helps to identify which datacenter an object belongs to.
+	//Helps to identify which data center an object belongs to.
 	LocationUUID string `json:"location_uuid"`
 
 	//Defines the date and time of the last object change.
 	ChangeTime GSTime `json:"change_time"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
 	//object (PaaSRelationService)
@@ -356,7 +356,7 @@ type ServiceObject struct {
 
 //PaaSSecurityZoneCreateRequest JSON struct of a request for creating a PaaS security zone
 type PaaSSecurityZoneCreateRequest struct {
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 }
 

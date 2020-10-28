@@ -47,7 +47,7 @@ type ServerProperties struct {
 	//The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
 	//Indicates the amount of memory in GB.
@@ -62,7 +62,7 @@ type ServerProperties struct {
 	//Status indicates the status of the object. it could be in-provisioning or active
 	Status string `json:"status"`
 
-	//Helps to identify which datacenter an object belongs to.
+	//Helps to identify which data center an object belongs to.
 	LocationUUID string `json:"location_uuid"`
 
 	//The power status of the server.
@@ -78,7 +78,7 @@ type ServerProperties struct {
 	AutoRecovery bool `json:"auto_recovery"`
 
 	//Legacy-Hardware emulation instead of virtio hardware.
-	//If enabled, hotplugging cores, memory, storage, network, etc. will not work,
+	//If enabled, hot-plugging cores, memory, storage, network, etc. will not work,
 	//but the server will most likely run every x86 compatible operating system.
 	//This mode comes with a performance penalty, as emulated hardware does not benefit from the virtio driver infrastructure.
 	Legacy bool `json:"legacy"`
@@ -95,7 +95,7 @@ type ServerProperties struct {
 	//List of labels.
 	Labels []string `json:"labels"`
 
-	//The information about other object which are related to this server. the object could be ip, storage, network, and isoimage
+	//Information about other objects which are related to this server. Object could be IPs, storages, networks, and ISO images.
 	Relations ServerRelations `json:"relations"`
 
 	//Defines the date and time the object was initially created.
@@ -122,7 +122,7 @@ type ServerRelations struct {
 
 //ServerCreateRequest JSON struct of a request for creating a server
 type ServerCreateRequest struct {
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
 	//The amount of server memory in GB.
@@ -221,7 +221,7 @@ type ServerCreateRequestIP struct {
 	IPaddrUUID string `json:"ipaddr_uuid"`
 }
 
-//ServerCreateRequestIsoimage JSON struct of a relation between a server and an ISO-Image
+//ServerCreateRequestIsoimage JSON struct of a relation between a server and an ISO image
 type ServerCreateRequestIsoimage struct {
 	//UUID of the ISO-image being attached to the server
 	IsoimageUUID string `json:"isoimage_uuid"`
@@ -229,7 +229,7 @@ type ServerCreateRequestIsoimage struct {
 
 //ServerUpdateRequest JSON of a request for updating a server
 type ServerUpdateRequest struct {
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	//Leave it if you do not want to update the name.
 	Name string `json:"name,omitempty"`
 

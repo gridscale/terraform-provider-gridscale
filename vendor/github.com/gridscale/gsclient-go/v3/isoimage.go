@@ -42,16 +42,16 @@ type ISOImageProperties struct {
 	//The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
 
-	//The information about other object which are related to this isoimage.
+	//The information about other object which are related to this ISO image.
 	Relations ISOImageRelation `json:"relations"`
 
-	//Description of the ISO-Image release.
+	//Description of the ISO image release.
 	Description string `json:"description"`
 
-	//The human-readable name of the location. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	LocationName string `json:"location_name"`
 
-	//Contains the source URL of the ISO-Image that it was originally fetched from.
+	//Contains the source URL of the ISO image that it was originally fetched from.
 	SourceURL string `json:"source_url"`
 
 	//List of labels
@@ -60,7 +60,7 @@ type ISOImageProperties struct {
 	//Uses IATA airport code, which works as a location identifier.
 	LocationIata string `json:"location_iata"`
 
-	//Helps to identify which datacenter an object belongs to.
+	//Helps to identify which data center an object belongs to.
 	LocationUUID string `json:"location_uuid"`
 
 	//Status indicates the status of the object.
@@ -69,38 +69,38 @@ type ISOImageProperties struct {
 	//Defines the date and time the object was initially created.
 	CreateTime GSTime `json:"create_time"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
-	//Upstream version of the ISO-Image release
+	//Upstream version of the ISO image release
 	Version string `json:"version"`
 
-	//The human-readable name of the location. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	LocationCountry string `json:"location_country"`
 
 	//Total minutes the object has been running.
 	UsageInMinutes int `json:"usage_in_minutes"`
 
-	//Whether the ISO-Image is private or not.
+	//Whether the ISO image is private or not.
 	Private bool `json:"private"`
 
 	//Defines the date and time of the last object change.
 	ChangeTime GSTime `json:"change_time"`
 
-	//The capacity of an ISO-Image in GB.
+	//The capacity of an ISO image in GB.
 	Capacity int `json:"capacity"`
 
 	//The price for the current period since the last bill.
 	CurrentPrice float64 `json:"current_price"`
 }
 
-//ISOImageRelation is JSON struct of a list of an ISO-Image's relations
+//ISOImageRelation is JSON struct of a list of an ISO image's relations
 type ISOImageRelation struct {
 	//Array of object (ServerinIsoimage)
 	Servers []ServerinISOImage `json:"servers"`
 }
 
-//ServerinISOImage is JSON struct of a relation between an ISO-Image and a Server
+//ServerinISOImage is JSON struct of a relation between an ISO image and a Server
 type ServerinISOImage struct {
 	//Whether the server boots from this iso image or not.
 	Bootdevice bool `json:"bootdevice"`
@@ -108,26 +108,26 @@ type ServerinISOImage struct {
 	//Defines the date and time the object was initially created.
 	CreateTime GSTime `json:"create_time"`
 
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	ObjectName string `json:"object_name"`
 
 	//The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
 }
 
-//ISOImageCreateRequest is JSON struct of a request for creating an ISO-Image
+//ISOImageCreateRequest is JSON struct of a request for creating an ISO image
 type ISOImageCreateRequest struct {
-	//The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
-	//The source URL from which the ISO-Image should be downloaded.
+	//The source URL from which the ISO image should be downloaded.
 	SourceURL string `json:"source_url"`
 
 	//List of labels. Can be leave empty.
 	Labels []string `json:"labels,omitempty"`
 }
 
-//ISOImageCreateResponse is JSON struct of a response for creating an ISO-Image
+//ISOImageCreateResponse is JSON struct of a response for creating an ISO image
 type ISOImageCreateResponse struct {
 	//Request's UUID
 	RequestUUID string `json:"request_uuid"`
@@ -136,7 +136,7 @@ type ISOImageCreateResponse struct {
 	ObjectUUID string `json:"object_uuid"`
 }
 
-//ISOImageUpdateRequest is JSON struct of a request for updating an ISO-Image
+//ISOImageUpdateRequest is JSON struct of a request for updating an ISO image
 type ISOImageUpdateRequest struct {
 	//New name. Leave it if you do not want to update the name.
 	Name string `json:"name,omitempty"`
