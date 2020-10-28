@@ -51,7 +51,7 @@ The following arguments are supported:
 * `source` - (Required) The global source address for the provider you intend to use. In this case, we use `gridscale/gridscale`
 * `version` - (Optional) A version constraint specifying which subset of available provider versions the module is compatible with.
 
-* `uuid` - (Required) This is the User-UUID for the gridscale API. It can be found [in the panel](https://my.gridscale.io/APIs/). If omitted, the GRIDSCALE_UUID environment variable is used.
-* `token` - (Required) This is an API-Token for the gridscale API. It can be created [in the panel](https://my.gridscale.io/APIs/). The created token needs to have full access to be usable by Terraform. If omitted, the GRIDSCALE_TOKEN environment variable is used.
+* `uuid` - (Optional) This is the User-UUID for the gridscale API. It can be found [in the panel](https://my.gridscale.io/APIs/). If omitted, the GRIDSCALE_UUID environment variable is used.
+* `token` - (Optional) This is an API-Token for the gridscale API. It can be created [in the panel](https://my.gridscale.io/APIs/). The created token needs to have full access to be usable by Terraform. If omitted, the GRIDSCALE_TOKEN environment variable is used.
 * `api_url` - (Optional) The URL for the API. By default this is set to "https://api.gridscale.io". Do not add a "/" character at the end.
 * `http_headers` - (Optional) Custom HTTP headers sent to gridscale server. If omitted, the GRIDSCALE_TF_HEADERS environment variable is used. 
