@@ -1,3 +1,13 @@
+# Changelog
+
+## 1.7.2 (UNRELEASED)
+
+CHANGES:
+
+* Update gsclient-go package to v3.2.2.
+* Allow to omit user UUID and API token when they are empty.
+* Update release checklist. No need to do GPG signing and building manually. All done by the pipeline now.
+
 ## 1.7.1 (Oct 15, 2020)
 
 BUG FIXES:
@@ -10,12 +20,12 @@ BUG FIXES:
 FEATURES:
 
 * Support marketplace application features.
-* Support storage backup functionalities and schedule storage backup.
+* Support storage backup functionality and schedule storage backup.
 
 IMPROVEMENTS:
 
 * Update gsclient-go package to v3.2.1.
-* Replace travis with github actions.
+* Replace Travis CI with GitHub Actions.
 
 BUG FIXES:
 
