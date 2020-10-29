@@ -30,7 +30,7 @@ jobs:
       run: |
         gpg --pinentry-mode=loopback --passphrase $GPG_PASSPHRASE --armor --detach-sign --local-user "${GPG_FINGERPRINT}" README.md
         rm -f README.md.asc
-    
+
     - name: Build executable files
       env:
         GPG_FINGERPRINT: oss@gridscale.io
