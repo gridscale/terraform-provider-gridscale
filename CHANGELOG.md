@@ -1,11 +1,11 @@
 # Changelog
 
-## 1.7.2 (UNRELEASED)
+## 1.7.2 (Oct 29, 2020)
 
 CHANGES:
 
 * Update gsclient-go package to v3.2.2.
-* Allow to omit user UUID and API token when they are empty.
+* Allow to omit user UUID and API token in requests when they are empty.
 * Update release checklist. No need to do GPG signing and building manually. All done by the pipeline now.
 
 ## 1.7.1 (Oct 15, 2020)
