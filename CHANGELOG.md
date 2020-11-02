@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.3 (Nov 02, 2020)
+
+BUG FIXES:
+
+* The ordering of networks in a server's relation now can be set. See [#95](https://github.com/gridscale/terraform-provider-gridscale/issues/95).
+
 ## 1.7.2 (Oct 29, 2020)
 
 CHANGES:

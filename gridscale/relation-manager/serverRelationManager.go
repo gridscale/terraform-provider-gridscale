@@ -3,8 +3,9 @@ package relationmanager
 import (
 	"context"
 	"fmt"
-	fwu "github.com/terraform-providers/terraform-provider-gridscale/gridscale/firewall-utils"
 	"net/http"
+
+	fwu "github.com/terraform-providers/terraform-provider-gridscale/gridscale/firewall-utils"
 
 	"github.com/gridscale/gsclient-go/v3"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -135,7 +136,7 @@ func (c *ServerRelationManger) LinkNetworks(ctx context.Context) error {
 				network["object_uuid"].(string),
 				network["firewall_template_uuid"].(string),
 				network["bootdevice"].(bool),
-				0,
+				network["ordering"].(int),
 				nil,
 				&customFwRules,
 			)
