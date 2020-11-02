@@ -24,12 +24,12 @@ func dataSourceGridscaleISOImage() *schema.Resource {
 			},
 			"name": {
 				Type:        schema.TypeString,
-				Description: "The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.",
+				Description: "The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.",
 				Computed:    true,
 			},
 			"source_url": {
 				Type:        schema.TypeString,
-				Description: "Contains the source URL of the ISO Image that it was originally fetched from.",
+				Description: "Contains the source URL of the ISO image that it was originally fetched from.",
 				Computed:    true,
 			},
 			"server": {
@@ -74,7 +74,7 @@ func dataSourceGridscaleISOImage() *schema.Resource {
 			},
 			"location_name": {
 				Type:        schema.TypeString,
-				Description: "The human-readable name of the location. It supports the full UTF-8 charset, with a maximum of 64 characters",
+				Description: "The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters",
 				Computed:    true,
 			},
 			"status": {
@@ -84,7 +84,7 @@ func dataSourceGridscaleISOImage() *schema.Resource {
 			},
 			"version": {
 				Type:        schema.TypeString,
-				Description: "Upstream version of the ISO Image release",
+				Description: "Upstream version of the ISO image release",
 				Computed:    true,
 			},
 			"private": {
@@ -104,7 +104,7 @@ func dataSourceGridscaleISOImage() *schema.Resource {
 			},
 			"description": {
 				Type:        schema.TypeString,
-				Description: "Description of the ISO Image.",
+				Description: "Description of the ISO image.",
 				Computed:    true,
 			},
 			"labels": {
@@ -120,7 +120,7 @@ func dataSourceGridscaleISOImage() *schema.Resource {
 			},
 			"capacity": {
 				Type:        schema.TypeInt,
-				Description: "The capacity of a storage/ISO Image/template/snapshot in GB.",
+				Description: "The capacity of a storage/ISO image/template/snapshot in GB.",
 				Computed:    true,
 			},
 			"current_price": {

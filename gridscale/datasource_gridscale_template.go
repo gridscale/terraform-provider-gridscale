@@ -39,7 +39,7 @@ func dataSourceGridscaleTemplate() *schema.Resource {
 			},
 			"location_name": {
 				Type:        schema.TypeString,
-				Description: "The human-readable name of the location. It supports the full UTF-8 charset, with a maximum of 64 characters",
+				Description: "The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters",
 				Computed:    true,
 			},
 			"status": {
@@ -78,12 +78,12 @@ func dataSourceGridscaleTemplate() *schema.Resource {
 			},
 			"distro": {
 				Type:        schema.TypeString,
-				Description: "The OS distrobution that the Template contains.",
+				Description: "The OS distribution that the template contains.",
 				Computed:    true,
 			},
 			"description": {
 				Type:        schema.TypeString,
-				Description: "Description of the Template.",
+				Description: "Description of the template.",
 				Computed:    true,
 			},
 			"labels": {
@@ -99,7 +99,7 @@ func dataSourceGridscaleTemplate() *schema.Resource {
 			},
 			"capacity": {
 				Type:        schema.TypeInt,
-				Description: "The capacity of a storage/ISO Image/template/snapshot in GB.",
+				Description: "The capacity of a storage/ISO image/template/snapshot in GB.",
 				Computed:    true,
 			},
 			"current_price": {

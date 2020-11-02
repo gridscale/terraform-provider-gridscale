@@ -25,7 +25,7 @@ func resourceGridscaleTemplate() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:        schema.TypeString,
-				Description: "The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.",
+				Description: "The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.",
 				Required:    true,
 			},
 			"snapshot_uuid": {
@@ -51,7 +51,7 @@ func resourceGridscaleTemplate() *schema.Resource {
 			},
 			"location_name": {
 				Type:        schema.TypeString,
-				Description: "The human-readable name of the location. It supports the full UTF-8 charset, with a maximum of 64 characters",
+				Description: "The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters",
 				Computed:    true,
 			},
 			"status": {
@@ -90,12 +90,12 @@ func resourceGridscaleTemplate() *schema.Resource {
 			},
 			"distro": {
 				Type:        schema.TypeString,
-				Description: "The OS distrobution that the Template contains.",
+				Description: "The OS distribution that the template contains.",
 				Computed:    true,
 			},
 			"description": {
 				Type:        schema.TypeString,
-				Description: "Description of the Template.",
+				Description: "Description of the template.",
 				Computed:    true,
 			},
 			"labels": {
@@ -111,7 +111,7 @@ func resourceGridscaleTemplate() *schema.Resource {
 			},
 			"capacity": {
 				Type:        schema.TypeInt,
-				Description: "The capacity of a storage/ISO Image/template/snapshot in GB.",
+				Description: "The capacity of a storage/ISO image/template/snapshot in GB.",
 				Computed:    true,
 			},
 			"current_price": {

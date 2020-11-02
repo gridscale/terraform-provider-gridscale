@@ -73,7 +73,7 @@ func dataSourceGridscaleStorageSnapshot() *schema.Resource {
 			"license_product_no": {
 				Type:     schema.TypeInt,
 				Computed: true,
-				Description: `If a template has been used that requires a license key (e.g. Windows Servers) this shows 
+				Description: `If a template has been used that requires a license key (e.g. Windows Servers) this shows
 the product_no of the license (see the /prices endpoint for more details)`,
 			},
 			"current_price": {
@@ -84,7 +84,7 @@ the product_no of the license (see the /prices endpoint for more details)`,
 			"capacity": {
 				Type:        schema.TypeInt,
 				Computed:    true,
-				Description: "The capacity of a storage/ISO Image/template/snapshot in GB",
+				Description: "The capacity of a storage/ISO image/template/snapshot in GB",
 			},
 			"labels": {
 				Type:        schema.TypeList,

@@ -25,12 +25,12 @@ func resourceGridscaleISOImage() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:        schema.TypeString,
-				Description: "The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.",
+				Description: "The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.",
 				Required:    true,
 			},
 			"source_url": {
 				Type:        schema.TypeString,
-				Description: "Contains the source URL of the ISO Image that it was originally fetched from.",
+				Description: "Contains the source URL of the ISO image that it was originally fetched from.",
 				Required:    true,
 				ForceNew:    true,
 			},
@@ -76,7 +76,7 @@ func resourceGridscaleISOImage() *schema.Resource {
 			},
 			"location_name": {
 				Type:        schema.TypeString,
-				Description: "The human-readable name of the location. It supports the full UTF-8 charset, with a maximum of 64 characters",
+				Description: "The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters",
 				Computed:    true,
 			},
 			"status": {
@@ -86,7 +86,7 @@ func resourceGridscaleISOImage() *schema.Resource {
 			},
 			"version": {
 				Type:        schema.TypeString,
-				Description: "Upstream version of the ISO Image release",
+				Description: "Upstream version of the ISO image release",
 				Computed:    true,
 			},
 			"private": {
@@ -106,7 +106,7 @@ func resourceGridscaleISOImage() *schema.Resource {
 			},
 			"description": {
 				Type:        schema.TypeString,
-				Description: "Description of the ISO Image.",
+				Description: "Description of the ISO image.",
 				Computed:    true,
 			},
 			"labels": {
@@ -122,7 +122,7 @@ func resourceGridscaleISOImage() *schema.Resource {
 			},
 			"capacity": {
 				Type:        schema.TypeInt,
-				Description: "The capacity of a storage/ISO Image/template/snapshot in GB.",
+				Description: "The capacity of a storage/ISO image/template/snapshot in GB.",
 				Computed:    true,
 			},
 			"current_price": {

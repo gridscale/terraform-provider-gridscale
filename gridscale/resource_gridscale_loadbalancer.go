@@ -26,7 +26,7 @@ func resourceGridscaleLoadBalancer() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:         schema.TypeString,
-				Description:  "The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters",
+				Description:  "The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters",
 				Required:     true,
 				ValidateFunc: validation.NoZeroValues,
 			},
@@ -48,7 +48,7 @@ func resourceGridscaleLoadBalancer() *schema.Resource {
 						}
 					}
 					if !valid {
-						errors = append(errors, fmt.Errorf("%v is not a valid loadbalancer algorithm. Valid loadbalancer algorithms are: %v", v.(string), strings.Join(loadbalancerAlgs, ",")))
+						errors = append(errors, fmt.Errorf("%v is not a valid load balancer algorithm. Valid load balancer algorithms are: %v", v.(string), strings.Join(loadbalancerAlgs, ",")))
 					}
 					return
 				},
