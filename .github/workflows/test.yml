@@ -35,5 +35,5 @@ jobs:
         env:
           GRIDSCALE_UUID: ${{ secrets.CI_USER_UUID }}
           GRIDSCALE_TOKEN: ${{ secrets.CI_API_TOKEN }}
-          GRIDSCALE_URL: https://dev.gridscale.cloud
+          GRIDSCALE_URL: https://api.gridscale.cloud
         run: make testacc
