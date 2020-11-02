@@ -75,6 +75,9 @@ The following arguments are supported:
 
     * `object_uuid` - (Required) The object UUID or id of the network.
 
+    * `ordering` - (Optional) Defines the ordering of the network interfaces. Lower numbers have lower PCI-IDs. The default value is 0, that means the ordering will be automatically defined
+    by the gridscale's backend.
+
     * `bootdevice` - (Optional, Computed) Make this network the boot device. This can only be set for one network.
 
     * `firewall_template_uuid` - (Optional) The UUID of firewall template.
