@@ -8,7 +8,7 @@ description: |-
 
 # gridscale_sshkey
 
-Provides an SSH public key resource. This can be used to create, modify and delete SSH public keys.
+Provides an SSH public key resource. This can be used to create, modify, and delete SSH public keys.
 
 ## Example Usage
 
@@ -16,11 +16,11 @@ The following example shows how one might use this resource to add an SSH public
 
 ```terraform
 resource "gridscale_sshkey" "sshkey-john"{
-	name = "john's computer"
-	sshkey = "an ssh public key"
-	timeouts {
-      create="10m"
-  	}
+  name = "john's computer"
+  sshkey = "an ssh public key"
+  timeouts {
+    create="10m"
+  }
 }
 ```
 
@@ -28,7 +28,7 @@ resource "gridscale_sshkey" "sshkey-john"{
 
 The following arguments are supported:
 
-* `name` - (Required) The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+* `name` - (Required) The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 
 * `sshkey` - (Required) This is the OpenSSH public key string (all key types are supported => ed25519, ecdsa, dsa, rsa, rsa1).
 
@@ -37,11 +37,11 @@ The following arguments are supported:
 ## Timeouts
 
 Timeouts configuration options (in seconds):
-More info: https://www.terraform.io/docs/configuration/resources.html#operation-timeouts
+More info: [terraform.io/docs/configuration/resources.html#operation-timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts)
 
-* `create` - (Default value is "5m" - 5 minutes) Used for Creating resource.
-* `update` - (Default value is "5m" - 5 minutes) Used for Updating resource.
-* `delete` - (Default value is "5m" - 5 minutes) Used for Deleteing resource.
+* `create` - (Default value is "5m" - 5 minutes) Used for creating a resource.
+* `update` - (Default value is "5m" - 5 minutes) Used for updating a resource.
+* `delete` - (Default value is "5m" - 5 minutes) Used for deleting a resource.
 
 ## Attributes
 

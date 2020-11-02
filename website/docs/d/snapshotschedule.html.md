@@ -25,8 +25,8 @@ resource "gridscale_snapshotschedule" "foo" {
   next_runtime = "2025-12-30 15:04:05"
 }
 data "gridscale_snapshotschedule" "foo" {
-	resource_id   = gridscale_snapshotschedule.foo.id
-	storage_uuid   = gridscale_storage.foo.id
+  resource_id   = gridscale_snapshotschedule.foo.id
+  storage_uuid   = gridscale_storage.foo.id
 }
 ```
 
@@ -53,6 +53,6 @@ The following attributes are exported:
 * `change_time` - The date and time of the last snapshot schedule change.
 * `labels` - The list of labels.
 * `snapshot` - Related snapshots.
-    * `name` - Name of the snapshot.
-    * `object_uuid` - UUID of the snapshot.
-    * `create_time` - The date and time the snapshot was initially created.
+  * `name` - Name of the snapshot.
+  * `object_uuid` - UUID of the snapshot.
+  * `create_time` - The date and time the snapshot was initially created.

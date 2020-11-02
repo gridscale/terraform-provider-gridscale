@@ -8,25 +8,26 @@ description: |-
 
 # gridscale_marketplace_application
 
-Provides a marketplace application resource. This can be used to create, modify and delete marketplace applications.
+Provides a marketplace application resource. This can be used to create, modify, and delete marketplace applications.
 
 ## Example Usage
 
 ```terraform
 resource "gridscale_marketplace_application" "foo" {
-	name = "example"
-	object_storage_path = "s3://testsnapshot/test.gz"
-	category = "Archiving"
-	setup_cores = 1
-	setup_memory = 1
-	setup_storage_capacity = 1
+  name = "example"
+  object_storage_path = "s3://testsnapshot/test.gz"
+  category = "Archiving"
+  setup_cores = 1
+  setup_memory = 1
+  setup_storage_capacity = 1
 }
 ```
+
 ## Argument Reference
 
 The following arguments are supported:
 
-* `name` - (Required) The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+* `name` - (Required) The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 
 * `object_storage_path` - (Required) Path to the images for the application, must be in .gz format and started with s3//.
 
@@ -59,11 +60,11 @@ The following arguments are supported:
 ## Timeouts
 
 Timeouts configuration options (in seconds):
-More info: https://www.terraform.io/docs/configuration/resources.html#operation-timeouts
+More info: [terraform.io/docs/configuration/resources.html#operation-timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts)
 
-* `create` - (Default value is "5m" - 5 minutes) Used for Creating resource.
-* `update` - (Default value is "5m" - 5 minutes) Used for Updating resource.
-* `delete` - (Default value is "5m" - 5 minutes) Used for Deleteing resource.
+* `create` - (Default value is "5m" - 5 minutes) Used for creating a resource.
+* `update` - (Default value is "5m" - 5 minutes) Used for updating a resource.
+* `delete` - (Default value is "5m" - 5 minutes) Used for deleting a resource.
 
 ## Attributes Reference
 

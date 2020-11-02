@@ -16,9 +16,10 @@ Get data of a specific marketplace application:
 
 ```terraform
 data "gridscale_marketplace_application" "foo" {
-	resource_id   = "XXX-XXX-XXX-XXX"
+  resource_id   = "XXX-XXX-XXX-XXX"
 }
 ```
+
 ## Argument Reference
 
 The following arguments are supported:

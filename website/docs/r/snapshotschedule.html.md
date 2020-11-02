@@ -8,7 +8,7 @@ description: |-
 
 # gridscale_snapshotschedule
 
-Provides a storage snapshot schedule resource. This can be used to create, modify and delete snapshot schedules.
+Provides a storage snapshot schedule resource. This can be used to create, modify, and delete snapshot schedules.
 
 ## Example Usage
 
@@ -48,11 +48,11 @@ The following arguments are supported:
 ## Timeouts
 
 Timeouts configuration options (in seconds):
-More info: https://www.terraform.io/docs/configuration/resources.html#operation-timeouts
+More info: [terraform.io/docs/configuration/resources.html#operation-timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts)
 
-* `create` - (Default value is "5m" - 5 minutes) Used for Creating resource.
-* `update` - (Default value is "5m" - 5 minutes) Used for Updating resource.
-* `delete` - (Default value is "5m" - 5 minutes) Used for Deleteing resource.
+* `create` - (Default value is "5m" - 5 minutes) Used for creating a resource.
+* `update` - (Default value is "5m" - 5 minutes) Used for updating a resource.
+* `delete` - (Default value is "5m" - 5 minutes) Used for deleting a resource.
 
 ## Attributes Reference
 
@@ -70,6 +70,6 @@ The following attributes are exported:
 * `change_time` - The date and time of the last snapshot schedule change.
 * `labels` - See Argument Reference above.
 * `snapshot` - Related snapshots.
-    * `name` - Name of the snapshot.
-    * `object_uuid` - UUID of the snapshot.
-    * `create_time` - The date and time the snapshot was initially created.
+  * `name` - Name of the snapshot.
+  * `object_uuid` - UUID of the snapshot.
+  * `create_time` - The date and time the snapshot was initially created.

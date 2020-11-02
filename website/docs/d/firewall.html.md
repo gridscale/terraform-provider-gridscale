@@ -16,26 +16,25 @@ Get data of a firewall by its UUID.
 resource "gridscale_firewall" "foo" {
   name   = "example-firewall"
   rules_v4_in {
-	order = 0
-	protocol = "tcp"
-	action = "drop"
-	dst_port = "20:80"
-	comment = "some comments"
+    order = 0
+    protocol = "tcp"
+    action = "drop"
+    dst_port = "20:80"
+    comment = "some comments"
   }
   rules_v6_in {
-	order = 0
-	protocol = "tcp"
-	action = "drop"
-	dst_port = "2000:3000"
-	comment = "some comments"
+    order = 0
+    protocol = "tcp"
+    action = "drop"
+    dst_port = "2000:3000"
+    comment = "some comments"
   }
 }
 
 data "gridscale_firewall" "foo" {
-	resource_id   = gridscale_firewall.foo.id
+  resource_id   = gridscale_firewall.foo.id
 }
 ```
-
 
 ## Argument Reference
 
@@ -91,7 +90,7 @@ The following attributes are exported:
     * `network_uuid` - The object UUID or id of the network.
     * `network_name` - Name of the network.
     * `create_time` - The date and time the object was initially created.
-* `location_name` - The human-readable name of the location. It supports the full UTF-8 charset, with a maximum of 64 characters.
+* `location_name` - The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
 * `status` - Status indicates the status of the object.
 * `private` - The object is private, the value will be true. Otherwise the value will be false.
 * `create_time` - The date and time the object was initially created.

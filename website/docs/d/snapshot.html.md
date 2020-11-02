@@ -23,8 +23,8 @@ resource "gridscale_snapshot" "foo" {
 }
 
 data "gridscale_snapshot" "foo" {
-	resource_id   = gridscale_snapshot.foo.id
-  	storage_uuid = gridscale_storage.foo.id
+  resource_id   = gridscale_snapshot.foo.id
+    storage_uuid = gridscale_storage.foo.id
 }
 ```
 

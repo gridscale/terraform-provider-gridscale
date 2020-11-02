@@ -30,30 +30,30 @@ resource "gridscale_server" "foo" {
   power = true
   ipv4 = gridscale_ipv4.foo1.id
   network {
-		object_uuid = gridscale_network.foo.id
-		rules_v4_in {
-				order = 0
-				protocol = "tcp"
-				action = "drop"
-				dst_port = "20:80"
-				comment = "test"
-		}
-		rules_v6_in	{
-				order = 1
-				protocol = "tcp"
-				action = "drop"
-				dst_port = "10:20"
-				comment = "test1"
-		}
-  	}
+    object_uuid = gridscale_network.foo.id
+    rules_v4_in {
+      order = 0
+      protocol = "tcp"
+      action = "drop"
+      dst_port = "20:80"
+      comment = "test"
+    }
+    rules_v6_in {
+      order = 1
+      protocol = "tcp"
+      action = "drop"
+      dst_port = "10:20"
+      comment = "test1"
+    }
+  }
   storage {
-  	object_uuid = gridscale_storage.foo1.id
+    object_uuid = gridscale_storage.foo1.id
   }
 }
 
 
 data "gridscale_server" "foo" {
-	resource_id   = gridscale_server.foo.id
+  resource_id   = gridscale_server.foo.id
 }
 ```
 
@@ -139,7 +139,7 @@ This resource exports the following attributes:
 * `availability_zone` - Defines which Availability-Zone the Server is placed.
 * `auto_recovery` - If the server should be auto-started in case of a failure.
 * `console_token` - The token used by the panel to open the websocket VNC connection to the server console.
-* `legacy` - Legacy-Hardware emulation instead of virtio hardware. If enabled, hotplugging cores, memory, storage, network, etc. will not work, but the server will most likely run every x86 compatible operating system. This mode comes with a performance penalty, as emulated hardware does not benefit from the virtio driver infrastructure.
+* `legacy` - Legacy-Hardware emulation instead of virtio hardware. If enabled, hot-plugging cores, memory, storage, network, etc. will not work, but the server will most likely run every x86 compatible operating system. This mode comes with a performance penalty, as emulated hardware does not benefit from the virtio driver infrastructure.
 * `status` - Status indicates the status of the object.
 * `usage_in_minutes_memory` - Total minutes of memory used.
 * `usage_in_minutes_cores` - Total minutes of cores used.

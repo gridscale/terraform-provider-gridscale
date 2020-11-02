@@ -8,7 +8,7 @@ description: |-
 
 # gridscale_paas
 
-Provides a PaaS resource. This can be used to create, modify and delete PaaS.
+Provides a PaaS resource. This can be used to create, modify, and delete PaaS instances.
 
 ## Example
 
@@ -28,7 +28,7 @@ resource "gridscale_paas" "terra-paas-test" {
 
 The following arguments are supported:
 
-* `name` - (Required) The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+* `name` - (Required) The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 
 * `service_template_uuid` - (Required) The template used to create the service.
 
@@ -37,27 +37,27 @@ The following arguments are supported:
 * `security_zone_uuid` - (Optional) The UUID of the security zone that the service is running in.
 
 * `parameters` - (Optional) Contains the service parameters for the service.
-    
-    * `param` - (Required) Name of parameter.
 
-    * `value` - (Required) Value of the corresponding parameter.
-    
+  * `param` - (Required) Name of parameter.
+
+  * `value` - (Required) Value of the corresponding parameter.
+
 * `resource_limit` - (Optional) A list of service resource limits..
-    
-    * `resource` - (Required) The name of the resource you would like to cap.
 
-    * `limit` - (Required) The maximum number of the specific resource your service can use.
+  * `resource` - (Required) The name of the resource you would like to cap.
 
-    * `type` - (Required) Primitive type of the parameter: bool, int (better use float for int case), float, string.
+  * `limit` - (Required) The maximum number of the specific resource your service can use.
+
+  * `type` - (Required) Primitive type of the parameter: bool, int (better use float for int case), float, string.
 
 ## Timeouts
 
 Timeouts configuration options (in seconds):
-More info: https://www.terraform.io/docs/configuration/resources.html#operation-timeouts
+More info: [terraform.io/docs/configuration/resources.html#operation-timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts)
 
-* `create` - (Default value is "15m" - 15 minutes) Used for Creating resource.
-* `update` - (Default value is "15m" - 15 minutes) Used for Updating resource.
-* `delete` - (Default value is "15m" - 15 minutes) Used for Deleteing resource.
+* `create` - (Default value is "15m" - 15 minutes) Used for creating a resource.
+* `update` - (Default value is "15m" - 15 minutes) Used for updating a resource.
+* `delete` - (Default value is "15m" - 15 minutes) Used for deleting a resource.
 
 ## Attributes
 
@@ -67,8 +67,8 @@ This resource exports the following attributes:
 * `username` - Username for PaaS service.
 * `password` - Password for PaaS service.
 * `listen_port` - Ports that PaaS service listens to.
-    * `name` - Name of a port.
-    * `listen_port` - Port number.
+  * `name` - Name of a port.
+  * `listen_port` - Port number.
 * `security_zone_uuid` - See Argument Reference above.
 * `network_uuid` - Network UUID containing security zone.
 * `service_template_uuid` - See Argument Reference above.
@@ -78,10 +78,10 @@ This resource exports the following attributes:
 * `create_time` - Time of the creation.
 * `status` - Current status of PaaS service.
 * `parameter` - See Argument Reference above.
-    * `param` - See Argument Reference above.
-    * `value` - See Argument Reference above.
-    * `type` - See Argument Reference above.
+  * `param` - See Argument Reference above.
+  * `value` - See Argument Reference above.
+  * `type` - See Argument Reference above.
 * `resource_limit` - See Argument Reference above.
-    * `resource` - See Argument Reference above.
-    * `limit` - See Argument Reference above.
+  * `resource` - See Argument Reference above.
+  * `limit` - See Argument Reference above.
 * `labels` - See Argument Reference above.

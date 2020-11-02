@@ -8,26 +8,26 @@ description: |-
 
 # gridscale_storage
 
-Provides a storage resource. This can be used to create, modify and delete storages.
+Provides a storage resource. This can be used to create, modify, and delete storages.
 
 ## Example Usage
 
 The following example shows how one might use this resource to add a storage to gridscale:
 
 ```terraform
-resource "gridscale_storage" "storage-john"{
-	name = "john's storage"
-	capacity = 10
-	storage_type = "storage_high"
-	template {
-	    template_uuid = "4db64bfc-9fb2-4976-80b5-94ff43b1233a"
-	    password = var.gridscale_password-john
-	    password_type = "plain"
-	    hostname = "Ubuntu"
-	}
-	timeouts {
-      create="10m"
-  	}
+resource "gridscale_storage" "storage-john" {
+  name = "john's storage"
+  capacity = 10
+  storage_type = "storage_high"
+  template {
+    template_uuid = "4db64bfc-9fb2-4976-80b5-94ff43b1233a"
+    password = var.gridscale_password-john
+    password_type = "plain"
+    hostname = "Ubuntu"
+  }
+  timeouts {
+    create="10m"
+  }
 }
 ```
 
@@ -35,7 +35,7 @@ resource "gridscale_storage" "storage-john"{
 
 The following arguments are supported:
 
-* `name` - (Required) The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+* `name` - (Required) The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 
 * `capacity` - (Required) required (integer - minimum: 1 - maximum: 4096).
 
@@ -59,15 +59,14 @@ The following arguments are supported:
 
 ~> **Note** When using official templates using either a password and password_type or at least one SSH public key is required. This is not the case when using custom templates. For official templates password authentication for SSH is enabled by default, so be sure to pick a strong password.
 
-
 ## Timeouts
 
 Timeouts configuration options (in seconds):
-More info: https://www.terraform.io/docs/configuration/resources.html#operation-timeouts
+More info: [terraform.io/docs/configuration/resources.html#operation-timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts)
 
-* `create` - (Default value is "5m" - 5 minutes) Used for Creating resource.
-* `update` - (Default value is "5m" - 5 minutes) Used for Updating resource.
-* `delete` - (Default value is "5m" - 5 minutes) Used for Deleteing resource.
+* `create` - (Default value is "5m" - 5 minutes) Used for creating a resource.
+* `update` - (Default value is "5m" - 5 minutes) Used for updating a resource.
+* `delete` - (Default value is "5m" - 5 minutes) Used for deleting a resource.
 
 ## Attributes
 

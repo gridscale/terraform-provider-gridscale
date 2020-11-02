@@ -17,7 +17,7 @@ resource "gridscale_object_storage_accesskey" "foo" {
 }
 
 data "gridscale_object_storage_accesskey" "foo" {
-	resource_id   = "${gridscale_object_storage_accesskey.foo.id}"
+  resource_id   = "${gridscale_object_storage_accesskey.foo.id}"
 }
 ```
 

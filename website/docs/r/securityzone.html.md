@@ -8,7 +8,7 @@ description: |-
 
 # gridscale_paas_securityzone
 
-Provides a security zone resource. This can be used to create, modify and delete security zones. 
+Provides a security zone resource. This can be used to create, modify, and delete security zones.
 
 ## Example Usage
 
@@ -27,24 +27,24 @@ resource "gridscale_paas_securityzone" "foo" {
 
 The following arguments are supported:
 
-* `name` - (Required) The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+* `name` - (Required) The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 * `location_uuid` - (Optional) Helps to identify which datacenter an object belongs to.
 
 ## Timeouts
 
 Timeouts configuration options (in seconds):
-More info: https://www.terraform.io/docs/configuration/resources.html#operation-timeouts
+More info: [terraform.io/docs/configuration/resources.html#operation-timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts)
 
-* `create` - (Default value is "5m" - 5 minutes) Used for Creating resource.
-* `update` - (Default value is "5m" - 5 minutes) Used for Updating resource.
-* `delete` - (Default value is "5m" - 5 minutes) Used for Deleteing resource.
+* `create` - (Default value is "5m" - 5 minutes) Used for creating a resource.
+* `update` - (Default value is "5m" - 5 minutes) Used for updating a resource.
+* `delete` - (Default value is "5m" - 5 minutes) Used for deleting a resource.
 
 ## Attributes
 
 This resource exports the following attributes:
 
 * `id` - The UUID of the security zone.
-* `name` - The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+* `name` - The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 * `location_uuid` - Helps to identify which datacenter an object belongs to.
 * `location_country` - The human-readable name of the location's country.
 * `location_iata` - Uses IATA airport code, which works as a location identifier.
