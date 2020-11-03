@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"reflect"
 
 	fwu "github.com/terraform-providers/terraform-provider-gridscale/gridscale/firewall-utils"
 
@@ -127,9 +128,15 @@ func (c *ServerRelationManger) LinkNetworks(ctx context.Context) error {
 	client := c.getGSClient()
 	if attrNetRel, ok := d.GetOk("network"); ok {
 		for _, value := range attrNetRel.([]interface{}) {
+			// customFwRulesPtr is nil initially, that mean the fw is inactive
+			var customFwRulesPtr *gsclient.FirewallRules
 			network := value.(map[string]interface{})
 			//Read custom firewall rules from `network` property (field)
 			customFwRules := readCustomFirewallRules(network)
+			// if customFwRules is not empty, customFwRulesPtr is not nil (fw is active)
+			if !reflect.DeepEqual(customFwRules, gsclient.FirewallRules{}) {
+				customFwRulesPtr = &customFwRules
+			}
 			err := client.LinkNetwork(
 				ctx,
 				d.Id(),
@@ -138,7 +145,7 @@ func (c *ServerRelationManger) LinkNetworks(ctx context.Context) error {
 				network["bootdevice"].(bool),
 				network["ordering"].(int),
 				nil,
-				&customFwRules,
+				customFwRulesPtr,
 			)
 			if err != nil {
 				return fmt.Errorf(
