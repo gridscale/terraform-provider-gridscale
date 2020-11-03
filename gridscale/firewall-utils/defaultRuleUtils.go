@@ -4,6 +4,9 @@ import "github.com/gridscale/gsclient-go/v3"
 
 // AddDefaultFirewallInboundRules adds default fw rules
 func AddDefaultFirewallInboundRules(rules []gsclient.FirewallRuleProperties, forIPv6 bool) []gsclient.FirewallRuleProperties {
+	if len(rules) == 0 { // If no custom fw rules are added, no need to add default ones
+		return rules
+	}
 	srcCidr := "0.0.0.0/0"
 	DHCPDstPort := "67:68"
 	DHCPComment := "DHCP IPv4"

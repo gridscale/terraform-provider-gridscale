@@ -22,24 +22,60 @@ resource "gridscale_server" "terra-server-test" {
   storage {
     object_uuid = gridscale_storage.terra-storage-test.id
   }
-  storage {
-    object_uuid = "UUID of storage 2",
-  }
   network {
     object_uuid = gridscale_network.terra-network-test.id
     bootdevice = true
   }
   network {
-    object_uuid = "UUID of network 2"
+    object_uuid = gridscale_network.terra-network-test-2.id
   }
-  ipv4 = gridscale_ipv4.terra-ipv4-test.id}
-  ipv6 = "UUID of ipv6 address"
+  ipv4 = gridscale_ipv4.terra-ipv4-test.id
   isoimage = "9be3e0a3-42ac-4207-8887-3383c405724d"
-    timeouts {
+  timeouts {
       create="10m"
   }
 }
 ```
+
+**NOTE: If no firewall rules are set, the firewall is INACTIVE. If (a) firewall rule(s) is(are) set (the firewall is ACTIVE), 
+packets that do not match any rules are blocked by default. E.g:
+
+```terraform
+resource "gridscale_server" "terra-server-test" {
+  name = "terra-server-test"
+  cores = 2
+  memory = 1
+  storage {
+    object_uuid = gridscale_storage.terra-storage-test.id
+  }
+  network {
+    object_uuid = gridscale_network.terra-network-test.id
+    rules_v4_in {
+        order = 0
+        protocol = "tcp"
+        action = "accept"
+        dst_port = "22"
+        comment = "ssh"
+    }
+    rules_v6_in	{
+        order = 1
+        protocol = "tcp"
+        action = "accept"
+        dst_port = "22"
+        comment = "ssh"
+    }
+  }
+  network {
+    object_uuid = gridscale_network.terra-network-test-2.id
+  }
+  ipv4 = gridscale_ipv4.terra-ipv4-test.id
+  isoimage = "9be3e0a3-42ac-4207-8887-3383c405724d"
+  timeouts {
+      create="10m"
+  }
+}
+```
+In this case, the inbound packets that do not match 2 rules above will be blocked.
 
 ## Argument Reference
 
@@ -71,12 +107,11 @@ The following arguments are supported:
 
     * `object_uuid` - (Required) The object UUID or id of the storage.
 
-* `network` - (Optional) Connects a network to the server.
+* `network` - (Optional) Connects a network to the server. **NOTE: Ordering of network interfaces on the host is the same as defined in the Terraform definition (top-down order), if `ordering` is not set.
 
     * `object_uuid` - (Required) The object UUID or id of the network.
 
-    * `ordering` - (Optional) Defines the ordering of the network interfaces. Lower numbers have lower PCI-IDs. The default value is 0, that means the ordering will be automatically defined
-    by the gridscale's backend.
+    * `ordering` - (Optional) Defines the ordering of the network interfaces. Lower numbers have lower PCI-IDs.
 
     * `bootdevice` - (Optional, Computed) Make this network the boot device. This can only be set for one network.
 
