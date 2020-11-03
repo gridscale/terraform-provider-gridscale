@@ -22,18 +22,14 @@ resource "gridscale_server" "terra-server-test" {
   storage {
     object_uuid = gridscale_storage.terra-storage-test.id
   }
-  storage {
-    object_uuid = "UUID of storage 2"
-  }
   network {
     object_uuid = gridscale_network.terra-network-test.id
     bootdevice = true
   }
   network {
-    object_uuid = "UUID of network 2"
+    object_uuid = gridscale_network.terra-network-test-2.id
   }
   ipv4 = gridscale_ipv4.terra-ipv4-test.id
-  ipv6 = "UUID of ipv6 address"
   isoimage = "9be3e0a3-42ac-4207-8887-3383c405724d"
   timeouts {
       create="10m"
@@ -51,9 +47,6 @@ resource "gridscale_server" "terra-server-test" {
   memory = 1
   storage {
     object_uuid = gridscale_storage.terra-storage-test.id
-  }
-  storage {
-    object_uuid = "UUID of storage 2"
   }
   network {
     object_uuid = gridscale_network.terra-network-test.id
@@ -73,10 +66,9 @@ resource "gridscale_server" "terra-server-test" {
     }
   }
   network {
-    object_uuid = "UUID of network 2"
+    object_uuid = gridscale_network.terra-network-test-2.id
   }
   ipv4 = gridscale_ipv4.terra-ipv4-test.id
-  ipv6 = "UUID of ipv6 address"
   isoimage = "9be3e0a3-42ac-4207-8887-3383c405724d"
   timeouts {
       create="10m"
