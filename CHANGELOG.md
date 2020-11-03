@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.7.4 (Nov 03, 2020)
+
+IMPROVEMENTS:
+
+* Reword docs.
+* Add an example (and explanation) about firewall rules in server-network relation.
+* Explain how ordering of network interfaces works.
+
+BUG FIXES:
+
+* Fix ordering of network interfaces on the host is NOT the same as defined in the Terraform definition (top-down order). See [#99](https://github.com/gridscale/terraform-provider-gridscale/issues/99).
+* Enable firewall only when at least one firewall rule is set. In previous version, when no firewall rules are set, the default firewall rules are added. This makes all ports blocked. See [#100](https://github.com/gridscale/terraform-provider-gridscale/issues/100)
+
 ## 1.7.3 (Nov 02, 2020)
 
 BUG FIXES:
