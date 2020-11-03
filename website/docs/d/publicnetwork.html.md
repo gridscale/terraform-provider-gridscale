@@ -19,13 +19,13 @@ data "gridscale_public_network" "pubnet"{
 }
 
 resource "gridscale_server" "servername"{
-	name = "terra-server"
-	cores = 2
-	memory = 4
-	network {
-		object_uuid = data.gridscale_public_network.pubnet.id
-		bootdevice = true
-	}
+  name = "terra-server"
+  cores = 2
+  memory = 4
+  network {
+    object_uuid = data.gridscale_public_network.pubnet.id
+    bootdevice = true
+  }
 }
 ```
 

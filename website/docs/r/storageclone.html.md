@@ -8,7 +8,7 @@ description: |-
 
 # gridscale_storage_clone
 
-Clone a storage instance. This can be used to create, modify and delete the storage clones.
+Clone a storage instance. This can be used to create, modify, and delete the storage clones.
 
 ## Example Usage
 
@@ -16,20 +16,20 @@ The following example shows how to clone a storage instance in gridscale:
 
 ```terraform
 resource "gridscale_storage" "storage-john"{
-	name = "john's storage"
-	capacity = 10
-	storage_type = "storage_high"
-	timeouts {
-      create="10m"
-  	}
+  name = "john's storage"
+  capacity = 10
+  storage_type = "storage_high"
+  timeouts {
+    create="10m"
+  }
 }
 
 resource "gridscale_storage_clone" "storage-clone-john"{
-    source_storage_id = gridscale_storage.storage-clone-john.id
-	name = "john's storage clone"
-	timeouts {
-      create="10m"
-  	}
+  source_storage_id = gridscale_storage.storage-clone-john.id
+  name = "john's storage clone"
+  timeouts {
+    create="10m"
+  }
 }
 ```
 
@@ -39,7 +39,7 @@ The following arguments are supported:
 
 * `source_storage_id` - (Required) The ID of a storage instance which will be cloned.
 
-* `name` - (Optional) The default value is inherited from the source storage instance. A desired name is possible. The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+* `name` - (Optional) The default value is inherited from the source storage instance. A desired name is possible. The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 
 * `capacity` - (Optional) The default value is inherited from the source storage instance. A desired capacity is possible. Required (integer - minimum: 1 - maximum: 4096).
 
@@ -47,15 +47,14 @@ The following arguments are supported:
 
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
 
-
 ## Timeouts
 
 Timeouts configuration options (in seconds):
-More info: https://www.terraform.io/docs/configuration/resources.html#operation-timeouts
+More info: [terraform.io/docs/configuration/resources.html#operation-timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts)
 
-* `create` - (Default value is "5m" - 5 minutes) Used for Creating resource.
-* `update` - (Default value is "5m" - 5 minutes) Used for Updating resource.
-* `delete` - (Default value is "5m" - 5 minutes) Used for Deleteing resource.
+* `create` - (Default value is "5m" - 5 minutes) Used for creating a resource.
+* `update` - (Default value is "5m" - 5 minutes) Used for updating a resource.
+* `delete` - (Default value is "5m" - 5 minutes) Used for deleting a resource.
 
 ## Attributes
 

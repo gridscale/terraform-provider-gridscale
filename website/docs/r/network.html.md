@@ -8,7 +8,7 @@ description: |-
 
 # gridscale_network
 
-Provides a network resource. This can be used to create, modify and delete networks.
+Provides a network resource. This can be used to create, modify, and delete networks.
 
 ## Example Usage
 
@@ -16,7 +16,7 @@ The following example shows how one might use this resource to add a network to 
 
 ```terraform
 resource "gridscale_network" "networkname"{
-	name = "terraform-network"
+  name = "terraform-network"
   timeouts {
       create="10m"
   }
@@ -27,7 +27,7 @@ resource "gridscale_network" "networkname"{
 
 The following arguments are supported:
 
-* `name` - (Required) The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+* `name` - (Required) The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 
 * `l2security` - (Optional) Defines information about MAC spoofing protection (filters layer2 and ARP traffic based on MAC source). It can only be (de-)activated on a private network - the public network always has l2security enabled. It will be true if the network is public, and false if the network is private.
 
@@ -36,11 +36,11 @@ The following arguments are supported:
 ## Timeouts
 
 Timeouts configuration options (in seconds):
-More info: https://www.terraform.io/docs/configuration/resources.html#operation-timeouts
+More info: [terraform.io/docs/configuration/resources.html#operation-timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts)
 
-* `create` - (Default value is "5m" - 5 minutes) Used for Creating resource.
-* `update` - (Default value is "5m" - 5 minutes) Used for Updating resource.
-* `delete` - (Default value is "5m" - 5 minutes) Used for Deleteing resource.
+* `create` - (Default value is "5m" - 5 minutes) Used for creating a resource.
+* `update` - (Default value is "5m" - 5 minutes) Used for updating a resource.
+* `delete` - (Default value is "5m" - 5 minutes) Used for deleting a resource.
 
 ## Attributes
 

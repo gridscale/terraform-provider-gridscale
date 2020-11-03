@@ -16,17 +16,17 @@ Using the network datasource for the creation of a server:
 
 ```terraform
 data "gridscale_network" "networkname"{
-	resource_id = "xxxx-xxxx-xxxx-xxxx"
+  resource_id = "xxxx-xxxx-xxxx-xxxx"
 }
 
 resource "gridscale_server" "servername"{
-	name = "terra-server"
-	cores = 2
-	memory = 4
-	network {
-		object_uuid = data.gridscale_network.networkname.id
-		bootdevice = true
-	}
+  name = "terra-server"
+  cores = 2
+  memory = 4
+  network {
+    object_uuid = data.gridscale_network.networkname.id
+    bootdevice = true
+  }
 }
 ```
 

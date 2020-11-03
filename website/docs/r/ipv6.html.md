@@ -8,7 +8,7 @@ description: |-
 
 # gridscale_ipv6
 
-Provides an IPv6 address resource. This can be used to create, modify and delete IPv6 addresses.
+Provides an IPv6 address resource. This can be used to create, modify, and delete IPv6 addresses.
 
 ## Example Usage
 
@@ -16,7 +16,7 @@ The following example shows how one might use this resource to add an IPv6 addre
 
 ```terraform
 resource "gridscale_ipv6" "terra-ipv6-test" {
-	name = "terra-test"
+  name = "terra-test"
   timeouts {
       create="10m"
   }
@@ -27,22 +27,22 @@ resource "gridscale_ipv6" "terra-ipv6-test" {
 
 The following arguments are supported:
 
-* `name` - (Optional) The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+* `name` - (Optional) The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 
 * `failover` - (Optional) Sets failover mode for this IP. If true, then this IP is no longer available for DHCP and can no longer be related to any server.
 
-* `reverse_dns` - (Optional) Defines the reverse DNS entry for the IP Address (PTR Resource Record).
+* `reverse_dns` - (Optional) Defines the reverse DNS entry for the IP address (PTR Resource Record).
 
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
 
 ## Timeouts
 
 Timeouts configuration options (in seconds):
-More info: https://www.terraform.io/docs/configuration/resources.html#operation-timeouts
+More info: [terraform.io/docs/configuration/resources.html#operation-timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts)
 
-* `create` - (Default value is "5m" - 5 minutes) Used for Creating resource.
-* `update` - (Default value is "5m" - 5 minutes) Used for Updating resource.
-* `delete` - (Default value is "5m" - 5 minutes) Used for Deleteing resource.
+* `create` - (Default value is "5m" - 5 minutes) Used for creating a resource.
+* `update` - (Default value is "5m" - 5 minutes) Used for updating a resource.
+* `delete` - (Default value is "5m" - 5 minutes) Used for deleting a resource.
 
 ## Attributes
 
@@ -53,7 +53,7 @@ This resource exports the following attributes:
 * `failover` - See Argument Reference above.
 * `reverse_dns` - See Argument Reference above.
 * `labels` - See Argument Reference above.
-* `ip` - Defines the IP Address.
+* `ip` - Defines the IP address.
 * `prefix` - The network address and the subnet.
 * `status` - status indicates the status of the object.
 * `create_time` - The time the object was created.

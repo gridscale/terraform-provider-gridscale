@@ -8,7 +8,7 @@ description: |-
 
 # gridscale_snapshot
 
-Provides a storage snapshot resource. This can be used to create, modify and delete storage snapshots.
+Provides a storage snapshot resource. This can be used to create, modify, and delete storage snapshots.
 
 ## Example Usage
 
@@ -17,6 +17,7 @@ resource "gridscale_storage" "foo" {
   name   = "storage"
   capacity = 1
 }
+
 resource "gridscale_snapshot" "foo" {
   name = "snapshot"
   storage_uuid = gridscale_storage.foo.id
@@ -38,7 +39,7 @@ The following arguments are supported:
 
 * `object_storage_export` - (Optional) Export snapshot to a object storage.
 
-    * `host` - (Required) Host of object storage. Must be of URL type. E.g: https://gos3.io
+    * `host` - (Required) Host of object storage. Must be of URL type, e.g., https://gos3.io
 
     * `access_key` - (Required) Access key.
 
@@ -50,18 +51,18 @@ The following arguments are supported:
 
     * `private` - (Required) Privacy.
 
-* `rollback` - (Optional) Returns a storage to the state of the selected Snapshot. 
+* `rollback` - (Optional) Returns a storage to the state of the selected Snapshot.
 
-    * `id` - (Required) ID of the rollback request. It can be any string value. Each rollback request has to have a UNIQUE id. 
+    * `id` - (Required) ID of the rollback request. It can be any string value. Each rollback request has to have a UNIQUE id.
 
 ## Timeouts
 
 Timeouts configuration options (in seconds):
-More info: https://www.terraform.io/docs/configuration/resources.html#operation-timeouts
+More info: [terraform.io/docs/configuration/resources.html#operation-timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts)
 
-* `create` - (Default value is "5m" - 5 minutes) Used for Creating resource.
-* `update` - (Default value is "5m" - 5 minutes) Used for Updating resource.
-* `delete` - (Default value is "5m" - 5 minutes) Used for Deleteing resource.
+* `create` - (Default value is "5m" - 5 minutes) Used for creating a resource.
+* `update` - (Default value is "5m" - 5 minutes) Used for updating a resource.
+* `delete` - (Default value is "5m" - 5 minutes) Used for deleting a resource.
 
 ## Attributes Reference
 
@@ -90,7 +91,7 @@ The following attributes are exported:
     * `private` - See Argument Reference above.
     * `status` - Status of the export request.
 * `rollback` - See Argument Reference above.
-    * `id` - See Argument Reference above. 
+    * `id` - See Argument Reference above.
     * `rollback_time` - The time when rollback request is fulfilled.
     * `status` - Status of the rollback request.
 * `labels` - See Argument Reference above.

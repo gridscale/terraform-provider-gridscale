@@ -14,18 +14,19 @@ Provides an imported marketplace application resource. This can be used to impor
 
 ```terraform
 resource "gridscale_marketplace_application" "foo" {
-	name = "example"
-	object_storage_path = "s3://testsnapshot/test.gz"
-	category = "Archiving"
-	setup_cores = 1
-	setup_memory = 1
-	setup_storage_capacity = 1
+  name = "example"
+  object_storage_path = "s3://testsnapshot/test.gz"
+  category = "Archiving"
+  setup_cores = 1
+  setup_memory = 1
+  setup_storage_capacity = 1
 }
 
 resource "gridscale_marketplace_application_import" "importedFoo" {
-	import_unique_hash = gridscale_marketplace_application.foo.unique_hash
+  import_unique_hash = gridscale_marketplace_application.foo.unique_hash
 }
 ```
+
 ## Argument Reference
 
 The following arguments are supported:
@@ -35,10 +36,10 @@ The following arguments are supported:
 ## Timeouts
 
 Timeouts configuration options (in seconds):
-More info: https://www.terraform.io/docs/configuration/resources.html#operation-timeouts
+More info: [terraform.io/docs/configuration/resources.html#operation-timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts)
 
-* `create` - (Default value is "5m" - 5 minutes) Used for Creating resource.
-* `delete` - (Default value is "5m" - 5 minutes) Used for Deleteing resource.
+* `create` - (Default value is "5m" - 5 minutes) Used for creating a resource.
+* `delete` - (Default value is "5m" - 5 minutes) Used for deleting a resource.
 
 ## Attributes Reference
 

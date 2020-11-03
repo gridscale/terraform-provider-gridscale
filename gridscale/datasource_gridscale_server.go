@@ -3,6 +3,7 @@ package gridscale
 import (
 	"context"
 	"fmt"
+
 	fwu "github.com/terraform-providers/terraform-provider-gridscale/gridscale/firewall-utils"
 
 	"github.com/gridscale/gsclient-go/v3"
@@ -23,7 +24,7 @@ func dataSourceGridscaleServer() *schema.Resource {
 			},
 			"name": {
 				Type:        schema.TypeString,
-				Description: "The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters",
+				Description: "The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters",
 				Computed:    true,
 			},
 			"memory": {

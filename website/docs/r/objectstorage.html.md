@@ -8,7 +8,7 @@ description: |-
 
 # gridscale_object_storage_accesskey
 
-Provides an access key resource of an object storage. This can be used to create, modify and delete object storages' access keys. 
+Provides an access key resource of an object storage. This can be used to create, modify, and delete object storages' access keys.
 
 ## Example Usage
 
@@ -23,10 +23,10 @@ resource "gridscale_object_storage_accesskey" "foo" {
 ## Timeouts
 
 Timeouts configuration options (in seconds):
-More info: https://www.terraform.io/docs/configuration/resources.html#operation-timeouts
+More info: [terraform.io/docs/configuration/resources.html#operation-timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts)
 
-* `create` - (Default value is "5m" - 5 minutes) Used for Creating resource.
-* `delete` - (Default value is "5m" - 5 minutes) Used for Deleteing resource.
+* `create` - (Default value is "5m" - 5 minutes) Used for creating a resource.
+* `delete` - (Default value is "5m" - 5 minutes) Used for deleting a resource.
 
 ## Attributes Reference
 

@@ -8,7 +8,7 @@ description: |-
 
 # gridscale_firewall
 
-Provides a firewall resource. This can be used to create, modify and delete firewalls.
+Provides a firewall resource. This can be used to create, modify, and delete firewalls.
 
 ## Example Usage
 
@@ -16,18 +16,18 @@ Provides a firewall resource. This can be used to create, modify and delete fire
 resource "gridscale_firewall" "foo" {
   name   = "example-firewall"
   rules_v4_in {
-	order = 0
-	protocol = "tcp"
-	action = "drop"
-	dst_port = "20:80"
-	comment = "some comments"
+    order = 0
+    protocol = "tcp"
+    action = "drop"
+    dst_port = "20:80"
+    comment = "some comments"
   }
   rules_v6_in {
-	order = 0
-	protocol = "tcp"
-	action = "drop"
-	dst_port = "2000:3000"
-	comment = "some comments"
+    order = 0
+    protocol = "tcp"
+    action = "drop"
+    dst_port = "2000:3000"
+    comment = "some comments"
   }
   timeouts {
       create="10m"
@@ -35,54 +35,53 @@ resource "gridscale_firewall" "foo" {
 }
 ```
 
-
 ## Argument Reference
 
 The following arguments are supported:
 
 ***Note: `Optional*` means there is at least 1 rule in the firewall. Otherwise, an error will be returned.
 
-* `name` - (Required) The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+* `name` - (Required) The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 
 * `rules_v4_in` - (Optional*) Firewall template rules for inbound traffic - covers ipv4 addresses.
 
-    * `order` - (Required) The order at which the firewall will compare packets against its rules. A packet will be compared against the first rule, it will either allow it to pass or block it and it won't be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2. Packets that do not match any rules are blocked by default (Only for inbound).
+  * `order` - (Required) The order at which the firewall will compare packets against its rules. A packet will be compared against the first rule, it will either allow it to pass or block it and it won't be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2. Packets that do not match any rules are blocked by default (Only for inbound).
 
-    * `action` - (Required) This defines what the firewall will do. Either accept or drop.
+  * `action` - (Required) This defines what the firewall will do. Either accept or drop.
 
-    * `protocol` - (Required) Either 'udp' or 'tcp'.
+  * `protocol` - (Required) Either 'udp' or 'tcp'.
 
-    * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
+  * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
 
-    * `src_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
+  * `src_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
 
-    * `src_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
+  * `src_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
 
-    * `dst_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
+  * `dst_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
 
-    * `comment` - (Optional) Comment.
-        
+  * `comment` - (Optional) Comment.
+
 * `rules_v4_out` - (Optional*) Firewall template rules for outbound traffic - covers ipv4 addresses.
 
-    * `order` - (Required) The order at which the firewall will compare packets against its rules. A packet will be compared against the first rule, it will either allow it to pass or block it and it won't be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2.
+  * `order` - (Required) The order at which the firewall will compare packets against its rules. A packet will be compared against the first rule, it will either allow it to pass or block it and it won't be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2.
 
-    * `action` - (Required) This defines what the firewall will do. Either accept or drop.
+  * `action` - (Required) This defines what the firewall will do. Either accept or drop.
 
-    * `protocol` - (Required) Either 'udp' or 'tcp'.
+  * `protocol` - (Required) Either 'udp' or 'tcp'.
 
-    * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
+  * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
 
-    * `src_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
+  * `src_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
 
-    * `src_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
+  * `src_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
 
-    * `dst_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
+  * `dst_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
 
-    * `comment` - (Optional) Comment.
+  * `comment` - (Optional) Comment.
 
 * `rules_v6_in` - (Optional*) Firewall template rules for inbound traffic - covers ipv6 addresses.
 
-    * `order` - (Required) The order at which the firewall will compare packets against its rules. A packet will be compared against the first rule, it will either allow it to pass or block it and it won't be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2. Packets that do not match any rules are blocked by default (Only for inbound).
+  * `order` - (Required) The order at which the firewall will compare packets against its rules. A packet will be compared against the first rule, it will either allow it to pass or block it and it won't be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2. Packets that do not match any rules are blocked by default (Only for inbound).
 
     * `action` - (Required) This defines what the firewall will do. Either accept or drop.
 
@@ -100,32 +99,32 @@ The following arguments are supported:
 
 * `rules_v6_out` - (Optional*) Firewall template rules for outbound traffic - covers ipv6 addresses.
 
-    * `order` - (Required) The order at which the firewall will compare packets against its rules. A packet will be compared against the first rule, it will either allow it to pass or block it and it won't be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2.
+  * `order` - (Required) The order at which the firewall will compare packets against its rules. A packet will be compared against the first rule, it will either allow it to pass or block it and it won't be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2.
 
-    * `action` - (Required) This defines what the firewall will do. Either accept or drop.
+  * `action` - (Required) This defines what the firewall will do. Either accept or drop.
 
-    * `protocol` - (Required) Either 'udp' or 'tcp'.
+  * `protocol` - (Required) Either 'udp' or 'tcp'.
 
-    * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
+  * `dst_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
 
-    * `src_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
+  * `src_port` - (Optional) A Number between 1 and 65535, port ranges are separated by a colon for FTP.
 
-    * `src_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
+  * `src_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
 
-    * `dst_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
+  * `dst_cidr` - (Optional) Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
 
-    * `comment` - (Optional) Comment. 
+  * `comment` - (Optional) Comment.
 
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
 
 ## Timeouts
 
 Timeouts configuration options (in seconds):
-More info: https://www.terraform.io/docs/configuration/resources.html#operation-timeouts
+More info: [terraform.io/docs/configuration/resources.html#operation-timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts)
 
-* `create` - (Default value is "5m" - 5 minutes) Used for Creating resource.
-* `update` - (Default value is "5m" - 5 minutes) Used for Updating resource.
-* `delete` - (Default value is "5m" - 5 minutes) Used for Deleteing resource.
+* `create` - (Default value is "5m" - 5 minutes) Used for creating a resource.
+* `update` - (Default value is "5m" - 5 minutes) Used for updating a resource.
+* `delete` - (Default value is "5m" - 5 minutes) Used for deleting a resource.
 
 ## Attributes Reference
 
@@ -175,7 +174,7 @@ The following attributes are exported:
     * `network_uuid` - The object UUID or id of the network.
     * `network_name` - Name of the network.
     * `create_time` - The date and time the object was initially created.
-* `location_name` - The human-readable name of the location. It supports the full UTF-8 charset, with a maximum of 64 characters.
+* `location_name` - The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
 * `status` - Status indicates the status of the object.
 * `private` - The object is private, the value will be true. Otherwise the value will be false.
 * `create_time` - The date and time the object was initially created.

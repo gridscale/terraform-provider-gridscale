@@ -28,7 +28,7 @@ func resourceGridscaleStorage() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:        schema.TypeString,
-				Description: "The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.",
+				Description: "The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.",
 				Required:    true,
 			},
 			"capacity": {
@@ -91,7 +91,7 @@ func resourceGridscaleStorage() *schema.Resource {
 			},
 			"location_name": {
 				Type:        schema.TypeString,
-				Description: "The human-readable name of the location. It supports the full UTF-8 charset, with a maximum of 64 characters.",
+				Description: "The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.",
 				Computed:    true,
 			},
 			"location_country": {

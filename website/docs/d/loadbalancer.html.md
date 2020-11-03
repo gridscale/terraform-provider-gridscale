@@ -14,7 +14,7 @@ Get the data of a Load Balancer.
 
 ```terraform
 data "gridscale_loadbalancer" "foo" {
-	resource_id   = "xxxx-xxxx-xxxx-xxxx"
+  resource_id   = "xxxx-xxxx-xxxx-xxxx"
 }
 ```
 
@@ -22,19 +22,19 @@ data "gridscale_loadbalancer" "foo" {
 
 The following arguments are supported:
 
-* `resource_id` - (Required) The UUID of the loadbalancer.
+* `resource_id` - (Required) The UUID of the load balancer.
 
 ## Attributes Reference
 
 The following attributes are exported:
 
-* `id` - The UUID of the loadbalancer.
-* `name` - The human-readable name of the loadbalancer.
+* `id` - The UUID of the load balancer.
+* `name` - The human-readable name of the load balancer.
 * `algorithm` - The algorithm used to process requests.
-* `status` - The status of the loadbalancer.
+* `status` - The status of the load balancer.
 * `redirect_http_to_https` - Whether the Load balancer is forced to redirect requests from HTTP to HTTPS.
-* `listen_ipv4_uuid` - The UUID of the IPv4 address the loadbalancer will listen to for incoming requests.
-* `listen_ipv6_uuid` - The UUID of the IPv6 address the loadbalancer will listen to for incoming requests.
-* `forwarding_rule` - The forwarding rules of the loadbalancer.
-* `backend_server` - The servers that the loadbalancer can communicate with.
+* `listen_ipv4_uuid` - The UUID of the IPv4 address the load balancer will listen to for incoming requests.
+* `listen_ipv6_uuid` - The UUID of the IPv6 address the load balancer will listen to for incoming requests.
+* `forwarding_rule` - The forwarding rules of the load balancer.
+* `backend_server` - The servers that the load balancer can communicate with.
 * `labels` - The list of labels.

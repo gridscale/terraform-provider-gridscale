@@ -21,7 +21,7 @@ resource "gridscale_paas" "foo" {
 }
 
 data "gridscale_paas" "foo" {
-	resource_id   = gridscale_paas.foo.id
+  resource_id   = gridscale_paas.foo.id
 }
 ```
 
@@ -39,8 +39,8 @@ The following attributes are exported:
 * `username` - Username for PaaS service.
 * `password` - Password for PaaS service.
 * `listen_port` - Ports that PaaS service listens to.
-    * `name` - Name of a port.
-    * `listen_port` - Port number.
+  * `name` - Name of a port.
+  * `listen_port` - Port number.
 * `security_zone_uuid` - The UUID of the security zone that the service is running in.
 * `network_uuid` - Network UUID containing security zone.
 * `service_template_uuid` - The template used to create the service.
@@ -50,10 +50,10 @@ The following attributes are exported:
 * `create_time` - Time of the creation.
 * `status` - Current status of PaaS service.
 * `parameter` - Contains the service parameters for the service.
-    * `param` - Name of parameter.
-    * `value` - Value of the corresponding parameter.
-    * `type` - Primitive type of the parameter.
+  * `param` - Name of parameter.
+  * `value` - Value of the corresponding parameter.
+  * `type` - Primitive type of the parameter.
 * `resource_limit` - A list of service resource limits.
-    * `resource` - The name of the resource you would like to cap.
-    * `limit` - The maximum number of the specific resource your service can use.
+  * `resource` - The name of the resource you would like to cap.
+  * `limit` - The maximum number of the specific resource your service can use.
 * `labels` - List of labels in the format [ "label1", "label2" ].

@@ -8,33 +8,33 @@ description: |-
 
 # gridscale_server
 
-Provides a server resource. This can be used to create, modify and delete servers.
+Provides a server resource. This can be used to create, modify, and delete servers.
 
 ## Example
 
 The following example shows how one might use this resource to add a server to gridscale:
 
 ```terraform
-resource "gridscale_server" "terra-server-test"{
-	name = "terra-server-test"
-	cores = 2
-	memory = 1
-	storage {
-		object_uuid = gridscale_storage.terra-storage-test.id
-	}
-	storage {
-    		object_uuid = "UUID of storage 2",
-    	}
-	network {
-		object_uuid = gridscale_network.terra-network-test.id
-		bootdevice = true
-	}
-	network {
-    		object_uuid = "UUID of network 2"
-    }
-	ipv4 = gridscale_ipv4.terra-ipv4-test.id}
-	ipv6 = "UUID of ipv6 address"
-	isoimage = "9be3e0a3-42ac-4207-8887-3383c405724d"
+resource "gridscale_server" "terra-server-test" {
+  name = "terra-server-test"
+  cores = 2
+  memory = 1
+  storage {
+    object_uuid = gridscale_storage.terra-storage-test.id
+  }
+  storage {
+    object_uuid = "UUID of storage 2",
+  }
+  network {
+    object_uuid = gridscale_network.terra-network-test.id
+    bootdevice = true
+  }
+  network {
+    object_uuid = "UUID of network 2"
+  }
+  ipv4 = gridscale_ipv4.terra-ipv4-test.id}
+  ipv6 = "UUID of ipv6 address"
+  isoimage = "9be3e0a3-42ac-4207-8887-3383c405724d"
     timeouts {
       create="10m"
   }
@@ -45,7 +45,7 @@ resource "gridscale_server" "terra-server-test"{
 
 The following arguments are supported:
 
-* `name` - (Required) The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+* `name` - (Required) The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 
 * `cores` - (Required) The number of server cores.
 
@@ -157,11 +157,11 @@ The following arguments are supported:
 ## Timeouts
 
 Timeouts configuration options (in seconds):
-More info: https://www.terraform.io/docs/configuration/resources.html#operation-timeouts
+More info: [terraform.io/docs/configuration/resources.html#operation-timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts)
 
-* `create` - (Default value is "5m" - 5 minutes) Used for Creating resource.
-* `update` - (Default value is "5m" - 5 minutes) Used for Updating resource.
-* `delete` - (Default value is "5m" - 5 minutes) Used for Deleteing resource.
+* `create` - (Default value is "5m" - 5 minutes) Used for creating a resource.
+* `update` - (Default value is "5m" - 5 minutes) Used for updating a resource.
+* `delete` - (Default value is "5m" - 5 minutes) Used for deleting a resource.
 
 ## Attributes
 
@@ -239,7 +239,7 @@ This resource exports the following attributes:
 * `availability_zone` - Defines which Availability-Zone the Server is placed.
 * `auto_recovery` - If the server should be auto-started in case of a failure.
 * `console_token` - The token used by the panel to open the websocket VNC connection to the server console.
-* `legacy` - Legacy-Hardware emulation instead of virtio hardware. If enabled, hotplugging cores, memory, storage, network, etc. will not work, but the server will most likely run every x86 compatible operating system. This mode comes with a performance penalty, as emulated hardware does not benefit from the virtio driver infrastructure.
+* `legacy` - Legacy-Hardware emulation instead of virtio hardware. If enabled, hot-plugging cores, memory, storage, network, etc. will not work, but the server will most likely run every x86 compatible operating system. This mode comes with a performance penalty, as emulated hardware does not benefit from the virtio driver infrastructure.
 * `status` - Status indicates the status of the object.
 * `usage_in_minutes_memory` - Total minutes of memory used.
 * `usage_in_minutes_cores` - Total minutes of cores used.

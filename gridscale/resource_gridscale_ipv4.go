@@ -26,12 +26,12 @@ func resourceGridscaleIpv4() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"ip": {
 				Type:        schema.TypeString,
-				Description: "Defines the IP Address.",
+				Description: "Defines the IP address.",
 				Computed:    true,
 			},
 			"name": {
 				Type:        schema.TypeString,
-				Description: "The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.",
+				Description: "The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.",
 				Optional:    true,
 			},
 			"prefix": {
@@ -51,7 +51,7 @@ func resourceGridscaleIpv4() *schema.Resource {
 			},
 			"reverse_dns": {
 				Type:        schema.TypeString,
-				Description: "Defines the reverse DNS entry for the IP Address (PTR Resource Record).",
+				Description: "Defines the reverse DNS entry for the IP address (PTR Resource Record).",
 				Optional:    true,
 				Computed:    true,
 			},
@@ -67,7 +67,7 @@ func resourceGridscaleIpv4() *schema.Resource {
 			},
 			"location_name": {
 				Type:        schema.TypeString,
-				Description: "The human-readable name of the location. It supports the full UTF-8 charset, with a maximum of 64 characters",
+				Description: "The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters",
 				Computed:    true,
 			},
 			"status": {

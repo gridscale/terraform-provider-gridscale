@@ -16,14 +16,14 @@ Using the security zone datasource for the creation of a paas:
 
 ```terraform
 data "gridscale_paas_securityzone" "foo"{
-	resource_id = "xxxx-xxxx-xxxx-xxxx"
+  resource_id = "xxxx-xxxx-xxxx-xxxx"
 }
 
 
 resource "gridscale_paas" "foo"{
-	name = "terra-paas-test"
-    service_template_uuid = "f9625726-5ca8-4d5c-b9bd-3257e1e2211a"
-    security_zone_uuid = data.gridscale_paas_securityzone.foo.id
+  name = "terra-paas-test"
+  service_template_uuid = "f9625726-5ca8-4d5c-b9bd-3257e1e2211a"
+  security_zone_uuid = data.gridscale_paas_securityzone.foo.id
 }
 ```
 
@@ -38,7 +38,7 @@ The following arguments are supported:
 The following attributes are exported:
 
 * `id` - The UUID of the security zone.
-* `name` - The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters.
+* `name` - The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 * `location_uuid` - Helps to identify which datacenter an object belongs to.
 * `location_country` - The human-readable name of the location's country.
 * `location_iata` - Uses IATA airport code, which works as a location identifier.

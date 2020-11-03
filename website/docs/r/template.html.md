@@ -8,7 +8,7 @@ description: |-
 
 # gridscale_template
 
-Provides a template resource. This can be used to create, modify and delete template.
+Provides a template resource. This can be used to create, modify, and delete template.
 
 ## Example Usage
 
@@ -47,11 +47,11 @@ The following arguments are supported:
 ## Timeouts
 
 Timeouts configuration options (in seconds):
-More info: https://www.terraform.io/docs/configuration/resources.html#operation-timeouts
+More info: [terraform.io/docs/configuration/resources.html#operation-timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts)
 
-* `create` - (Default value is "5m" - 5 minutes) Used for Creating resource.
-* `update` - (Default value is "5m" - 5 minutes) Used for Updating resource.
-* `delete` - (Default value is "5m" - 5 minutes) Used for Deleteing resource.
+* `create` - (Default value is "5m" - 5 minutes) Used for creating a resource.
+* `update` - (Default value is "5m" - 5 minutes) Used for updating a resource.
+* `delete` - (Default value is "5m" - 5 minutes) Used for deleting a resource.
 
 ## Attributes Reference
 
@@ -62,7 +62,7 @@ The following attributes are exported:
 * `location_uuid` - Helps to identify which datacenter an object belongs to.
 * `location_country` - Formatted by the 2 digit country code (ISO 3166-2) of the host country.
 * `location_iata` - Uses IATA airport code, which works as a location identifier.
-* `location_name` - The human-readable name of the location. It supports the full UTF-8 charset, with a maximum of 64 characters.
+* `location_name` - The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
 * `status` - Status indicates the status of the object.
 * `ostype` - The operating system installed in the template.
 * `version` - The version of the template.
@@ -70,8 +70,8 @@ The following attributes are exported:
 * `license_product_no` - If a template has been used that requires a license key (e.g. Windows Servers) this shows the product_no of the license (see the /prices endpoint for more details).
 * `create_time` - The date and time the object was initially created.
 * `change_time` - The date and time of the last object change.
-* `distro` - The OS distrobution that the Template contains.
-* `description` - Description of the Template.
+* `distro` - The OS distribution that the template contains.
+* `description` - Description of the template.
 * `usage_in_minutes` - Total minutes the object has been running.
 * `capacity` - The capacity of a storage/ISO Image/template/snapshot in GB.
 * `current_price` - Defines the price for the current period since the last bill.

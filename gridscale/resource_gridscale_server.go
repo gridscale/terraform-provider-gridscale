@@ -32,7 +32,7 @@ func resourceGridscaleServer() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:         schema.TypeString,
-				Description:  "The human-readable name of the object. It supports the full UTF-8 charset, with a maximum of 64 characters",
+				Description:  "The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters",
 				Required:     true,
 				ValidateFunc: validation.NoZeroValues,
 			},
@@ -302,9 +302,9 @@ func getFirewallRuleCommonSchema() map[string]*schema.Schema {
 	commonSchema := map[string]schema.Schema{
 		"order": {
 			Type: schema.TypeInt,
-			Description: `The order at which the firewall will compare packets against its rules. 
-A packet will be compared against the first rule, it will either allow it to pass or block it 
-and it won't be matched against any other rules. However, if it does no match the rule, 
+			Description: `The order at which the firewall will compare packets against its rules.
+A packet will be compared against the first rule, it will either allow it to pass or block it
+and it won't be matched against any other rules. However, if it does no match the rule,
 then it will proceed onto rule 2. Packets that do not match any rules are blocked by default (Only for inbound).`,
 			Required: true,
 		},
