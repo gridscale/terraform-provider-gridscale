@@ -126,7 +126,7 @@ func (c *ServerRelationManger) LinkNetworks(ctx context.Context) error {
 	d := c.getData()
 	client := c.getGSClient()
 	if attrNetRel, ok := d.GetOk("network"); ok {
-		for _, value := range attrNetRel.(*schema.Set).List() {
+		for _, value := range attrNetRel.([]interface{}) {
 			network := value.(map[string]interface{})
 			//Read custom firewall rules from `network` property (field)
 			customFwRules := readCustomFirewallRules(network)
@@ -315,7 +315,7 @@ func (c *ServerRelationManger) UpdateNetworksRel(ctx context.Context) error {
 	if d.HasChange("network") {
 		oldNetworks, _ := d.GetChange("network")
 		//Unlink all old networks if there are any networks linked to the server
-		for _, value := range oldNetworks.(*schema.Set).List() {
+		for _, value := range oldNetworks.([]interface{}) {
 			network := value.(map[string]interface{})
 			if network["object_uuid"].(string) != "" {
 				//If 404 or 409, that means network is already deleted => the relation between network and server is deleted automatically
