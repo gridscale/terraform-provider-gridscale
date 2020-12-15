@@ -1,5 +1,5 @@
 Terraform gridscale Provider
-[![Build Status](https://travis-ci.com/gridscale/terraform-provider-gridscale.svg?branch=master)](https://travis-ci.com/gridscale/terraform-provider-gridscale)
+[![Build status](https://github.com/gridscale/terraform-provider-gridscale/workflows/Test/badge.svg)](https://github.com/gridscale/terraform-provider-gridscale/actions)
 [![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/gridscale/terraform-provider-gridscale?label=release)](https://github.com/gridscale/terraform-provider-gridscale/releases)
 [![Gitter chat](https://badges.gitter.im/hashicorp-terraform/Lobby.png)](https://gitter.im/hashicorp-terraform/Lobby)
 ==================
