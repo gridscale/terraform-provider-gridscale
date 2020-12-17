@@ -155,7 +155,8 @@ func resourceGridscaleStorageCloneCreate(d *schema.ResourceData, meta interface{
 		return err
 	}
 	if sourceStorage.Properties.Name != d.Get("name").(string) ||
-		sourceStorage.Properties.Capacity != d.Get("capacity").(int) {
+		sourceStorage.Properties.Capacity != d.Get("capacity").(int) ||
+		sourceStorage.Properties.StorageType != d.Get("storage_type").(string) {
 		err = resourceGridscaleStorageUpdate(d, meta)
 		if err != nil {
 			return err
