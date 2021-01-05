@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.8.0 (Jan 05, 2020)
+
+IMPROVEMENTS:
+
+* Update docs.
+* Update gsclient-go package to v3.3.1.
+
+BUG FIXES:
+
+* Fix storage_type is not set when cloning a storage See [#105](https://github.com/gridscale/terraform-provider-gridscale/issues/105)
+
+FEATURES:
+
+* Add storage import (from storage backups) feature.
+
 ## 1.7.4 (Nov 03, 2020)
 
 IMPROVEMENTS:
