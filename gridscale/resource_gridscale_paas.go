@@ -74,7 +74,6 @@ func resourceGridscalePaaS() *schema.Resource {
 				Type:         schema.TypeString,
 				Description:  "Template that PaaS service uses",
 				Required:     true,
-				ForceNew:     true,
 				ValidateFunc: validation.NoZeroValues,
 			},
 			"usage_in_minute": {
@@ -340,8 +339,9 @@ func resourceGridscalePaaSServiceUpdate(d *schema.ResourceData, meta interface{}
 
 	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
 	requestBody := gsclient.PaaSServiceUpdateRequest{
-		Name:   d.Get("name").(string),
-		Labels: &labels,
+		Name:                    d.Get("name").(string),
+		Labels:                  &labels,
+		PaaSServiceTemplateUUID: d.Get("service_template_uuid").(string),
 	}
 
 	params := make(map[string]interface{}, 0)
