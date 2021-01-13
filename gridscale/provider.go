@@ -1,6 +1,7 @@
 package gridscale
 
 import (
+	"fmt"
 	"runtime"
 	"strings"
 
@@ -8,7 +9,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-const version = "1.8.1"
+var (
+	version string
+	commit  string
+)
 
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
@@ -88,7 +92,7 @@ func Provider() terraform.ResourceProvider {
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	headers := convertStrToHeaderMap(d.Get("http_headers").(string))
-	headers["User-Agent"] = "terraform-provider-gridscale/" + version + " (" + runtime.GOOS + ")"
+	headers["User-Agent"] = fmt.Sprintf("terraform-provider-gridscale/%s-%s-%s", version, commit, runtime.GOOS)
 	config := Config{
 		UserUUID:    d.Get("uuid").(string),
 		APIToken:    d.Get("token").(string),
