@@ -1,5 +1,11 @@
 # Changelog
 
+## X.Y.Z (UNRELEASED)
+
+IMPROVEMENTS:
+
+* We fixed the User-Agent header that is sent with Terraform requests to something useful ([#108](https://github.com/gridscale/terraform-provider-gridscale/issues/108)).
+
 ## 1.8.0 (Jan 05, 2020)
 
 IMPROVEMENTS:
