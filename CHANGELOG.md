@@ -5,6 +5,7 @@
 IMPROVEMENTS:
 
 * We fixed the User-Agent header that is sent with Terraform requests to something useful ([#108](https://github.com/gridscale/terraform-provider-gridscale/issues/108)).
+* PaaS services are not destroyed and re-created anymore when a service template changes ([#109](https://github.com/gridscale/terraform-provider-gridscale/issues/109)).
 
 ## 1.8.0 (Jan 05, 2020)
 
