@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -105,9 +106,10 @@ func resourceGridscaleSshkeyUpdate(d *schema.ResourceData, meta interface{}) err
 	errorPrefix := fmt.Sprintf("update SSH key (%s) resource -", d.Id())
 
 	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
+	pubKey := d.Get("sshkey").(string)
 	requestBody := gsclient.SshkeyUpdateRequest{
 		Name:   d.Get("name").(string),
-		Sshkey: d.Get("sshkey").(string),
+		Sshkey: strings.TrimSpace(pubKey),
 		Labels: &labels,
 	}
 
@@ -123,10 +125,10 @@ func resourceGridscaleSshkeyUpdate(d *schema.ResourceData, meta interface{}) err
 
 func resourceGridscaleSshkeyCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-
+	pubKey := d.Get("sshkey").(string)
 	requestBody := gsclient.SshkeyCreateRequest{
 		Name:   d.Get("name").(string),
-		Sshkey: d.Get("sshkey").(string),
+		Sshkey: strings.TrimSpace(pubKey),
 		Labels: convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
