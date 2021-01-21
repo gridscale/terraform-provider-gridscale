@@ -17,7 +17,7 @@ The following example shows how one might use this resource to add an SSH public
 ```terraform
 resource "gridscale_sshkey" "sshkey-john"{
   name = "john's computer"
-  sshkey = "an ssh public key"
+  sshkey = "an ssh public key" //or file("/path/to/ssh.pub")
   timeouts {
     create="10m"
   }
