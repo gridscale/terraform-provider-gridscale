@@ -28,9 +28,6 @@ jobs:
       - name: Vet
         run: make vet
 
-      - name: Web test
-        run: make website-test
-
       - name: Acceptance test
         env:
           GRIDSCALE_UUID: ${{ secrets.CI_USER_UUID }}
