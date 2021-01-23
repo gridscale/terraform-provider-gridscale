@@ -34,6 +34,9 @@ func resourceGridscaleSshkey() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "sshkey_string is the OpenSSH public key string (all key types are supported => ed25519, ecdsa, dsa, rsa, rsa1)",
 				Required:    true,
+				StateFunc: func(val interface{}) string {
+					return strings.TrimSpace((val.(string)))
+				},
 			},
 			"status": {
 				Type:     schema.TypeString,
