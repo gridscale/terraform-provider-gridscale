@@ -69,9 +69,9 @@ To test the provider, simply run
 
     $ make test
 
-In order to run the full suite of acceptance tests, run `make testacc`. You will need to set `GRIDSCALE_UUID`, `GRIDSCALE_TOKEN`, and `GRIDSCALE_URL` environment variables to point to an existing project when running acceptance tests.
+To run the full suite of acceptance tests execute `make testacc`. You will need to set `GRIDSCALE_UUID`, `GRIDSCALE_TOKEN`, and `GRIDSCALE_URL` environment variables to point to an existing project when running acceptance tests.
 
-*Note:* acceptance tests create real resources, and often cost money to run.
+*Note:* acceptance tests create real resources and often cost money to run.
 
     $ make testacc
 
@@ -94,5 +94,5 @@ Jump to the [Release Checklist](release-checklist.md) for details.
 The following issues are known to us:
 
 - Changing the name attribute in a template datasource will not trigger storages using this template to be recreated.
-- If a storage has snapshots, terraform can not delete it.
+- If a storage has snapshots, Terraform cannot delete it.
 - The autorecovery value of a server can't be changed with Terraform.
