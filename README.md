@@ -1,52 +1,39 @@
-Terraform gridscale Provider
+# Terraform gridscale Provider
+
 [![Build status](https://github.com/gridscale/terraform-provider-gridscale/workflows/Test/badge.svg)](https://github.com/gridscale/terraform-provider-gridscale/actions)
 [![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/gridscale/terraform-provider-gridscale?label=release)](https://github.com/gridscale/terraform-provider-gridscale/releases)
 [![Gitter chat](https://badges.gitter.im/hashicorp-terraform/Lobby.png)](https://gitter.im/hashicorp-terraform/Lobby)
-==================
 
-Website: https://www.terraform.io
+<img src="https://cdn.rawgit.com/hashicorp/terraform-website/master/content/source/assets/images/logo-hashicorp.svg" width="400px">
 
-Mailing list: [Google Groups](http://groups.google.com/group/terraform-tool)
-
-<img src="https://cdn.rawgit.com/hashicorp/terraform-website/master/content/source/assets/images/logo-hashicorp.svg" width="600px">
-
-Maintainers
------------
+## Maintainers
 
 This provider plugin is maintained by the Terraform team at [gridscale](https://www.gridscale.io/).
 
-Requirements
-------------
+## Requirements
 
-- [Terraform](https://www.terraform.io/downloads.html) 0.12.x
+- [Terraform](https://www.terraform.io/downloads.html) ≥ 0.12.x
 - [Go](https://golang.org/doc/install) ≥ 1.13 (to build the provider plugin)
 
-Building the Provider
----------------------
+## Building the Provider
 
 Clone repository to: `$GOPATH/src/github.com/gridscale/terraform-provider-gridscale`
 
-```sh
-$ mkdir -p $GOPATH/src/github.com/gridscale; cd $GOPATH/src/github.com/gridscale
-$ git clone git@github.com:gridscale/terraform-provider-gridscale.git
-```
+    $ mkdir -p $GOPATH/src/github.com/gridscale; cd $GOPATH/src/github.com/gridscale
+    $ git clone git@github.com:gridscale/terraform-provider-gridscale.git
 
 Enter the provider directory and build the provider
 
-```sh
-$ cd $GOPATH/src/github.com/gridscale/terraform-provider-gridscale
-$ make build
-```
+    $ cd $GOPATH/src/github.com/gridscale/terraform-provider-gridscale
+    $ make build
 
-Using the Provider
-------------------
+## Using the Provider
 
 See the [gridscale provider documentation](https://registry.terraform.io/providers/gridscale/gridscale/latest/docs) to get started on using the gridscale provider.
 
 Alternatively, this documentation can also be found within this repository. Check out [`website/docs/index.html.markdown`](website/docs/index.html.markdown) to get started. Documentation on how to create resources like servers, storages and networks can be found in [`website/docs/r`](website/docs/r). Documentation on how to add resources like storages, networks and IP addresses to servers, check out the documentation on datasources found in [`website/docs/d`](website/docs/d).
 
-Available Features
----------------------------
+## Available Features
 
 | Feature | Availability |
 |---|:---:|
@@ -70,8 +57,7 @@ Available Features
 | Multiple project support ([Workaround](https://github.com/gridscale/terraform-examples/tree/master/multi-project)) | :x: |
 | Marketplace | :heavy_check_mark: |
 
-Developing the Provider
----------------------------
+## Development
 
 If you wish to work on the provider, you'll first need [Go](http://www.golang.org) installed on your machine (version 1.13+ is *required*). You'll also need to correctly setup a [GOPATH](http://golang.org/doc/code.html#GOPATH), as well as adding `$GOPATH/bin` to your `$PATH`.
 
@@ -91,10 +77,11 @@ In order to run the full suite of acceptance tests, run `make testacc`. You will
 
 To run a specific acceptance test, use `TESTARGS`.
 
-    $ make testacc TEST=./gridscale/ TESTARGS='-run=TestAccResourceGridscaleLoadBalancerBasic'
+    $ make testacc \
+        TEST=./gridscale \
+        TESTARGS='-run=TestAccResourceGridscaleLoadBalancerBasic'
 
-Releasing the Provider
-----------------------
+## Releasing the Provider
 
 A [GoReleaser](https://goreleaser.com/) configuration is provided that produces build artifacts matching the [layout required](https://www.terraform.io/docs/registry/providers/publishing.html#manually-preparing-a-release) to publish the provider in the Terraform Registry.
 
@@ -102,8 +89,7 @@ Releases will appear as drafts. Once marked as published on the GitHub Releases 
 
 Jump to the [Release Checklist](release-checklist.md) for details.
 
-Known Issues
----------------------------
+## Known Issues
 
 The following issues are known to us:
 
