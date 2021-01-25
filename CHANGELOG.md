@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.8.2 (UNRELEASED)
+
+IMPROVEMENTS:
+
+BUG FIXES:
+
+* Reading SSH public key from file via `file()` function will not cause key to be set in every apply ([#116](https://github.com/gridscale/terraform-provider-gridscale/issues/116)).
+
 ## 1.8.1 (Jan 21, 2021)
 
 IMPROVEMENTS:
@@ -9,8 +17,7 @@ IMPROVEMENTS:
 BUG FIXES:
 
 * PaaS services are not destroyed and re-created anymore when a service template changes ([#109](https://github.com/gridscale/terraform-provider-gridscale/issues/109)).
-* SSH Public key can be added via funtion `file()` without any problems with whitespace ([#112](https://github.com/gridscale/terraform-provider-gridscale/issues/112)).
-
+* SSH Public key can be added via function `file()` without any problems with whitespace ([#112](https://github.com/gridscale/terraform-provider-gridscale/issues/112)).
 
 ## 1.8.0 (Jan 05, 2021)
 
