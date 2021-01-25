@@ -1,5 +1,16 @@
 # Changelog
 
+
+## 1.8.2 (Jan 25, 2021)
+
+IMPROVEMENTS:
+
+* Reword README.
+
+BUG FIXES:
+
+* Reading SSH public key from file cia `file()` function will not cause key to be set in every apply ([#116](https://github.com/gridscale/terraform-provider-gridscale/issues/116)).
+
 ## 1.8.1 (Jan 21, 2021)
 
 IMPROVEMENTS:
