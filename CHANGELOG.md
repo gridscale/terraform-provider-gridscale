@@ -1,8 +1,12 @@
 # Changelog
 
-## 1.8.2 (UNRELEASED)
+## 1.8.3 (UNRELEASED)
 
 IMPROVEMENTS:
+
+BUG FIXES:
+
+## 1.8.2 (Jan 26, 2021)
 
 BUG FIXES:
 
