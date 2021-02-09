@@ -76,6 +76,11 @@ func resourceGridscalePaaS() *schema.Resource {
 				Required:     true,
 				ValidateFunc: validation.NoZeroValues,
 			},
+			"service_template_uuid_computed": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Template that PaaS service uses. The `service_template_uuid_computed` will be different from `service_template_uuid`, when `service_template_uuid` is updated outside of terraform.",
+			},
 			"usage_in_minute": {
 				Type:        schema.TypeInt,
 				Description: "Number of minutes that PaaS service is in use",
@@ -196,8 +201,8 @@ func resourceGridscalePaaSServiceRead(d *schema.ResourceData, meta interface{}) 
 	if err = d.Set("security_zone_uuid", props.SecurityZoneUUID); err != nil {
 		return fmt.Errorf("%s error setting security_zone_uuid: %v", errorPrefix, err)
 	}
-	if err = d.Set("service_template_uuid", props.ServiceTemplateUUID); err != nil {
-		return fmt.Errorf("%s error setting service_template_uuid: %v", errorPrefix, err)
+	if err = d.Set("service_template_uuid_computed", props.ServiceTemplateUUID); err != nil {
+		return fmt.Errorf("%s error setting service_template_uuid_computed: %v", errorPrefix, err)
 	}
 	if err = d.Set("usage_in_minute", props.UsageInMinutes); err != nil {
 		return fmt.Errorf("%s error setting usage_in_minute: %v", errorPrefix, err)
