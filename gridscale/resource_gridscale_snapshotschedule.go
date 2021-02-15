@@ -208,12 +208,15 @@ func resourceGridscaleSnapshotScheduleUpdate(d *schema.ResourceData, meta interf
 		RunInterval:   d.Get("run_interval").(int),
 		KeepSnapshots: d.Get("keep_snapshots").(int),
 	}
-	if strings.TrimSpace(d.Get("next_runtime").(string)) != "" {
-		nextRuntime, err := time.Parse(timeLayout, d.Get("next_runtime").(string))
-		if err != nil {
-			return fmt.Errorf("%s error: %v", errorPrefix, err)
+
+	if d.HasChange("next_runtime") {
+		if strings.TrimSpace(d.Get("next_runtime").(string)) != "" {
+			nextRuntime, err := time.Parse(timeLayout, d.Get("next_runtime").(string))
+			if err != nil {
+				return fmt.Errorf("%s error: %v", errorPrefix, err)
+			}
+			requestBody.NextRuntime = &gsclient.GSTime{Time: nextRuntime}
 		}
-		requestBody.NextRuntime = &gsclient.GSTime{Time: nextRuntime}
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
