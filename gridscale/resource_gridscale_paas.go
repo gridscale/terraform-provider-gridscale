@@ -41,6 +41,11 @@ func resourceGridscalePaaS() *schema.Resource {
 				Description: "Password for PaaS service",
 				Computed:    true,
 			},
+			"kubeconfig": {
+				Type:        schema.TypeString,
+				Description: "K8s config data",
+				Computed:    true,
+			},
 			"listen_port": {
 				Type:        schema.TypeSet,
 				Description: "Ports that PaaS service listens to",
@@ -196,6 +201,9 @@ func resourceGridscalePaaSServiceRead(d *schema.ResourceData, meta interface{}) 
 		}
 		if err = d.Set("password", creds[0].Password); err != nil {
 			return fmt.Errorf("%s error setting password: %v", errorPrefix, err)
+		}
+		if err = d.Set("kubeconfig", creds[0].KubeConfig); err != nil {
+			return fmt.Errorf("%s error setting kubeconfig: %v", errorPrefix, err)
 		}
 	}
 	if err = d.Set("security_zone_uuid", props.SecurityZoneUUID); err != nil {
