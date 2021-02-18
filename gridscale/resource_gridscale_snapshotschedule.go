@@ -208,7 +208,11 @@ func resourceGridscaleSnapshotScheduleUpdate(d *schema.ResourceData, meta interf
 		RunInterval:   d.Get("run_interval").(int),
 		KeepSnapshots: d.Get("keep_snapshots").(int),
 	}
-
+	// NOTE: remember to check if next_runtime is changed,
+	// otherwise tf will force to update next_runtime every time Update is executed.
+	// This is a bad behavior. Because if next_runtime_computed is different from
+	// next_runtime (since it might be changed outside of tf), and next_runtime is not changed (by the user);
+	// tf should not put the "old" next_runtime to the update request.
 	if d.HasChange("next_runtime") {
 		if strings.TrimSpace(d.Get("next_runtime").(string)) != "" {
 			nextRuntime, err := time.Parse(timeLayout, d.Get("next_runtime").(string))
