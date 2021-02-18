@@ -357,6 +357,11 @@ func resourceGridscalePaaSServiceUpdate(d *schema.ResourceData, meta interface{}
 	}
 
 	// Only update service_template_uuid, when it is changed
+	// NOTE: remember to check if service_template_uuid is changed,
+	// otherwise tf will force to update service_template_uuid every time Update is executed.
+	// This is a bad behavior. Because if service_template_uuid_computed is different from
+	// service_template_uuid (since it might be changed outside of tf), and service_template_uuid is not changed (by the user);
+	// tf should not put the "old" service_template_uuid to the update request.
 	if d.HasChange("service_template_uuid") {
 		requestBody.PaaSServiceTemplateUUID = d.Get("service_template_uuid").(string)
 	}
