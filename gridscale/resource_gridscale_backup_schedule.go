@@ -202,15 +202,18 @@ func resourceGridscaleBackupScheduleUpdate(d *schema.ResourceData, meta interfac
 	}
 	active := d.Get("active").(bool)
 	requestBody.Active = &active
-	nextRuntime, err := time.Parse(timeLayout, d.Get("next_runtime").(string))
-	if err != nil {
-		return fmt.Errorf("%s error: %v", errorPrefix, err)
+
+	if d.HasChange("next_runtime") {
+		nextRuntime, err := time.Parse(timeLayout, d.Get("next_runtime").(string))
+		if err != nil {
+			return fmt.Errorf("%s error: %v", errorPrefix, err)
+		}
+		requestBody.NextRuntime = &gsclient.GSTime{Time: nextRuntime}
 	}
-	requestBody.NextRuntime = &gsclient.GSTime{Time: nextRuntime}
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
 	defer cancel()
-	err = client.UpdateStorageBackupSchedule(ctx, storageUUID, d.Id(), requestBody)
+	err := client.UpdateStorageBackupSchedule(ctx, storageUUID, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
