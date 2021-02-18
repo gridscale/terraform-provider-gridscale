@@ -41,6 +41,11 @@ func resourceGridscalePaaS() *schema.Resource {
 				Description: "Password for PaaS service",
 				Computed:    true,
 			},
+			"kubeconfig": {
+				Type:        schema.TypeString,
+				Description: "K8s config data",
+				Computed:    true,
+			},
 			"listen_port": {
 				Type:        schema.TypeSet,
 				Description: "Ports that PaaS service listens to",
@@ -75,6 +80,11 @@ func resourceGridscalePaaS() *schema.Resource {
 				Description:  "Template that PaaS service uses",
 				Required:     true,
 				ValidateFunc: validation.NoZeroValues,
+			},
+			"service_template_uuid_computed": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Template that PaaS service uses. The `service_template_uuid_computed` will be different from `service_template_uuid`, when `service_template_uuid` is updated outside of terraform.",
 			},
 			"usage_in_minute": {
 				Type:        schema.TypeInt,
@@ -192,12 +202,15 @@ func resourceGridscalePaaSServiceRead(d *schema.ResourceData, meta interface{}) 
 		if err = d.Set("password", creds[0].Password); err != nil {
 			return fmt.Errorf("%s error setting password: %v", errorPrefix, err)
 		}
+		if err = d.Set("kubeconfig", creds[0].KubeConfig); err != nil {
+			return fmt.Errorf("%s error setting kubeconfig: %v", errorPrefix, err)
+		}
 	}
 	if err = d.Set("security_zone_uuid", props.SecurityZoneUUID); err != nil {
 		return fmt.Errorf("%s error setting security_zone_uuid: %v", errorPrefix, err)
 	}
-	if err = d.Set("service_template_uuid", props.ServiceTemplateUUID); err != nil {
-		return fmt.Errorf("%s error setting service_template_uuid: %v", errorPrefix, err)
+	if err = d.Set("service_template_uuid_computed", props.ServiceTemplateUUID); err != nil {
+		return fmt.Errorf("%s error setting service_template_uuid_computed: %v", errorPrefix, err)
 	}
 	if err = d.Set("usage_in_minute", props.UsageInMinutes); err != nil {
 		return fmt.Errorf("%s error setting usage_in_minute: %v", errorPrefix, err)
@@ -339,9 +352,13 @@ func resourceGridscalePaaSServiceUpdate(d *schema.ResourceData, meta interface{}
 
 	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
 	requestBody := gsclient.PaaSServiceUpdateRequest{
-		Name:                    d.Get("name").(string),
-		Labels:                  &labels,
-		PaaSServiceTemplateUUID: d.Get("service_template_uuid").(string),
+		Name:   d.Get("name").(string),
+		Labels: &labels,
+	}
+
+	// Only update service_template_uuid, when it is changed
+	if d.HasChange("service_template_uuid") {
+		requestBody.PaaSServiceTemplateUUID = d.Get("service_template_uuid").(string)
 	}
 
 	params := make(map[string]interface{}, 0)
