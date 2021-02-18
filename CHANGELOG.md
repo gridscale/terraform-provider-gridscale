@@ -1,10 +1,11 @@
 # Changelog
 
-## 1.8.3 (UNRELEASED)
-
-IMPROVEMENTS:
+## 1.8.3 (Feb 18, 2020)
 
 BUG FIXES:
+
+* Fix inconsistency issue of PaaS service resource, when the `paas_service_template_uuid` is updated outside of terraform ([#123](https://github.com/gridscale/terraform-provider-gridscale/issues/123)).
+* Fix `gridscale_backupschedule` and `gridscale_snapshotschedule` resources force to update `next_runtime` when updating other fields ([#126](https://github.com/gridscale/terraform-provider-gridscale/issues/126))
 
 ## 1.8.2 (Jan 26, 2021)
 
