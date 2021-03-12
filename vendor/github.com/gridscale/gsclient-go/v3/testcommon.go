@@ -47,7 +47,6 @@ var uuidCommonTestCases []uuidTestCase = []uuidTestCase{
 }
 
 var syncClientTestCases []bool = []bool{true, false}
-var timeoutTestCases []bool = []bool{true, false}
 
 func setupTestClient(sync bool) (*httptest.Server, *Client, *http.ServeMux) {
 	mux := http.NewServeMux()

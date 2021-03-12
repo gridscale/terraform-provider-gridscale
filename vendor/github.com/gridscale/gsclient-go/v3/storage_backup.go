@@ -7,43 +7,43 @@ import (
 	"path"
 )
 
-//StorageBackupOperator is an interface defining API of a storage backup operator
+// StorageBackupOperator provides an interface for operations on storage backups.
 type StorageBackupOperator interface {
 	GetStorageBackupList(ctx context.Context, id string) ([]StorageBackup, error)
 	DeleteStorageBackup(ctx context.Context, storageID, backupID string) error
 	RollbackStorageBackup(ctx context.Context, storageID, backupID string, body StorageRollbackRequest) error
 }
 
-//StorageBackupList is JSON structure of a list of storage backups
+// StorageBackupList holds of a list of storage backups.
 type StorageBackupList struct {
-	//Array of backups
+	// Array of backups.
 	List map[string]StorageBackupProperties `json:"backups"`
 }
 
-//StorageBackup is JSON structure of a single storage backup
+// StorageBackup represents a single storage backup.
 type StorageBackup struct {
-	//Properties of a backup
+	// Properties of a backup.
 	Properties StorageBackupProperties `json:"backup"`
 }
 
-//StorageBackupProperties hold the properties of a single backup.
+// StorageBackupProperties holds the properties of a single backup.
 type StorageBackupProperties struct {
-	//The UUID of a backup is always unique, and refers to a specific object.
+	// The UUID of a backup is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
 
-	//The name of the backup equals schedule name plus backup uuid.
+	// The name of the backup equals schedule name plus backup UUID.
 	Name string `json:"name"`
 
-	//Defines the date and time the object was initially created.
+	// Defines the date and time the object was initially created.
 	CreateTime GSTime `json:"create_time"`
 
-	//The size of a backup in GB.
+	// The size of a backup in GB.
 	Capacity int `json:"capacity"`
 }
 
-//GetStorageBackupList gets a list of available storage backups
+// GetStorageBackupList gets a list of available storage backups.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/getStorageBackups
+// See: https://gridscale.io/en//api-documentation/index.html#operation/getStorageBackups
 func (c *Client) GetStorageBackupList(ctx context.Context, id string) ([]StorageBackup, error) {
 	r := gsRequest{
 		uri:                 path.Join(apiStorageBase, id, "backups"),
@@ -61,9 +61,9 @@ func (c *Client) GetStorageBackupList(ctx context.Context, id string) ([]Storage
 	return storageBackups, err
 }
 
-//DeleteStorageBackup deletes a specific storage's backup
+// DeleteStorageBackup removes a specific storage's backup.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/deleteStorageBackup
+// See: https://gridscale.io/en//api-documentation/index.html#operation/deleteStorageBackup
 func (c *Client) DeleteStorageBackup(ctx context.Context, storageID, backupID string) error {
 	if !isValidUUID(storageID) || !isValidUUID(backupID) {
 		return errors.New("'storageID' or 'backupID' is invalid")
@@ -75,9 +75,9 @@ func (c *Client) DeleteStorageBackup(ctx context.Context, storageID, backupID st
 	return r.execute(ctx, *c, nil)
 }
 
-//RollbackStorageBackup rollbacks a storage's backup
+// RollbackStorageBackup rollbacks a storage from a storage backup.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/rollbackStorageBackup
+// See: https://gridscale.io/en//api-documentation/index.html#operation/rollbackStorageBackup
 func (c *Client) RollbackStorageBackup(ctx context.Context, storageID, backupID string, body StorageRollbackRequest) error {
 	if !isValidUUID(storageID) || !isValidUUID(backupID) {
 		return errors.New("'storageID' or 'backupID' is invalid")

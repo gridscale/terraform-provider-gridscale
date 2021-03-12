@@ -7,7 +7,7 @@ import (
 	"path"
 )
 
-//ServerStorageRelationOperator is an interface defining API of a server-storage relation operator
+// ServerStorageRelationOperator provides an interface for operations on server-storage relations.
 type ServerStorageRelationOperator interface {
 	GetServerStorageList(ctx context.Context, id string) ([]ServerStorageRelationProperties, error)
 	GetServerStorage(ctx context.Context, serverID, storageID string) (ServerStorageRelationProperties, error)
@@ -18,91 +18,91 @@ type ServerStorageRelationOperator interface {
 	UnlinkStorage(ctx context.Context, serverID string, storageID string) error
 }
 
-//ServerStorageRelationList JSON struct of a list of relations between a server and storages
+// ServerStorageRelationList holds a list of relations between a server and storages.
 type ServerStorageRelationList struct {
-	//Array of relations between a server and storages
+	// Array of relations between a server and storages.
 	List []ServerStorageRelationProperties `json:"storage_relations"`
 }
 
-//ServerStorageRelationSingle JSON struct of a single relation between a server and a storage
+// ServerStorageRelationSingle represents a single relation between a server and a storage.
 type ServerStorageRelationSingle struct {
-	//Properties of a relation between a server and a storage
+	// Properties of a relation between a server and a storage.
 	Properties ServerStorageRelationProperties `json:"storage_relation"`
 }
 
-//ServerStorageRelationProperties JSON struct of properties of a relation between a server and a storage
+// ServerStorageRelationProperties holds properties of a relation between a server and a storage.
 type ServerStorageRelationProperties struct {
-	//The UUID of an object is always unique, and refers to a specific object.
+	// The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
 
-	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
+	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	ObjectName string `json:"object_name"`
 
-	//The capacity of a storage/ISO image/template/snapshot in GB.
+	// The capacity of a storage/ISO image/template/snapshot in GB.
 	Capacity int `json:"capacity"`
 
-	//Indicates the speed of the storage. This may be (storage, storage_high or storage_insane).
+	// Indicates the speed of the storage. This may be (storage, storage_high or storage_insane).
 	StorageType string `json:"storage_type"`
 
-	//Defines the SCSI target ID. The SCSI defines transmission routes like Serial Attached SCSI (SAS), Fibre Channel and iSCSI.
-	//The target ID is a device (e.g. disk).
+	// Defines the SCSI target ID. The SCSI defines transmission routes like Serial Attached SCSI (SAS), Fibre Channel and iSCSI.
+	// The target ID is a device (e.g. disk).
 	Target int `json:"target"`
 
-	//Is the common SCSI abbreviation of the Logical Unit Number. A LUN is a unique identifier for a single disk or a composite of disks.
+	// Is the common SCSI abbreviation of the Logical Unit Number. A LUN is a unique identifier for a single disk or a composite of disks.
 	Lun int `json:"lun"`
 
-	//Defines the SCSI controller id. The SCSI defines transmission routes such as Serial Attached SCSI (SAS), Fibre Channel and iSCSI.
+	// Defines the SCSI controller id. The SCSI defines transmission routes such as Serial Attached SCSI (SAS), Fibre Channel and iSCSI.
 	Controller int `json:"controller"`
 
-	//Defines the date and time the object was initially created.
+	// Defines the date and time the object was initially created.
 	CreateTime GSTime `json:"create_time"`
 
-	//Defines if this object is the boot device. Storages, Networks and ISO images can have a boot device configured,
-	//but only one boot device per Storage, Network or ISO image.
-	//The boot order is as follows => Network > ISO image > Storage.
+	// Defines if this object is the boot device. Storages, Networks and ISO images can have a boot device configured,
+	// but only one boot device per Storage, Network or ISO image.
+	// The boot order is as follows => Network > ISO image > Storage.
 	BootDevice bool `json:"bootdevice"`
 
-	//The SCSI bus id. The SCSI defines transmission routes like Serial Attached SCSI (SAS), Fibre Channel and iSCSI.
-	//Each SCSI device is addressed via a specific number. Each SCSI bus can have multiple SCSI devices connected to it.
+	// The SCSI bus id. The SCSI defines transmission routes like Serial Attached SCSI (SAS), Fibre Channel and iSCSI.
+	// Each SCSI device is addressed via a specific number. Each SCSI bus can have multiple SCSI devices connected to it.
 	Bus int `json:"bus"`
 
-	//Indicates the UUID of the last used template on this storage (inherited from snapshots).
+	// Indicates the UUID of the last used template on this storage (inherited from snapshots).
 	LastUsedTemplate string `json:"last_used_template"`
 
-	//If a template has been used that requires a license key (e.g. Windows Servers)
-	//this shows the product_no of the license (see the /prices endpoint for more details).
+	// If a template has been used that requires a license key (e.g. Windows Servers)
+	// this shows the product_no of the license (see the /prices endpoint for more details).
 	LicenseProductNo int `json:"license_product_no"`
 
-	//The same as the object_uuid.
+	// The same as the object_uuid.
 	ServerUUID string `json:"server_uuid"`
 }
 
-//ServerStorageRelationCreateRequest JSON struct of a request for creating a relation between a server and a storage
+// ServerStorageRelationCreateRequest represents a request for creating a relation between a server and a storage.
 type ServerStorageRelationCreateRequest struct {
-	//The UUID of the storage you are requesting. If server's hardware profile is default, nested, q35 or q35_nested,
-	//you are allowed to attached 8 servers. Only 2 storage are allowed to be attached to server with other hardware profile
+	// The UUID of the storage you are requesting. If server's hardware profile is default, nested, q35 or q35_nested,
+	// you are allowed to attached 8 servers. Only 2 storage are allowed to be attached to server with other hardware profile.
 	ObjectUUID string `json:"object_uuid"`
 
-	//Whether the server will boot from this storage device or not. Optional.
+	// Whether the server will boot from this storage device or not. Optional.
 	BootDevice bool `json:"bootdevice,omitempty"`
 }
 
-//ServerStorageRelationUpdateRequest JSON struct of a request for updating a relation between a server and a storage
+// ServerStorageRelationUpdateRequest represents a request for updating a relation between a server and a storage.
 type ServerStorageRelationUpdateRequest struct {
-	//The ordering of the network interfaces. Lower numbers have lower PCI-IDs. Optional.
+	// The ordering of the network interfaces. Lower numbers have lower PCI-IDs. Optional.
 	Ordering int `json:"ordering,omitempty"`
 
-	//Whether the server boots from this network or not. Optional.
+	// Whether the server boots from this network or not. Optional.
 	BootDevice bool `json:"bootdevice,omitempty"`
 
-	//Defines information about IP prefix spoof protection (it allows source traffic only from the IPv4/IPv4 network prefixes).
-	//If empty, it allow no IPv4/IPv6 source traffic. If set to null, l3security is disabled (default). Optional.
+	// Defines information about IP prefix spoof protection (it allows source traffic only from the IPv4/IPv4 network prefixes).
+	// If empty, it allow no IPv4/IPv6 source traffic. If set to null, l3security is disabled (default). Optional.
 	L3security []string `json:"l3security,omitempty"`
 }
 
-//GetServerStorageList gets a list of a specific server's storages
+// GetServerStorageList gets a list of a specific server's storages.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/getServerLinkedStorages
+// See: https://gridscale.io/en//api-documentation/index.html#operation/getServerLinkedStorages
 func (c *Client) GetServerStorageList(ctx context.Context, id string) ([]ServerStorageRelationProperties, error) {
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
@@ -117,9 +117,9 @@ func (c *Client) GetServerStorageList(ctx context.Context, id string) ([]ServerS
 	return response.List, err
 }
 
-//GetServerStorage gets a storage of a specific server
+// GetServerStorage gets a storage of a specific server.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/getServerLinkedStorage
+// See: https://gridscale.io/en//api-documentation/index.html#operation/getServerLinkedStorage
 func (c *Client) GetServerStorage(ctx context.Context, serverID, storageID string) (ServerStorageRelationProperties, error) {
 	if !isValidUUID(serverID) || !isValidUUID(storageID) {
 		return ServerStorageRelationProperties{}, errors.New("'serverID' or 'storageID' is invalid")
@@ -134,9 +134,9 @@ func (c *Client) GetServerStorage(ctx context.Context, serverID, storageID strin
 	return response.Properties, err
 }
 
-//UpdateServerStorage updates a link between a storage and a server
+// UpdateServerStorage updates a link between a storage and a server.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/updateServerLinkedStorage
+// See: https://gridscale.io/en//api-documentation/index.html#operation/updateServerLinkedStorage
 func (c *Client) UpdateServerStorage(ctx context.Context, serverID, storageID string, body ServerStorageRelationUpdateRequest) error {
 	if !isValidUUID(serverID) || !isValidUUID(storageID) {
 		return errors.New("'serverID' or 'storageID' is invalid")
@@ -149,9 +149,9 @@ func (c *Client) UpdateServerStorage(ctx context.Context, serverID, storageID st
 	return r.execute(ctx, *c, nil)
 }
 
-//CreateServerStorage create a link between a server and a storage
+// CreateServerStorage creates a link between a server and a storage.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/linkStorageToServer
+// See: https://gridscale.io/en//api-documentation/index.html#operation/linkStorageToServer
 func (c *Client) CreateServerStorage(ctx context.Context, id string, body ServerStorageRelationCreateRequest) error {
 	if !isValidUUID(id) || !isValidUUID(body.ObjectUUID) {
 		return errors.New("'server_id' or 'storage_id' is invalid")
@@ -164,9 +164,9 @@ func (c *Client) CreateServerStorage(ctx context.Context, id string, body Server
 	return r.execute(ctx, *c, nil)
 }
 
-//DeleteServerStorage delete a link between a storage and a server
+// DeleteServerStorage removes a link between a storage and a server.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/unlinkStorageFromServer
+// See: https://gridscale.io/en//api-documentation/index.html#operation/unlinkStorageFromServer
 func (c *Client) DeleteServerStorage(ctx context.Context, serverID, storageID string) error {
 	if !isValidUUID(serverID) || !isValidUUID(storageID) {
 		return errors.New("'serverID' or 'storageID' is invalid")
@@ -178,7 +178,7 @@ func (c *Client) DeleteServerStorage(ctx context.Context, serverID, storageID st
 	return r.execute(ctx, *c, nil)
 }
 
-//LinkStorage attaches a storage to a server
+// LinkStorage attaches a storage to a server.
 func (c *Client) LinkStorage(ctx context.Context, serverID string, storageID string, bootdevice bool) error {
 	body := ServerStorageRelationCreateRequest{
 		ObjectUUID: storageID,
@@ -187,7 +187,7 @@ func (c *Client) LinkStorage(ctx context.Context, serverID string, storageID str
 	return c.CreateServerStorage(ctx, serverID, body)
 }
 
-//UnlinkStorage remove a storage from a server
+// UnlinkStorage detaches a storage from a server.
 func (c *Client) UnlinkStorage(ctx context.Context, serverID string, storageID string) error {
 	return c.DeleteServerStorage(ctx, serverID, storageID)
 }

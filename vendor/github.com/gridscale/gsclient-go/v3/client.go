@@ -29,12 +29,12 @@ const (
 	apiDeletedBase                = "/objects/deleted"
 )
 
-//Client struct of a gridscale golang client
+// Client struct of a gridscale golang client.
 type Client struct {
 	cfg *Config
 }
 
-//NewClient creates new gridscale golang client
+// NewClient creates new gridscale golang client.
 func NewClient(c *Config) *Client {
 	client := &Client{
 		cfg: c,
@@ -42,52 +42,52 @@ func NewClient(c *Config) *Client {
 	return client
 }
 
-//HttpClient returns http client
+// HttpClient returns http client.
 func (c *Client) HttpClient() *http.Client {
 	return c.cfg.httpClient
 }
 
-//Synchronous returns if the client is sync or not
+// Synchronous returns if the client is sync or not.
 func (c *Client) Synchronous() bool {
 	return c.cfg.sync
 }
 
-//DelayInterval returns request delay interval
+// DelayInterval returns request delay interval.
 func (c *Client) DelayInterval() time.Duration {
 	return c.cfg.delayInterval
 }
 
-//MaxNumberOfRetries returns max number of retries
+// MaxNumberOfRetries returns max number of retries.
 func (c *Client) MaxNumberOfRetries() int {
 	return c.cfg.maxNumberOfRetries
 }
 
-//APIURL returns api URL
+// APIURL returns api URL.
 func (c *Client) APIURL() string {
 	return c.cfg.apiURL
 }
 
-//UserAgent returns user agent
+// UserAgent returns user agent.
 func (c *Client) UserAgent() string {
 	return c.cfg.userAgent
 }
 
-//UserUUID returns user UUID
+// UserUUID returns user UUID.
 func (c *Client) UserUUID() string {
 	return c.cfg.userUUID
 }
 
-//APIToken returns api token
+// APIToken returns api token.
 func (c *Client) APIToken() string {
 	return c.cfg.apiToken
 }
 
-//WithHTTPHeaders adds custom HTTP headers to Client
+// WithHTTPHeaders adds custom HTTP headers to Client.
 func (c *Client) WithHTTPHeaders(headers map[string]string) {
 	c.cfg.httpHeaders = headers
 }
 
-//waitForRequestCompleted allows to wait for a request to complete
+// waitForRequestCompleted allows to wait for a request to complete.
 func (c *Client) waitForRequestCompleted(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
