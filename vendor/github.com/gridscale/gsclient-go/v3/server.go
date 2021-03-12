@@ -7,7 +7,7 @@ import (
 	"path"
 )
 
-//ServerOperator is an interface defining API of a server operator
+// ServerOperator provides an interface for operations on servers.
 type ServerOperator interface {
 	GetServer(ctx context.Context, id string) (Server, error)
 	GetServerList(ctx context.Context) ([]Server, error)
@@ -24,277 +24,278 @@ type ServerOperator interface {
 	GetDeletedServers(ctx context.Context) ([]Server, error)
 }
 
-//ServerList JSON struct of a list of servers
+// ServerList holds a list of servers.
 type ServerList struct {
-	//Array of servers
+	// Array of servers.
 	List map[string]ServerProperties `json:"servers"`
 }
 
-//DeletedServerList JSON struct of a list of deleted servers
+// DeletedServerList holds a list of deleted servers.
 type DeletedServerList struct {
-	//Array of deleted servers
+	// Array of deleted servers.
 	List map[string]ServerProperties `json:"deleted_servers"`
 }
 
-//Server JSON struct of a single server
+// Server represents a single server.
 type Server struct {
-	//Properties of a server
+	// Properties of a server.
 	Properties ServerProperties `json:"server"`
 }
 
-//ServerProperties JSON struct of properties of a server
+// ServerProperties holds properties of a server.
 type ServerProperties struct {
-	//The UUID of an object is always unique, and refers to a specific object.
+	// The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
 
-	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
+	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
-	//Indicates the amount of memory in GB.
+	// Indicates the amount of memory in GB.
 	Memory int `json:"memory"`
 
-	//Number of server cores.
+	// Number of server cores.
 	Cores int `json:"cores"`
 
-	//Specifies the hardware settings for the virtual machine.
+	// Specifies the hardware settings for the virtual machine.
 	HardwareProfile string `json:"hardware_profile"`
 
-	//Status indicates the status of the object. it could be in-provisioning or active
+	// Status indicates the status of the object. it could be in-provisioning or active
 	Status string `json:"status"`
 
-	//Helps to identify which data center an object belongs to.
+	// Helps to identify which data center an object belongs to.
 	LocationUUID string `json:"location_uuid"`
 
-	//The power status of the server.
+	// The power status of the server.
 	Power bool `json:"power"`
 
-	//The price for the current period since the last bill.
+	// The price for the current period since the last bill.
 	CurrentPrice float64 `json:"current_price"`
 
-	//Which Availability-Zone the Server is placed.
+	// Which Availability-Zone the Server is placed.
 	AvailabilityZone string `json:"availability_zone"`
 
-	//If the server should be auto-started in case of a failure (default=true).
+	// If the server should be auto-started in case of a failure (default=true).
 	AutoRecovery bool `json:"auto_recovery"`
 
-	//Legacy-Hardware emulation instead of virtio hardware.
-	//If enabled, hot-plugging cores, memory, storage, network, etc. will not work,
-	//but the server will most likely run every x86 compatible operating system.
-	//This mode comes with a performance penalty, as emulated hardware does not benefit from the virtio driver infrastructure.
+	// Legacy-Hardware emulation instead of virtio hardware.
+	// If enabled, hot-plugging cores, memory, storage, network, etc. will not work,
+	// but the server will most likely run every x86 compatible operating system.
+	// This mode comes with a performance penalty, as emulated hardware does not benefit from the virtio driver infrastructure.
 	Legacy bool `json:"legacy"`
 
-	//The token used by the panel to open the websocket VNC connection to the server console.
+	// The token used by the panel to open the websocket VNC connection to the server console.
 	ConsoleToken string `json:"console_token"`
 
-	//Total minutes of memory used.
+	// Total minutes of memory used.
 	UsageInMinutesMemory int `json:"usage_in_minutes_memory"`
 
-	//Total minutes of cores used.
+	// Total minutes of cores used.
 	UsageInMinutesCores int `json:"usage_in_minutes_cores"`
 
-	//List of labels.
+	// List of labels.
 	Labels []string `json:"labels"`
 
-	//Information about other objects which are related to this server. Object could be IPs, storages, networks, and ISO images.
+	// Information about other objects which are related to this server. Object could be IPs, storages, networks, and ISO images.
 	Relations ServerRelations `json:"relations"`
 
-	//Defines the date and time the object was initially created.
+	// Defines the date and time the object was initially created.
 	CreateTime GSTime `json:"create_time"`
 
-	//Defines the date and time of the last object change.
+	// Defines the date and time of the last object change.
 	ChangeTime GSTime `json:"change_time"`
 }
 
-//ServerRelations JSON struct of a list of server relations
+// ServerRelations holds a list of server relations.
+// It shows the relations between a server and ISO images/Networks/IP addresses/Storages.
 type ServerRelations struct {
-	//Array of object (ServerIsoImageRelationProperties)
+	// Array of object (ServerIsoImageRelationProperties).
 	IsoImages []ServerIsoImageRelationProperties `json:"isoimages"`
 
-	//Array of object (ServerNetworkRelationProperties)
+	// Array of object (ServerNetworkRelationProperties).
 	Networks []ServerNetworkRelationProperties `json:"networks"`
 
-	//Array of object (ServerIPRelationProperties)
+	// Array of object (ServerIPRelationProperties).
 	PublicIPs []ServerIPRelationProperties `json:"public_ips"`
 
-	//Array of object (ServerStorageRelationProperties)
+	// Array of object (ServerStorageRelationProperties).
 	Storages []ServerStorageRelationProperties `json:"storages"`
 }
 
-//ServerCreateRequest JSON struct of a request for creating a server
+// ServerCreateRequest represents a request for creating a server.
 type ServerCreateRequest struct {
-	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
+	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
-	//The amount of server memory in GB.
+	// The amount of server memory in GB.
 	Memory int `json:"memory"`
 
-	//The number of server cores.
+	// The number of server cores.
 	Cores int `json:"cores"`
 
-	//Specifies the hardware settings for the virtual machine.
-	//Allowed values: DefaultServerHardware, NestedServerHardware, LegacyServerHardware, CiscoCSRServerHardware,
-	//SophosUTMServerHardware, F5BigipServerHardware, Q35ServerHardware, Q35NestedServerHardware.
-	//HardwareProfile is not set => server hardware is normal type
+	// Specifies the hardware settings for the virtual machine.
+	// Allowed values: DefaultServerHardware, NestedServerHardware, LegacyServerHardware, CiscoCSRServerHardware,
+	// SophosUTMServerHardware, F5BigipServerHardware, Q35ServerHardware, Q35NestedServerHardware.
 	HardwareProfile ServerHardwareProfile `json:"hardware_profile,omitempty"`
 
-	//Defines which Availability-Zone the Server is placed. Can be empty
+	// Defines which Availability-Zone the Server is placed. Can be empty.
 	AvailablityZone string `json:"availability_zone,omitempty"`
 
-	//List of labels. Can be empty.
+	// List of labels. Can be empty.
 	Labels []string `json:"labels,omitempty"`
 
-	//Status indicates the status of the object. Can be empty
+	// Status indicates the status of the object. Can be empty.
 	Status string `json:"status,omitempty"`
 
-	//If the server should be auto-started in case of a failure (default=true when AutoRecovery=nil).
+	// If the server should be auto-started in case of a failure (default=true when AutoRecovery=nil).
 	AutoRecovery *bool `json:"auto_recovery,omitempty"`
 
-	//The information about other object which are related to this server. the object could be ip, storage, network, and isoimage.
-	//*Caution: This field will be deprecated.
+	// The information about other object which are related to this server. the object could be ip, storage, network, and isoimage.
+	// **Caution**: This field is deprecated.
 	Relations *ServerCreateRequestRelations `json:"relations,omitempty"`
 }
 
-//ServerCreateRequestRelations JSOn struct of a list of a server's relations
+// ServerCreateRequestRelations holds a list of a server's relations.
 type ServerCreateRequestRelations struct {
-	//Array of objects (ServerCreateRequestIsoimage)
+	// Array of objects (ServerCreateRequestIsoimage).
 	IsoImages []ServerCreateRequestIsoimage `json:"isoimages"`
 
-	//Array of objects (ServerCreateRequestNetwork)
+	// Array of objects (ServerCreateRequestNetwork).
 	Networks []ServerCreateRequestNetwork `json:"networks"`
 
-	//Array of objects (ServerCreateRequestIP)
+	// Array of objects (ServerCreateRequestIP).
 	PublicIPs []ServerCreateRequestIP `json:"public_ips"`
 
-	//Array of objects (ServerCreateRequestStorage)
+	// Array of objects (ServerCreateRequestStorage).
 	Storages []ServerCreateRequestStorage `json:"storages"`
 }
 
-//ServerCreateResponse JSON struct of a response for creating a server
+// ServerCreateResponse represents a response for creating a server.
 type ServerCreateResponse struct {
-	//UUID of object being created. Same as ServerUUID.
+	// UUID of object being created. Same as ServerUUID.
 	ObjectUUID string `json:"object_uuid"`
 
-	//UUID of the request
+	// UUID of the request.
 	RequestUUID string `json:"request_uuid"`
 
-	//UUID of server being created. Same as ObjectUUID.
+	// UUID of server being created. Same as ObjectUUID.
 	ServerUUID string `json:"server_uuid"`
 
-	//UUIDs of attached networks
+	// UUIDs of attached networks.
 	NetworkUUIDs []string `json:"network_uuids"`
 
-	//UUIDs of attached storages
+	// UUIDs of attached storages.
 	StorageUUIDs []string `json:"storage_uuids"`
 
-	//UUIDs of attached IP addresses
+	// UUIDs of attached IP addresses.
 	IPaddrUUIDs []string `json:"ipaddr_uuids"`
 }
 
-//ServerPowerUpdateRequest JSON struct of a request for updating server's power state
+// ServerPowerUpdateRequest reresents a request for updating server's power state.
 type ServerPowerUpdateRequest struct {
-	//Power=true => server is on
-	//Power=false => server if off
+	// Power=true => server is on.
+	// Power=false => server if off.
 	Power bool `json:"power"`
 }
 
-//ServerCreateRequestStorage JSON struct of a relation between a server and a storage
+// ServerCreateRequestStorage represents a relation between a server and a storage.
 type ServerCreateRequestStorage struct {
-	//UUID of the storage being attached to the server
+	// UUID of the storage being attached to the server.
 	StorageUUID string `json:"storage_uuid"`
 
-	//Is the storage a boot device?
+	// Is the storage a boot device?
 	BootDevice bool `json:"bootdevice,omitempty"`
 }
 
-//ServerCreateRequestNetwork JSON struct of a relation between a server and a network
+// ServerCreateRequestNetwork represents a relation between a server and a network.
 type ServerCreateRequestNetwork struct {
-	//UUID of the networks being attached to the server
+	// UUID of the networks being attached to the server.
 	NetworkUUID string `json:"network_uuid"`
 
-	//Is the network a boot device?
+	// Is the network a boot device?
 	BootDevice bool `json:"bootdevice,omitempty"`
 }
 
-//ServerCreateRequestIP JSON struct of a relation between a server and an IP address
+// ServerCreateRequestIP represents a relation between a server and an IP address.
 type ServerCreateRequestIP struct {
-	//UUID of the IP address being attached to the server
+	// UUID of the IP address being attached to the server.
 	IPaddrUUID string `json:"ipaddr_uuid"`
 }
 
-//ServerCreateRequestIsoimage JSON struct of a relation between a server and an ISO image
+// ServerCreateRequestIsoimage represents a relation between a server and an ISO image.
 type ServerCreateRequestIsoimage struct {
-	//UUID of the ISO-image being attached to the server
+	// UUID of the ISO-image being attached to the server.
 	IsoimageUUID string `json:"isoimage_uuid"`
 }
 
-//ServerUpdateRequest JSON of a request for updating a server
+// ServerUpdateRequest represents a request for updating a server.
 type ServerUpdateRequest struct {
-	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
-	//Leave it if you do not want to update the name.
+	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
+	// Leave it if you do not want to update the name.
 	Name string `json:"name,omitempty"`
 
-	//Defines which Availability-Zone the Server is placed. Leave it if you do not want to update the zone.
+	// Defines which Availability-Zone the Server is placed. Leave it if you do not want to update the zone.
 	AvailablityZone string `json:"availability_zone,omitempty"`
 
-	//The amount of server memory in GB. Leave it if you do not want to update the memory
+	// The amount of server memory in GB. Leave it if you do not want to update the memory.
 	Memory int `json:"memory,omitempty"`
 
-	//The number of server cores. Leave it if you do not want to update the number of the cpu cores.
+	// The number of server cores. Leave it if you do not want to update the number of the cpu cores.
 	Cores int `json:"cores,omitempty"`
 
-	//List of labels. Leave it if you do not want to update the list of labels
+	// List of labels. Leave it if you do not want to update the list of labels.
 	Labels *[]string `json:"labels,omitempty"`
 
-	//If the server should be auto-started in case of a failure (default=true).
-	//Leave it if you do not want to update this feature of the server.
+	// If the server should be auto-started in case of a failure (default=true).
+	// Leave it if you do not want to update this feature of the server.
 	AutoRecovery *bool `json:"auto_recovery,omitempty"`
 }
 
-//ServerMetricList JSON struct of a list of a server's metrics
+// ServerMetricList holds a list of a server's metrics.
 type ServerMetricList struct {
-	//Array of a server's metrics
+	// Array of a server's metrics
 	List []ServerMetricProperties `json:"server_metrics"`
 }
 
-//ServerMetric JSON struct of a single metric of a server
+// ServerMetric represents a single metric of a server.
 type ServerMetric struct {
-	//Properties of a server metric
+	// Properties of a server metric.
 	Properties ServerMetricProperties `json:"server_metric"`
 }
 
-//ServerMetricProperties JSON struct
+// ServerMetricProperties holds properties of a server metric.
 type ServerMetricProperties struct {
-	//Defines the begin of the time range.
+	// Defines the begin of the time range.
 	BeginTime GSTime `json:"begin_time"`
 
-	//Defines the end of the time range.
+	// Defines the end of the time range.
 	EndTime GSTime `json:"end_time"`
 
-	//The UUID of an object is always unique, and refers to a specific object.
+	// The UUID of an object is always unique, and refers to a specific object.
 	PaaSServiceUUID string `json:"paas_service_uuid"`
 
-	//Core usage
+	// Core usage.
 	CoreUsage struct {
-		//Value
+		// Value.
 		Value float64 `json:"value"`
 
-		//Unit of value
+		// Unit of value.
 		Unit string `json:"unit"`
 	} `json:"core_usage"`
 
-	//Storage usage
+	// Storage usage.
 	StorageSize struct {
-		//Value
+		// Value.
 		Value float64 `json:"value"`
 
-		//Unit of value
+		// Unit of value.
 		Unit string `json:"unit"`
 	} `json:"storage_size"`
 }
 
+// ServerHardwareProfile represents the type of server.
 type ServerHardwareProfile string
 
-//All available server's hardware types
+// All available server's hardware types.
 const (
 	DefaultServerHardware   ServerHardwareProfile = "default"
 	NestedServerHardware    ServerHardwareProfile = "nested"
@@ -306,9 +307,9 @@ const (
 	Q35NestedServerHardware ServerHardwareProfile = "q35_nested"
 )
 
-//GetServer gets a specific server based on given list
+// GetServer gets a specific server based on given list.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/getServer
+// See: https://gridscale.io/en//api-documentation/index.html#operation/getServer
 func (c *Client) GetServer(ctx context.Context, id string) (Server, error) {
 	if !isValidUUID(id) {
 		return Server{}, errors.New("'id' is invalid")
@@ -323,9 +324,9 @@ func (c *Client) GetServer(ctx context.Context, id string) (Server, error) {
 	return response, err
 }
 
-//GetServerList gets a list of available servers
+// GetServerList gets a list of available servers.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/getServers
+// See: https://gridscale.io/en//api-documentation/index.html#operation/getServers
 func (c *Client) GetServerList(ctx context.Context) ([]Server, error) {
 	r := gsRequest{
 		uri:                 apiServerBase,
@@ -343,16 +344,14 @@ func (c *Client) GetServerList(ctx context.Context) ([]Server, error) {
 	return servers, err
 }
 
-//CreateServer create a server
+// CreateServer creates a new server in a project. Normally you want to use
+// `Q35ServerHardware` as hardware profile.
 //
-//NOTE: Allowed values of `HardwareProfile`: nil, DefaultServerHardware, NestedServerHardware, LegacyServerHardware,
-//CiscoCSRServerHardware, SophosUTMServerHardware, F5BigipServerHardware, Q35ServerHardware, Q35NestedServerHardware.
-//
-//See: https://gridscale.io/en//api-documentation/index.html#operation/createServer
+// See: https://gridscale.io/en//api-documentation/index.html#operation/createServer
 func (c *Client) CreateServer(ctx context.Context, body ServerCreateRequest) (ServerCreateResponse, error) {
-	//check if these slices are nil
-	//make them be empty slice instead of nil
-	//so that JSON structure will be valid
+	// check if these slices are nil
+	// make them be empty slice instead of nil
+	// so that JSON structure will be valid
 	if body.Relations != nil && body.Relations.PublicIPs == nil {
 		body.Relations.PublicIPs = make([]ServerCreateRequestIP, 0)
 	}
@@ -372,8 +371,8 @@ func (c *Client) CreateServer(ctx context.Context, body ServerCreateRequest) (Se
 	}
 	var response ServerCreateResponse
 	err := r.execute(ctx, *c, &response)
-	//this fixed the endpoint's bug temporarily when creating server with/without
-	//'relations' field
+	// this fixed the endpoint's bug temporarily when creating server with/without
+	//'relations' field.
 	if response.ServerUUID == "" && response.ObjectUUID != "" {
 		response.ServerUUID = response.ObjectUUID
 	} else if response.ObjectUUID == "" && response.ServerUUID != "" {
@@ -382,9 +381,9 @@ func (c *Client) CreateServer(ctx context.Context, body ServerCreateRequest) (Se
 	return response, err
 }
 
-//DeleteServer deletes a specific server
+// DeleteServer removes a specific server.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/deleteServer
+// See: https://gridscale.io/en//api-documentation/index.html#operation/deleteServer
 func (c *Client) DeleteServer(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
@@ -396,9 +395,9 @@ func (c *Client) DeleteServer(ctx context.Context, id string) error {
 	return r.execute(ctx, *c, nil)
 }
 
-//UpdateServer updates a specific server
+// UpdateServer updates a specific server.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/updateServer
+// See: https://gridscale.io/en//api-documentation/index.html#operation/updateServer
 func (c *Client) UpdateServer(ctx context.Context, id string, body ServerUpdateRequest) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
@@ -411,9 +410,9 @@ func (c *Client) UpdateServer(ctx context.Context, id string, body ServerUpdateR
 	return r.execute(ctx, *c, nil)
 }
 
-//GetServerEventList gets a list of a specific server's events
+// GetServerEventList gets a list of a specific server's events.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/getServerEvents
+// See: https://gridscale.io/en//api-documentation/index.html#operation/getServerEvents
 func (c *Client) GetServerEventList(ctx context.Context, id string) ([]Event, error) {
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
@@ -432,9 +431,9 @@ func (c *Client) GetServerEventList(ctx context.Context, id string) ([]Event, er
 	return serverEvents, err
 }
 
-//GetServerMetricList gets a list of a specific server's metrics
+// GetServerMetricList gets a list of a specific server's metrics.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/getServerMetrics
+// See: https://gridscale.io/en//api-documentation/index.html#operation/getServerMetrics
 func (c *Client) GetServerMetricList(ctx context.Context, id string) ([]ServerMetric, error) {
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
@@ -453,7 +452,7 @@ func (c *Client) GetServerMetricList(ctx context.Context, id string) ([]ServerMe
 	return serverMetrics, err
 }
 
-//IsServerOn returns true if the server's power is on, otherwise returns false
+// IsServerOn returns true if the server's power is on, otherwise returns false.
 func (c *Client) IsServerOn(ctx context.Context, id string) (bool, error) {
 	server, err := c.GetServer(ctx, id)
 	if err != nil {
@@ -462,8 +461,8 @@ func (c *Client) IsServerOn(ctx context.Context, id string) (bool, error) {
 	return server.Properties.Power, nil
 }
 
-//setServerPowerState turn on/off a specific server.
-//turnOn=true to turn on, turnOn=false to turn off
+// setServerPowerState turn on/off a specific server.
+// turnOn=true to turn on, turnOn=false to turn off.
 func (c *Client) setServerPowerState(ctx context.Context, id string, powerState bool) error {
 	isOn, err := c.IsServerOn(ctx, id)
 	if err != nil {
@@ -489,19 +488,19 @@ func (c *Client) setServerPowerState(ctx context.Context, id string, powerState 
 	return nil
 }
 
-//StartServer starts a server
+// StartServer starts a server.
 func (c *Client) StartServer(ctx context.Context, id string) error {
 	return c.setServerPowerState(ctx, id, true)
 }
 
-//StopServer stops a server
+// StopServer stops a server.
 func (c *Client) StopServer(ctx context.Context, id string) error {
 	return c.setServerPowerState(ctx, id, false)
 }
 
-//ShutdownServer shutdowns a specific server
+// ShutdownServer shutdowns a specific server.
 func (c *Client) ShutdownServer(ctx context.Context, id string) error {
-	//Make sure the server exists and that it isn't already in the state we need it to be
+	// Make sure the server exists and that it isn't already in the state we need it to be
 	server, err := c.GetServer(ctx, id)
 	if err != nil {
 		return err
@@ -521,7 +520,7 @@ func (c *Client) ShutdownServer(ctx context.Context, id string) error {
 	}
 
 	if c.Synchronous() {
-		//If we get an error, which includes a timeout, power off the server instead
+		// If we get an error, which includes a timeout, power off the server instead.
 		err = c.waitForServerPowerStatus(ctx, id, false)
 		if err != nil {
 			return err
@@ -530,9 +529,9 @@ func (c *Client) ShutdownServer(ctx context.Context, id string) error {
 	return nil
 }
 
-//GetServersByLocation gets a list of servers by location
+// GetServersByLocation gets a list of servers by location.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/getLocationServers
+// See: https://gridscale.io/en//api-documentation/index.html#operation/getLocationServers
 func (c *Client) GetServersByLocation(ctx context.Context, id string) ([]Server, error) {
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
@@ -551,9 +550,9 @@ func (c *Client) GetServersByLocation(ctx context.Context, id string) ([]Server,
 	return servers, err
 }
 
-//GetDeletedServers gets a list of deleted servers
+// GetDeletedServers gets a list of deleted servers.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedServers
+// See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedServers
 func (c *Client) GetDeletedServers(ctx context.Context) ([]Server, error) {
 	r := gsRequest{
 		uri:                 path.Join(apiDeletedBase, "servers"),
@@ -569,7 +568,7 @@ func (c *Client) GetDeletedServers(ctx context.Context) ([]Server, error) {
 	return servers, err
 }
 
-//waitForServerPowerStatus  allows to wait for a server changing its power status.
+// waitForServerPowerStatus allows to wait for a server changing its power status.
 func (c *Client) waitForServerPowerStatus(ctx context.Context, id string, status bool) error {
 	return retryWithContext(ctx, func() (bool, error) {
 		server, err := c.GetServer(ctx, id)

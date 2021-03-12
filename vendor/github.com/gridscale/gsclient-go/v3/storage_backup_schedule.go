@@ -7,7 +7,7 @@ import (
 	"path"
 )
 
-//StorageBackupScheduleOperator is an interface defining API of a backup schedule operator
+// StorageBackupScheduleOperator provides an interface for operations on backup schedules.
 type StorageBackupScheduleOperator interface {
 	GetStorageBackupScheduleList(ctx context.Context, id string) ([]StorageBackupSchedule, error)
 	GetStorageBackupSchedule(ctx context.Context, storageID, scheduleID string) (StorageBackupSchedule, error)
@@ -16,122 +16,125 @@ type StorageBackupScheduleOperator interface {
 	DeleteStorageBackupSchedule(ctx context.Context, storageID, scheduleID string) error
 }
 
+// StorageBackupScheduleList holds a list of storage backup schedules.
 type StorageBackupScheduleList struct {
 	List map[string]StorageBackupScheduleProperties `json:"schedule_storage_backups"`
 }
 
+// StorageBackupSchedule represents a single storage backup schedule.
 type StorageBackupSchedule struct {
 	Properties StorageBackupScheduleProperties `json:"schedule_storage_backup"`
 }
 
+// StorageBackupScheduleProperties holds properties of a storage backup schedule.
 type StorageBackupScheduleProperties struct {
-	//Defines the date and time of the last object change.
+	// Defines the date and time of the last object change.
 	ChangeTime GSTime `json:"change_time"`
 
-	//Defines the date and time the object was initially created.
+	// Defines the date and time the object was initially created.
 	CreateTime GSTime `json:"create_time"`
 
-	//The amount of backups to keep before overwriting the last created backup.
-	//value >= 1
+	// The amount of backups to keep before overwriting the last created backup.
+	// value >= 1.
 	KeepBackups int `json:"keep_backups"`
 
-	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
+	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
-	//The date and time that the storage backup schedule will be run.
+	// The date and time that the storage backup schedule will be run.
 	NextRuntime GSTime `json:"next_runtime"`
 
-	//The UUID of an object is always unique, and refers to a specific object.
+	// The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
 
-	//Related backups (backups taken by this storage backup schedule)
+	// Related backups (backups taken by this storage backup schedule)
 	Relations StorageBackupScheduleRelations `json:"relations"`
 
-	//The interval at which the schedule will run (in minutes)
-	//value >= 60
+	// The interval at which the schedule will run (in minutes)
+	// value >= 60.
 	RunInterval int `json:"run_interval"`
 
-	//Status indicates the status of the object.
+	// Status indicates the status of the object.
 	Status string `json:"status"`
 
-	//UUID of the storage that will be used for making taking backups
+	// UUID of the storage that will be used for making taking backups
 	StorageUUID string `json:"storage_uuid"`
 
-	//Status of the schedule
+	// Status of the schedule.
 	Active bool `json:"active"`
 }
 
-//StorageBackupScheduleRelations JSON struct of a list of relations of a storage backup schedule
+// StorageBackupScheduleRelations holds a list of relations between a storage backup schedule and storage backups.
 type StorageBackupScheduleRelations struct {
-	//Array of all related backups (backups taken by this storage backup schedule)
+	// Array of all related backups (backups taken by this storage backup schedule).
 	StorageBackups []StorageBackupScheduleRelation `json:"storages_backups"`
 }
 
-//StorageBackupScheduleRelation JSON struct of a relation of a storage backup schedule
+// StorageBackupScheduleRelation represents a relation between a storage backup schedule and a storage backup.
 type StorageBackupScheduleRelation struct {
-	//Defines the date and time the object was initially created.
+	// Defines the date and time the object was initially created.
 	CreateTime GSTime `json:"create_time"`
 
-	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
+	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
-	//The UUID of an object is always unique, and refers to a specific object.
+	// The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
 }
 
-//StorageBackupScheduleCreateRequest JSON struct of a request for creating a storage backup schedule
+// StorageBackupScheduleCreateRequest represents a request for creating a storage backup schedule.
 type StorageBackupScheduleCreateRequest struct {
-	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
+	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
-	//The interval at which the schedule will run (in minutes)
-	//Allowed value >= 60
+	// The interval at which the schedule will run (in minutes).
+	// Allowed value >= 60.
 	RunInterval int `json:"run_interval"`
 
-	//The amount of backups to keep before overwriting the last created backup.
-	//value >= 1
+	// The amount of backups to keep before overwriting the last created backup.
+	// value >= 1.
 	KeepBackups int `json:"keep_backups"`
 
-	//The date and time that the storage backup schedule will be run.
+	// The date and time that the storage backup schedule will be run.
 	NextRuntime GSTime `json:"next_runtime"`
 
-	//Status of the schedule
+	// Status of the schedule.
 	Active bool `json:"active"`
 }
 
-//StorageBackupScheduleCreateResponse JSON struct of a response for creating a storage backup schedule
+// StorageBackupScheduleCreateResponse represents a response for creating a storage backup schedule.
 type StorageBackupScheduleCreateResponse struct {
-	//UUID of the request
+	// UUID of the request.
 	RequestUUID string `json:"request_uuid"`
 
-	//UUID of the storage backup schedule being created
+	// UUID of the storage backup schedule being created.
 	ObjectUUID string `json:"object_uuid"`
 }
 
-//StorageBackupScheduleUpdateRequest JSON struct of a request for updating a storage backup schedule
+// StorageBackupScheduleUpdateRequest represents a request for updating a storage backup schedule.
 type StorageBackupScheduleUpdateRequest struct {
-	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
-	//Optional.
+	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
+	// Optional.
 	Name string `json:"name,omitempty"`
 
-	//The interval at which the schedule will run (in minutes). Optional.
-	//Allowed value >= 60
+	// The interval at which the schedule will run (in minutes). Optional.
+	// Allowed value >= 60
 	RunInterval int `json:"run_interval,omitempty"`
 
-	//The amount of backups to keep before overwriting the last created backup. Optional.
-	//value >= 1
+	// The amount of backups to keep before overwriting the last created backup. Optional.
+	// value >= 1
 	KeepBackups int `json:"keep_backups,omitempty"`
 
-	//The date and time that the storage backup schedule will be run. Optional.
+	// The date and time that the storage backup schedule will be run. Optional.
 	NextRuntime *GSTime `json:"next_runtime,omitempty"`
 
-	//Status of the schedule. Optional
+	// Status of the schedule. Optional.
 	Active *bool `json:"active,omitempty"`
 }
 
-//GetStorageBackupScheduleList gets a list of available storage backup schedules based on a given storage's id
+// GetStorageBackupScheduleList gets a list of available storage backup schedules based on a given storage's id.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/getStorageBackupSchedules
+// See: https://gridscale.io/en//api-documentation/index.html#operation/getStorageBackupSchedules
 func (c *Client) GetStorageBackupScheduleList(ctx context.Context, id string) ([]StorageBackupSchedule, error) {
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
@@ -150,9 +153,9 @@ func (c *Client) GetStorageBackupScheduleList(ctx context.Context, id string) ([
 	return schedules, err
 }
 
-//GetStorageBackupSchedule gets a specific storage backup schedule based on a given storage's id and a backup schedule's id
+// GetStorageBackupSchedule gets a specific storage backup schedule based on a given storage's id and a backup schedule's id.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/getStorageBackupSchedules
+// See: https://gridscale.io/en//api-documentation/index.html#operation/getStorageBackupSchedules
 func (c *Client) GetStorageBackupSchedule(ctx context.Context, storageID, scheduleID string) (StorageBackupSchedule, error) {
 	if !isValidUUID(storageID) || !isValidUUID(scheduleID) {
 		return StorageBackupSchedule{}, errors.New("'storageID' or 'scheduleID' is invalid")
@@ -167,9 +170,9 @@ func (c *Client) GetStorageBackupSchedule(ctx context.Context, storageID, schedu
 	return response, err
 }
 
-//CreateStorageBackupSchedule create a storage backup schedule based on a given storage UUID
+// CreateStorageBackupSchedule creates a storage backup schedule based on a given storage UUID.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/getStorageBackupSchedule
+// See: https://gridscale.io/en//api-documentation/index.html#operation/getStorageBackupSchedule
 func (c *Client) CreateStorageBackupSchedule(ctx context.Context, id string, body StorageBackupScheduleCreateRequest) (
 	StorageBackupScheduleCreateResponse, error) {
 	if !isValidUUID(id) {
@@ -185,9 +188,9 @@ func (c *Client) CreateStorageBackupSchedule(ctx context.Context, id string, bod
 	return response, err
 }
 
-//UpdateStorageBackupSchedule updates a specific storage backup schedule based on a given storage's id and a backup schedule's id
+// UpdateStorageBackupSchedule updates a specific storage backup schedule based on a given storage's id and a backup schedule's id.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/updateStorageBackupSchedule
+// See: https://gridscale.io/en//api-documentation/index.html#operation/updateStorageBackupSchedule
 func (c *Client) UpdateStorageBackupSchedule(ctx context.Context, storageID, scheduleID string,
 	body StorageBackupScheduleUpdateRequest) error {
 	if !isValidUUID(storageID) || !isValidUUID(scheduleID) {
@@ -201,9 +204,9 @@ func (c *Client) UpdateStorageBackupSchedule(ctx context.Context, storageID, sch
 	return r.execute(ctx, *c, nil)
 }
 
-//DeleteStorageBackupSchedule deletes a specific storage backup scheduler based on a given storage's id and a backup schedule's id
+// DeleteStorageBackupSchedule removes a specific storage backup scheduler based on a given storage's id and a backup schedule's id.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/deleteStorageBackupSchedule
+// See: https://gridscale.io/en//api-documentation/index.html#operation/deleteStorageBackupSchedule
 func (c *Client) DeleteStorageBackupSchedule(ctx context.Context, storageID, scheduleID string) error {
 	if !isValidUUID(storageID) || !isValidUUID(scheduleID) {
 		return errors.New("'storageID' or 'scheduleID' is invalid")

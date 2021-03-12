@@ -7,7 +7,7 @@ import (
 	"path"
 )
 
-//MarketplaceApplicationOperator an interface defining API of a marketplace application operator
+// MarketplaceApplicationOperator aprovides an interface for operations on marketplace applications.
 type MarketplaceApplicationOperator interface {
 	GetMarketplaceApplicationList(ctx context.Context) ([]MarketplaceApplication, error)
 	GetMarketplaceApplication(ctx context.Context, id string) (MarketplaceApplication, error)
@@ -18,95 +18,95 @@ type MarketplaceApplicationOperator interface {
 	GetMarketplaceApplicationEventList(ctx context.Context, id string) ([]Event, error)
 }
 
-//MarketplaceApplicationList JSON struct of a list of market applications
+// MarketplaceApplicationList holds a list of market applications.
 type MarketplaceApplicationList struct {
-	//Array of market applications
+	// Array of market applications.
 	List map[string]MarketplaceApplicationProperties `json:"applications"`
 }
 
-//MarketplaceApplication JSON struct of a single market application
+// MarketplaceApplication represent a single market application.
 type MarketplaceApplication struct {
-	//Properties of a market application
+	// Properties of a market application.
 	Properties MarketplaceApplicationProperties `json:"application"`
 }
 
-//MarketplaceApplicationProperties JSON struct of properties of a market application
+// MarketplaceApplicationProperties holds properties of a market application.
 type MarketplaceApplicationProperties struct {
-	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
+	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
-	//Unique hash to allow user to import the self-created marketplace application
+	// Unique hash to allow user to import the self-created marketplace application.
 	UniqueHash string `json:"unique_hash"`
 
-	//Path to the images of the application
+	// Path to the images of the application.
 	ObjectStoragePath string `json:"object_storage_path"`
 
-	//Whether the you are the owner of application or not.
+	// Whether the you are the owner of application or not.
 	IsApplicationOwner bool `json:"application_owner"`
 
-	//Setup of the application
+	// Setup of the application.
 	Setup MarketplaceApplicationSetup `json:"setup"`
 
-	//Whether the template is published by the partner to their tenant.
+	// Whether the template is published by the partner to their tenant.
 	Published bool `json:"published"`
 
-	//The date when the template is published into other tenant in the same partner.
+	// The date when the template is published into other tenant in the same partner.
 	PublishedDate GSTime `json:"published_date"`
 
-	//Whether the tenants want their template to be published or not.
+	// Whether the tenants want their template to be published or not.
 	PublishRequested bool `json:"publish_requested"`
 
-	//The date when the tenant requested their template to be published.
+	// The date when the tenant requested their template to be published.
 	PublishRequestedDate GSTime `json:"publish_requested_date"`
 
-	//Whether a partner wants their tenant template published to other partners.
+	// Whether a partner wants their tenant template published to other partners.
 	PublishGlobalRequested bool `json:"publish_global_requested"`
 
-	//The date when a partner requested their tenants template to be published.
+	// The date when a partner requested their tenants template to be published.
 	PublishGlobalRequestedDate GSTime `json:"publish_global_requested_date"`
 
-	//Whether a template is published to other partner or not.
+	// Whether a template is published to other partner or not.
 	PublishedGlobal bool `json:"published_global"`
 
-	//The date when a template is published to other partner.
+	// The date when a template is published to other partner.
 	PublishedGlobalDate GSTime `json:"published_global_date"`
 
-	//Enum:"CMS", "project management", "Adminpanel", "Collaboration", "Cloud Storage", "Archiving"
-	//Category of marketplace application
+	// Enum:"CMS", "project management", "Adminpanel", "Collaboration", "Cloud Storage", "Archiving".
+	// Category of marketplace application.
 	Category string `json:"category"`
 
-	//Metadata of the Application
+	// Metadata of the Application.
 	Metadata MarketplaceApplicationMetadata `json:"metadata"`
 
-	//Defines the date and time of the last object change.
+	// Defines the date and time of the last object change.
 	ChangeTime GSTime `json:"change_time"`
 
-	//Defines the date and time the object was initially created.
+	// Defines the date and time the object was initially created.
 	CreateTime GSTime `json:"create_time"`
 
-	//The UUID of an object is always unique, and refers to a specific object.
+	// The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
 
-	//Status indicates the status of the object.
+	// Status indicates the status of the object.
 	Status string `json:"status"`
 
-	//The type of template
+	// The type of template.
 	ApplicationType string `json:"application_type"`
 }
 
-//MarketplaceApplicationSetup JSON struct of marketplace application's setup
+// MarketplaceApplicationSetup represents marketplace application's setup.
 type MarketplaceApplicationSetup struct {
-	//Number of server cores.
+	// Number of server cores.
 	Cores int `json:"cores"`
 
-	//The capacity of server memory in GB.
+	// The capacity of server memory in GB.
 	Memory int `json:"memory"`
 
-	//The capacity of a storage in GB.
+	// The capacity of a storage in GB.
 	Capacity int `json:"capacity"`
 }
 
-//MarketplaceApplicationMetadata JSON struct of metadata of marketplace application
+// MarketplaceApplicationMetadata holds metadata of a marketplace application.
 type MarketplaceApplicationMetadata struct {
 	License    string   `json:"license"`
 	OS         string   `json:"os"`
@@ -120,71 +120,72 @@ type MarketplaceApplicationMetadata struct {
 	Advices    string   `json:"advices"`
 }
 
-//MarketplaceApplicationCreateRequest JSON struct of a request for creating a marketplace application
+// MarketplaceApplicationCreateRequest represents a request for creating a marketplace application.
 type MarketplaceApplicationCreateRequest struct {
-	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
+	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
-	//Path to the images for the application, must be in .gz format and started with s3//
+	// Path to the images for the application, must be in .gz format and started with "s3//"".
 	ObjectStoragePath string `json:"object_storage_path"`
 
-	//Category of the marketplace application. Allowed values: not-set, MarketplaceApplicationCMSCategory, MarketplaceApplicationProjectManagementCategory, MarketplaceApplicationAdminpanelCategory,
-	//MarketplaceApplicationCollaborationCategory, MarketplaceApplicationCloudStorageCategory, MarketplaceApplicationArchivingCategory. Optional.
+	// Category of the marketplace application. Allowed values: not-set, MarketplaceApplicationCMSCategory, MarketplaceApplicationProjectManagementCategory, MarketplaceApplicationAdminpanelCategory,
+	// MarketplaceApplicationCollaborationCategory, MarketplaceApplicationCloudStorageCategory, MarketplaceApplicationArchivingCategory. Optional.
 	Category MarketplaceApplicationCategory `json:"category,omitempty"`
 
-	//whether you want to publish your application or not. Optional
+	// whether you want to publish your application or not. Optional.
 	Publish *bool `json:"publish,omitempty"`
 
-	//Application's setup, consist the number of resource for creating the application
+	// Application's setup, consist the number of resource for creating the application.
 	Setup MarketplaceApplicationSetup `json:"setup"`
 
-	//Metadata of application
+	// Metadata of application.
 	Metadata *MarketplaceApplicationMetadata `json:"metadata,omitempty"`
 }
 
-//MarketplaceApplicationImportRequest JSON struct of a request for importing a marketplace application
+// MarketplaceApplicationImportRequest represents a request for importing a marketplace application.
 type MarketplaceApplicationImportRequest struct {
-	//Unique hash for importing this marketplace application
+	// Unique hash for importing this marketplace application.
 	UniqueHash string `json:"unique_hash"`
 }
 
-//MarketplaceApplicationCreateResponse JSON struct of a response for a marketplace application's creation
+// MarketplaceApplicationCreateResponse represents a response for a marketplace application's creation.
 type MarketplaceApplicationCreateResponse struct {
-	//UUID of the object being created
+	// UUID of the object being created.
 	ObjectUUID string `json:"object_uuid"`
 
-	//UUID of the request
+	// UUID of the request.
 	RequestUUID string `json:"request_uuid"`
 
-	//Unique hash for importing this marketplace application
+	// Unique hash for importing this marketplace application.
 	UniqueHash string `json:"unique_hash"`
 }
 
-//MarketplaceApplicationUpdateRequest JSON struct of a request for updating a marketplace application
+// MarketplaceApplicationUpdateRequest represents a request for updating a marketplace application.
 type MarketplaceApplicationUpdateRequest struct {
-	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters. Optional.
+	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters. Optional.
 	Name string `json:"name,omitempty"`
 
-	//Path to the images for the application, must be in .gz format and started with s3// . Optional.
+	// Path to the images for the application, must be in .gz format and started with s3// . Optional.
 	ObjectStoragePath string `json:"object_storage_path,omitempty"`
 
-	//Category of the marketplace application. Allowed values: not-set, MarketplaceApplicationCMSCategory, MarketplaceApplicationProjectManagementCategory, MarketplaceApplicationAdminpanelCategory,
-	//MarketplaceApplicationCollaborationCategory, MarketplaceApplicationCloudStorageCategory, MarketplaceApplicationArchivingCategory. Optional.
+	// Category of the marketplace application. Allowed values: not-set, MarketplaceApplicationCMSCategory, MarketplaceApplicationProjectManagementCategory, MarketplaceApplicationAdminpanelCategory,
+	// MarketplaceApplicationCollaborationCategory, MarketplaceApplicationCloudStorageCategory, MarketplaceApplicationArchivingCategory. Optional.
 	Category MarketplaceApplicationCategory `json:"category,omitempty"`
 
-	//whether you want to publish your application or not. Optional
+	// Whether you want to publish your application or not. Optional.
 	Publish *bool `json:"publish,omitempty"`
 
-	//Application's setup, consist the number of resource for creating the application
+	// Application's setup, consist the number of resource for creating the application.
 	Setup *MarketplaceApplicationSetup `json:"setup,omitempty"`
 
-	//Metadata of application
+	// Metadata of application.
 	Metadata *MarketplaceApplicationMetadata `json:"metadata,omitempty"`
 }
 
+// MarketplaceApplicationCategory represents the category in which a market application is.
 type MarketplaceApplicationCategory string
 
-//All allowed Marketplace application category's values
+// All allowed Marketplace application category's values.
 var (
 	MarketplaceApplicationCMSCategory               MarketplaceApplicationCategory = "CMS"
 	MarketplaceApplicationProjectManagementCategory MarketplaceApplicationCategory = "project management"
@@ -194,9 +195,9 @@ var (
 	MarketplaceApplicationArchivingCategory         MarketplaceApplicationCategory = "Archiving"
 )
 
-//GetMarketplaceApplicationList gets a list of available marketplace applications
+// GetMarketplaceApplicationList gets a list of available marketplace applications.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/getMarketplaceApplications
+// See: https://gridscale.io/en//api-documentation/index.html#operation/getMarketplaceApplications
 func (c *Client) GetMarketplaceApplicationList(ctx context.Context) ([]MarketplaceApplication, error) {
 	r := gsRequest{
 		uri:                 apiMarketplaceApplicationBase,
@@ -214,9 +215,9 @@ func (c *Client) GetMarketplaceApplicationList(ctx context.Context) ([]Marketpla
 	return marketApps, err
 }
 
-//GetMarketplaceApplication get a marketplace application
+// GetMarketplaceApplication gets a marketplace application.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/getMarketplaceApplication
+// See https://gridscale.io/en//api-documentation/index.html#operation/getMarketplaceApplication
 func (c *Client) GetMarketplaceApplication(ctx context.Context, id string) (MarketplaceApplication, error) {
 	if !isValidUUID(id) {
 		return MarketplaceApplication{}, errors.New("'id' is invalid")
@@ -231,14 +232,13 @@ func (c *Client) GetMarketplaceApplication(ctx context.Context, id string) (Mark
 	return response, err
 }
 
-//CreateMarketplaceApplication create a marketplace application
+// CreateMarketplaceApplication creates a new marketplace application. Allowed
+// values for Category are `nil`, `MarketplaceApplicationCMSCategory`,
+// `MarketplaceApplicationProjectManagementCategory`,
+// `MarketplaceApplicationAdminpanelCategory`,
+// `MarketplaceApplicationCollaborationCategory`, `MarketplaceApplicationCloudStorageCategory`, `MarketplaceApplicationArchivingCategory`.
 //
-//NOTE:
-//
-// - Allowed value for `Category`: nil, MarketplaceApplicationCMSCategory, MarketplaceApplicationProjectManagementCategory, MarketplaceApplicationAdminpanelCategory,
-//MarketplaceApplicationCollaborationCategory, MarketplaceApplicationCloudStorageCategory, MarketplaceApplicationArchivingCategory.
-//
-//See: https://gridscale.io/en//api-documentation/index.html#operation/createMarketplaceApplication
+//See https://gridscale.io/en//api-documentation/index.html#operation/createMarketplaceApplication.
 func (c *Client) CreateMarketplaceApplication(ctx context.Context, body MarketplaceApplicationCreateRequest) (MarketplaceApplicationCreateResponse, error) {
 	r := gsRequest{
 		uri:    apiMarketplaceApplicationBase,
@@ -250,14 +250,15 @@ func (c *Client) CreateMarketplaceApplication(ctx context.Context, body Marketpl
 	return response, err
 }
 
-//ImportMarketplaceApplication import a marketplace application
+// ImportMarketplaceApplication imports a marketplace application. Allowed
+// values for Category are `nil`, `MarketplaceApplicationCMSCategory`,
+// `MarketplaceApplicationProjectManagementCategory`,
+// `MarketplaceApplicationAdminpanelCategory`,
+// `MarketplaceApplicationCollaborationCategory`,
+// `MarketplaceApplicationCloudStorageCategory`,
+// `MarketplaceApplicationArchivingCategory`.
 //
-//NOTE:
-//
-// - Allowed value for `Category`: nil, MarketplaceApplicationCMSCategory, MarketplaceApplicationProjectManagementCategory, MarketplaceApplicationAdminpanelCategory,
-//MarketplaceApplicationCollaborationCategory, MarketplaceApplicationCloudStorageCategory, MarketplaceApplicationArchivingCategory.
-//
-//See: https://gridscale.io/en//api-documentation/index.html#operation/createMarketplaceApplication
+// See https://gridscale.io/en//api-documentation/index.html#operation/createMarketplaceApplication.
 func (c *Client) ImportMarketplaceApplication(ctx context.Context, body MarketplaceApplicationImportRequest) (MarketplaceApplicationCreateResponse, error) {
 	r := gsRequest{
 		uri:    apiMarketplaceApplicationBase,
@@ -269,9 +270,9 @@ func (c *Client) ImportMarketplaceApplication(ctx context.Context, body Marketpl
 	return response, err
 }
 
-//UpdateMarketplaceApplication update a marketplace application
+// UpdateMarketplaceApplication updates a marketplace application.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/updateMarketplaceApplication
+// See https://gridscale.io/en//api-documentation/index.html#operation/updateMarketplaceApplication.
 func (c *Client) UpdateMarketplaceApplication(ctx context.Context, id string, body MarketplaceApplicationUpdateRequest) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
@@ -284,9 +285,9 @@ func (c *Client) UpdateMarketplaceApplication(ctx context.Context, id string, bo
 	return r.execute(ctx, *c, nil)
 }
 
-//DeleteMarketplaceApplication delete a marketplace application
+// DeleteMarketplaceApplication removes a marketplace application.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/deleteMarketplaceApplication
+// See https://gridscale.io/en//api-documentation/index.html#operation/deleteMarketplaceApplication.
 func (c *Client) DeleteMarketplaceApplication(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
@@ -298,9 +299,9 @@ func (c *Client) DeleteMarketplaceApplication(ctx context.Context, id string) er
 	return r.execute(ctx, *c, nil)
 }
 
-//GetMarketplaceApplicationEventList get list of a marketplace application's events
+// GetMarketplaceApplicationEventList gets list of a marketplace application's events.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/getStorageEvents
+// See https://gridscale.io/en//api-documentation/index.html#operation/getStorageEvents.
 func (c *Client) GetMarketplaceApplicationEventList(ctx context.Context, id string) ([]Event, error) {
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")

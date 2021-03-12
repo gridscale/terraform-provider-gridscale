@@ -7,7 +7,7 @@ import (
 	"path"
 )
 
-//IPOperator is an interface defining API of an IP operator
+// IPOperator provides an interface for operations on IP addresses.
 type IPOperator interface {
 	GetIP(ctx context.Context, id string) (IP, error)
 	GetIPList(ctx context.Context) ([]IP, error)
@@ -20,182 +20,179 @@ type IPOperator interface {
 	GetDeletedIPs(ctx context.Context) ([]IP, error)
 }
 
-//IPList is JSON struct of a list of IPs
+// IPList holds a list of IP addresses.
 type IPList struct {
-	//Array of IP addresses
+	// Array of IP addresses.
 	List map[string]IPProperties `json:"ips"`
 }
 
-//DeletedIPList is JSON struct of a list of deleted IPs
+// DeletedIPList holds a list of deleted IP addresses.
 type DeletedIPList struct {
-	//Array of deleted IP addresses
+	// Array of deleted IP addresses.
 	List map[string]IPProperties `json:"deleted_ips"`
 }
 
-//IP is JSON struct if a single IP
+// IP represent a single IP address.
 type IP struct {
-	//Properties of an IP address
+	// Properties of an IP address.
 	Properties IPProperties `json:"ip"`
 }
 
-//IPProperties is JSON struct of an IP's properties
+// IPProperties holds properties of an IP address.
+// An IP address can be retrieved and attached to a server via the IP address's UUID.
 type IPProperties struct {
-	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
+	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	Name string `json:"name"`
 
-	//The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
+	// The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	LocationCountry string `json:"location_country"`
 
-	//Helps to identify which data center an object belongs to.
+	// Helps to identify which data center an object belongs to.
 	LocationUUID string `json:"location_uuid"`
 
-	//The UUID of an object is always unique, and refers to a specific object.
+	// The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
 
-	//Defines the reverse DNS entry for the IP Address (PTR Resource Record).
+	// Defines the reverse DNS entry for the IP Address (PTR Resource Record).
 	ReverseDNS string `json:"reverse_dns"`
 
-	//Enum:4 6. The IP Address family (v4 or v6)
+	// Enum:4 6. The IP Address family (v4 or v6).
 	Family int `json:"family"`
 
-	//Status indicates the status of the object.
+	// Status indicates the status of the object.
 	Status string `json:"status"`
 
-	//Defines the date and time the object was initially created.
+	// Defines the date and time the object was initially created.
 	CreateTime GSTime `json:"create_time"`
 
-	//Sets failover mode for this IP. If true, then this IP is no longer available for DHCP and can no longer be related to any server.
+	// Sets failover mode for this IP. If true, then this IP is no longer available for DHCP and can no longer be related to any server.
 	Failover bool `json:"failover"`
 
-	//Defines the date and time of the last object change.
+	// Defines the date and time of the last object change.
 	ChangeTime GSTime `json:"change_time"`
 
-	//Uses IATA airport code, which works as a location identifier.
+	// Uses IATA airport code, which works as a location identifier.
 	LocationIata string `json:"location_iata"`
 
-	//The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
+	// The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	LocationName string `json:"location_name"`
 
-	//The IP prefix.
+	// The IP prefix.
 	Prefix string `json:"prefix"`
 
-	//Defines the IP Address (v4 or v6).
+	// Defines the IP Address (v4 or v6).
 	IP string `json:"ip"`
 
-	//Defines if the object is administratively blocked. If true, it can not be deleted by the user.
+	// Defines if the object is administratively blocked. If true, it can not be deleted by the user.
 	DeleteBlock bool `json:"delete_block"`
 
-	//Total minutes the object has been running.
+	// Total minutes the object has been running.
 	UsagesInMinutes float64 `json:"usage_in_minutes"`
 
-	//The price for the current period since the last bill.
+	// The price for the current period since the last bill.
 	CurrentPrice float64 `json:"current_price"`
 
-	//List of labels.
+	// List of labels.
 	Labels []string `json:"labels"`
 
-	//The information about other object which are related to this IP. the object could be servers and/or load balancer.
+	// The information about other object which are related to this IP. the object could be servers and/or load balancer.
 	Relations IPRelations `json:"relations"`
 }
 
-//IPRelations is JSON struct of a list of an IP's relations
+// IPRelations holds list of an IP address's relations.
+// Relations between an IP address, Load Balancers, and servers.
 type IPRelations struct {
-	//Array of object (IPLoadbalancer)
+	// Array of object (IPLoadbalancer)
 	Loadbalancers []IPLoadbalancer `json:"loadbalancers"`
 
-	//Array of object (IPServer)
+	// Array of object (IPServer)
 	Servers []IPServer `json:"servers"`
-
-	//Array of object (ServerIPRelationProperties)
-	PublicIPs []ServerIPRelationProperties `json:"public_ips"`
-
-	//Array of object (ServerStorageRelationProperties)
-	Storages []ServerStorageRelationProperties `json:"storages"`
 }
 
-//IPLoadbalancer is JSON struct of the relation between an IP and a Load Balancer
+// IPLoadbalancer represents relation between an IP address and a Load Balancer.
 type IPLoadbalancer struct {
-	//Defines the date and time the object was initially created.
+	// Defines the date and time the object was initially created.
 	CreateTime GSTime `json:"create_time"`
 
-	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
+	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	LoadbalancerName string `json:"loadbalancer_name"`
 
-	//The UUID of load balancer.
+	// The UUID of load balancer.
 	LoadbalancerUUID string `json:"loadbalancer_uuid"`
 }
 
-//IPServer is JSON struct of the relation between an IP and a Server
+// IPServer represents relation between an IP address and a Server.
 type IPServer struct {
-	//Defines the date and time the object was initially created.
+	// Defines the date and time the object was initially created.
 	CreateTime GSTime `json:"create_time"`
 
-	//The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
+	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 	ServerName string `json:"server_name"`
 
-	//The UUID of the server.
+	// The UUID of the server.
 	ServerUUID string `json:"server_uuid"`
 }
 
-//IPCreateResponse is JSON struct of a response for creating an IP
+// IPCreateResponse represents a response for creating an IP.
 type IPCreateResponse struct {
-	//Request's UUID
+	// Request's UUID
 	RequestUUID string `json:"request_uuid"`
 
-	//UUID of the IP address being created
+	// UUID of the IP address being created.
 	ObjectUUID string `json:"object_uuid"`
 
-	//The IP prefix.
+	// The IP prefix.
 	Prefix string `json:"prefix"`
 
-	//The IP Address (v4 or v6).
+	// The IP Address (v4 or v6).
 	IP string `json:"ip"`
 }
 
-//IPCreateRequest is JSON struct of a request for creating an IP
+// IPCreateRequest represent a request for creating an IP.
 type IPCreateRequest struct {
-	//Name of an IP address being created. Can be an empty string
+	// Name of an IP address being created. Can be an empty string.
 	Name string `json:"name,omitempty"`
 
-	//IP address family. Can only be either `IPv4Type` or `IPv6Type`
+	// IP address family. Can only be either `IPv4Type` or `IPv6Type`
 	Family IPAddressType `json:"family"`
 
-	//Sets failover mode for this IP. If true, then this IP is no longer available for DHCP and can no longer be related to any server.
+	// Sets failover mode for this IP. If true, then this IP is no longer available for DHCP and can no longer be related to any server.
 	Failover bool `json:"failover,omitempty"`
 
-	//Defines the reverse DNS entry for the IP Address (PTR Resource Record).
+	// Defines the reverse DNS entry for the IP Address (PTR Resource Record).
 	ReverseDNS string `json:"reverse_dns,omitempty"`
 
-	//List of labels.
+	// List of labels.
 	Labels []string `json:"labels,omitempty"`
 }
 
-//IPUpdateRequest is JSON struct of a request for updating an IP
+// IPUpdateRequest represent a request for updating an IP.
 type IPUpdateRequest struct {
-	//New name. Leave it if you do not want to update the name
+	// New name. Leave it if you do not want to update the name.
 	Name string `json:"name,omitempty"`
 
-	//Sets failover mode for this IP. If true, then this IP is no longer available for DHCP and can no longer be related to any server.
+	// Sets failover mode for this IP. If true, then this IP is no longer available for DHCP and can no longer be related to any server.
 	Failover bool `json:"failover"`
 
-	//Defines the reverse DNS entry for the IP Address (PTR Resource Record). Leave it if you do not want to update the reverse DNS.
+	// Defines the reverse DNS entry for the IP Address (PTR Resource Record). Leave it if you do not want to update the reverse DNS.
 	ReverseDNS string `json:"reverse_dns,omitempty"`
 
-	//List of labels. Leave it if you do not want to update the labels.
+	// List of labels. Leave it if you do not want to update the labels.
 	Labels *[]string `json:"labels,omitempty"`
 }
 
+// IPAddressType represents IP address family
 type IPAddressType int
 
-//Allowed IP address versions
+// Allowed IP address versions.
 const (
 	IPv4Type IPAddressType = 4
 	IPv6Type IPAddressType = 6
 )
 
-//GetIP get a specific IP based on given id
+// GetIP get a specific IP based on given id.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/getIp
+// See: https://gridscale.io/en//api-documentation/index.html#operation/getIp
 func (c *Client) GetIP(ctx context.Context, id string) (IP, error) {
 	if !isValidUUID(id) {
 		return IP{}, errors.New("'id' is invalid")
@@ -212,9 +209,9 @@ func (c *Client) GetIP(ctx context.Context, id string) (IP, error) {
 	return response, err
 }
 
-//GetIPList gets a list of available IPs
+// GetIPList gets a list of available IP addresses.
 //
-//https://gridscale.io/en//api-documentation/index.html#operation/getIps
+// https://gridscale.io/en//api-documentation/index.html#operation/getIps
 func (c *Client) GetIPList(ctx context.Context) ([]IP, error) {
 	r := gsRequest{
 		uri:                 apiIPBase,
@@ -232,11 +229,11 @@ func (c *Client) GetIPList(ctx context.Context) ([]IP, error) {
 	return IPs, err
 }
 
-//CreateIP creates an IP
+// CreateIP creates an IP address.
 //
-//Note: IP address family can only be either `IPv4Type` or `IPv6Type`
+// Note: IP address family can only be either `IPv4Type` or `IPv6Type`.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/createIp
+// See: https://gridscale.io/en//api-documentation/index.html#operation/createIp
 func (c *Client) CreateIP(ctx context.Context, body IPCreateRequest) (IPCreateResponse, error) {
 	r := gsRequest{
 		uri:    apiIPBase,
@@ -249,9 +246,9 @@ func (c *Client) CreateIP(ctx context.Context, body IPCreateRequest) (IPCreateRe
 	return response, err
 }
 
-//DeleteIP deletes a specific IP based on given id
+// DeleteIP removes a specific IP address based on given id.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/deleteIp
+// See: https://gridscale.io/en//api-documentation/index.html#operation/deleteIp
 func (c *Client) DeleteIP(ctx context.Context, id string) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
@@ -263,9 +260,9 @@ func (c *Client) DeleteIP(ctx context.Context, id string) error {
 	return r.execute(ctx, *c, nil)
 }
 
-//UpdateIP updates a specific IP based on given id
+// UpdateIP updates a specific IP address based on given id.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/updateIp
+// See: https://gridscale.io/en//api-documentation/index.html#operation/updateIp
 func (c *Client) UpdateIP(ctx context.Context, id string, body IPUpdateRequest) error {
 	if !isValidUUID(id) {
 		return errors.New("'id' is invalid")
@@ -278,9 +275,9 @@ func (c *Client) UpdateIP(ctx context.Context, id string, body IPUpdateRequest) 
 	return r.execute(ctx, *c, nil)
 }
 
-//GetIPEventList gets a list of an IP's events
+// GetIPEventList gets a list of an IP address's events.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/getIpEvents
+// See: https://gridscale.io/en//api-documentation/index.html#operation/getIpEvents
 func (c *Client) GetIPEventList(ctx context.Context, id string) ([]Event, error) {
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
@@ -299,7 +296,7 @@ func (c *Client) GetIPEventList(ctx context.Context, id string) ([]Event, error)
 	return IPEvents, err
 }
 
-//GetIPVersion gets IP's version, returns 0 if an error was encountered
+// GetIPVersion gets IP address's version, returns 0 if an error was encountered.
 func (c *Client) GetIPVersion(ctx context.Context, id string) int {
 	ip, err := c.GetIP(ctx, id)
 	if err != nil {
@@ -308,9 +305,9 @@ func (c *Client) GetIPVersion(ctx context.Context, id string) int {
 	return ip.Properties.Family
 }
 
-//GetIPsByLocation gets a list of IPs by location
+// GetIPsByLocation gets a list of IP adresses by location.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/getLocationIps
+// See: https://gridscale.io/en//api-documentation/index.html#operation/getLocationIps
 func (c *Client) GetIPsByLocation(ctx context.Context, id string) ([]IP, error) {
 	if !isValidUUID(id) {
 		return nil, errors.New("'id' is invalid")
@@ -329,9 +326,9 @@ func (c *Client) GetIPsByLocation(ctx context.Context, id string) ([]IP, error) 
 	return IPs, err
 }
 
-//GetDeletedIPs gets a list of deleted IPs
+// GetDeletedIPs gets a list of deleted IP adresses.
 //
-//See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedIps
+// See: https://gridscale.io/en//api-documentation/index.html#operation/getDeletedIps
 func (c *Client) GetDeletedIPs(ctx context.Context) ([]IP, error) {
 	r := gsRequest{
 		uri:                 path.Join(apiDeletedBase, "ips"),

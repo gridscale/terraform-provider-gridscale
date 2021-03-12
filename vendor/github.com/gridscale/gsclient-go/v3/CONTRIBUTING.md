@@ -5,7 +5,7 @@ enhancement requests, bug reports, or code contributions!
 
 ## Development workflow
 
-* Development is done on the `develop` branch.
+* Development is done on the `master` branch.
 * Releases are cut from the `master` branch.
 * For anything larger than single commits, please use feature/bugfix branches.
 
