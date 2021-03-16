@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.8.4 (Mar 16, 2020)
+
+IMPROVEMENTS:
+
+* Update go version to v1.16.
+* Update gsclient-go package to v3.5.0 ([#130](https://github.com/gridscale/terraform-provider-gridscale/pull/131)).
+* Use go v1.16 in GH action & enable macOS arm64 build ([#129](https://github.com/gridscale/terraform-provider-gridscale/issues/129)).
+
 ## 1.8.3 (Feb 18, 2020)
 
 BUG FIXES:
