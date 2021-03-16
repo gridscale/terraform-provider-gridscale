@@ -81,12 +81,14 @@ func resourceGridscaleK8s() *schema.Resource {
 			"node_pool": {
 				Type:        schema.TypeList,
 				Required:    true,
-				Description: `A list of node pools, there can be multiple in a k8s cluster. The cluster scheduler can assign certain workloads to certain node pools.`,
+				MaxItems:    1,
+				Description: `Node pool's specification.`,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"name": {
-							Type:     schema.TypeString,
-							Required: true,
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Name of node pool",
 						},
 						"node_count": {
 							Type:        schema.TypeInt,
@@ -254,6 +256,7 @@ func resourceGridscaleK8sRead(d *schema.ResourceData, meta interface{}) error {
 	nodePoolList := make([]interface{}, 0)
 	// TODO: The API scheme will be CHANGED in the future. There will be multiple node pools.
 	nodePool := map[string]interface{}{
+		"name":         d.Get("node_pool.0.name"),
 		"node_count":   props.Parameters["k8s_worker_node_count"],
 		"cores":        props.Parameters["k8s_worker_node_cores"],
 		"memory":       props.Parameters["k8s_worker_node_ram"],
