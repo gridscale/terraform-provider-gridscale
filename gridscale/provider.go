@@ -77,6 +77,7 @@ func Provider() terraform.ResourceProvider {
 			"gridscale_snapshotschedule":               resourceGridscaleStorageSnapshotSchedule(),
 			"gridscale_backupschedule":                 resourceGridscaleStorageBackupSchedule(),
 			"gridscale_paas":                           resourceGridscalePaaS(),
+			"gridscale_k8s":                            resourceGridscaleK8s(),
 			"gridscale_paas_securityzone":              resourceGridscalePaaSSecurityZone(),
 			"gridscale_object_storage_accesskey":       resourceGridscaleObjectStorage(),
 			"gridscale_template":                       resourceGridscaleTemplate(),
