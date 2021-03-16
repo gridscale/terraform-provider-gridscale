@@ -100,7 +100,7 @@ func resourceGridscaleK8s() *schema.Resource {
 						},
 						"memory": {
 							Type:        schema.TypeInt,
-							Description: "Memory per worker nod (in GiB)",
+							Description: "Memory per worker node (in GiB)",
 							Required:    true,
 						},
 						"storage": {
