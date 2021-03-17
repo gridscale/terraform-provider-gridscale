@@ -414,7 +414,7 @@ func validateK8sParameters(client *gsclient.Client, d *schema.ResourceData, para
 		}
 	}
 	if !isReleaseValid && isValOptSelected(k8sReleaseValidationOpt, parameters) {
-		errorMessages = append(errorMessages, fmt.Sprintf("%v is not a valid kubernetes release number. Valid release numbers are: %v\n", release, strings.Join(releases, ",")))
+		errorMessages = append(errorMessages, fmt.Sprintf("%v is not a valid kubernetes release number. Valid release numbers are: %v\n", release, strings.Join(releases, ", ")))
 	}
 
 	// Check if mem, core count, node count, and storage are valid
@@ -423,35 +423,39 @@ func validateK8sParameters(client *gsclient.Client, d *schema.ResourceData, para
 			nodePool := element.(map[string]interface{})
 
 			mem := nodePool["memory"].(int)
+			_, ok := uTemplate.Properties.ParametersSchema["k8s_worker_node_ram"]
 			minMem := uTemplate.Properties.ParametersSchema["k8s_worker_node_ram"].Min
 			maxMem := uTemplate.Properties.ParametersSchema["k8s_worker_node_ram"].Max
 			if (minMem > mem || maxMem < mem) &&
-				isValOptSelected(k8sMemoryValidationOpt, parameters) {
+				isValOptSelected(k8sMemoryValidationOpt, parameters) && ok {
 				errorMessages = append(errorMessages, fmt.Sprintf("%v is not a valid value for \"memory\". Valid value stays between %v and %v\n", mem, minMem, maxMem))
 			}
 
 			coreCount := nodePool["cores"].(int)
+			_, ok = uTemplate.Properties.ParametersSchema["k8s_worker_node_cores"]
 			minCoreCount := uTemplate.Properties.ParametersSchema["k8s_worker_node_cores"].Min
 			maxCoreCount := uTemplate.Properties.ParametersSchema["k8s_worker_node_cores"].Max
 			if (minCoreCount > coreCount || maxCoreCount < coreCount) &&
-				isValOptSelected(k8sCoreCountValidationOpt, parameters) {
+				isValOptSelected(k8sCoreCountValidationOpt, parameters) && ok {
 				errorMessages = append(errorMessages, fmt.Sprintf("%v is not a valid value for \"cores\". Valid value stays between %v and %v\n", coreCount, minCoreCount, maxCoreCount))
 			}
 
 			nodeCount := nodePool["node_count"].(int)
+			_, ok = uTemplate.Properties.ParametersSchema["k8s_worker_node_count"]
 			minNodeCount := uTemplate.Properties.ParametersSchema["k8s_worker_node_count"].Min
 			maxNodeCount := uTemplate.Properties.ParametersSchema["k8s_worker_node_count"].Max
 			if (minNodeCount > nodeCount || maxNodeCount < nodeCount) &&
-				isValOptSelected(k8sNodeCountValidationOpt, parameters) {
+				isValOptSelected(k8sNodeCountValidationOpt, parameters) && ok {
 				errorMessages = append(errorMessages, fmt.Sprintf("%v is not a valid value for number of \"node_count\". Valid value stays between %v and %v\n", nodeCount, minNodeCount, maxNodeCount))
 			}
 
 			storage := nodePool["storage"].(int)
+			_, ok = uTemplate.Properties.ParametersSchema["k8s_worker_node_storage"]
 			minStorage := uTemplate.Properties.ParametersSchema["k8s_worker_node_storage"].Min
 			maxStorage := uTemplate.Properties.ParametersSchema["k8s_worker_node_storage"].Max
 			if (minStorage > storage || maxStorage < storage) &&
-				isValOptSelected(k8sStorageValidationOpt, parameters) {
-				errorMessages = append(errorMessages, fmt.Sprintf("%v is not a valid value for number of \"storage\". Valid value stays between %v and %v\n", storage, minStorage, maxStorage))
+				isValOptSelected(k8sStorageValidationOpt, parameters) && ok {
+				errorMessages = append(errorMessages, fmt.Sprintf("%v is not a valid value for \"storage\". Valid value stays between %v and %v\n", storage, minStorage, maxStorage))
 			}
 		}
 	}
