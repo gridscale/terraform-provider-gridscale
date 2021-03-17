@@ -17,6 +17,16 @@ import (
 
 const k8sTemplateFlavourName = "kubernetes"
 
+type k8sValidationOpt int
+
+const (
+	k8sReleaseValidationOpt k8sValidationOpt = iota
+	k8sNodeCountValidationOpt
+	k8sCoreCountValidationOpt
+	k8sMemoryValidationOpt
+	k8sStorageValidationOpt
+)
+
 func resourceGridscaleK8s() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceGridscaleK8sCreate,
@@ -73,9 +83,9 @@ func resourceGridscaleK8s() *schema.Resource {
 				Required:     true,
 				ValidateFunc: validation.NoZeroValues,
 			},
-			"k8s_release_computed": {
+			"service_template_uuid": {
 				Type:        schema.TypeString,
-				Description: "Release number of k8s service. The `k8s_release_computed` will be different from `k8s_release`, when `k8s_release` is updated outside of terraform.",
+				Description: "PaaS service template that k8s service uses.",
 				Computed:    true,
 			},
 			"node_pool": {
@@ -213,28 +223,8 @@ func resourceGridscaleK8sRead(d *schema.ResourceData, meta interface{}) error {
 	if err = d.Set("status", props.Status); err != nil {
 		return fmt.Errorf("%s error setting status: %v", errorPrefix, err)
 	}
-
-	k8sReleaseTemplateUUIDMap, err := getK8sReleaseTemplateUUIDMap(client)
-	if err != nil {
-		return fmt.Errorf("%s error: %v", errorPrefix, err)
-	}
-
-	// Get k8s release number based on paas_service_template_uuid
-	var validTemplateUUID bool
-	for k, v := range k8sReleaseTemplateUUIDMap {
-		if v == props.ServiceTemplateUUID {
-			validTemplateUUID = true
-			if err = d.Set("k8s_release_computed", k); err != nil {
-				return fmt.Errorf("%s error setting k8s_release_computed: %v", errorPrefix, err)
-			}
-			break
-		}
-	}
-	if !validTemplateUUID {
-		return fmt.Errorf(
-			"%s error setting k8s_release_computed: could not find a release number of k8s service template UUID %s",
-			errorPrefix,
-			props.ServiceTemplateUUID)
+	if err = d.Set("service_template_uuid", props.ServiceTemplateUUID); err != nil {
+		return fmt.Errorf("%s error setting service_template_uuid: %v", errorPrefix, err)
 	}
 
 	//Get listen ports
@@ -297,18 +287,16 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("create k8s (%s) resource -", d.Id())
 
-	k8sReleaseTemplateUUIDMap, err := getK8sReleaseTemplateUUIDMap(client)
+	// Validate k8s parameters
+	templateUUID, err := validateK8sParameters(client, d,
+		k8sReleaseValidationOpt,
+		k8sNodeCountValidationOpt,
+		k8sCoreCountValidationOpt,
+		k8sMemoryValidationOpt,
+		k8sStorageValidationOpt,
+	)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
-	}
-	// Check if the k8s release number exists
-	templateUUID, ok := k8sReleaseTemplateUUIDMap[d.Get("k8s_release").(string)]
-	if !ok {
-		var releases []string
-		for releaseNo := range k8sReleaseTemplateUUIDMap {
-			releases = append(releases, releaseNo)
-		}
-		return fmt.Errorf("%v is not a valid kubernetes release number. Valid release numbers are: %v", d.Get("k8s_release").(string), strings.Join(releases, ","))
 	}
 
 	requestBody := gsclient.PaaSServiceCreateRequest{
@@ -342,11 +330,6 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("update k8s (%s) resource -", d.Id())
 
-	k8sReleaseTemplateUUIDMap, err := getK8sReleaseTemplateUUIDMap(client)
-	if err != nil {
-		return fmt.Errorf("%s error: %v", errorPrefix, err)
-	}
-
 	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
 	requestBody := gsclient.PaaSServiceUpdateRequest{
 		Name:   d.Get("name").(string),
@@ -356,15 +339,21 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 	// Only update k8s_release, when it is changed
 	if d.HasChange("k8s_release") {
 		// Check if the k8s release number exists
-		templateUUID, ok := k8sReleaseTemplateUUIDMap[d.Get("k8s_release").(string)]
-		if !ok {
-			var releases []string
-			for releaseNo := range k8sReleaseTemplateUUIDMap {
-				releases = append(releases, releaseNo)
-			}
-			return fmt.Errorf("%v is not a valid kubernetes release number. Valid release numbers are: %v", d.Get("k8s_release").(string), strings.Join(releases, ","))
+		templateUUID, err := validateK8sParameters(client, d, k8sReleaseValidationOpt)
+		if err != nil {
+			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
 		requestBody.PaaSServiceTemplateUUID = templateUUID
+	}
+
+	// Validate k8s parameters
+	if _, err := validateK8sParameters(client, d,
+		k8sNodeCountValidationOpt,
+		k8sCoreCountValidationOpt,
+		k8sMemoryValidationOpt,
+		k8sStorageValidationOpt,
+	); err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
 	// TODO: The API scheme will be CHANGED in the future. There will be multiple node pools.
@@ -378,7 +367,7 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
 	defer cancel()
-	err = client.UpdatePaaSService(ctx, d.Id(), requestBody)
+	err := client.UpdatePaaSService(ctx, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -401,22 +390,83 @@ func resourceGridscaleK8sDelete(d *schema.ResourceData, meta interface{}) error 
 	return nil
 }
 
-// getK8sReleaseTemplateUUIDMap gets all k8s service templates' release numbers and their UUIDs.
-// Returns a map where release numbers are keys and UUIDs are values.
-func getK8sReleaseTemplateUUIDMap(client *gsclient.Client) (map[string]string, error) {
-	k8sReleaseTemplateUUIDMap := make(map[string]string)
-	// Get all PaaS service templates
-	// for validating PaaS resource purposes
+// validateK8sParameters validate k8s resource's selected parameters.
+// It returns the UUID of the k8s service template, if the validation is successful.
+// Otherwise, an error will be returned.
+func validateK8sParameters(client *gsclient.Client, d *schema.ResourceData, parameters ...k8sValidationOpt) (string, error) {
+	errorMessages := []string{"List of validation errors:\n"}
 	paasTemplates, err := client.GetPaaSTemplateList(context.Background())
 	if err != nil {
-		return k8sReleaseTemplateUUIDMap, err
+		return "", err
 	}
-
-	// Get k8s releases and corresponding UUIDs
+	// Check if the k8s release number exists
+	release := d.Get("k8s_release").(string)
+	var isReleaseValid bool
+	var releases []string
+	var uTemplate gsclient.PaaSTemplate
 	for _, template := range paasTemplates {
 		if template.Properties.Flavour == k8sTemplateFlavourName {
-			k8sReleaseTemplateUUIDMap[template.Properties.Release] = template.Properties.ObjectUUID
+			releases = append(releases, template.Properties.Release)
+			if template.Properties.Release == release {
+				isReleaseValid = true
+				uTemplate = template
+			}
 		}
 	}
-	return k8sReleaseTemplateUUIDMap, nil
+	if !isReleaseValid && isValOptSelected(k8sReleaseValidationOpt, parameters) {
+		errorMessages = append(errorMessages, fmt.Sprintf("%v is not a valid kubernetes release number. Valid release numbers are: %v\n", release, strings.Join(releases, ",")))
+	}
+
+	// Check if mem, core count, node count, and storage are valid
+	if attr, ok := d.GetOk("node_pool"); ok {
+		for _, element := range attr.([]interface{}) {
+			nodePool := element.(map[string]interface{})
+
+			mem := nodePool["memory"].(int)
+			minMem := uTemplate.Properties.ParametersSchema["k8s_worker_node_ram"].Min
+			maxMem := uTemplate.Properties.ParametersSchema["k8s_worker_node_ram"].Max
+			if (minMem > mem || maxMem < mem) &&
+				isValOptSelected(k8sMemoryValidationOpt, parameters) {
+				errorMessages = append(errorMessages, fmt.Sprintf("%v is not a valid value for \"memory\". Valid value stays between %v and %v\n", mem, minMem, maxMem))
+			}
+
+			coreCount := nodePool["cores"].(int)
+			minCoreCount := uTemplate.Properties.ParametersSchema["k8s_worker_node_cores"].Min
+			maxCoreCount := uTemplate.Properties.ParametersSchema["k8s_worker_node_cores"].Max
+			if (minCoreCount > coreCount || maxCoreCount < coreCount) &&
+				isValOptSelected(k8sCoreCountValidationOpt, parameters) {
+				errorMessages = append(errorMessages, fmt.Sprintf("%v is not a valid value for \"cores\". Valid value stays between %v and %v\n", coreCount, minCoreCount, maxCoreCount))
+			}
+
+			nodeCount := nodePool["node_count"].(int)
+			minNodeCount := uTemplate.Properties.ParametersSchema["k8s_worker_node_count"].Min
+			maxNodeCount := uTemplate.Properties.ParametersSchema["k8s_worker_node_count"].Max
+			if (minNodeCount > nodeCount || maxNodeCount < nodeCount) &&
+				isValOptSelected(k8sNodeCountValidationOpt, parameters) {
+				errorMessages = append(errorMessages, fmt.Sprintf("%v is not a valid value for number of \"node_count\". Valid value stays between %v and %v\n", nodeCount, minNodeCount, maxNodeCount))
+			}
+
+			storage := nodePool["storage"].(int)
+			minStorage := uTemplate.Properties.ParametersSchema["k8s_worker_node_storage"].Min
+			maxStorage := uTemplate.Properties.ParametersSchema["k8s_worker_node_storage"].Max
+			if (minStorage > storage || maxStorage < storage) &&
+				isValOptSelected(k8sStorageValidationOpt, parameters) {
+				errorMessages = append(errorMessages, fmt.Sprintf("%v is not a valid value for number of \"storage\". Valid value stays between %v and %v\n", storage, minStorage, maxStorage))
+			}
+		}
+	}
+	if len(errorMessages) > 1 {
+		return "", fmt.Errorf(strings.Join(errorMessages, ""))
+	}
+	return uTemplate.Properties.ObjectUUID, nil
+}
+
+// isValOptSelected checks if a k8s validation option presents in a list of k8s validation options.
+func isValOptSelected(opt k8sValidationOpt, list []k8sValidationOpt) bool {
+	for _, v := range list {
+		if v == opt {
+			return true
+		}
+	}
+	return false
 }
