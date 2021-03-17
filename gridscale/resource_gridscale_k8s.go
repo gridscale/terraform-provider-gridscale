@@ -15,7 +15,7 @@ import (
 	"log"
 )
 
-const k8sTemplateCategoryName = "kubernetes"
+const k8sTemplateFlavourName = "kubernetes"
 
 func resourceGridscaleK8s() *schema.Resource {
 	return &schema.Resource{
@@ -414,7 +414,7 @@ func getK8sReleaseTemplateUUIDMap(client *gsclient.Client) (map[string]string, e
 
 	// Get k8s releases and corresponding UUIDs
 	for _, template := range paasTemplates {
-		if template.Properties.Category == k8sTemplateCategoryName {
+		if template.Properties.Flavour == k8sTemplateFlavourName {
 			k8sReleaseTemplateUUIDMap[template.Properties.Release] = template.Properties.ObjectUUID
 		}
 	}
