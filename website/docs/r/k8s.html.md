@@ -67,7 +67,7 @@ This resource exports the following attributes:
 * `name` - See Argument Reference above.
 * `security_zone_uuid` - See Argument Reference above.
 * `k8s_release` - See Argument Reference above.
-* `k8s_release_computed` - Release number of k8s service. The `k8s_release_computed` will be different from `k8s_release`, when `k8s_release` is updated outside of terraform.
+* `service_template_uuid` - PaaS service template that k8s service uses. The `service_template_uuid` may not relate to `k8s_release`, if `service_template_uuid`/`k8s_release` is updated outside of terraform (e.g. the k8s service is upgraded by gridscale staffs).
 * `labels` - See Argument Reference above.
 * `network_uuid` - Network UUID containing security zone, which is linked to the k8s cluster.
 * `node_pool` - See Argument Reference above.
