@@ -192,6 +192,11 @@ func resourceGridscaleServer() *schema.Resource {
 							Type:     schema.TypeInt,
 							Optional: true,
 						},
+						"ordering_computed": {
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "The ordering of the networks set by gridscale backend (if the ordering is not specified by the user)",
+						},
 						"create_time": {
 							Type:     schema.TypeString,
 							Computed: true,
@@ -529,6 +534,7 @@ func readServerNetworkRels(serverNetRels []gsclient.ServerNetworkRelationPropert
 			"firewall_template_uuid": rel.FirewallTemplateUUID,
 			"object_name":            rel.ObjectName,
 			"network_type":           rel.NetworkType,
+			"ordering_computed":      rel.Ordering,
 		}
 		//Init all types of firewall rule
 		v4InRuleProps := make([]interface{}, 0)
