@@ -141,7 +141,7 @@ func resourceGridscaleK8s() *schema.Resource {
 					},
 				},
 			},
-			"usage_in_minute": {
+			"usage_in_minutes": {
 				Type:        schema.TypeInt,
 				Description: "Number of minutes that PaaS service is in use",
 				Computed:    true,
@@ -203,8 +203,8 @@ func resourceGridscaleK8sRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("%s error setting security_zone_uuid: %v", errorPrefix, err)
 	}
 
-	if err = d.Set("usage_in_minute", props.UsageInMinutes); err != nil {
-		return fmt.Errorf("%s error setting usage_in_minute: %v", errorPrefix, err)
+	if err = d.Set("usage_in_minutes", props.UsageInMinutes); err != nil {
+		return fmt.Errorf("%s error setting usage_in_minutes: %v", errorPrefix, err)
 	}
 	if err = d.Set("change_time", props.ChangeTime.String()); err != nil {
 		return fmt.Errorf("%s error setting change_time: %v", errorPrefix, err)
