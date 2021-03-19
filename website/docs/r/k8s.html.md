@@ -20,7 +20,7 @@ resource "gridscale_k8s" "k8s-test" {
   name   = "test"
   k8s_release = "1.19"
   node_pool {
-	name = "my_node_pool"
+  name = "my_node_pool"
     node_count = 2
     cores = 1
     memory = 2
@@ -78,7 +78,6 @@ This resource exports the following attributes:
     * `storage` - See Argument Reference above.
     * `storage_type` - See Argument Reference above.
 * `usage_in_minutes` - The amount of minutes the IP address has been in use.
-* `current_price` - The price for the current period since the last bill.
 * `create_time` - The time the object was created.
 * `change_time` - Defines the date and time of the last object change.
 * `status` - status indicates the status of the object.
