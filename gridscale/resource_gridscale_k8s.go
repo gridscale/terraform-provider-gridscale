@@ -153,12 +153,12 @@ func resourceGridscaleK8s() *schema.Resource {
 			},
 			"create_time": {
 				Type:        schema.TypeString,
-				Description: "Time of the creation",
+				Description: "Time this service was created.",
 				Computed:    true,
 			},
 			"status": {
 				Type:        schema.TypeString,
-				Description: "Current status of PaaS service",
+				Description: "Current status of the service",
 				Computed:    true,
 			},
 			"labels": {
