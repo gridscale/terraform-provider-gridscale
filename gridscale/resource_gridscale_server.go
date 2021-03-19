@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"sort"
 	"strings"
 	"time"
 
@@ -190,7 +191,6 @@ func resourceGridscaleServer() *schema.Resource {
 						"ordering": {
 							Type:     schema.TypeInt,
 							Optional: true,
-							Default:  0,
 						},
 						"create_time": {
 							Type:     schema.TypeString,
@@ -514,6 +514,13 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 
 //readServerNetworkRels extract relationships between server and networks
 func readServerNetworkRels(serverNetRels []gsclient.ServerNetworkRelationProperties) []interface{} {
+	// Sort the server-network relation slice by order
+	sort.Slice(serverNetRels, func(i, j int) bool {
+		return serverNetRels[i].Ordering < serverNetRels[j].Ordering
+	})
+	for _, v := range serverNetRels {
+		log.Println("serverNetRels", v.ObjectUUID, v.Ordering)
+	}
 	networks := make([]interface{}, 0)
 	for _, rel := range serverNetRels {
 		network := map[string]interface{}{
