@@ -157,28 +157,28 @@ func resourceGridscaleServer() *schema.Resource {
 							Computed: true,
 						},
 						"rules_v4_in": {
-							Type:     schema.TypeList,
+							Type:     schema.TypeSet,
 							Optional: true,
 							Elem: &schema.Resource{
 								Schema: getFirewallRuleCommonSchema(),
 							},
 						},
 						"rules_v4_out": {
-							Type:     schema.TypeList,
+							Type:     schema.TypeSet,
 							Optional: true,
 							Elem: &schema.Resource{
 								Schema: getFirewallRuleCommonSchema(),
 							},
 						},
 						"rules_v6_in": {
-							Type:     schema.TypeList,
+							Type:     schema.TypeSet,
 							Optional: true,
 							Elem: &schema.Resource{
 								Schema: getFirewallRuleCommonSchema(),
 							},
 						},
 						"rules_v6_out": {
-							Type:     schema.TypeList,
+							Type:     schema.TypeSet,
 							Optional: true,
 							Elem: &schema.Resource{
 								Schema: getFirewallRuleCommonSchema(),
