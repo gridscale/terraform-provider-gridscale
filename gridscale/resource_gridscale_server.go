@@ -531,7 +531,6 @@ func readServerNetworkRels(serverNetRels []gsclient.ServerNetworkRelationPropert
 			"firewall_template_uuid": rel.FirewallTemplateUUID,
 			"object_name":            rel.ObjectName,
 			"network_type":           rel.NetworkType,
-			"ordering":               rel.Ordering,
 		}
 		//Init all types of firewall rule
 		v4InRuleProps := make([]interface{}, 0)
