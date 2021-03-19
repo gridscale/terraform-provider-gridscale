@@ -518,9 +518,7 @@ func readServerNetworkRels(serverNetRels []gsclient.ServerNetworkRelationPropert
 	sort.Slice(serverNetRels, func(i, j int) bool {
 		return serverNetRels[i].Ordering < serverNetRels[j].Ordering
 	})
-	for _, v := range serverNetRels {
-		log.Println("serverNetRels", v.ObjectUUID, v.Ordering)
-	}
+
 	networks := make([]interface{}, 0)
 	for _, rel := range serverNetRels {
 		network := map[string]interface{}{
