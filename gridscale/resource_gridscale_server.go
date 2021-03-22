@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"sort"
 	"strings"
 	"time"
 
@@ -156,28 +157,28 @@ func resourceGridscaleServer() *schema.Resource {
 							Computed: true,
 						},
 						"rules_v4_in": {
-							Type:     schema.TypeList,
+							Type:     schema.TypeSet,
 							Optional: true,
 							Elem: &schema.Resource{
 								Schema: getFirewallRuleCommonSchema(),
 							},
 						},
 						"rules_v4_out": {
-							Type:     schema.TypeList,
+							Type:     schema.TypeSet,
 							Optional: true,
 							Elem: &schema.Resource{
 								Schema: getFirewallRuleCommonSchema(),
 							},
 						},
 						"rules_v6_in": {
-							Type:     schema.TypeList,
+							Type:     schema.TypeSet,
 							Optional: true,
 							Elem: &schema.Resource{
 								Schema: getFirewallRuleCommonSchema(),
 							},
 						},
 						"rules_v6_out": {
-							Type:     schema.TypeList,
+							Type:     schema.TypeSet,
 							Optional: true,
 							Elem: &schema.Resource{
 								Schema: getFirewallRuleCommonSchema(),
@@ -190,7 +191,11 @@ func resourceGridscaleServer() *schema.Resource {
 						"ordering": {
 							Type:     schema.TypeInt,
 							Optional: true,
-							Default:  0,
+						},
+						"ordering_computed": {
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "The ordering of the networks set by gridscale backend (if the ordering is not specified by the user)",
 						},
 						"create_time": {
 							Type:     schema.TypeString,
@@ -514,6 +519,11 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 
 //readServerNetworkRels extract relationships between server and networks
 func readServerNetworkRels(serverNetRels []gsclient.ServerNetworkRelationProperties) []interface{} {
+	// Sort the server-network relation slice by order
+	sort.Slice(serverNetRels, func(i, j int) bool {
+		return serverNetRels[i].Ordering < serverNetRels[j].Ordering
+	})
+
 	networks := make([]interface{}, 0)
 	for _, rel := range serverNetRels {
 		network := map[string]interface{}{
@@ -524,7 +534,7 @@ func readServerNetworkRels(serverNetRels []gsclient.ServerNetworkRelationPropert
 			"firewall_template_uuid": rel.FirewallTemplateUUID,
 			"object_name":            rel.ObjectName,
 			"network_type":           rel.NetworkType,
-			"ordering":               rel.Ordering,
+			"ordering_computed":      rel.Ordering,
 		}
 		//Init all types of firewall rule
 		v4InRuleProps := make([]interface{}, 0)
