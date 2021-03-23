@@ -174,7 +174,7 @@ func readCustomFirewallRules(netData map[string]interface{}) gsclient.FirewallRu
 		//Check if the firewall rule type is declared in the current network
 		if rulesInTypeAttr, ok := netData[ruleType]; ok {
 			//Loop through all rules in the current firewall type
-			for _, rulesInType := range rulesInTypeAttr.(*schema.Set).List() {
+			for _, rulesInType := range rulesInTypeAttr.([]interface{}) {
 				ruleProps := rulesInType.(map[string]interface{})
 				ruleProperties := gsclient.FirewallRuleProperties{
 					DstPort: ruleProps["dst_port"].(string),

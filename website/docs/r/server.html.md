@@ -227,7 +227,6 @@ This resource exports the following attributes:
     * `bootdevice` - Make this network the boot device. This can only be set for one network.
     * `object_name` - Name of the network.
     * `ordering` - Defines the ordering of the network interfaces. Lower numbers have lower PCI-IDs.
-    * `ordering_computed` - The ordering of the networks set by gridscale backend (if the ordering is not specified by the user).
     * `create_time` - Defines the date and time the object was initially created.
     * `network_type` - One of network, network_high, network_insane.
     * `mac` - network_mac defines the MAC address of the network interface.
