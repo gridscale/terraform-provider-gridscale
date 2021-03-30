@@ -1,5 +1,23 @@
 # Changelog
 
+## 3.6.0 (March 30, 2021)
+
+FEATURES:
+
+* Add SSL certificate operations ([#194](https://github.com/gridscale/gsclient-go/issues/194)).
+
+IMPROVEMENTS:
+
+* Add `AutoscalingProperties` field to `AutoscalingProperties` ([#192](https://github.com/gridscale/gsclient-go/issues/192)).
+
+* Add `CertificateUUID` field in loadbalancer, allow to use a custom certificate ([#194](https://github.com/gridscale/gsclient-go/issues/194)).
+
+BUG FIXES:
+
+* Change `LetsencryptSSL` field in loadbalancer from `interface{}` to `*string` ([#194](https://github.com/gridscale/gsclient-go/issues/194)).
+
+* Add DEPRECATED notice to `CurrentPrice` field docs.
+
 ## 3.5.0 (March 12, 2021)
 
 This release focuses on performance and documentation fixes.

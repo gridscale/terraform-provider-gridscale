@@ -91,7 +91,7 @@ type ISOImageProperties struct {
 	// The capacity of an ISO image in GB.
 	Capacity int `json:"capacity"`
 
-	// The price for the current period since the last bill.
+	// **DEPRECATED** The price for the current period since the last bill.
 	CurrentPrice float64 `json:"current_price"`
 }
 

@@ -64,7 +64,7 @@ type StorageProperties struct {
 	// Indicates the UUID of the last used template on this storage.
 	LastUsedTemplate string `json:"last_used_template"`
 
-	// The price for the current period since the last bill.
+	// **DEPRECATED** The price for the current period since the last bill.
 	CurrentPrice float64 `json:"current_price"`
 
 	// The capacity of a storage/ISO image/template/snapshot in GB.

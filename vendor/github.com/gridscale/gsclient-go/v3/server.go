@@ -68,7 +68,7 @@ type ServerProperties struct {
 	// The power status of the server.
 	Power bool `json:"power"`
 
-	// The price for the current period since the last bill.
+	// **DEPRECATED** The price for the current period since the last bill.
 	CurrentPrice float64 `json:"current_price"`
 
 	// Which Availability-Zone the Server is placed.
