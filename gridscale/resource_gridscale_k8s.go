@@ -17,10 +17,8 @@ import (
 
 const k8sTemplateFlavourName = "kubernetes"
 
-type k8sValidationOpt int
-
 const (
-	k8sReleaseValidationOpt k8sValidationOpt = iota
+	k8sReleaseValidationOpt = iota
 	k8sNodeCountValidationOpt
 	k8sCoreCountValidationOpt
 	k8sMemoryValidationOpt
@@ -385,7 +383,7 @@ func resourceGridscaleK8sDelete(d *schema.ResourceData, meta interface{}) error 
 // validateK8sParameters validate k8s resource's selected parameters.
 // It returns the UUID of the k8s service template, if the validation is successful.
 // Otherwise, an error will be returned.
-func validateK8sParameters(client *gsclient.Client, d *schema.ResourceData, parameters ...k8sValidationOpt) (string, error) {
+func validateK8sParameters(client *gsclient.Client, d *schema.ResourceData, parameters ...int) (string, error) {
 	errorMessages := []string{"List of validation errors:\n"}
 	paasTemplates, err := client.GetPaaSTemplateList(context.Background())
 	if err != nil {
@@ -458,7 +456,7 @@ func validateK8sParameters(client *gsclient.Client, d *schema.ResourceData, para
 }
 
 // isValOptSelected checks if a k8s validation option presents in a list of k8s validation options.
-func isValOptSelected(opt k8sValidationOpt, list []k8sValidationOpt) bool {
+func isValOptSelected(opt int, list []int) bool {
 	for _, v := range list {
 		if v == opt {
 			return true
