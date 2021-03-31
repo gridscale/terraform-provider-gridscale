@@ -75,7 +75,7 @@ func resourceGridscaleK8s() *schema.Resource {
 				Description: "Network UUID containing security zone",
 				Computed:    true,
 			},
-			"k8s_release": {
+			"release_no": {
 				Type:         schema.TypeString,
 				Description:  "Release number of k8s service",
 				Required:     true,
@@ -326,8 +326,8 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 		Labels: &labels,
 	}
 
-	// Only update k8s_release, when it is changed
-	if d.HasChange("k8s_release") {
+	// Only update release_no, when it is changed
+	if d.HasChange("release_no") {
 		// Check if the k8s release number exists
 		templateUUID, err := validateK8sParameters(client, d, k8sReleaseValidationOpt)
 		if err != nil {
@@ -390,7 +390,7 @@ func validateK8sParameters(client *gsclient.Client, d *schema.ResourceData, para
 		return "", err
 	}
 	// Check if the k8s release number exists
-	release := d.Get("k8s_release").(string)
+	release := d.Get("release_no").(string)
 	var isReleaseValid bool
 	var releases []string
 	var uTemplate gsclient.PaaSTemplate

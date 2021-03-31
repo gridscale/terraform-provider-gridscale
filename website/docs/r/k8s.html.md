@@ -18,7 +18,7 @@ The following example shows how one might use this resource to add a k8s cluster
 ```terraform
 resource "gridscale_k8s" "k8s-test" {
   name   = "test"
-  k8s_release = "1.19"
+  release_no = "1.19"
   node_pool {
   name = "my_node_pool"
     node_count = 2
@@ -39,7 +39,7 @@ The following arguments are supported:
 
 * `security_zone_uuid` - (Optional, Computed, ForceNew) Security zone UUID linked to k8s service. If `security_zone_uuid` is not set, the default security zone will be created (if it doesn't exist) and linked to the k8s service.
 
-* `k8s_release` - (Required) Release number of k8s service. Define which release of k8s service will be used to create the k8s cluster.
+* `release_no` - (Required) Release number of k8s service. Define which release of k8s service will be used to create the k8s cluster.
 
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
 
@@ -66,8 +66,8 @@ This resource exports the following attributes:
 
 * `name` - See Argument Reference above.
 * `security_zone_uuid` - See Argument Reference above.
-* `k8s_release` - See Argument Reference above.
-* `service_template_uuid` - PaaS service template that k8s service uses. The `service_template_uuid` may not relate to `k8s_release`, if `service_template_uuid`/`k8s_release` is updated outside of terraform (e.g. the k8s service is upgraded by gridscale staffs).
+* `release_no` - See Argument Reference above.
+* `service_template_uuid` - PaaS service template that k8s service uses. The `service_template_uuid` may not relate to `release_no`, if `service_template_uuid`/`release_no` is updated outside of terraform (e.g. the k8s service is upgraded by gridscale staffs).
 * `labels` - See Argument Reference above.
 * `network_uuid` - Network UUID containing security zone, which is linked to the k8s cluster.
 * `node_pool` - See Argument Reference above.
