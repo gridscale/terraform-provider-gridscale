@@ -357,7 +357,7 @@ func validatePostgresParameters(client *gsclient.Client, d *schema.ResourceData,
 	}
 
 	// Check max core count are valid
-	if val, ok := d.GetOk("max_core_count"); ok {
+	if val, ok := d.GetOk("max_core_count"); ok && isReleaseValid {
 		coreCount := val.(int)
 		minCoreCount := uTemplate.Properties.Autoscaling.Cores.Min
 		maxCoreCount := uTemplate.Properties.Autoscaling.Cores.Max
