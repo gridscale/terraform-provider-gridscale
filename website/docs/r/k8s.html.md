@@ -39,7 +39,7 @@ The following arguments are supported:
 
 * `security_zone_uuid` - (Optional, Computed, ForceNew) Security zone UUID linked to k8s service. If `security_zone_uuid` is not set, the default security zone will be created (if it doesn't exist) and linked to the k8s service.
 
-* `release_no` - (Required) Release number of k8s service. Define which release of k8s service will be used to create the k8s cluster.
+* `release_no` - (Required) Release number of k8s service. Define which release of k8s service will be used to create the k8s cluster. For convenience, please use [gscloud](https://github.com/gridscale/gscloud) to get the list of available k8s release numbers.
 
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
 
