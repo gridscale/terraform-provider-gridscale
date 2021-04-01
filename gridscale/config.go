@@ -17,6 +17,7 @@ var passwordTypes = []string{"plain", "crypt"}
 var firewallActionTypes = []string{"accept", "drop"}
 var firewallRuleProtocols = []string{"udp", "tcp"}
 var marketplaceAppCategories = []string{"CMS", "project management", "Adminpanel", "Collaboration", "Cloud Storage", "Archiving"}
+var postgresPerformanceClass = []string{"standard", "high", "insane", "ultra"}
 
 const timeLayout = "2006-01-02 15:04:05"
 const (

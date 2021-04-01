@@ -48,6 +48,19 @@ func resourceGridscalePostgresSQL() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "Performance class of postgresSQL service.",
 				Required:    true,
+				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
+					valid := false
+					for _, class := range postgresPerformanceClass {
+						if v.(string) == class {
+							valid = true
+							break
+						}
+					}
+					if !valid {
+						errors = append(errors, fmt.Errorf("%v is not a valid postgres performance class. Valid values are: %v", v.(string), strings.Join(postgresPerformanceClass, ",")))
+					}
+					return
+				},
 			},
 			"username": {
 				Type:        schema.TypeString,
