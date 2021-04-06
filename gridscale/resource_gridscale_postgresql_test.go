@@ -43,7 +43,7 @@ func testAccCheckResourceGridscalePostgresConfig_basic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_postgresql" "test" {
 	name = "%s"
-	release_no = "13"
+	release = "13"
 	performance_class = "standard"
 }
 `, name)
@@ -53,7 +53,7 @@ func testAccCheckResourceGridscalePostgresConfig_basic_update() string {
 	return fmt.Sprintf(`
 resource "gridscale_postgresql" "test" {
 	name = "newname"
-	release_no = "13"
+	release = "13"
 	performance_class = "standard"
 	max_core_count = 20
 	labels = ["test"]

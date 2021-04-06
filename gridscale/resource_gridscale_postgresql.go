@@ -38,9 +38,10 @@ func resourceGridscalePostgreSQL() *schema.Resource {
 				Required:     true,
 				ValidateFunc: validation.NoZeroValues,
 			},
-			"release_no": {
-				Type:         schema.TypeString,
-				Description:  "Release no. of postgreSQL service.",
+			"release": {
+				Type: schema.TypeString,
+				Description: `The PostgreSQL release of this instance.\n
+				For convenience, please use gscloud https://github.com/gridscale/gscloud to get the list of available PostgreSQL service releases.`,
 				Required:     true,
 				ValidateFunc: validation.NoZeroValues,
 			},
@@ -64,17 +65,17 @@ func resourceGridscalePostgreSQL() *schema.Resource {
 			},
 			"username": {
 				Type:        schema.TypeString,
-				Description: "Username for PostgreSQL service.",
+				Description: "Username for PostgreSQL service. It is used to connect to the PostgreSQL instance.",
 				Computed:    true,
 			},
 			"password": {
 				Type:        schema.TypeString,
-				Description: "Password for PostgreSQL service.",
+				Description: "Password for PostgreSQL service. It is used to connect to the PostgreSQL instance.",
 				Computed:    true,
 			},
 			"listen_port": {
 				Type:        schema.TypeSet,
-				Description: "Ports that PostgreSQL service listens to.",
+				Description: "The port numbers where this PostgreSQL service accepts connections.",
 				Computed:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -118,7 +119,7 @@ func resourceGridscalePostgreSQL() *schema.Resource {
 			},
 			"create_time": {
 				Type:        schema.TypeString,
-				Description: "Time of the creation.",
+				Description: "Date time this service has been created.",
 				Computed:    true,
 			},
 			"status": {
@@ -128,7 +129,7 @@ func resourceGridscalePostgreSQL() *schema.Resource {
 			},
 			"max_core_count": {
 				Type:        schema.TypeInt,
-				Description: "Maximum CPU core count. It is used for autoscaling.",
+				Description: "Maximum CPU core count. The PostgreSQL instance's CPU core count will be autoscaled based on the workload. The number of cores stays between 1 and `max_core_count`.",
 				Optional:    true,
 				Computed:    true,
 			},

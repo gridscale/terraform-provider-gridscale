@@ -17,7 +17,7 @@ The following example shows how one might use this resource to add a postgreSQL 
 ```terraform
 resource "gridscale_postgresql" "terra-postgres-test" {
   name = "test"
-  release_no = "13"
+  release = "13"
   performance_class = "standard"
   max_core_count = 20
   labels = ["test"]
@@ -30,7 +30,7 @@ The following arguments are supported:
 
 * `name` - (Required) The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 
-* `release_no` - (Required) Release no. of postgreSQL service. For convenience, please use [gscloud](https://github.com/gridscale/gscloud) to get the list of available postgreSQL service release numbers.
+* `release` - (Required) The PostgreSQL release of this instance. For convenience, please use [gscloud](https://github.com/gridscale/gscloud) to get the list of available postgreSQL service releases.
 
 * `performance_class` - (Required) Performance class of postgreSQL service. Available performance classes at the time of writing: `standard`, `high`, `insane`, `ultra`.
 
@@ -38,7 +38,7 @@ The following arguments are supported:
 
 * `security_zone_uuid` - (Optional) The UUID of the security zone that the service is running in.
 
-* `max_core_count` - (Optional) Maximum CPU core count. It is used for autoscaling.
+* `max_core_count` - (Optional) Maximum CPU core count. The PostgreSQL instance's CPU core count will be autoscaled based on the workload. The number of cores stays between 1 and `max_core_count`.
 
 ## Timeouts
 
@@ -54,9 +54,11 @@ More info: [terraform.io/docs/configuration/resources.html#operation-timeouts](h
 This resource exports the following attributes:
 
 * `name` - See Argument Reference above.
-* `username` - Username for PaaS service.
-* `password` - Password for PaaS service.
-* `listen_port` - Ports that PaaS service listens to.
+* `release` - See Argument Reference above.
+* `performance_class` - See Argument Reference above.
+* `username` - Username for PaaS service. It is used to connect to the PostgreSQL instance.
+* `password` - Password for PaaS service. It is used to connect to the PostgreSQL instance.
+* `listen_port` - The port numbers where this PostgreSQL service accepts connections.
   * `name` - Name of a port.
   * `listen_port` - Port number.
 * `security_zone_uuid` - See Argument Reference above.
@@ -64,7 +66,7 @@ This resource exports the following attributes:
 * `service_template_uuid` - PaaS service template that postgreSQL service uses.
 * `usage_in_minutes` - Number of minutes that PaaS service is in use.
 * `change_time` - Time of the last change.
-* `create_time` - Time of the creation.
+* `create_time` - Date time this service has been created.
 * `status` - Current status of PaaS service.
 * `max_core_count` - See Argument Reference above.
 * `labels` - See Argument Reference above.
