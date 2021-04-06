@@ -326,8 +326,8 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 		Labels: &labels,
 	}
 
-	// Only update release_no, when it is changed
-	if d.HasChange("release_no") {
+	// Only update release, when it is changed
+	if d.HasChange("release") {
 		// Check if the k8s release number exists
 		templateUUID, err := validateK8sParameters(client, d, k8sReleaseValidationOpt)
 		if err != nil {
@@ -390,7 +390,7 @@ func validateK8sParameters(client *gsclient.Client, d *schema.ResourceData, para
 		return "", err
 	}
 	// Check if the k8s release number exists
-	release := d.Get("release_no").(string)
+	release := d.Get("release").(string)
 	var isReleaseValid bool
 	var releases []string
 	var uTemplate gsclient.PaaSTemplate
