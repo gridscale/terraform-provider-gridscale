@@ -293,15 +293,21 @@ func resourceGridscalePostgreSQLUpdate(d *schema.ResourceData, meta interface{})
 		Labels: &labels,
 	}
 
-	// Validate
-	templateUUID, err := validatePostgresParameters(client, d,
-		postgresReleaseValidationOpt,
-		postgresMaxCoreCountValidationOpt,
-	)
+	// Only update templateUUID, when `release` is changed
+	if d.HasChange("release") {
+		// Check if the k8s release number exists
+		templateUUID, err := validatePostgresParameters(client, d, postgresReleaseValidationOpt)
+		if err != nil {
+			return fmt.Errorf("%s error: %v", errorPrefix, err)
+		}
+		requestBody.PaaSServiceTemplateUUID = templateUUID
+	}
+
+	// Validate other parameters
+	_, err := validatePostgresParameters(client, d, postgresMaxCoreCountValidationOpt)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
-	requestBody.PaaSServiceTemplateUUID = templateUUID
 
 	if val, ok := d.GetOk("max_core_count"); ok {
 		limits := []gsclient.ResourceLimit{
