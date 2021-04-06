@@ -348,7 +348,7 @@ func validatePostgresParameters(client *gsclient.Client, d *schema.ResourceData,
 		return "", err
 	}
 	// Check if the postgres release number exists
-	release := d.Get("release_no").(string)
+	release := d.Get("release").(string)
 	performanceClass := d.Get("performance_class").(string)
 	var isReleaseValid bool
 	releases := make(map[string][]string)
