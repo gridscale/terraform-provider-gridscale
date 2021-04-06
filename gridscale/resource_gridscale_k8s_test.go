@@ -43,7 +43,7 @@ func testAccCheckResourceGridscaleK8sConfig_basic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_k8s" "foopaas" {
 	name   = "%s"
-	release_no = "1.19"
+	release = "1.19"
 	node_pool {
 		name = "my_node_pool"
 		node_count = 2
@@ -60,7 +60,7 @@ func testAccCheckResourceGridscaleK8sConfig_basic_update() string {
 	return fmt.Sprintf(`
 resource "gridscale_k8s" "foopaas" {
 	name   = "newname"
-	release_no = "1.19"
+	release = "1.19"
 	node_pool {
 		name = "my_node_pool"
 		node_count = 2

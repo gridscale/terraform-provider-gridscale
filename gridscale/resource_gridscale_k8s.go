@@ -48,7 +48,7 @@ func resourceGridscaleK8s() *schema.Resource {
 			},
 			"listen_port": {
 				Type:        schema.TypeSet,
-				Description: "Ports that PaaS service listens to",
+				Description: "The port number where this k8s service accepts connections.",
 				Computed:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -75,9 +75,9 @@ func resourceGridscaleK8s() *schema.Resource {
 				Description: "Network UUID containing security zone",
 				Computed:    true,
 			},
-			"release_no": {
+			"release": {
 				Type:         schema.TypeString,
-				Description:  "Release number of k8s service",
+				Description:  "The k8s release of this instance.",
 				Required:     true,
 				ValidateFunc: validation.NoZeroValues,
 			},
