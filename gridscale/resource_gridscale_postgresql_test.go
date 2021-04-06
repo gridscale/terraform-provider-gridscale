@@ -22,17 +22,17 @@ func TestAccResourceGridscalePostgres_Basic(t *testing.T) {
 			{
 				Config: testAccCheckResourceGridscalePostgresConfig_basic(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckResourceGridscalePaaSExists("gridscale_postgres.test", &object),
+					testAccCheckResourceGridscalePaaSExists("gridscale_postgresql.test", &object),
 					resource.TestCheckResourceAttr(
-						"gridscale_postgres.test", "name", name),
+						"gridscale_postgresql.test", "name", name),
 				),
 			},
 			{
 				Config: testAccCheckResourceGridscalePostgresConfig_basic_update(),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckResourceGridscalePaaSExists("gridscale_postgres.test", &object),
+					testAccCheckResourceGridscalePaaSExists("gridscale_postgresql.test", &object),
 					resource.TestCheckResourceAttr(
-						"gridscale_postgres.test", "name", "newname"),
+						"gridscale_postgresql.test", "name", "newname"),
 				),
 			},
 		},
@@ -41,7 +41,7 @@ func TestAccResourceGridscalePostgres_Basic(t *testing.T) {
 
 func testAccCheckResourceGridscalePostgresConfig_basic(name string) string {
 	return fmt.Sprintf(`
-resource "gridscale_postgres" "test" {
+resource "gridscale_postgresql" "test" {
 	name = "%s"
 	release_no = "13"
 	performance_class = "standard"
@@ -51,7 +51,7 @@ resource "gridscale_postgres" "test" {
 
 func testAccCheckResourceGridscalePostgresConfig_basic_update() string {
 	return fmt.Sprintf(`
-resource "gridscale_postgres" "test" {
+resource "gridscale_postgresql" "test" {
 	name = "newname"
 	release_no = "13"
 	performance_class = "standard"

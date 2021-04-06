@@ -22,12 +22,12 @@ const (
 	postgresMaxCoreCountValidationOpt
 )
 
-func resourceGridscalePostgresSQL() *schema.Resource {
+func resourceGridscalePostgreSQL() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceGridscalePostgresSQLCreate,
-		Read:   resourceGridscalePostgresSQLRead,
-		Delete: resourceGridscalePostgresSQLDelete,
-		Update: resourceGridscalePostgresSQLUpdate,
+		Create: resourceGridscalePostgreSQLCreate,
+		Read:   resourceGridscalePostgreSQLRead,
+		Delete: resourceGridscalePostgreSQLDelete,
+		Update: resourceGridscalePostgreSQLUpdate,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -40,41 +40,41 @@ func resourceGridscalePostgresSQL() *schema.Resource {
 			},
 			"release_no": {
 				Type:         schema.TypeString,
-				Description:  "Release no. of postgresSQL service.",
+				Description:  "Release no. of postgreSQL service.",
 				Required:     true,
 				ValidateFunc: validation.NoZeroValues,
 			},
 			"performance_class": {
 				Type:        schema.TypeString,
-				Description: "Performance class of postgresSQL service.",
+				Description: "Performance class of postgreSQL service.",
 				Required:    true,
 				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
 					valid := false
-					for _, class := range postgresPerformanceClass {
+					for _, class := range postgreSQLPerformanceClasses {
 						if v.(string) == class {
 							valid = true
 							break
 						}
 					}
 					if !valid {
-						errors = append(errors, fmt.Errorf("%v is not a valid postgres performance class. Valid values are: %v", v.(string), strings.Join(postgresPerformanceClass, ",")))
+						errors = append(errors, fmt.Errorf("%v is not a valid postgreSQL performance class. Valid values are: %v", v.(string), strings.Join(postgreSQLPerformanceClasses, ",")))
 					}
 					return
 				},
 			},
 			"username": {
 				Type:        schema.TypeString,
-				Description: "Username for PostgresSQL service.",
+				Description: "Username for PostgreSQL service.",
 				Computed:    true,
 			},
 			"password": {
 				Type:        schema.TypeString,
-				Description: "Password for PostgresSQL service.",
+				Description: "Password for PostgreSQL service.",
 				Computed:    true,
 			},
 			"listen_port": {
 				Type:        schema.TypeSet,
-				Description: "Ports that PostgresSQL service listens to.",
+				Description: "Ports that PostgreSQL service listens to.",
 				Computed:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -91,7 +91,7 @@ func resourceGridscalePostgresSQL() *schema.Resource {
 			},
 			"security_zone_uuid": {
 				Type:        schema.TypeString,
-				Description: "Security zone UUID linked to PostgresSQL service.",
+				Description: "Security zone UUID linked to PostgreSQL service.",
 				Optional:    true,
 				ForceNew:    true,
 				Computed:    true,
@@ -103,12 +103,12 @@ func resourceGridscalePostgresSQL() *schema.Resource {
 			},
 			"service_template_uuid": {
 				Type:        schema.TypeString,
-				Description: "PaaS service template that postgresSQL service uses.",
+				Description: "PaaS service template that postgreSQL service uses.",
 				Computed:    true,
 			},
 			"usage_in_minutes": {
 				Type:        schema.TypeInt,
-				Description: "Number of minutes that PostgresSQL service is in use",
+				Description: "Number of minutes that PostgreSQL service is in use",
 				Computed:    true,
 			},
 			"change_time": {
@@ -123,7 +123,7 @@ func resourceGridscalePostgresSQL() *schema.Resource {
 			},
 			"status": {
 				Type:        schema.TypeString,
-				Description: "Current status of PostgresSQL service.",
+				Description: "Current status of PostgreSQL service.",
 				Computed:    true,
 			},
 			"max_core_count": {
@@ -147,7 +147,7 @@ func resourceGridscalePostgresSQL() *schema.Resource {
 	}
 }
 
-func resourceGridscalePostgresSQLRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGridscalePostgreSQLRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("read paas (%s) resource -", d.Id())
 	paas, err := client.GetPaaSService(context.Background(), d.Id())
@@ -226,7 +226,7 @@ func resourceGridscalePostgresSQLRead(d *schema.ResourceData, meta interface{}) 
 	if err != nil {
 		return fmt.Errorf("%s error getting networks: %v", errorPrefix, err)
 	}
-	//look for a network that the PostgresSQL service is in
+	//look for a network that the PostgreSQL service is in
 	for _, network := range networks {
 		securityZones := network.Properties.Relations.PaaSSecurityZones
 		//Each network can contain only one security zone
@@ -241,7 +241,7 @@ func resourceGridscalePostgresSQLRead(d *schema.ResourceData, meta interface{}) 
 	return nil
 }
 
-func resourceGridscalePostgresSQLCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGridscalePostgreSQLCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("create k8s (%s) resource -", d.Id())
 
@@ -278,11 +278,11 @@ func resourceGridscalePostgresSQLCreate(d *schema.ResourceData, meta interface{}
 		return err
 	}
 	d.SetId(response.ObjectUUID)
-	log.Printf("The id for PostgresSQL service %s has been set to %v", requestBody.Name, response.ObjectUUID)
-	return resourceGridscalePostgresSQLRead(d, meta)
+	log.Printf("The id for PostgreSQL service %s has been set to %v", requestBody.Name, response.ObjectUUID)
+	return resourceGridscalePostgreSQLRead(d, meta)
 }
 
-func resourceGridscalePostgresSQLUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceGridscalePostgreSQLUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("update k8s (%s) resource -", d.Id())
 
@@ -318,10 +318,10 @@ func resourceGridscalePostgresSQLUpdate(d *schema.ResourceData, meta interface{}
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
-	return resourceGridscalePostgresSQLRead(d, meta)
+	return resourceGridscalePostgreSQLRead(d, meta)
 }
 
-func resourceGridscalePostgresSQLDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGridscalePostgreSQLDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete paas (%s) resource -", d.Id())
 
@@ -363,7 +363,7 @@ func validatePostgresParameters(client *gsclient.Client, d *schema.ResourceData,
 		}
 	}
 	if !isReleaseValid && isIntInList(postgresReleaseValidationOpt, parameters) {
-		errorMessages = append(errorMessages, fmt.Sprintf("%v/%v is not a valid postgresSQL release no/performance class. Valid release numbers (and corresponding performance classes) are:\n", release, performanceClass))
+		errorMessages = append(errorMessages, fmt.Sprintf("%v/%v is not a valid postgreSQL release no/performance class. Valid release numbers (and corresponding performance classes) are:\n", release, performanceClass))
 		for k, v := range releases {
 			errorMessages = append(errorMessages, fmt.Sprintf("      Release No.: %s. Performance classes: %s\n", k, strings.Join(v, ", ")))
 		}

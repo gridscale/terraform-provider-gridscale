@@ -1,21 +1,21 @@
 ---
 layout: "gridscale"
-page_title: "gridscale: gridscale_postgres"
-sidebar_current: "docs-gridscale-resource-postgres"
+page_title: "gridscale: gridscale_postgresql"
+sidebar_current: "docs-gridscale-resource-postgresql"
 description: |-
-  Manage a postgresSQL service in gridscale.
+  Manage a postgreSQL service in gridscale.
 ---
 
-# gridscale_postgres
+# gridscale_postgresql
 
-Provides a postgresSQL resource. This can be used to create, modify, and delete postgresSQL instances.
+Provides a postgreSQL resource. This can be used to create, modify, and delete postgreSQL instances.
 
 ## Example
 
-The following example shows how one might use this resource to add a postgresSQL service to gridscale:
+The following example shows how one might use this resource to add a postgreSQL service to gridscale:
 
 ```terraform
-resource "gridscale_postgres" "terra-postgres-test" {
+resource "gridscale_postgresql" "terra-postgres-test" {
   name = "test"
   release_no = "13"
   performance_class = "standard"
@@ -30,9 +30,9 @@ The following arguments are supported:
 
 * `name` - (Required) The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 
-* `release_no` - (Required) Release no. of postgresSQL service. For convenience, please use [gscloud](https://github.com/gridscale/gscloud) to get the list of available postgresSQL service release numbers.
+* `release_no` - (Required) Release no. of postgreSQL service. For convenience, please use [gscloud](https://github.com/gridscale/gscloud) to get the list of available postgreSQL service release numbers.
 
-* `performance_class` - (Required) Performance class of postgresSQL service. Available performance classes at the time of writing: `standard`, `high`, `insane`, `ultra`.
+* `performance_class` - (Required) Performance class of postgreSQL service. Available performance classes at the time of writing: `standard`, `high`, `insane`, `ultra`.
 
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
 
@@ -61,7 +61,7 @@ This resource exports the following attributes:
   * `listen_port` - Port number.
 * `security_zone_uuid` - See Argument Reference above.
 * `network_uuid` - Network UUID containing security zone.
-* `service_template_uuid` - PaaS service template that postgresSQL service uses.
+* `service_template_uuid` - PaaS service template that postgreSQL service uses.
 * `usage_in_minutes` - Number of minutes that PaaS service is in use.
 * `change_time` - Time of the last change.
 * `create_time` - Time of the creation.
