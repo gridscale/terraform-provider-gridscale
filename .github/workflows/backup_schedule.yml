@@ -2,8 +2,7 @@ name: Test backup schedule ds/rs
 
 on:
   push:
-    tags:
-      - "*"
+    branches: [master]
     paths:
       - "**gridscale_backup_schedule**"
       - "gridscale/error-handler/**"

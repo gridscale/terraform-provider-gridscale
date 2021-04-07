@@ -2,8 +2,7 @@ name: Test object storage ds/rs
 
 on:
   push:
-    tags:
-      - "*"
+    branches: [master]
     paths:
       - "**gridscale_objectstorage**"
       - "gridscale/error-handler/**"

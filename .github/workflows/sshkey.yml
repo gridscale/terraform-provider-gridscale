@@ -2,8 +2,7 @@ name: Test SSH key ds/rs
 
 on:
   push:
-    tags:
-      - "*"
+    branches: [master]
     paths:
       - "**gridscale_sshkey**"
       - "gridscale/error-handler/**"

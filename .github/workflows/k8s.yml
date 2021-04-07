@@ -2,8 +2,7 @@ name: Test k8s rs
 
 on:
   push:
-    tags:
-      - "*"
+    branches: [master]
     paths:
       - "**gridscale_k8s**"
       - "gridscale/error-handler/**"

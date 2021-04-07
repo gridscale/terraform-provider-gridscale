@@ -2,8 +2,7 @@ name: Test server ds/rs
 
 on:
   push:
-    tags:
-      - "*"
+    branches: [master]
     paths:
       - "**gridscale_server**"
       - "gridscale/relation-manager/**"

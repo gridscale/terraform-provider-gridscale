@@ -2,8 +2,7 @@ name: Test snapshot/snapshot schedule ds/rs
 
 on:
   push:
-    tags:
-      - "*"
+    branches: [master]
     paths:
       - "**gridscale_snapshot**"
       - "gridscale/error-handler/**"

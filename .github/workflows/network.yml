@@ -2,8 +2,7 @@ name: Test network ds/rs
 
 on:
   push:
-    tags:
-      - "*"
+    branches: [master]
     paths:
       - "**gridscale_network**"
       - "**gridscale_publicnetwork**"

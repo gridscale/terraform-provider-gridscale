@@ -2,8 +2,7 @@ name: Test ISO image ds/rs
 
 on:
   push:
-    tags:
-      - "*"
+    branches: [master]
     paths:
       - "**gridscale_isoimage**"
       - "gridscale/error-handler/**"
