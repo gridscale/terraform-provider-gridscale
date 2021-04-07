@@ -9,6 +9,7 @@ on:
       - "gridscale/relation-manager/**"
       - "gridscale/firewall-utils/**"
       - "gridscale/error-handler/**"
+      - "gridscale/server_concurrency_handler.go"
       - "gridscale/common.go"
       - "gridscale/config.go"
       - "gridscale/provider.go"
