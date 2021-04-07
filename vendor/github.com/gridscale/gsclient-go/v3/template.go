@@ -89,7 +89,7 @@ type TemplateProperties struct {
 	// Description of the template.
 	Description string `json:"description"`
 
-	// The price for the current period since the last bill.
+	// **DEPRECATED** The price for the current period since the last bill.
 	CurrentPrice float64 `json:"current_price"`
 
 	// The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.

@@ -70,7 +70,7 @@ type StorageSnapshotProperties struct {
 	// this shows the product_no of the license (see the /prices endpoint for more details).
 	LicenseProductNo int `json:"license_product_no"`
 
-	// The price for the current period since the last bill.
+	// **DEPRECATED** The price for the current period since the last bill.
 	CurrentPrice float64 `json:"current_price"`
 
 	// Defines the date and time the object was initially created.

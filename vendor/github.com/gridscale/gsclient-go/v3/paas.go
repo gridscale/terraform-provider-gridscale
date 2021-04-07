@@ -70,7 +70,7 @@ type PaaSServiceProperties struct {
 	// Total minutes the object has been running.
 	UsageInMinutes int `json:"usage_in_minutes"`
 
-	// The price for the current period since the last bill.
+	// **DEPRECATED** The price for the current period since the last bill.
 	CurrentPrice float64 `json:"current_price"`
 
 	// Defines the date and time of the last object change.
@@ -228,6 +228,28 @@ type PaaSTemplateProperties struct {
 
 	// List of service template uuids to which a patch update is allowed.
 	PatchUpdates []string `json:"patch_updates"`
+
+	// Values of the autoscaling resources.
+	Autoscaling AutoscalingProperties `json:"autoscaling"`
+}
+
+// AutoscalingProperties holds properties of resource autoscalings.
+type AutoscalingProperties struct {
+	// Limit values of CPU core autoscaling.
+	Cores AutoscalingResourceProperties `json:"cores"`
+
+	// Limit values of storage autoscaling.
+	Storage AutoscalingResourceProperties `json:"storage"`
+}
+
+// AutoscalingResourceProperties holds properties (Min/Max values)
+// of a resource autoscaling.
+type AutoscalingResourceProperties struct {
+	// Min value of a resource autoscaling.
+	Min int `json:"min"`
+
+	// Max value of a resource autoscaling.
+	Max int `json:"max"`
 }
 
 // Parameter represents a parameter used in PaaS template.

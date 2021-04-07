@@ -89,7 +89,7 @@ type IPProperties struct {
 	// Total minutes the object has been running.
 	UsagesInMinutes float64 `json:"usage_in_minutes"`
 
-	// The price for the current period since the last bill.
+	// **DEPRECATED** The price for the current period since the last bill.
 	CurrentPrice float64 `json:"current_price"`
 
 	// List of labels.

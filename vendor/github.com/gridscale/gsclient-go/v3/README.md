@@ -312,5 +312,10 @@ Not all endpoints have been implemented in this client, but new ones will be add
   * Deleted Storages Get (GetDeletedStorages)
   * Deleted Templates Get (GetDeletedTemplates)
   * Deleted PaaS Services Get (GetDeletedPaaSServices)
+* SSL certificate
+  * SSL certificates Get (GetSSLCertificateList)
+  * SSL certificate Get (GetSSLCertificate)
+  * SSL certificate Create (CreateSSLCertificate)
+  * SSL certificate Delete (DeleteSSLCertificate)
 
 Note: The functions in this list can be called with a Client type.

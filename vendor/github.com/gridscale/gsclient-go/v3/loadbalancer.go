@@ -58,7 +58,7 @@ type LoadBalancerProperties struct {
 	// Status indicates the status of the object.
 	Status string `json:"status"`
 
-	// The price for the current period since the last bill.
+	// **DEPRECATED** The price for the current period since the last bill.
 	CurrentPrice float64 `json:"current_price"`
 
 	// The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
@@ -101,8 +101,11 @@ type BackendServer struct {
 // ForwardingRule represents a forwarding rule.
 // It tells which port are forwarded to which port.
 type ForwardingRule struct {
-	// SSL from LetsEncrypt.
-	LetsencryptSSL interface{} `json:"letsencrypt_ssl"`
+	// A valid domain name that points to the loadbalancer's IP address.
+	LetsencryptSSL *string `json:"letsencrypt_ssl"`
+
+	// The UUID of a custom certificate.
+	CertificateUUID string `json:"certificate_uuid,omitempty"`
 
 	// Listen port.
 	ListenPort int `json:"listen_port"`

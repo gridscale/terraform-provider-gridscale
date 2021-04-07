@@ -27,6 +27,7 @@ const (
 	apiEventBase                  = "/objects/events"
 	apiLabelBase                  = "/objects/labels"
 	apiDeletedBase                = "/objects/deleted"
+	apiSSLCertificateBase         = "/objects/certificates"
 )
 
 // Client struct of a gridscale golang client.
