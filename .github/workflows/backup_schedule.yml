@@ -40,6 +40,7 @@ jobs:
           GRIDSCALE_TOKEN: ${{ secrets.CI_API_TOKEN }}
           GRIDSCALE_URL: https://api.gridscale.cloud
         run: make testacc TEST=./gridscale TESTARGS='-run=TestAccdataSourceGridscaleBackupSchedule_basic'
+
       - name: Run TestAccResourceGridscaleBackupSchedule_Basic
         env:
           GRIDSCALE_UUID: ${{ secrets.CI_USER_UUID }}
