@@ -7,6 +7,7 @@ on:
     paths:
       - "**gridscale_server**"
       - "gridscale/relation-manager/**"
+      - "gridscale/firewall-utils/**"
       - "gridscale/error-handler/**"
       - "gridscale/common.go"
       - "gridscale/config.go"
