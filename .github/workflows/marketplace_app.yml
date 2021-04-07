@@ -7,10 +7,10 @@ on:
     paths:
       - "**gridscale_marketplace_app**"
       - "gridscale/error-handler/**"
-      - "common.go"
-      - "config.go"
-      - "provider.go"
-      - "provider_test.go"
+      - "gridscale/common.go"
+      - "gridscale/config.go"
+      - "gridscale/provider.go"
+      - "gridscale/provider_test.go"
 
 jobs:
   build:
