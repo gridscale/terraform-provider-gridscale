@@ -1,0 +1,50 @@
+name: Test SSH key ds/rs
+
+on:
+  push:
+    tags:
+      - "*"
+    paths:
+      - "**gridscale_storage**"
+      - "gridscale/error-handler/**"
+      - "gridscale/common.go"
+      - "gridscale/config.go"
+      - "gridscale/provider.go"
+      - "gridscale/provider_test.go"
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    env:
+      GOPATH: /home/runner/go
+    steps:
+      - name: Set up Go 1.16
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.16
+        id: go
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+
+      - name: Run TestAccdataSourceGridscaleStorage_basic
+        env:
+          GRIDSCALE_UUID: ${{ secrets.CI_USER_UUID }}
+          GRIDSCALE_TOKEN: ${{ secrets.CI_API_TOKEN }}
+          GRIDSCALE_URL: https://api.gridscale.cloud
+        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccdataSourceGridscaleStorage_basic'
+
+      - name: Run TestAccResourceGridscaleStorage_Basic
+        env:
+          GRIDSCALE_UUID: ${{ secrets.CI_USER_UUID }}
+          GRIDSCALE_TOKEN: ${{ secrets.CI_API_TOKEN }}
+          GRIDSCALE_URL: https://api.gridscale.cloud
+        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccResourceGridscaleStorage_Basic'
+
+      - name: Run TestAccResourceGridscaleStorageClone_Basic
+        env:
+          GRIDSCALE_UUID: ${{ secrets.CI_USER_UUID }}
+          GRIDSCALE_TOKEN: ${{ secrets.CI_API_TOKEN }}
+          GRIDSCALE_URL: https://api.gridscale.cloud
+        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccResourceGridscaleStorageClone_Basic'
