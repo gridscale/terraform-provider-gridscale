@@ -192,7 +192,7 @@ func resourceGridscaleK8sRead(d *schema.ResourceData, meta interface{}) error {
 	if err = d.Set("name", props.Name); err != nil {
 		return fmt.Errorf("%s error setting name: %v", errorPrefix, err)
 	}
-	if creds != nil && len(creds) > 0 {
+	if len(creds) > 0 {
 		if err = d.Set("kubeconfig", creds[0].KubeConfig); err != nil {
 			return fmt.Errorf("%s error setting kubeconfig: %v", errorPrefix, err)
 		}

@@ -166,7 +166,7 @@ func resourceGridscalePostgreSQLRead(d *schema.ResourceData, meta interface{}) e
 	if err = d.Set("name", props.Name); err != nil {
 		return fmt.Errorf("%s error setting name: %v", errorPrefix, err)
 	}
-	if creds != nil && len(creds) > 0 {
+	if len(creds) > 0 {
 		if err = d.Set("username", creds[0].Username); err != nil {
 			return fmt.Errorf("%s error setting username: %v", errorPrefix, err)
 		}
