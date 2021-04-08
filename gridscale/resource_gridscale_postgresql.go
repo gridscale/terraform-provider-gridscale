@@ -47,7 +47,7 @@ func resourceGridscalePostgreSQL() *schema.Resource {
 			},
 			"performance_class": {
 				Type:        schema.TypeString,
-				Description: "Performance class of postgreSQL service.",
+				Description: "Performance class of PostgreSQL service.",
 				Required:    true,
 				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
 					valid := false
@@ -58,7 +58,7 @@ func resourceGridscalePostgreSQL() *schema.Resource {
 						}
 					}
 					if !valid {
-						errors = append(errors, fmt.Errorf("%v is not a valid postgreSQL performance class. Valid values are: %v", v.(string), strings.Join(postgreSQLPerformanceClasses, ",")))
+						errors = append(errors, fmt.Errorf("%v is not a valid PostgreSQL performance class. Valid values are: %v", v.(string), strings.Join(postgreSQLPerformanceClasses, ",")))
 					}
 					return
 				},
@@ -104,12 +104,12 @@ func resourceGridscalePostgreSQL() *schema.Resource {
 			},
 			"service_template_uuid": {
 				Type:        schema.TypeString,
-				Description: "PaaS service template that postgreSQL service uses.",
+				Description: "PaaS service template that PostgreSQL service uses.",
 				Computed:    true,
 			},
 			"usage_in_minutes": {
 				Type:        schema.TypeInt,
-				Description: "Number of minutes that PostgreSQL service is in use",
+				Description: "Number of minutes that PostgreSQL service is in use.",
 				Computed:    true,
 			},
 			"change_time": {
@@ -370,7 +370,7 @@ func validatePostgresParameters(client *gsclient.Client, d *schema.ResourceData,
 		}
 	}
 	if !isReleaseValid && isIntInList(postgresReleaseValidationOpt, parameters) {
-		errorMessages = append(errorMessages, fmt.Sprintf("%v/%v is not a valid postgreSQL release no/performance class. Valid release numbers (and corresponding performance classes) are:\n", release, performanceClass))
+		errorMessages = append(errorMessages, fmt.Sprintf("%v/%v is not a valid PostgreSQL release no/performance class. Valid release numbers (and corresponding performance classes) are:\n", release, performanceClass))
 		for k, v := range releases {
 			errorMessages = append(errorMessages, fmt.Sprintf("      Release No.: %s. Performance classes: %s\n", k, strings.Join(v, ", ")))
 		}
@@ -383,7 +383,7 @@ func validatePostgresParameters(client *gsclient.Client, d *schema.ResourceData,
 		maxCoreCount := uTemplate.Properties.Autoscaling.Cores.Max
 		if (minCoreCount > coreCount || maxCoreCount < coreCount) &&
 			isIntInList(postgresMaxCoreCountValidationOpt, parameters) {
-			errorMessages = append(errorMessages, fmt.Sprintf("%v is not a valid value for \"max_core_count\". Valid value stays between %v and %v\n", coreCount, minCoreCount, maxCoreCount))
+			errorMessages = append(errorMessages, fmt.Sprintf("%v is not a valid value for \"max_core_count\". Valid value should be between %v and %v\n", coreCount, minCoreCount, maxCoreCount))
 		}
 	}
 	if len(errorMessages) > 1 {

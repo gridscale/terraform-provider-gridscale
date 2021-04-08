@@ -3,16 +3,16 @@ layout: "gridscale"
 page_title: "gridscale: gridscale_postgresql"
 sidebar_current: "docs-gridscale-resource-postgresql"
 description: |-
-  Manage a postgreSQL service in gridscale.
+  Manage a PostgreSQL service in gridscale.
 ---
 
 # gridscale_postgresql
 
-Provides a postgreSQL resource. This can be used to create, modify, and delete postgreSQL instances.
+Provides a PostgreSQL resource. This can be used to create, modify, and delete PostgreSQL instances.
 
 ## Example
 
-The following example shows how one might use this resource to add a postgreSQL service to gridscale:
+The following example shows how one might use this resource to add a PostgreSQL service to gridscale:
 
 ```terraform
 resource "gridscale_postgresql" "terra-postgres-test" {
@@ -30,9 +30,9 @@ The following arguments are supported:
 
 * `name` - (Required) The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 
-* `release` - (Required) The PostgreSQL release of this instance. For convenience, please use [gscloud](https://github.com/gridscale/gscloud) to get the list of available postgreSQL service releases.
+* `release` - (Required) The PostgreSQL release of this instance. For convenience, please use [gscloud](https://github.com/gridscale/gscloud) to get the list of available PostgreSQL service releases.
 
-* `performance_class` - (Required) Performance class of postgreSQL service. Available performance classes at the time of writing: `standard`, `high`, `insane`, `ultra`.
+* `performance_class` - (Required) Performance class of PostgreSQL service. Available performance classes at the time of writing: `standard`, `high`, `insane`, `ultra`.
 
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
 
@@ -63,7 +63,7 @@ This resource exports the following attributes:
   * `listen_port` - Port number.
 * `security_zone_uuid` - See Argument Reference above.
 * `network_uuid` - Network UUID containing security zone.
-* `service_template_uuid` - PaaS service template that postgreSQL service uses.
+* `service_template_uuid` - PaaS service template that PostgreSQL service uses.
 * `usage_in_minutes` - Number of minutes that PaaS service is in use.
 * `change_time` - Time of the last change.
 * `create_time` - Date time this service has been created.
