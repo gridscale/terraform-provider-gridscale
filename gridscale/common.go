@@ -89,13 +89,3 @@ func convInterfaceToString(interfaceType string, val interface{}) (string, error
 		return "", errors.New("type is invalid")
 	}
 }
-
-// isIntInList checks if an integer presents in a list of integers.
-func isIntInList(a int, list []int) bool {
-	for _, v := range list {
-		if v == a {
-			return true
-		}
-	}
-	return false
-}
