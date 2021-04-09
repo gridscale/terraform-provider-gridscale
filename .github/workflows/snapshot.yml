@@ -23,6 +23,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GOPATH: /home/runner/go
+      GRIDSCALE_UUID: ${{ secrets.CI_USER_UUID }}
+      GRIDSCALE_TOKEN: ${{ secrets.CI_API_TOKEN }}
+      GRIDSCALE_URL: https://api.gridscale.cloud
     steps:
       - name: Set up Go 1.16
         uses: actions/setup-go@v2
@@ -34,29 +37,13 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Run TestAccdataSourceGridscaleSnapshot_basic
-        env:
-          GRIDSCALE_UUID: ${{ secrets.CI_USER_UUID }}
-          GRIDSCALE_TOKEN: ${{ secrets.CI_API_TOKEN }}
-          GRIDSCALE_URL: https://api.gridscale.cloud
         run: make testacc TEST=./gridscale TESTARGS='-run=TestAccdataSourceGridscaleSnapshot_basic'
 
       - name: Run TestAccdataSourceGridscaleSnapshotSchedule_basic
-        env:
-          GRIDSCALE_UUID: ${{ secrets.CI_USER_UUID }}
-          GRIDSCALE_TOKEN: ${{ secrets.CI_API_TOKEN }}
-          GRIDSCALE_URL: https://api.gridscale.cloud
         run: make testacc TEST=./gridscale TESTARGS='-run=TestAccdataSourceGridscaleSnapshotSchedule_basic'
 
       - name: Run TestAccResourceGridscaleSnapshot_Basic
-        env:
-          GRIDSCALE_UUID: ${{ secrets.CI_USER_UUID }}
-          GRIDSCALE_TOKEN: ${{ secrets.CI_API_TOKEN }}
-          GRIDSCALE_URL: https://api.gridscale.cloud
         run: make testacc TEST=./gridscale TESTARGS='-run=TestAccResourceGridscaleSnapshot_Basic'
 
       - name: Run TestAccResourceGridscaleSnapshotSchedule_Basic
-        env:
-          GRIDSCALE_UUID: ${{ secrets.CI_USER_UUID }}
-          GRIDSCALE_TOKEN: ${{ secrets.CI_API_TOKEN }}
-          GRIDSCALE_URL: https://api.gridscale.cloud
         run: make testacc TEST=./gridscale TESTARGS='-run=TestAccResourceGridscaleSnapshotSchedule_Basic'
