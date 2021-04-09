@@ -2,7 +2,11 @@ name: Test backup ds
 
 on:
   push:
-    branches: [master]
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
     paths:
       - "**gridscale_backup**"
       - "gridscale/error-handler/**"

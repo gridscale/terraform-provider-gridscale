@@ -2,7 +2,11 @@ name: Test security zone ds/rs
 
 on:
   push:
-    branches: [master]
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
     paths:
       - "**gridscale_securityzone**"
       - "gridscale/error-handler/**"

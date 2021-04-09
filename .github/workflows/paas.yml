@@ -2,7 +2,11 @@ name: Test PaaS ds/rs
 
 on:
   push:
-    branches: [master]
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
     paths:
       - "**gridscale_paas**"
       - "gridscale/error-handler/**"

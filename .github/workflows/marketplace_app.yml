@@ -2,7 +2,11 @@ name: Test marketplace application ds/rs
 
 on:
   push:
-    branches: [master]
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
     paths:
       - "**gridscale_marketplace_app**"
       - "gridscale/error-handler/**"

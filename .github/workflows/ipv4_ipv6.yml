@@ -2,7 +2,11 @@ name: Test IPv4/IPv6 ds/rs
 
 on:
   push:
-    branches: [master]
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
     paths:
       - "**gridscale_ipv**"
       - "gridscale/error-handler/**"

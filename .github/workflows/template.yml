@@ -2,7 +2,11 @@ name: Test template ds/rs
 
 on:
   push:
-    branches: [master]
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
     paths:
       - "**gridscale_template**"
       - "gridscale/error-handler/**"

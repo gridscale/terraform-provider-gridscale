@@ -2,7 +2,11 @@ name: Test Loadbalancer ds/rs
 
 on:
   push:
-    branches: [master]
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
     paths:
       - "**gridscale_loadbalancer**"
       - "gridscale/error-handler/**"

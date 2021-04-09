@@ -2,7 +2,11 @@ name: Test firewall ds/rs
 
 on:
   push:
-    branches: [master]
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
     paths:
       - "**gridscale_firewall**"
       - "gridscale/firewall-utils/**"
