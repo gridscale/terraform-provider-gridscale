@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Build
+    name: Common Test
     runs-on: ubuntu-latest
     env:
       GOPATH: /home/runner/go

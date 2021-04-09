@@ -19,7 +19,7 @@ on:
 
 jobs:
   build:
-    name: Build
+    name: Backup AccTest
     runs-on: ubuntu-latest
     env:
       GOPATH: /home/runner/go

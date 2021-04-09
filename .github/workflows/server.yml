@@ -22,7 +22,7 @@ on:
 
 jobs:
   build:
-    name: Build
+    name: GS server AccTest
     runs-on: ubuntu-latest
     env:
       GOPATH: /home/runner/go
