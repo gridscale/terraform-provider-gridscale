@@ -1,4 +1,4 @@
-name: Test backup ds
+name: Test backup/backup schedule ds
 
 on:
   push:
@@ -19,7 +19,7 @@ on:
 
 jobs:
   build:
-    name: Backup AccTest
+    name: Backup/Backup schedule AccTest
     runs-on: ubuntu-latest
     env:
       GOPATH: /home/runner/go
@@ -38,3 +38,9 @@ jobs:
 
       - name: Run TestAccdataSourceGridscaleBackup_basic
         run: for i in $(seq 1 3); do make testacc TEST=./gridscale TESTARGS='-run=TestAccdataSourceGridscaleBackup_basic' && s=0 && break || s=$? && sleep 10; done; (exit $s)
+
+      - name: Run TestAccdataSourceGridscaleBackupSchedule_basic
+        run: for i in $(seq 1 3); do make testacc TEST=./gridscale TESTARGS='-run=TestAccdataSourceGridscaleBackupSchedule_basic' && s=0 && break || s=$? && sleep 10; done; (exit $s)
+
+      - name: Run TestAccResourceGridscaleBackupSchedule_Basic
+        run: for i in $(seq 1 3); do make testacc TEST=./gridscale TESTARGS='-run=TestAccResourceGridscaleBackupSchedule_Basic' && s=0 && break || s=$? && sleep 10; done; (exit $s)
