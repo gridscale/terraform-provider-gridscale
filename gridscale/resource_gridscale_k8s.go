@@ -19,10 +19,6 @@ const k8sTemplateFlavourName = "kubernetes"
 
 const (
 	k8sReleaseValidationOpt = iota
-	k8sNodeCountValidationOpt
-	k8sCoreCountValidationOpt
-	k8sMemoryValidationOpt
-	k8sStorageValidationOpt
 )
 
 func resourceGridscaleK8s() *schema.Resource {
@@ -102,21 +98,45 @@ func resourceGridscaleK8s() *schema.Resource {
 							Type:        schema.TypeInt,
 							Description: "Number of worker nodes.",
 							Required:    true,
+							ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
+								if 1 > v.(int) || v.(int) > 30 {
+									errors = append(errors, fmt.Errorf("%v is not a valid value for number of \"node_count\". Valid value should be between 1 and 30\n", v.(int)))
+								}
+								return
+							},
 						},
 						"cores": {
 							Type:        schema.TypeInt,
 							Description: "Cores per worker node.",
 							Required:    true,
+							ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
+								if 1 > v.(int) || v.(int) > 32 {
+									errors = append(errors, fmt.Errorf("%v is not a valid value for number of \"cores\". Valid value should be between 1 and 32\n", v.(int)))
+								}
+								return
+							},
 						},
 						"memory": {
 							Type:        schema.TypeInt,
 							Description: "Memory per worker node (in GiB).",
 							Required:    true,
+							ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
+								if 2 > v.(int) || v.(int) > 192 {
+									errors = append(errors, fmt.Errorf("%v is not a valid value for number of \"memory\". Valid value should be between 2 and 192\n", v.(int)))
+								}
+								return
+							},
 						},
 						"storage": {
 							Type:        schema.TypeInt,
 							Description: "Storage per worker node (in GiB).",
 							Required:    true,
+							ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
+								if 30 > v.(int) || v.(int) > 1024 {
+									errors = append(errors, fmt.Errorf("%v is not a valid value for number of \"storage\". Valid value should be between 30 and 1024\n", v.(int)))
+								}
+								return
+							},
 						},
 						"storage_type": {
 							Type:        schema.TypeString,
@@ -277,14 +297,8 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("create k8s (%s) resource -", d.Id())
 
-	// Validate k8s parameters
-	templateUUID, err := validateK8sParameters(client, d,
-		k8sReleaseValidationOpt,
-		k8sNodeCountValidationOpt,
-		k8sCoreCountValidationOpt,
-		k8sMemoryValidationOpt,
-		k8sStorageValidationOpt,
-	)
+	// Validate k8s release
+	templateUUID, err := validateK8sRelease(client, d)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -329,21 +343,11 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 	// Only update release, when it is changed
 	if d.HasChange("release") {
 		// Check if the k8s release number exists
-		templateUUID, err := validateK8sParameters(client, d, k8sReleaseValidationOpt)
+		templateUUID, err := validateK8sRelease(client, d)
 		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
 		requestBody.PaaSServiceTemplateUUID = templateUUID
-	}
-
-	// Validate k8s parameters
-	if _, err := validateK8sParameters(client, d,
-		k8sNodeCountValidationOpt,
-		k8sCoreCountValidationOpt,
-		k8sMemoryValidationOpt,
-		k8sStorageValidationOpt,
-	); err != nil {
-		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
 	// TODO: The API scheme will be CHANGED in the future. There will be multiple node pools.
@@ -380,11 +384,10 @@ func resourceGridscaleK8sDelete(d *schema.ResourceData, meta interface{}) error 
 	return nil
 }
 
-// validateK8sParameters validate k8s resource's selected parameters.
+// validateK8sRelease validate input k8s release.
 // It returns the UUID of the k8s service template, if the validation is successful.
 // Otherwise, an error will be returned.
-func validateK8sParameters(client *gsclient.Client, d *schema.ResourceData, parameters ...int) (string, error) {
-	errorMessages := []string{"List of validation errors:\n"}
+func validateK8sRelease(client *gsclient.Client, d *schema.ResourceData) (string, error) {
 	paasTemplates, err := client.GetPaaSTemplateList(context.Background())
 	if err != nil {
 		return "", err
@@ -403,54 +406,9 @@ func validateK8sParameters(client *gsclient.Client, d *schema.ResourceData, para
 			}
 		}
 	}
-	if !isReleaseValid && isIntInList(k8sReleaseValidationOpt, parameters) {
-		errorMessages = append(errorMessages, fmt.Sprintf("%v is not a valid Kubernetes release. Valid releases are: %v\n", release, strings.Join(releases, ", ")))
+	if !isReleaseValid {
+		return "", fmt.Errorf("%v is not a valid Kubernetes release. Valid releases are: %v\n", release, strings.Join(releases, ", "))
 	}
 
-	// Check if mem, core count, node count, and storage are valid
-	if attr, ok := d.GetOk("node_pool"); ok {
-		for _, element := range attr.([]interface{}) {
-			nodePool := element.(map[string]interface{})
-
-			mem := nodePool["memory"].(int)
-			_, ok := uTemplate.Properties.ParametersSchema["k8s_worker_node_ram"]
-			minMem := uTemplate.Properties.ParametersSchema["k8s_worker_node_ram"].Min
-			maxMem := uTemplate.Properties.ParametersSchema["k8s_worker_node_ram"].Max
-			if (minMem > mem || maxMem < mem) &&
-				isIntInList(k8sMemoryValidationOpt, parameters) && ok {
-				errorMessages = append(errorMessages, fmt.Sprintf("%v is not a valid value for \"memory\". Valid value should be between %v and %v\n", mem, minMem, maxMem))
-			}
-
-			coreCount := nodePool["cores"].(int)
-			_, ok = uTemplate.Properties.ParametersSchema["k8s_worker_node_cores"]
-			minCoreCount := uTemplate.Properties.ParametersSchema["k8s_worker_node_cores"].Min
-			maxCoreCount := uTemplate.Properties.ParametersSchema["k8s_worker_node_cores"].Max
-			if (minCoreCount > coreCount || maxCoreCount < coreCount) &&
-				isIntInList(k8sCoreCountValidationOpt, parameters) && ok {
-				errorMessages = append(errorMessages, fmt.Sprintf("%v is not a valid value for \"cores\". Valid value should be between %v and %v\n", coreCount, minCoreCount, maxCoreCount))
-			}
-
-			nodeCount := nodePool["node_count"].(int)
-			_, ok = uTemplate.Properties.ParametersSchema["k8s_worker_node_count"]
-			minNodeCount := uTemplate.Properties.ParametersSchema["k8s_worker_node_count"].Min
-			maxNodeCount := uTemplate.Properties.ParametersSchema["k8s_worker_node_count"].Max
-			if (minNodeCount > nodeCount || maxNodeCount < nodeCount) &&
-				isIntInList(k8sNodeCountValidationOpt, parameters) && ok {
-				errorMessages = append(errorMessages, fmt.Sprintf("%v is not a valid value for number of \"node_count\". Valid value should be between %v and %v\n", nodeCount, minNodeCount, maxNodeCount))
-			}
-
-			storage := nodePool["storage"].(int)
-			_, ok = uTemplate.Properties.ParametersSchema["k8s_worker_node_storage"]
-			minStorage := uTemplate.Properties.ParametersSchema["k8s_worker_node_storage"].Min
-			maxStorage := uTemplate.Properties.ParametersSchema["k8s_worker_node_storage"].Max
-			if (minStorage > storage || maxStorage < storage) &&
-				isIntInList(k8sStorageValidationOpt, parameters) && ok {
-				errorMessages = append(errorMessages, fmt.Sprintf("%v is not a valid value for \"storage\". Valid value should be between %v and %v\n", storage, minStorage, maxStorage))
-			}
-		}
-	}
-	if len(errorMessages) > 1 {
-		return "", fmt.Errorf(strings.Join(errorMessages, ""))
-	}
 	return uTemplate.Properties.ObjectUUID, nil
 }
