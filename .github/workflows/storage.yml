@@ -1,4 +1,4 @@
-name: Test SSH key ds/rs
+name: Test Storage ds/rs
 
 on:
   push:
