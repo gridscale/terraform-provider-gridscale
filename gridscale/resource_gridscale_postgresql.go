@@ -132,6 +132,12 @@ func resourceGridscalePostgreSQL() *schema.Resource {
 				Description: "Maximum CPU core count. The PostgreSQL instance's CPU core count will be autoscaled based on the workload. The number of cores stays between 1 and `max_core_count`.",
 				Optional:    true,
 				Computed:    true,
+				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
+					if 1 > v.(int) || v.(int) > 32 {
+						errors = append(errors, fmt.Errorf("%v is not a valid value for number of \"max_core_count\". Valid value should be between 1 and 32\n", v.(int)))
+					}
+					return
+				},
 			},
 			"labels": {
 				Type:        schema.TypeSet,
@@ -246,11 +252,8 @@ func resourceGridscalePostgreSQLCreate(d *schema.ResourceData, meta interface{})
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("create k8s (%s) resource -", d.Id())
 
-	// Validate k8s parameters
-	templateUUID, err := validatePostgresParameters(client, d,
-		postgresReleaseValidationOpt,
-		postgresMaxCoreCountValidationOpt,
-	)
+	// Validate k8s release
+	templateUUID, err := validatePostgresRelease(client, d)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -295,18 +298,12 @@ func resourceGridscalePostgreSQLUpdate(d *schema.ResourceData, meta interface{})
 
 	// Only update templateUUID, when `release` is changed
 	if d.HasChange("release") {
-		// Check if the k8s release number exists
-		templateUUID, err := validatePostgresParameters(client, d, postgresReleaseValidationOpt)
+		// Validate the k8s release
+		templateUUID, err := validatePostgresRelease(client, d)
 		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
 		requestBody.PaaSServiceTemplateUUID = templateUUID
-	}
-
-	// Validate other parameters
-	_, err := validatePostgresParameters(client, d, postgresMaxCoreCountValidationOpt)
-	if err != nil {
-		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
 	if val, ok := d.GetOk("max_core_count"); ok {
@@ -321,7 +318,7 @@ func resourceGridscalePostgreSQLUpdate(d *schema.ResourceData, meta interface{})
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
 	defer cancel()
-	err = client.UpdatePaaSService(ctx, d.Id(), requestBody)
+	err := client.UpdatePaaSService(ctx, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -344,11 +341,10 @@ func resourceGridscalePostgreSQLDelete(d *schema.ResourceData, meta interface{})
 	return nil
 }
 
-// validatePostgresParameters validate postgres resource's selected parameters.
+// validatePostgresRelease validate input postgres release.
 // It returns the UUID of the postgres service template, if the validation is successful.
 // Otherwise, an error will be returned.
-func validatePostgresParameters(client *gsclient.Client, d *schema.ResourceData, parameters ...int) (string, error) {
-	errorMessages := []string{"List of validation errors:\n"}
+func validatePostgresRelease(client *gsclient.Client, d *schema.ResourceData) (string, error) {
 	paasTemplates, err := client.GetPaaSTemplateList(context.Background())
 	if err != nil {
 		return "", err
@@ -357,37 +353,20 @@ func validatePostgresParameters(client *gsclient.Client, d *schema.ResourceData,
 	release := d.Get("release").(string)
 	performanceClass := d.Get("performance_class").(string)
 	var isReleaseValid bool
-	releases := make(map[string][]string)
+	var releases []string
 	var uTemplate gsclient.PaaSTemplate
 	for _, template := range paasTemplates {
 		if template.Properties.Flavour == postgresTemplateFlavourName {
-			releasePerformanceClasses := releases[template.Properties.Release]
-			releases[template.Properties.Release] = append(releasePerformanceClasses, template.Properties.PerformanceClass)
+			releases = append(releases, template.Properties.Release)
 			if template.Properties.Release == release && template.Properties.PerformanceClass == performanceClass {
 				isReleaseValid = true
 				uTemplate = template
 			}
 		}
 	}
-	if !isReleaseValid && isIntInList(postgresReleaseValidationOpt, parameters) {
-		errorMessages = append(errorMessages, fmt.Sprintf("%v/%v is not a valid PostgreSQL release no/performance class. Valid release numbers (and corresponding performance classes) are:\n", release, performanceClass))
-		for k, v := range releases {
-			errorMessages = append(errorMessages, fmt.Sprintf("      Release No.: %s. Performance classes: %s\n", k, strings.Join(v, ", ")))
-		}
+	if !isReleaseValid {
+		return "", fmt.Errorf("%v is not a valid PostgreSQL release. Valid releases are: %v\n", release, strings.Join(releases, ", "))
 	}
 
-	// Check max core count are valid
-	if val, ok := d.GetOk("max_core_count"); ok && isReleaseValid {
-		coreCount := val.(int)
-		minCoreCount := uTemplate.Properties.Autoscaling.Cores.Min
-		maxCoreCount := uTemplate.Properties.Autoscaling.Cores.Max
-		if (minCoreCount > coreCount || maxCoreCount < coreCount) &&
-			isIntInList(postgresMaxCoreCountValidationOpt, parameters) {
-			errorMessages = append(errorMessages, fmt.Sprintf("%v is not a valid value for \"max_core_count\". Valid value should be between %v and %v\n", coreCount, minCoreCount, maxCoreCount))
-		}
-	}
-	if len(errorMessages) > 1 {
-		return "", fmt.Errorf(strings.Join(errorMessages, ""))
-	}
 	return uTemplate.Properties.ObjectUUID, nil
 }
