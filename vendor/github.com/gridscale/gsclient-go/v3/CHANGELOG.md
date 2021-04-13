@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.6.1 (April 13, 2021)
+
+BUG FIXES:
+- Correct `service_template_uuid` field in PaaS update request ([#197](https://github.com/gridscale/gsclient-go/issues/197))
+
 ## 3.6.0 (March 30, 2021)
 
 FEATURES:
