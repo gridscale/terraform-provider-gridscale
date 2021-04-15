@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.9.0 (Apr 15, 2020)
+
+IMPROVEMENTS:
+
+* Update gsclient-go package to v3.6.1.
+
+FEATURES:
+
+* Add gridscale k8s resource ([#120](https://github.com/gridscale/terraform-provider-gridscale/issues/120)).
+* Add gridscale postgreSQL resource ([#133](https://github.com/gridscale/terraform-provider-gridscale/issues/133)).
+
 ## 1.8.4 (Mar 16, 2020)
 
 IMPROVEMENTS:
