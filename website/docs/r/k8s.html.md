@@ -56,9 +56,9 @@ The following arguments are supported:
 Timeouts configuration options (in seconds):
 More info: [terraform.io/docs/configuration/resources.html#operation-timeouts](https://www.terraform.io/docs/configuration/resources.html#operation-timeouts)
 
-* `create` - (Default value is "15m" - 15 minutes) Used for creating a resource.
-* `update` - (Default value is "15m" - 15 minutes) Used for updating a resource.
-* `delete` - (Default value is "15m" - 15 minutes) Used for deleting a resource.
+* `create` - (Default value is "45m" - 45 minutes) Used for creating a resource.
+* `update` - (Default value is "45m" - 45 minutes) Used for updating a resource.
+* `delete` - (Default value is "45m" - 45 minutes) Used for deleting a resource.
 
 ## Attributes
 
