@@ -43,6 +43,8 @@ Also make sure to check out our other Terraform examples over at [github.com/gri
 
 ~> **Note** To verify that you are using the official released version of gridscale terraform provider, you just need to check the format of the `source` whether it is `<NAMESPACE>/<NAME>/<PROVIDER>`. For more information, visit [registry.terraform.io/providers/gridscale/gridscale/](https://registry.terraform.io/providers/gridscale/gridscale/latest).
 
+~> **Good to know** To protect any resources from being accidently destroyed, take a look at [lifecycle.prevent_destroy](https://www.terraform.io/docs/language/meta-arguments/lifecycle.html#prevent_destroy). Other arguments in [lifecycle](https://www.terraform.io/docs/language/meta-arguments/lifecycle.html) are also good to know.
+
 ## Argument Reference
 
 The following arguments are supported:
