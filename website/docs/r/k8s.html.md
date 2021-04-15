@@ -43,13 +43,13 @@ The following arguments are supported:
 
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
 
-* `node_pool` - (Required) Node pool's specification. **NOTE**: The node pool's specification is not yet mutable.
-    * `name` - Name of the node pool.
+* `node_pool` - (Required) Node pool's specification. **NOTE**: The node pool's specification is not yet mutable (except `node_count`).
+    * `name` - (Immutable) Name of the node pool.
     * `node_count` - Number of worker nodes.
-    * `cores` - Cores per worker node.
-    * `memory` - Memory per worker node (in GiB).
-    * `storage` - Storage per worker node (in GiB).
-    * `storage_type` - Storage type (one of storage, storage_high, storage_insane).
+    * `cores` - (Immutable) Cores per worker node.
+    * `memory` - (Immutable) Memory per worker node (in GiB).
+    * `storage` - (Immutable) Storage per worker node (in GiB).
+    * `storage_type` - (Immutable) Storage type (one of storage, storage_high, storage_insane).
 
 ## Timeouts
 
