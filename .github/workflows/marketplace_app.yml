@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - master
-    paths-ignore:
-      - "website/**"
+    paths:
+      - "**.go"
   pull_request:
     branches:
       - master
