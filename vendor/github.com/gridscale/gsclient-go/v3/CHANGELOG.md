@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.6.2 (April 20, 2021)
+
+BUG FIXES:
+- Fix `PROTOCOL_ERROR` when using moderate amount of concurrency on `gsclient-go`. The issue causes the body of the HTTP2 upgraded request loss during retrial. ([#199](https://github.com/gridscale/gsclient-go/pull/199)).
+
 ## 3.6.1 (April 13, 2021)
 
 BUG FIXES:
