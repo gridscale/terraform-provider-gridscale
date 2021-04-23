@@ -14,8 +14,8 @@ Provides a loadbalancer resource. This can be used to create, modify, and delete
 
 ```terraform
 resource "gridscale_loadbalancer" "foo" {
-  name   = "%s"
-  algorithm = "%s"
+  name   = "test-lb"
+  algorithm = "leastconn"
   redirect_http_to_https = false
   listen_ipv4_uuid = gridscale_ipv4.lb.id
   listen_ipv6_uuid = gridscale_ipv6.lb.id
