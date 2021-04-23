@@ -24,6 +24,28 @@ resource "gridscale_ssl_certificate" "ssl-certificate-john"{
     create="10m"
   }
 }
+
+resource "gridscale_loadbalancer" "lb-john" {
+  name   = "john's lb"
+  algorithm = "leastconn"
+  redirect_http_to_https = false
+  listen_ipv4_uuid = gridscale_ipv4.lb.id
+  listen_ipv6_uuid = gridscale_ipv6.lb.id
+  labels = []
+  backend_server {
+    weight = 100
+    host   = gridscale_ipv4.server.ip
+  }
+  forwarding_rule {
+    listen_port =  80
+    mode        =  "http"
+    target_port =  80
+    certificate_uuid = gridscale_ssl_certificate.ssl-certificate-john.id
+  }
+  timeouts {
+      create="10m"
+  }
+}
 ```
 
 ## Argument Reference
