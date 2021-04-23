@@ -54,6 +54,7 @@ More info: [terraform.io/docs/configuration/resources.html#operation-timeouts](h
 This resource exports the following attributes:
 
 * `name` - See Argument Reference above.
+* `common_name` - The common domain name of the SSL certificate.
 * `ssl_certificate` - See Argument Reference above.
 * `leaf_certificate` - See Argument Reference above.
 * `certificate_chain` - See Argument Reference above.
