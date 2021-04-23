@@ -36,5 +36,10 @@ The following attributes are exported:
 * `listen_ipv4_uuid` - The UUID of the IPv4 address the load balancer will listen to for incoming requests.
 * `listen_ipv6_uuid` - The UUID of the IPv6 address the load balancer will listen to for incoming requests.
 * `forwarding_rule` - The forwarding rules of the load balancer.
+  *  `letsencrypt_ssl` - A valid domain name that points to the loadbalancer's IP address.
+  *  `certificate_uuid` - The UUID of a custom certificate.
+  *  `listen_port` - Specifies the entry port of the load balancer.
+  *  `target_port` - Specifies the exit port that the load balancer uses to forward the traffic to the backend server.
+  *  `mode` - HTTP or TCP mode.
 * `backend_server` - The servers that the load balancer can communicate with.
 * `labels` - The list of labels.
