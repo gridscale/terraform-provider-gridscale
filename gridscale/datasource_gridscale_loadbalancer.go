@@ -42,8 +42,9 @@ func dataSourceGridscaleLoadBalancer() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"letsencrypt_ssl": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "A valid domain name that points to the loadbalancer's IP address.",
 						},
 						"certificate_uuid": {
 							Type:        schema.TypeString,
@@ -51,16 +52,19 @@ func dataSourceGridscaleLoadBalancer() *schema.Resource {
 							Description: "The UUID of a custom certificate.",
 						},
 						"listen_port": {
-							Type:     schema.TypeInt,
-							Computed: true,
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "Specifies the entry port of the load balancer.",
 						},
 						"mode": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "Supports HTTP and TCP mode. Valid values: http, tcp.",
 						},
 						"target_port": {
-							Type:     schema.TypeInt,
-							Computed: true,
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Description: "Specifies the exit port that the load balancer uses to forward the traffic to the backend server.",
 						},
 					},
 				},
