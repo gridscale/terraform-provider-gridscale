@@ -48,7 +48,7 @@ func dataSourceGridscaleLoadBalancer() *schema.Resource {
 						},
 						"certificate_uuid": {
 							Type:        schema.TypeString,
-							Optional:    true,
+							Computed:    true,
 							Description: "The UUID of a custom certificate.",
 						},
 						"listen_port": {
