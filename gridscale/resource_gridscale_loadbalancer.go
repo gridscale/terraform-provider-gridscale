@@ -62,7 +62,6 @@ func resourceGridscaleLoadBalancer() *schema.Resource {
 						"letsencrypt_ssl": {
 							Type:        schema.TypeString,
 							Optional:    true,
-							Default:     nil,
 							Description: "A valid domain name that points to the loadbalancer's IP address.",
 						},
 						"certificate_uuid": {
@@ -297,11 +296,14 @@ func expandLoadbalancerForwardingRules(forwardingRules interface{}) []gsclient.F
 	for _, value := range forwardingRules.(*schema.Set).List() {
 		rule := value.(map[string]interface{})
 		forwardingRule := gsclient.ForwardingRule{
-			LetsencryptSSL:  nil,
 			CertificateUUID: rule["certificate_uuid"].(string),
 			ListenPort:      rule["listen_port"].(int),
 			Mode:            rule["mode"].(string),
 			TargetPort:      rule["target_port"].(int),
+		}
+		letsEnc := rule["letsencrypt_ssl"].(string)
+		if letsEnc != "" {
+			forwardingRule.LetsencryptSSL = &letsEnc
 		}
 		tempForwardingRules = append(tempForwardingRules, forwardingRule)
 	}
