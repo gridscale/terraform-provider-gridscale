@@ -63,17 +63,17 @@ func dataSourceGridscaleSSLCert() *schema.Resource {
 					Schema: map[string]*schema.Schema{
 						"md5": {
 							Type:        schema.TypeString,
-							Optional:    true,
+							Computed:    true,
 							Description: "MD5 fingerprint of the certificate.",
 						},
 						"sha256": {
 							Type:        schema.TypeString,
-							Optional:    true,
+							Computed:    true,
 							Description: "SHA256 fingerprint of the certificate.",
 						},
 						"sha1": {
 							Type:        schema.TypeString,
-							Optional:    true,
+							Computed:    true,
 							Description: "SHA1 fingerprint of the certificate.",
 						},
 					},
