@@ -86,6 +86,7 @@ func Provider() terraform.ResourceProvider {
 			"gridscale_firewall":                       resourceGridscaleFirewall(),
 			"gridscale_marketplace_application":        resourceGridscaleMarketplaceApplication(),
 			"gridscale_marketplace_application_import": resourceGridscaleImportedMarketplaceApplication(),
+			"gridscale_ssl_certificate":                resourceGridscaleSSLCert(),
 		},
 
 		ConfigureFunc: providerConfigure,
