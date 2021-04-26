@@ -60,21 +60,29 @@ func resourceGridscaleLoadBalancer() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"letsencrypt_ssl": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Default:  nil,
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "A valid domain name that points to the loadbalancer's IP address.",
+						},
+						"certificate_uuid": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: "The UUID of a custom certificate.",
 						},
 						"listen_port": {
-							Type:     schema.TypeInt,
-							Required: true,
+							Type:        schema.TypeInt,
+							Required:    true,
+							Description: "Specifies the entry port of the load balancer.",
 						},
 						"mode": {
-							Type:     schema.TypeString,
-							Required: true,
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Supports HTTP and TCP mode. Valid values: http, tcp.",
 						},
 						"target_port": {
-							Type:     schema.TypeInt,
-							Required: true,
+							Type:        schema.TypeInt,
+							Required:    true,
+							Description: "Specifies the exit port that the load balancer uses to forward the traffic to the backend server.",
 						},
 					},
 				},
@@ -288,10 +296,14 @@ func expandLoadbalancerForwardingRules(forwardingRules interface{}) []gsclient.F
 	for _, value := range forwardingRules.(*schema.Set).List() {
 		rule := value.(map[string]interface{})
 		forwardingRule := gsclient.ForwardingRule{
-			LetsencryptSSL: nil,
-			ListenPort:     rule["listen_port"].(int),
-			Mode:           rule["mode"].(string),
-			TargetPort:     rule["target_port"].(int),
+			CertificateUUID: rule["certificate_uuid"].(string),
+			ListenPort:      rule["listen_port"].(int),
+			Mode:            rule["mode"].(string),
+			TargetPort:      rule["target_port"].(int),
+		}
+		letsEnc := rule["letsencrypt_ssl"].(string)
+		if letsEnc != "" {
+			forwardingRule.LetsencryptSSL = &letsEnc
 		}
 		tempForwardingRules = append(tempForwardingRules, forwardingRule)
 	}
@@ -304,10 +316,11 @@ func flattenLoadbalancerForwardingRules(forwardingRules []gsclient.ForwardingRul
 	if forwardingRules != nil {
 		for _, value := range forwardingRules {
 			forwardingRule := map[string]interface{}{
-				"letsencrypt_ssl": value.LetsencryptSSL,
-				"listen_port":     value.ListenPort,
-				"mode":            value.Mode,
-				"target_port":     value.TargetPort,
+				"letsencrypt_ssl":  value.LetsencryptSSL,
+				"certificate_uuid": value.CertificateUUID,
+				"listen_port":      value.ListenPort,
+				"mode":             value.Mode,
+				"target_port":      value.TargetPort,
 			}
 			tempForwardingRules = append(tempForwardingRules, forwardingRule)
 		}

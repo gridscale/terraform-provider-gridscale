@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.9.1 (Apr 21, 2020)
+
+IMPROVEMENTS:
+
+* Update gsclient-go package to v3.6.2 (which fixes the `PROTOCOL_ERROR` when running terraform in moderate amount of concurrency [#199](https://github.com/gridscale/gsclient-go/pull/199)).
+
 ## 1.9.0 (Apr 15, 2020)
 
 IMPROVEMENTS:

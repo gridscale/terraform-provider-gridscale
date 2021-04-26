@@ -14,8 +14,8 @@ Provides a loadbalancer resource. This can be used to create, modify, and delete
 
 ```terraform
 resource "gridscale_loadbalancer" "foo" {
-  name   = "%s"
-  algorithm = "%s"
+  name   = "test-lb"
+  algorithm = "leastconn"
   redirect_http_to_https = false
   listen_ipv4_uuid = gridscale_ipv4.lb.id
   listen_ipv6_uuid = gridscale_ipv6.lb.id
@@ -49,6 +49,18 @@ The following arguments are supported:
 
 * `algorithm` - (Required) The algorithm used to process requests. Accepted values: roundrobin/leastconn.
 
+* `forwarding_rule` - (Required) The forwarding rules of the load balancer.
+
+  *  `letsencrypt_ssl` - (Optional) A valid domain name that points to the loadbalancer's IP address.
+
+  *  `certificate_uuid` - (Optional) The UUID of a custom certificate.
+
+  *  `listen_port` - (Required) Specifies the entry port of the load balancer.
+
+  *  `target_port` - (Required) Specifies the exit port that the load balancer uses to forward the traffic to the backend server.
+
+  *  `mode` - (Required) Supports HTTP and TCP mode. Valid values: http, tcp.
+
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
 
 ## Timeouts
@@ -72,6 +84,11 @@ This resource exports the following attributes:
 * `redirect_http_to_https` - Whether the Load balancer is forced to redirect requests from HTTP to HTTPS.
 * `listen_ipv4_uuid` - The UUID of the IPv4 address the load balancer will listen to for incoming requests.
 * `listen_ipv6_uuid` - The UUID of the IPv6 address the load balancer will listen to for incoming requests.
-* `forwarding_rule` - The forwarding rules of the load balancer.
+* `forwarding_rule` - See Argument Reference above.
+  * `letsencrypt_ssl` - See Argument Reference above.
+  * `certificate_uuid` - See Argument Reference above.
+  * `listen_port` - See Argument Reference above.
+  * `target_port` - See Argument Reference above.
+  * `mode` - See Argument Reference above.
 * `backend_server` - The servers that the load balancer can communicate with.
 * `labels` - The list of labels.

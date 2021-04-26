@@ -62,6 +62,7 @@ func Provider() terraform.ResourceProvider {
 			"gridscale_isoimage":                 dataSourceGridscaleISOImage(),
 			"gridscale_firewall":                 dataSourceGridscaleFirewall(),
 			"gridscale_marketplace_application":  dataSourceGridscaleMarketplaceApplication(),
+			"gridscale_ssl_certificate":          dataSourceGridscaleSSLCert(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"gridscale_server":                         resourceGridscaleServer(),
@@ -86,6 +87,7 @@ func Provider() terraform.ResourceProvider {
 			"gridscale_firewall":                       resourceGridscaleFirewall(),
 			"gridscale_marketplace_application":        resourceGridscaleMarketplaceApplication(),
 			"gridscale_marketplace_application_import": resourceGridscaleImportedMarketplaceApplication(),
+			"gridscale_ssl_certificate":                resourceGridscaleSSLCert(),
 		},
 
 		ConfigureFunc: providerConfigure,

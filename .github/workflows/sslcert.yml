@@ -1,0 +1,43 @@
+name: Test SSH key ds/rs
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "**.go"
+  pull_request:
+    branches:
+      - master
+    paths:
+      - "**gridscale_ssl**"
+      - "gridscale/error-handler/**"
+      - "gridscale/common.go"
+      - "gridscale/config.go"
+      - "gridscale/provider.go"
+      - "gridscale/provider_test.go"
+
+jobs:
+  build:
+    name: Run SSLCert resource acceptance tests
+    runs-on: ubuntu-latest
+    env:
+      GOPATH: /home/runner/go
+      GRIDSCALE_UUID: ${{ secrets.CI_USER_UUID }}
+      GRIDSCALE_TOKEN: ${{ secrets.CI_API_TOKEN }}
+      GRIDSCALE_URL: https://api.gridscale.cloud
+    steps:
+      - name: Set up Go 1.16
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.16
+        id: go
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+
+      - name: Run TestAccdataSourceGridscaleSSLCert_basic
+        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccdataSourceGridscaleSSLCert_basic'
+
+      - name: Run TestAccResourceGridscaleSSLCert_Basic
+        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccResourceGridscaleSSLCert_Basic'
