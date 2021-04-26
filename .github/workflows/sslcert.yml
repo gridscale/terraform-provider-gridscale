@@ -19,7 +19,7 @@ on:
 
 jobs:
   build:
-    name: SSL Cert AccTest
+    name: Run SSLCert resource acceptance tests
     runs-on: ubuntu-latest
     env:
       GOPATH: /home/runner/go
