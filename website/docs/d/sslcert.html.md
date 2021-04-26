@@ -1,14 +1,14 @@
 ---
 layout: "gridscale"
-page_title: "gridscale: SSL certificate"
+page_title: "gridscale: TLS/SSL certificate"
 sidebar_current: "docs-gridscale-datasource-ssl-certificate"
 description: |-
-  Gets data of a SSL Certificate resource.
+  Gets data of a TLS/SSL certificate resource.
 ---
 
 # gridscale_ssl_certificate
 
-Get data of a SSL Certificate resource. This can be used to link SSL Certificates to a loadbalancer.
+Get data of a TLS/SSL certificate resource. This can be used to link TLS/SSL certificates to a loadbalancer.
 
 ## Example Usage
 

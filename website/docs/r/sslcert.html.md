@@ -1,15 +1,15 @@
 ---
 layout: "gridscale"
 page_title: "gridscale: gridscale_ssl_certificate"
-sidebar_current: "docs-gridscale-resource-ssl_certificate"
+sidebar_current: "docs-gridscale-resource-ssl-certificate"
 description: |-
-  Manages a SSL Certificate resource in gridscale.
+  Manages a TLS/SSL certificate resource in gridscale.
 ---
 
 # gridscale_ssl_certificate
 
-Provides a SSL Certificate resource. This can be used to create and delete SSL Certificates.
-A SSL Certificate can be attached to a loadbalancer.
+Provides a TLS/SSL certificate resource. This can be used to create and delete TLS/SSL certificates.
+A TLS/SSL certificate can be attached to a loadbalancer.
 
 ## Example Usage
 
