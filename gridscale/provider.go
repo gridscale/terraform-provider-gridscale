@@ -41,6 +41,18 @@ func Provider() terraform.ResourceProvider {
 				DefaultFunc: schema.EnvDefaultFunc("GRIDSCALE_TF_HEADERS", nil),
 				Description: "Custom HTTP headers",
 			},
+			"request_delay_int": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("GRIDSCALE_TF_REQUEST_DELAY_INT", nil),
+				Description: "Custom request delay interval in Ms. This time interval is used to delay the synchronous request checks, or delay retryable requests.",
+			},
+			"max_n_retries": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("GRIDSCALE_TF_MAX_N_RETRIES", nil),
+				Description: "Custom maximum number of retries. The retryable requests can be retried up to max_n_retries. If max_n_retries is reached and the request is not successful, the last error is returned.",
+			},
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"gridscale_server":                   dataSourceGridscaleServer(),
@@ -101,6 +113,8 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		UserUUID:    d.Get("uuid").(string),
 		APIToken:    d.Get("token").(string),
 		APIUrl:      d.Get("api_url").(string),
+		DelayIntMs:  d.Get("request_delay_int").(int),
+		MaxNRetries: d.Get("max_n_retries").(int),
 		HTTPHeaders: headers,
 	}
 
