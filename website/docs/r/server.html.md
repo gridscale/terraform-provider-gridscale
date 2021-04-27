@@ -107,7 +107,7 @@ The following arguments are supported:
 
     * `object_uuid` - (Required) The object UUID or id of the storage.
 
-* `network` - (Optional) Connects a network to the server. **NOTE: Ordering of network interfaces on the host is the same as defined in the Terraform definition (top-down order), if `ordering` is not set.
+* `network` - (Optional) Connects a network to the server. **NOTE: Due to a known issue ([issue #142](https://github.com/gridscale/terraform-provider-gridscale/issues/142)) about network ordering, the argument `ordering` should be set and the network list should be sorted by their name. Other workaround is to use [lifecycle.ignore_changes](https://www.terraform.io/docs/language/meta-arguments/lifecycle.html#ignore_changes) temporarily to prevent the server from being rebooted.
 
     * `object_uuid` - (Required) The object UUID or id of the network.
 
