@@ -49,6 +49,12 @@ The following arguments are supported:
 
 * `algorithm` - (Required) The algorithm used to process requests. Accepted values: roundrobin/leastconn.
 
+* `backend_server` - (Required) The servers that the load balancer can communicate with.
+
+  * `host` - (Required) A valid domain or an IP address of a server.
+
+  * `weight` - (Optional) The backend host weight. Default: 100.
+
 * `forwarding_rule` - (Required) The forwarding rules of the load balancer.
 
   *  `letsencrypt_ssl` - (Optional) A valid domain name that points to the loadbalancer's IP address.
@@ -84,11 +90,13 @@ This resource exports the following attributes:
 * `redirect_http_to_https` - Whether the Load balancer is forced to redirect requests from HTTP to HTTPS.
 * `listen_ipv4_uuid` - The UUID of the IPv4 address the load balancer will listen to for incoming requests.
 * `listen_ipv6_uuid` - The UUID of the IPv6 address the load balancer will listen to for incoming requests.
+* `backend_server` - See Argument Reference above.
+  * `host` - See Argument Reference above.
+  * `weight` - See Argument Reference above.
 * `forwarding_rule` - See Argument Reference above.
   * `letsencrypt_ssl` - See Argument Reference above.
   * `certificate_uuid` - See Argument Reference above.
   * `listen_port` - See Argument Reference above.
   * `target_port` - See Argument Reference above.
   * `mode` - See Argument Reference above.
-* `backend_server` - The servers that the load balancer can communicate with.
 * `labels` - The list of labels.

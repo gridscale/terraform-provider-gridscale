@@ -42,4 +42,6 @@ The following attributes are exported:
   *  `target_port` - Specifies the exit port that the load balancer uses to forward the traffic to the backend server.
   *  `mode` - HTTP or TCP mode.
 * `backend_server` - The servers that the load balancer can communicate with.
+  * `host` - A valid domain or an IP address of the server.
+  * `weight` - The backend host weight.
 * `labels` - The list of labels.
