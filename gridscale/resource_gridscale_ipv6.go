@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/gridscale/gsclient-go/v3"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceGridscaleIpv6() *schema.Resource {

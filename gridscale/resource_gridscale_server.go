@@ -13,8 +13,8 @@ import (
 	errHandler "github.com/terraform-providers/terraform-provider-gridscale/gridscale/error-handler"
 	relation_manager "github.com/terraform-providers/terraform-provider-gridscale/gridscale/relation-manager"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 
 	"github.com/gridscale/gsclient-go/v3"
 )

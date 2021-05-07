@@ -9,7 +9,7 @@ import (
 	fwu "github.com/terraform-providers/terraform-provider-gridscale/gridscale/firewall-utils"
 
 	"github.com/gridscale/gsclient-go/v3"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	errHandler "github.com/terraform-providers/terraform-provider-gridscale/gridscale/error-handler"
 )
 
