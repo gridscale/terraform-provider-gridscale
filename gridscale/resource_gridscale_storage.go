@@ -132,9 +132,10 @@ func resourceGridscaleStorage() *schema.Resource {
 							Elem:     &schema.Schema{Type: schema.TypeString},
 						},
 						"password": {
-							Type:     schema.TypeString,
-							Optional: true,
-							ForceNew: true,
+							Type:      schema.TypeString,
+							Optional:  true,
+							ForceNew:  true,
+							Sensitive: true,
 						},
 						"password_type": {
 							Type:     schema.TypeString,

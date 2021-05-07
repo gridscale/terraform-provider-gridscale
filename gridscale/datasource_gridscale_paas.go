@@ -29,11 +29,13 @@ func dataSourceGridscalePaaS() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "Username for PaaS service",
 				Computed:    true,
+				Sensitive:   true,
 			},
 			"password": {
 				Type:        schema.TypeString,
 				Description: "Password for PaaS service",
 				Computed:    true,
+				Sensitive:   true,
 			},
 			"listen_port": {
 				Type:        schema.TypeSet,
