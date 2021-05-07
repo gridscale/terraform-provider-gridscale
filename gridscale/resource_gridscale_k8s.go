@@ -41,6 +41,7 @@ func resourceGridscaleK8s() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "K8s config data",
 				Computed:    true,
+				Sensitive:   true,
 			},
 			"listen_port": {
 				Type:        schema.TypeSet,

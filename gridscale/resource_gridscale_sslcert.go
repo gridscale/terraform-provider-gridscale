@@ -35,6 +35,7 @@ func resourceGridscaleSSLCert() *schema.Resource {
 				Description: "The PEM-formatted private-key of the SSL certificate.",
 				Required:    true,
 				ForceNew:    true,
+				Sensitive:   true,
 				StateFunc: func(val interface{}) string {
 					return strings.TrimSpace((val.(string)))
 				},
@@ -44,6 +45,7 @@ func resourceGridscaleSSLCert() *schema.Resource {
 				Description: "The PEM-formatted public SSL of the SSL certificate.",
 				Required:    true,
 				ForceNew:    true,
+				Sensitive:   true,
 				StateFunc: func(val interface{}) string {
 					return strings.TrimSpace((val.(string)))
 				},
@@ -53,6 +55,7 @@ func resourceGridscaleSSLCert() *schema.Resource {
 				Description: "The PEM-formatted full-chain between the certificate authority and the domain's SSL certificate.",
 				Optional:    true,
 				ForceNew:    true,
+				Sensitive:   true,
 				StateFunc: func(val interface{}) string {
 					return strings.TrimSpace((val.(string)))
 				},

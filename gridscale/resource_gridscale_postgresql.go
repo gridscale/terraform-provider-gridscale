@@ -67,11 +67,13 @@ func resourceGridscalePostgreSQL() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "Username for PostgreSQL service. It is used to connect to the PostgreSQL instance.",
 				Computed:    true,
+				Sensitive:   true,
 			},
 			"password": {
 				Type:        schema.TypeString,
 				Description: "Password for PostgreSQL service. It is used to connect to the PostgreSQL instance.",
 				Computed:    true,
+				Sensitive:   true,
 			},
 			"listen_port": {
 				Type:        schema.TypeSet,
