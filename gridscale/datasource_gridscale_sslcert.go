@@ -56,7 +56,6 @@ func dataSourceGridscaleSSLCert() *schema.Resource {
 			},
 			"fingerprints": {
 				Type:        schema.TypeSet,
-				MaxItems:    1,
 				Description: "Defines a list of unique identifiers generated from the MD5, SHA-1, and SHA-256 fingerprints of the certificate.",
 				Computed:    true,
 				Elem: &schema.Resource{
