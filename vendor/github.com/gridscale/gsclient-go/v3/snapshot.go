@@ -85,7 +85,7 @@ type StorageSnapshotProperties struct {
 	// Uses IATA airport code, which works as a location identifier.
 	LocationIata string `json:"location_iata"`
 
-	// Uuid of the storage used to create this snapshot.
+	// UUID of the storage used to create this snapshot.
 	ParentUUID string `json:"parent_uuid"`
 }
 

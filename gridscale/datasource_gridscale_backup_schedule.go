@@ -23,7 +23,7 @@ func dataSourceGridscaleStorageBackupSchedule() *schema.Resource {
 			"storage_uuid": {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "Uuid of the storage used to create backups",
+				Description: "UUID of the storage used to create backups",
 			},
 			"name": {
 				Type:        schema.TypeString,

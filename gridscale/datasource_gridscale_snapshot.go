@@ -23,7 +23,7 @@ func dataSourceGridscaleStorageSnapshot() *schema.Resource {
 			"storage_uuid": {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "Uuid of the storage used to create this snapshot",
+				Description: "UUID of the storage used to create this snapshot",
 			},
 			"name": {
 				Type:        schema.TypeString,

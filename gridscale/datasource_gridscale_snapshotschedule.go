@@ -23,7 +23,7 @@ func dataSourceGridscaleStorageSnapshotSchedule() *schema.Resource {
 			"storage_uuid": {
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "Uuid of the storage used to create snapshots",
+				Description: "UUID of the storage used to create snapshots",
 			},
 			"name": {
 				Type:        schema.TypeString,

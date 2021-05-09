@@ -90,7 +90,7 @@ the product_no of the license (see the /prices endpoint for more details)`,
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
-				Description: "Uuid of the storage used to create this snapshot",
+				Description: "UUID of the storage used to create this snapshot",
 			},
 			"object_storage_export": {
 				Type:        schema.TypeSet,

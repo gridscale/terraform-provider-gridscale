@@ -56,7 +56,7 @@ func resourceGridscaleStorageSnapshotSchedule() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
-				Description: "Uuid of the storage used to create snapshots",
+				Description: "UUID of the storage used to create snapshots",
 			},
 			"create_time": {
 				Type:        schema.TypeString,

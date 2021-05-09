@@ -55,7 +55,7 @@ func resourceGridscaleStorageBackupSchedule() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
-				Description: "Uuid of the storage used to create storage backups",
+				Description: "UUID of the storage used to create storage backups",
 			},
 			"active": {
 				Type:        schema.TypeBool,
