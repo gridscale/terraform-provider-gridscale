@@ -23,7 +23,7 @@ const timeLayout = "2006-01-02 15:04:05"
 const (
 	defaultAPIURL                    = "https://api.gridscale.io"
 	defaultGSCDelayIntervalMilliSecs = 1000
-	defaultGSCMaxNumberOfRetries     = 5
+	defaultGSCMaxNumberOfRetries     = 1
 )
 
 const serverShutdownTimeoutSecs = 120
@@ -32,6 +32,8 @@ type Config struct {
 	UserUUID    string
 	APIToken    string
 	APIUrl      string
+	DelayIntMs  int
+	MaxNRetries int
 	HTTPHeaders map[string]string
 }
 
@@ -41,15 +43,22 @@ func (c *Config) Client() (*gsclient.Client, error) {
 	if c.APIUrl != "" {
 		apiURL = c.APIUrl
 	}
-
+	delayIntMs := defaultGSCDelayIntervalMilliSecs
+	if c.DelayIntMs != 0 {
+		delayIntMs = c.DelayIntMs
+	}
+	maxNRetries := defaultGSCMaxNumberOfRetries
+	if c.MaxNRetries != 0 {
+		maxNRetries = c.MaxNRetries
+	}
 	config := gsclient.NewConfiguration(
 		apiURL,
 		c.UserUUID,
 		c.APIToken,
 		os.Getenv("TF_LOG") != "",
 		true,
-		defaultGSCDelayIntervalMilliSecs,
-		defaultGSCMaxNumberOfRetries,
+		delayIntMs,
+		maxNRetries,
 	)
 
 	client := gsclient.NewClient(config)
