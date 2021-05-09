@@ -30,23 +30,23 @@ func resourceGridscaleTemplate() *schema.Resource {
 			},
 			"snapshot_uuid": {
 				Type:        schema.TypeString,
-				Description: "Snapshot uuid for template.",
+				Description: "Snapshot UUID for template.",
 				Required:    true,
 				ForceNew:    true,
 			},
 			"location_uuid": {
 				Type:        schema.TypeString,
-				Description: "Helps to identify which datacenter an object belongs to",
+				Description: "The location this object is placed.",
 				Computed:    true,
 			},
 			"location_country": {
 				Type:        schema.TypeString,
-				Description: "Formatted by the 2 digit country code (ISO 3166-2) of the host country",
+				Description: "Two digit country code (ISO 3166-2) of the location where this object is placed.",
 				Computed:    true,
 			},
 			"location_iata": {
 				Type:        schema.TypeString,
-				Description: "Uses IATA airport code, which works as a location identifier",
+				Description: "Uses IATA airport code, which works as a location identifier.",
 				Computed:    true,
 			},
 			"location_name": {
@@ -56,12 +56,12 @@ func resourceGridscaleTemplate() *schema.Resource {
 			},
 			"status": {
 				Type:        schema.TypeString,
-				Description: "Status indicates the status of the object",
+				Description: "Status indicates the status of the object.",
 				Computed:    true,
 			},
 			"ostype": {
 				Type:        schema.TypeString,
-				Description: "The operating system installed in the template",
+				Description: "The operating system installed in the template.",
 				Computed:    true,
 			},
 			"version": {
@@ -90,7 +90,7 @@ func resourceGridscaleTemplate() *schema.Resource {
 			},
 			"distro": {
 				Type:        schema.TypeString,
-				Description: "The OS distribution that the template contains.",
+				Description: "The Linux distribution of this template (if applicable).",
 				Computed:    true,
 			},
 			"description": {

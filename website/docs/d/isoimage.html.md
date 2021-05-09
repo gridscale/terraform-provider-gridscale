@@ -41,8 +41,8 @@ The following attributes are exported:
   * `create_time` - The date and time the object was initially created.
   * `bootdevice` - True if the ISO Image is a boot device of this server.
 * `id` - The UUID of the ISO Image.
-* `location_uuid` - Helps to identify which datacenter an object belongs to.
-* `location_country` - Formatted by the 2 digit country code (ISO 3166-2) of the host country.
+* `location_uuid` - The location this object is placed.
+* `location_country` - Two digit country code (ISO 3166-2) of the location where this object is placed.
 * `location_iata` - Uses IATA airport code, which works as a location identifier.
 * `location_name` - The human-readable name of the location. It supports the full UTF-8 character set, with a maximum of 64 characters.
 * `status` - Status indicates the status of the object.

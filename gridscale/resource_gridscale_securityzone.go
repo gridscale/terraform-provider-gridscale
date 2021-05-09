@@ -33,7 +33,7 @@ func resourceGridscalePaaSSecurityZone() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
-				Description: "Helps to identify which datacenter an object belongs to",
+				Description: "The location this object is placed.",
 			},
 			"location_country": {
 				Type:        schema.TypeString,

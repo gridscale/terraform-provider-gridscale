@@ -27,7 +27,7 @@ func dataSourceGridscalePaaSSecurityZone() *schema.Resource {
 			"location_uuid": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: "Helps to identify which datacenter an object belongs to",
+				Description: "The location this object is placed.",
 			},
 			"location_country": {
 				Type:        schema.TypeString,

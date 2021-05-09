@@ -39,7 +39,7 @@ func dataSourceGridscaleServer() *schema.Resource {
 			},
 			"location_uuid": {
 				Type:        schema.TypeString,
-				Description: "Helps to identify which datacenter an object belongs to.",
+				Description: "The location this object is placed.",
 				Computed:    true,
 			},
 			"hardware_profile": {

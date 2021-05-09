@@ -37,8 +37,8 @@ resource "gridscale_server" "terra-server-test" {
 }
 ```
 
-**NOTE: If no firewall rules are set, the firewall is INACTIVE. If (a) firewall rule(s) is(are) set (the firewall is ACTIVE), 
-packets that do not match any rules are blocked by default. E.g:
+**NOTE: If no firewall rules are set, the firewall is inactive. Only if at least one firewall rule is set the firewall is active.
+Packets that do not match any rule are blocked. E.g:
 
 ```terraform
 resource "gridscale_server" "terra-server-test" {
@@ -206,9 +206,9 @@ This resource exports the following attributes:
 * `name` - The name of the server.
 * `cores` - The number of server cores.
 * `memory` - The amount of server memory in GB.
-* `location_uuid` - Helps to identify which datacenter an object belongs to. The location of the resource depends on the location of the project.
+* `location_uuid` - The location this server is placed. The location of a resource is determined by it's project.
 * `labels` - List of labels in the format [ "label1", "label2" ].
-* `hardware_profile` - The hardware profile of the Server.
+* `hardware_profile` - The hardware profile of the server.
 * `storage` - Connects a storage to the server.
     * `object_uuid` - The object UUID or id of the storage.
     * `storage_type` - Indicates the speed of the storage. This may be (storage, storage_high or storage_insane).
@@ -231,7 +231,7 @@ This resource exports the following attributes:
     * `network_type` - One of network, network_high, network_insane.
     * `mac` - network_mac defines the MAC address of the network interface.
     * `firewall_template_uuid` - The UUID of firewall template.
-    * `rules_v4_in` - Firewall template rules for inbound traffic - covers ipv4 addresses.
+    * `rules_v4_in` - Firewall template rules for inbound traffic - covers IPv4 addresses.
         * `order` - The order at which the firewall will compare packets against its rules. A packet will be compared against the first rule, it will either allow it to pass or block it and it won't be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2. Packets that do not match any rules are blocked by default (Only for inbound).
         * `action` - This defines what the firewall will do. Either accept or drop.
         * `protocol` - Either 'udp' or 'tcp'.
@@ -240,7 +240,7 @@ This resource exports the following attributes:
         * `src_cidr` - Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
         * `dst_cidr` - Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
         * `comment` - Comment.
-    * `rules_v4_out` - Firewall template rules for outbound traffic - covers ipv4 addresses.
+    * `rules_v4_out` - Firewall template rules for outbound traffic - covers IPv4 addresses.
         * `order` - The order at which the firewall will compare packets against its rules. A packet will be compared against the first rule, it will either allow it to pass or block it and it won't be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2.
         * `action` - This defines what the firewall will do. Either accept or drop.
         * `protocol` - Either 'udp' or 'tcp'.
@@ -249,7 +249,7 @@ This resource exports the following attributes:
         * `src_cidr` - Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
         * `dst_cidr` - Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
         * `comment` - Comment.
-    * `rules_v6_in` - Firewall template rules for inbound traffic - covers ipv6 addresses.
+    * `rules_v6_in` - Firewall template rules for inbound traffic - covers IPv6 addresses.
         * `order` - The order at which the firewall will compare packets against its rules. A packet will be compared against the first rule, it will either allow it to pass or block it and it won't be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2. Packets that do not match any rules are blocked by default (Only for inbound).
         * `action` - This defines what the firewall will do. Either accept or drop.
         * `protocol` - Either 'udp' or 'tcp'.
@@ -258,7 +258,7 @@ This resource exports the following attributes:
         * `src_cidr` - Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
         * `dst_cidr` - Either an IPv4/6 address or and IP Network in CIDR format. If this field is empty then this service has access to all IPs.
         * `comment` - Comment.
-    * `rules_v6_out` - Firewall template rules for outbound traffic - covers ipv6 addresses.
+    * `rules_v6_out` - Firewall template rules for outbound traffic - covers IPv6 addresses.
         * `order` - The order at which the firewall will compare packets against its rules. A packet will be compared against the first rule, it will either allow it to pass or block it and it won't be matched against any other rules. However, if it does no match the rule, then it will proceed onto rule 2.
         * `action` - This defines what the firewall will do. Either accept or drop.
         * `protocol` - Either 'udp' or 'tcp'.

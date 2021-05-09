@@ -59,12 +59,12 @@ func dataSourceGridscaleISOImage() *schema.Resource {
 			},
 			"location_uuid": {
 				Type:        schema.TypeString,
-				Description: "Helps to identify which datacenter an object belongs to",
+				Description: "The location this object is placed.",
 				Computed:    true,
 			},
 			"location_country": {
 				Type:        schema.TypeString,
-				Description: "Formatted by the 2 digit country code (ISO 3166-2) of the host country",
+				Description: "Two digit country code (ISO 3166-2) of the location where this object is placed.",
 				Computed:    true,
 			},
 			"location_iata": {

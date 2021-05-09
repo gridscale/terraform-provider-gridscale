@@ -49,7 +49,7 @@ More info: [terraform.io/docs/configuration/resources.html#operation-timeouts](h
 This resource exports the following attributes:
 
 * `name` - See Argument Reference above.
-* `location_uuid` - Helps to identify which datacenter an object belongs to. The location of the resource depends on the location of the project.
+* `location_uuid` - The location this resource is placed. The location of a resource is determined by it's project.
 * `failover` - See Argument Reference above.
 * `reverse_dns` - See Argument Reference above.
 * `labels` - See Argument Reference above.
@@ -58,7 +58,7 @@ This resource exports the following attributes:
 * `status` - status indicates the status of the object.
 * `create_time` - The time the object was created.
 * `change_time` - Defines the date and time of the last object change.
-* `location_country` - Formatted by the 2 digit country code (ISO 3166-2) of the host country.
+* `location_country` - Two digit country code (ISO 3166-2) of the location where this object is placed.
 * `location_iata` - Uses IATA airport code, which works as a location identifier.
 * `location_name` - The location name.
 * `delete_block` - Defines if the object is administratively blocked. If true, it can not be deleted by the user.

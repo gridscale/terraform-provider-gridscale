@@ -83,7 +83,7 @@ More info: [terraform.io/docs/configuration/resources.html#operation-timeouts](h
 This resource exports the following attributes:
 
 * `id` - The UUID of the load balancer.
-* `location_uuid` - Helps to identify which datacenter an object belongs to. The location of the resource depends on the location of the project.
+* `location_uuid` - The location this load balancer is placed. The location of a resource is determined by it's project.
 * `name` - The human-readable name of the load balancer.
 * `algorithm` - The algorithm used to process requests.
 * `status` - The status of the load balancer.

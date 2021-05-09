@@ -53,7 +53,7 @@ func resourceGridscaleStorageSnapshot() *schema.Resource {
 			"location_uuid": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: "Helps to identify which datacenter an object belongs to",
+				Description: "The location this object is placed.",
 			},
 			"usage_in_minutes": {
 				Type:        schema.TypeInt,

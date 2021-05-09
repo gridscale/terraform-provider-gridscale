@@ -37,9 +37,9 @@ The following arguments are supported:
 
 * `name` - (Required) The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 
-* `security_zone_uuid` - (Optional, Computed, ForceNew) Security zone UUID linked to k8s service. If `security_zone_uuid` is not set, the default security zone will be created (if it doesn't exist) and linked to the k8s service.
+* `security_zone_uuid` - (Optional) Security zone UUID linked to the Kubernetes resource. If `security_zone_uuid` is not set, the default security zone will be created (if it doesn't exist) and linked. A change of this argument necessitates the re-creation of the resource.
 
-* `release` - (Required) The k8s release of this instance. Define which release of k8s service will be used to create the k8s cluster. For convenience, please use [gscloud](https://github.com/gridscale/gscloud) to get the list of available k8s release numbers.
+* `release` - (Required) The Kubernetes release of this instance. Define which release will be used to create the cluster. For convenience, please use [gscloud](https://github.com/gridscale/gscloud) to get the list of available release numbers.
 
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
 

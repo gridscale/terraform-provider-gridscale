@@ -31,7 +31,7 @@ resource "gridscale_marketplace_application_import" "importedFoo" {
 
 The following arguments are supported:
 
-* `import_unique_hash` - (Required, ForceNew) Hash of a specific marketplace application that you want to import.
+* `import_unique_hash` - (Required) Hash of a specific marketplace application that you want to import. A change of this argument necessitates the re-creation of the resource.
 
 ## Timeouts
 

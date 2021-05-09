@@ -39,7 +39,7 @@ The following attributes are exported:
 
 * `id` - The UUID of the security zone.
 * `name` - The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
-* `location_uuid` - Helps to identify which datacenter an object belongs to.
+* `location_uuid` - The location this object is placed.
 * `location_country` - The human-readable name of the location's country.
 * `location_iata` - Uses IATA airport code, which works as a location identifier.
 * `location_name` - The human-readable name of the location.

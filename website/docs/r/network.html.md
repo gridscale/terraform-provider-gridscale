@@ -47,14 +47,14 @@ More info: [terraform.io/docs/configuration/resources.html#operation-timeouts](h
 This resource exports the following attributes:
 
 * `name` - See Argument Reference above.
-* `location_uuid` - Helps to identify which datacenter an object belongs to. The location of the resource depends on the location of the project.
+* `location_uuid` - The location this network is placed. The location of a resource is determined by it's project.
 * `l2security` - See Argument Reference above.
 * `labels` - See Argument Reference above.
 * `status` - status indicates the status of the object.
 * `create_time` - The time the object was created.
 * `change_time` - Defines the date and time of the last object change.
 * `network_type` - The type of this network, can be mpls, breakout or network.
-* `location_country` - Formatted by the 2 digit country code (ISO 3166-2) of the host country.
+* `location_country` - Two digit country code (ISO 3166-2) of the location where this object is placed.
 * `location_iata` - Uses IATA airport code, which works as a location identifier.
 * `location_name` - The location name.
 * `public_net` - Is the network public or not.
