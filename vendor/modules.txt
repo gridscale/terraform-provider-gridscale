@@ -76,7 +76,7 @@ github.com/golang/protobuf/ptypes/timestamp
 github.com/google/uuid
 # github.com/googleapis/gax-go/v2 v2.0.5
 github.com/googleapis/gax-go/v2
-# github.com/gridscale/gsclient-go/v3 v3.6.2
+# github.com/gridscale/gsclient-go/v3 v3.6.3
 ## explicit
 github.com/gridscale/gsclient-go/v3
 # github.com/hashicorp/errwrap v1.0.0
@@ -127,8 +127,6 @@ github.com/hashicorp/terraform-plugin-go/tfprotov5/internal/tfplugin5
 github.com/hashicorp/terraform-plugin-go/tfprotov5/internal/toproto
 github.com/hashicorp/terraform-plugin-go/tfprotov5/server
 github.com/hashicorp/terraform-plugin-go/tftypes
-# github.com/hashicorp/terraform-plugin-sdk v1.0.0
-## explicit
 # github.com/hashicorp/terraform-plugin-sdk/v2 v2.6.1
 ## explicit
 github.com/hashicorp/terraform-plugin-sdk/v2/diag
@@ -255,7 +253,7 @@ golang.org/x/oauth2/google
 golang.org/x/oauth2/internal
 golang.org/x/oauth2/jws
 golang.org/x/oauth2/jwt
-# golang.org/x/sys v0.0.0-20210420072515-93ed5bcd2bfe
+# golang.org/x/sys v0.0.0-20210510120138-977fb7262007
 ## explicit
 golang.org/x/sys/cpu
 golang.org/x/sys/internal/unsafeheader

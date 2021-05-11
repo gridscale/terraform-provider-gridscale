@@ -13,7 +13,7 @@ import (
 const (
 	defaultMaxNumberOfRetries     = 5
 	defaultDelayIntervalMilliSecs = 1000
-	version                       = "3.6.2"
+	version                       = "3.6.3"
 	defaultAPIURL                 = "https://api.gridscale.io"
 	resourceActiveStatus          = "active"
 	requestDoneStatus             = "done"
@@ -52,8 +52,8 @@ var logger = logrus.Logger{
 //		+ debugMode bool: true => run client in debug mode.
 //		+ sync bool: true => client is in synchronous mode. The client will block until Create/Update/Delete processes.
 //		are completely finished. It is safer to set this parameter to `true`.
-//		+ delayIntervalMilliSecs int: delay (in milliseconds) between requests when checking request (or retry 5xx, 424 error code).
-//		+ maxNumberOfRetries int: number of retries when server returns 5xx, 424 error code.
+//		+ delayIntervalMilliSecs int: delay (in milliseconds) between requests when checking request (or retry 503 error code).
+//		+ maxNumberOfRetries int: number of retries when server returns 503 error code.
 func NewConfiguration(apiURL string, uuid string, token string, debugMode, sync bool,
 	delayIntervalMilliSecs, maxNumberOfRetries int) *Config {
 	if debugMode {

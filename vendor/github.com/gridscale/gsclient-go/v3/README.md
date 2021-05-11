@@ -38,8 +38,8 @@ config := gsclient.NewConfiguration(
             "API-token",
             false, //Set debug mode
             true, //Set sync mode
-            500, //Delay (in milliseconds) between requests
-            100, //Maximum number of retries
+            500, //Delay (in milliseconds) between requests (or retry 503 error code)
+            100, //Maximum number of retries when server returns 503 error code
         )
 client := gsclient.NewClient(config)
 ```
