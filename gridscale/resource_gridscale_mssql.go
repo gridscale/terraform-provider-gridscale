@@ -35,7 +35,7 @@ func resourceGridscaleMSSQLServer() *schema.Resource {
 			},
 			"release": {
 				Type: schema.TypeString,
-				Description: `The MSSQLServer release of this instance.\n
+				Description: `The MS SQL Server release of this instance.\n
 				For convenience, please use gscloud https://github.com/gridscale/gscloud to get the list of available MS SQL Server releases.`,
 				Required:     true,
 				ValidateFunc: validation.NoZeroValues,
