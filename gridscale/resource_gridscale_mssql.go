@@ -120,6 +120,36 @@ func resourceGridscaleMSSQLServer() *schema.Resource {
 					},
 				},
 			},
+			"s3_backup": {
+				Type:        schema.TypeList,
+				Optional:    true,
+				MaxItems:    1,
+				Description: "Allow backup/restore MS SQL server to/from a S3 bucket.",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"backup_bucket": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Object Storage bucket to upload backups to and restore backups from.",
+						},
+						"backup_access_key": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Access key used to authenticate against Object Storage server.",
+						},
+						"backup_secret_key": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Secret key used to authenticate against Object Storage server.",
+						},
+						"backup_server_url": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Object Storage server URL the bucket is located on.",
+						},
+					},
+				},
+			},
 			"security_zone_uuid": {
 				Type:        schema.TypeString,
 				Description: "Security zone UUID linked to MS SQL Server.",
@@ -232,12 +262,16 @@ func resourceGridscaleMSSQLServerRead(d *schema.ResourceData, meta interface{}) 
 		return fmt.Errorf("%s error setting listen ports: %v", errorPrefix, err)
 	}
 
-	//Get core count's limit
-	for _, value := range props.ResourceLimits {
-		if value.Resource == "cores" {
-			if err = d.Set("max_core_count", value.Limit); err != nil {
-				return fmt.Errorf("%s error setting max_core_count: %v", errorPrefix, err)
-			}
+	if props.Parameters["backup_bucket"] != nil {
+		var s3Backup []interface{}
+		s3Backup = append(s3Backup, map[string]interface{}{
+			"backup_bucket":     props.Parameters["backup_bucket"],
+			"backup_access_key": props.Parameters["backup_access_key"],
+			"backup_secret_key": props.Parameters["backup_secret_key"],
+			"backup_server_url": props.Parameters["backup_server_url"],
+		})
+		if err = d.Set("s3_backup", s3Backup); err != nil {
+			return fmt.Errorf("%s error setting s3_backup: %v", errorPrefix, err)
 		}
 	}
 
@@ -285,6 +319,16 @@ func resourceGridscaleMSSQLServerCreate(d *schema.ResourceData, meta interface{}
 		PaaSSecurityZoneUUID:    d.Get("security_zone_uuid").(string),
 	}
 
+	// If s3_backup is set, attach the backup parameters to the create request.
+	if _, ok := d.GetOk("s3_backup"); ok {
+		params := make(map[string]interface{})
+		params["backup_bucket"] = d.Get("s3_backup.0.backup_bucket")
+		params["backup_access_key"] = d.Get("s3_backup.0.backup_access_key")
+		params["backup_secret_key"] = d.Get("s3_backup.0.backup_secret_key")
+		params["backup_server_url"] = d.Get("s3_backup.0.backup_server_url")
+		requestBody.Parameters = params
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
 	defer cancel()
 	response, err := client.CreatePaaSService(ctx, requestBody)
@@ -316,6 +360,18 @@ func resourceGridscaleMSSQLServerUpdate(d *schema.ResourceData, meta interface{}
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
 		requestBody.PaaSServiceTemplateUUID = templateUUID
+	}
+
+	if d.HasChange("s3_backup") {
+		params := make(map[string]interface{})
+		if _, ok := d.GetOk("s3_backup"); ok {
+			params := make(map[string]interface{})
+			params["backup_bucket"] = d.Get("s3_backup.0.backup_bucket")
+			params["backup_access_key"] = d.Get("s3_backup.0.backup_access_key")
+			params["backup_secret_key"] = d.Get("s3_backup.0.backup_secret_key")
+			params["backup_server_url"] = d.Get("s3_backup.0.backup_server_url")
+		}
+		requestBody.Parameters = params
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))

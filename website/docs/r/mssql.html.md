@@ -37,6 +37,15 @@ The following arguments are supported:
 
 * `security_zone_uuid` - (Optional) The UUID of the security zone that the service is running in.
 
+* `s3_backup` - (Optional) Allow backup/restore MS SQL server to/from a S3 bucket.
+
+  * `backup_bucket` - (Required) Object Storage bucket to upload backups to and restore backups from.
+
+  * `backup_access_key` - (Required) Access key used to authenticate against Object Storage server.
+
+  * `backup_secret_key` - (Required) Secret key used to authenticate against Object Storage server.
+
+  * `backup_server_url` - (Required) Object Storage server URL the bucket is located on.
 
 ## Timeouts
 
@@ -59,6 +68,11 @@ This resource exports the following attributes:
 * `listen_port` - The port numbers where this MS SQL server service accepts connections.
   * `name` - Name of a port.
   * `listen_port` - Port number.
+* `s3_backup` - See Argument Reference above.
+  * `backup_bucket` - See Argument Reference above.
+  * `backup_access_key` - See Argument Reference above.
+  * `backup_secret_key` - See Argument Reference above.
+  * `backup_server_url` - See Argument Reference above.
 * `security_zone_uuid` - See Argument Reference above.
 * `network_uuid` - Network UUID containing security zone.
 * `service_template_uuid` - PaaS service template that MS SQL server service uses.
