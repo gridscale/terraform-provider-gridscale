@@ -1,12 +1,12 @@
 ---
 layout: "gridscale"
-page_title: "gridscale: gridscale_sqlserver"
-sidebar_current: "docs-gridscale-resource-sqlserver"
+page_title: "gridscale: gridscale_mssql"
+sidebar_current: "docs-gridscale-resource-mssql"
 description: |-
   Manage a MS SQL server service in gridscale.
 ---
 
-# gridscale_sqlserver
+# gridscale_mssql
 
 Provides a MS SQL server resource. This can be used to create, modify, and delete MS SQL server instances.
 
@@ -15,7 +15,7 @@ Provides a MS SQL server resource. This can be used to create, modify, and delet
 The following example shows how one might use this resource to add a MS SQL server service to gridscale:
 
 ```terraform
-resource "gridscale_sqlserver" "terra-sqlserver-test" {
+resource "gridscale_mssql" "terra-mssql-test" {
   name = "test"
   release = "2019"
   performance_class = "standard"

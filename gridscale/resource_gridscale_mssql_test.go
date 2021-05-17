@@ -22,17 +22,17 @@ func TestAccResourceGridscaleMSSQLServer_Basic(t *testing.T) {
 			{
 				Config: testAccCheckResourceGridscaleMSSQLServerConfig_basic(name),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckResourceGridscalePaaSExists("gridscale_sqlserver.test", &object),
+					testAccCheckResourceGridscalePaaSExists("gridscale_mssql.test", &object),
 					resource.TestCheckResourceAttr(
-						"gridscale_sqlserver.test", "name", name),
+						"gridscale_mssql.test", "name", name),
 				),
 			},
 			{
 				Config: testAccCheckResourceGridscaleMSSQLServerConfig_basic_update(),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckResourceGridscalePaaSExists("gridscale_sqlserver.test", &object),
+					testAccCheckResourceGridscalePaaSExists("gridscale_mssql.test", &object),
 					resource.TestCheckResourceAttr(
-						"gridscale_sqlserver.test", "name", "newname"),
+						"gridscale_mssql.test", "name", "newname"),
 				),
 			},
 		},
@@ -41,7 +41,7 @@ func TestAccResourceGridscaleMSSQLServer_Basic(t *testing.T) {
 
 func testAccCheckResourceGridscaleMSSQLServerConfig_basic(name string) string {
 	return fmt.Sprintf(`
-resource "gridscale_sqlserver" "test" {
+resource "gridscale_mssql" "test" {
 	name = "%s"
 	release = "2019"
 	performance_class = "standard"
@@ -51,7 +51,7 @@ resource "gridscale_sqlserver" "test" {
 
 func testAccCheckResourceGridscaleMSSQLServerConfig_basic_update() string {
 	return fmt.Sprintf(`
-resource "gridscale_sqlserver" "test" {
+resource "gridscale_mssql" "test" {
 	name = "newname"
 	release = "2019"
 	performance_class = "standard"
