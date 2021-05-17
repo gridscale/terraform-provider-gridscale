@@ -350,7 +350,7 @@ func resourceGridscaleMSSQLServerUpdate(d *schema.ResourceData, meta interface{}
 		Labels: &labels,
 	}
 
-	// Only update templateUUID, when `release` is changed
+	// Only update templateUUID, when `release` or `performance_class` is changed.
 	if d.HasChange("performance_class") || d.HasChange("release") {
 		// get ms sql template UUID
 		release := d.Get("release").(string)
