@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gridscale/gsclient-go/v3"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/customdiff"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	errHandler "github.com/terraform-providers/terraform-provider-gridscale/gridscale/error-handler"
@@ -31,6 +32,38 @@ func resourceGridscalePostgreSQL() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
+		CustomizeDiff: customdiff.All(
+			customdiff.ValidateChange("release", func(ctx context.Context, old, new, meta interface{}) error {
+				client := meta.(*gsclient.Client)
+				newReleaseVal := new.(string)
+				paasTemplates, err := client.GetPaaSTemplateList(ctx)
+				if err != nil {
+					return err
+				}
+				var isReleaseValid bool
+				var releaseList []string
+			TEMPLATELOOP:
+				for _, template := range paasTemplates {
+					if template.Properties.Flavour == postgresTemplateFlavourName {
+						// check if release already presents in the release list.
+						// If so, ignore it.
+						for _, release := range releaseList {
+							if release == template.Properties.Release {
+								continue TEMPLATELOOP
+							}
+						}
+						releaseList = append(releaseList, template.Properties.Release)
+						if template.Properties.Release == newReleaseVal {
+							isReleaseValid = true
+						}
+					}
+				}
+				if !isReleaseValid {
+					return fmt.Errorf("%v is not a valid PostgreSQL release. Valid releases are: %v\n", newReleaseVal, strings.Join(releaseList, ", "))
+				}
+				return nil
+			}),
+		),
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:         schema.TypeString,
@@ -254,8 +287,10 @@ func resourceGridscalePostgreSQLCreate(d *schema.ResourceData, meta interface{})
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("create k8s (%s) resource -", d.Id())
 
-	// Validate k8s release
-	templateUUID, err := validatePostgresRelease(client, d)
+	// Get postgres template UUID
+	release := d.Get("release").(string)
+	performanceClass := d.Get("performance_class").(string)
+	templateUUID, err := getPostgresTemplateUUID(client, release, performanceClass)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -298,10 +333,12 @@ func resourceGridscalePostgreSQLUpdate(d *schema.ResourceData, meta interface{})
 		Labels: &labels,
 	}
 
-	// Only update templateUUID, when `release` is changed
-	if d.HasChange("release") {
-		// Validate the k8s release
-		templateUUID, err := validatePostgresRelease(client, d)
+	// Only update templateUUID, when `release` or `performance_class` is changed
+	if d.HasChange("release") || d.HasChange("performance_class") {
+		// Get postgres template UUID
+		release := d.Get("release").(string)
+		performanceClass := d.Get("performance_class").(string)
+		templateUUID, err := getPostgresTemplateUUID(client, release, performanceClass)
 		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
@@ -343,17 +380,12 @@ func resourceGridscalePostgreSQLDelete(d *schema.ResourceData, meta interface{})
 	return nil
 }
 
-// validatePostgresRelease validate input postgres release.
-// It returns the UUID of the postgres service template, if the validation is successful.
-// Otherwise, an error will be returned.
-func validatePostgresRelease(client *gsclient.Client, d *schema.ResourceData) (string, error) {
+// getPostgresTemplateUUID returns the UUID of the postgres service template.
+func getPostgresTemplateUUID(client *gsclient.Client, release, performanceClass string) (string, error) {
 	paasTemplates, err := client.GetPaaSTemplateList(context.Background())
 	if err != nil {
 		return "", err
 	}
-	// Check if the postgres release number exists
-	release := d.Get("release").(string)
-	performanceClass := d.Get("performance_class").(string)
 	var isReleaseValid bool
 	var releases []string
 	var uTemplate gsclient.PaaSTemplate
