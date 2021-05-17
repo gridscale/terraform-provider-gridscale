@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gridscale/gsclient-go/v3"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/customdiff"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	errHandler "github.com/terraform-providers/terraform-provider-gridscale/gridscale/error-handler"
@@ -30,6 +31,38 @@ func resourceGridscaleK8s() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
+		CustomizeDiff: customdiff.All(
+			customdiff.ValidateChange("release", func(ctx context.Context, old, new, meta interface{}) error {
+				client := meta.(*gsclient.Client)
+				newReleaseVal := new.(string)
+				paasTemplates, err := client.GetPaaSTemplateList(ctx)
+				if err != nil {
+					return err
+				}
+				var isReleaseValid bool
+				var releaseList []string
+			TEMPLATELOOP:
+				for _, template := range paasTemplates {
+					if template.Properties.Flavour == k8sTemplateFlavourName {
+						// check if release already presents in the release list.
+						// If so, ignore it.
+						for _, release := range releaseList {
+							if release == template.Properties.Release {
+								continue TEMPLATELOOP
+							}
+						}
+						releaseList = append(releaseList, template.Properties.Release)
+						if template.Properties.Release == newReleaseVal {
+							isReleaseValid = true
+						}
+					}
+				}
+				if !isReleaseValid {
+					return fmt.Errorf("%v is not a valid Kubernetes release. Valid releases are: %v\n", newReleaseVal, strings.Join(releaseList, ", "))
+				}
+				return nil
+			}),
+		),
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:         schema.TypeString,
@@ -299,7 +332,8 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 	errorPrefix := fmt.Sprintf("create k8s (%s) resource -", d.Id())
 
 	// Validate k8s release
-	templateUUID, err := validateK8sRelease(client, d)
+	release := d.Get("release").(string)
+	templateUUID, err := getK8sTemplateUUID(client, release)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -344,7 +378,8 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 	// Only update release, when it is changed
 	if d.HasChange("release") {
 		// Check if the k8s release number exists
-		templateUUID, err := validateK8sRelease(client, d)
+		release := d.Get("release").(string)
+		templateUUID, err := getK8sTemplateUUID(client, release)
 		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
@@ -385,16 +420,12 @@ func resourceGridscaleK8sDelete(d *schema.ResourceData, meta interface{}) error 
 	return nil
 }
 
-// validateK8sRelease validate input k8s release.
-// It returns the UUID of the k8s service template, if the validation is successful.
-// Otherwise, an error will be returned.
-func validateK8sRelease(client *gsclient.Client, d *schema.ResourceData) (string, error) {
+// getK8sTemplateUUID returns the UUID of the k8s service template.
+func getK8sTemplateUUID(client *gsclient.Client, release string) (string, error) {
 	paasTemplates, err := client.GetPaaSTemplateList(context.Background())
 	if err != nil {
 		return "", err
 	}
-	// Check if the k8s release number exists
-	release := d.Get("release").(string)
 	var isReleaseValid bool
 	var releases []string
 	var uTemplate gsclient.PaaSTemplate
