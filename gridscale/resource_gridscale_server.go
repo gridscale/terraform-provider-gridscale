@@ -58,7 +58,7 @@ func resourceGridscaleServer() *schema.Resource {
 				Description: "The number of server cores.",
 				Optional:    true,
 				ForceNew:    true,
-				Default:     "default",
+				Computed:    true,
 				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
 					valid := false
 					for _, profile := range hardwareProfiles {
@@ -604,21 +604,29 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	profile := d.Get("hardware_profile").(string)
-	if profile == "legacy" {
+	switch profile {
+	case string(gsclient.LegacyServerHardware):
 		requestBody.HardwareProfile = gsclient.LegacyServerHardware
-	} else if profile == "nested" {
+
+	case string(gsclient.NestedServerHardware):
 		requestBody.HardwareProfile = gsclient.NestedServerHardware
-	} else if profile == "cisco_csr" {
+
+	case string(gsclient.CiscoCSRServerHardware):
 		requestBody.HardwareProfile = gsclient.CiscoCSRServerHardware
-	} else if profile == "sophos_utm" {
+
+	case string(gsclient.SophosUTMServerHardware):
 		requestBody.HardwareProfile = gsclient.SophosUTMServerHardware
-	} else if profile == "f5_bigip" {
+
+	case string(gsclient.F5BigipServerHardware):
 		requestBody.HardwareProfile = gsclient.F5BigipServerHardware
-	} else if profile == "q35" {
+
+	case string(gsclient.Q35ServerHardware):
 		requestBody.HardwareProfile = gsclient.Q35ServerHardware
-	} else if profile == "q35_nested" {
+
+	case string(gsclient.Q35NestedServerHardware):
 		requestBody.HardwareProfile = gsclient.Q35NestedServerHardware
-	} else {
+
+	case string(gsclient.DefaultServerHardware):
 		requestBody.HardwareProfile = gsclient.DefaultServerHardware
 	}
 
