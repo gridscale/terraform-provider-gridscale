@@ -91,7 +91,7 @@ The following arguments are supported:
 
 * `auto_recovery` - (Optional) If the server should be auto-started in case of a failure (default=true).
 
-* `hardware_profile` - (Optional, ForceNew) The hardware profile of the Server. Options are default, legacy, nested, cisco_csr, sophos_utm, f5_bigip and q35 at the moment of writing. When `hardware_profile` is not set, the hard profile is set to "q35".
+* `hardware_profile` - (Optional, ForceNew) The hardware profile of the server. Possible values are q35, default, legacy, nested, cisco_csr, sophos_utm, and f5_bigip. When not set, the profile used for the server is 'q35' which is almost always what you want. A change necessitates the re-creation of the resource.
 
 * `ipv4` - (Optional) The UUID of the IPv4 address of the server. (***NOTE: The server will NOT automatically be connected to the public network; to give it access to the internet, please add server to the public network.)
 
