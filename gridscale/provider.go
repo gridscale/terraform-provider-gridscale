@@ -92,6 +92,7 @@ func Provider() *schema.Provider {
 			"gridscale_k8s":                            resourceGridscaleK8s(),
 			"gridscale_paas_securityzone":              resourceGridscalePaaSSecurityZone(),
 			"gridscale_postgresql":                     resourceGridscalePostgreSQL(),
+			"gridscale_mssql":                          resourceGridscaleMSSQLServer(),
 			"gridscale_object_storage_accesskey":       resourceGridscaleObjectStorage(),
 			"gridscale_template":                       resourceGridscaleTemplate(),
 			"gridscale_isoimage":                       resourceGridscaleISOImage(),

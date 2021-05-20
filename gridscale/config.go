@@ -18,6 +18,7 @@ var firewallActionTypes = []string{"accept", "drop"}
 var firewallRuleProtocols = []string{"udp", "tcp"}
 var marketplaceAppCategories = []string{"CMS", "project management", "Adminpanel", "Collaboration", "Cloud Storage", "Archiving"}
 var postgreSQLPerformanceClasses = []string{"standard", "high", "insane", "ultra"}
+var msSQLServerPerformanceClasses = []string{"standard", "high", "insane", "ultra"}
 
 const timeLayout = "2006-01-02 15:04:05"
 const (
