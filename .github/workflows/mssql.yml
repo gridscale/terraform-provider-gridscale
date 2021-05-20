@@ -10,7 +10,7 @@ on:
     branches:
       - master
     paths:
-      - "**gridscale_mssql**"
+      - "**gridscale_sqlserver**"
       - "gridscale/error-handler/**"
       - "gridscale/common.go"
       - "gridscale/config.go"
