@@ -1,18 +1,26 @@
 # Changelog
 
-## 1.10.0 (UNRELEASED)
+## 1.10.0 (Jun 01, 2021)
 
 IMPROVEMENTS:
+- Add more upfront validations [#162](https://github.com/gridscale/terraform-provider-gridscale/pull/162).
+- Allow customizing request delay interval and maximum number of retries [#157](https://github.com/gridscale/terraform-provider-gridscale/pull/157).
+
+FEATURES:
+- Add TLS/SSL certificate resource and data source [#156](https://github.com/gridscale/terraform-provider-gridscale/pull/156).
+- Add MS SQL server resource [#161](https://github.com/gridscale/terraform-provider-gridscale/pull/161).
+- Add MariaDB resource [#164](https://github.com/gridscale/terraform-provider-gridscale/pull/164).
 
 BUG FIXES:
+- Fix Loadbalancer rs/ds docs (add missing descriptions, fix typo, etc.) [#156](https://github.com/gridscale/terraform-provider-gridscale/pull/156).
 
-## 1.9.1 (Apr 21, 2020)
+## 1.9.1 (Apr 21, 2021)
 
 IMPROVEMENTS:
 
 * Update gsclient-go package to v3.6.2 (which fixes the `PROTOCOL_ERROR` when running terraform in moderate amount of concurrency [#199](https://github.com/gridscale/gsclient-go/pull/199)).
 
-## 1.9.0 (Apr 15, 2020)
+## 1.9.0 (Apr 15, 2021)
 
 IMPROVEMENTS:
 
@@ -23,7 +31,7 @@ FEATURES:
 * Add gridscale k8s resource ([#120](https://github.com/gridscale/terraform-provider-gridscale/issues/120)).
 * Add gridscale postgreSQL resource ([#133](https://github.com/gridscale/terraform-provider-gridscale/issues/133)).
 
-## 1.8.4 (Mar 16, 2020)
+## 1.8.4 (Mar 16, 2021)
 
 IMPROVEMENTS:
 
@@ -31,7 +39,7 @@ IMPROVEMENTS:
 * Update gsclient-go package to v3.5.0 ([#130](https://github.com/gridscale/terraform-provider-gridscale/pull/131)).
 * Use go v1.16 in GH action & enable macOS arm64 build ([#129](https://github.com/gridscale/terraform-provider-gridscale/issues/129)).
 
-## 1.8.3 (Feb 18, 2020)
+## 1.8.3 (Feb 18, 2021)
 
 BUG FIXES:
 
