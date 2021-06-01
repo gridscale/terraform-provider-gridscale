@@ -45,7 +45,7 @@ The following arguments are supported:
 
   * `backup_secret_key` - (Required) Secret key used to authenticate against Object Storage server.
 
-  * `backup_server_url` - (Required) Object Storage server URL the bucket is located on.
+  * `backup_server_url` - (Optional, Default: "https://gos3.io/") Object Storage server URL the bucket is located on. **Note**: Currently, only object storage host "https://gos3.io/" is supported.
 
 ## Timeouts
 

@@ -16,7 +16,10 @@ import (
 	"log"
 )
 
-const msSQLTemplateFlavourName = "mssql"
+const (
+	msSQLTemplateFlavourName = "mssql"
+	defaultBackupServerURL   = "https://gos3.io/"
+)
 
 func resourceGridscaleMSSQLServer() *schema.Resource {
 	return &schema.Resource{
@@ -145,8 +148,15 @@ func resourceGridscaleMSSQLServer() *schema.Resource {
 							Description: "Secret key used to authenticate against Object Storage server.",
 						},
 						"backup_server_url": {
-							Type:        schema.TypeString,
-							Required:    true,
+							Type:     schema.TypeString,
+							Optional: true,
+							Default:  defaultBackupServerURL,
+							ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
+								if v.(string) != defaultBackupServerURL {
+									errors = append(errors, fmt.Errorf("Currently, only %s is supported", defaultBackupServerURL))
+								}
+								return
+							},
 							Description: "Object Storage server URL the bucket is located on.",
 						},
 					},
