@@ -25,11 +25,13 @@ func resourceGridscaleObjectStorage() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "The object storage secret_key.",
 				Computed:    true,
+				Sensitive:   true,
 			},
 			"secret_key": {
 				Type:        schema.TypeString,
 				Description: "The object storage access_key.",
 				Computed:    true,
+				Sensitive:   true,
 			},
 		},
 		Timeouts: &schema.ResourceTimeout{
