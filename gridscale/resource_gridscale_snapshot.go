@@ -106,11 +106,13 @@ the product_no of the license (see the /prices endpoint for more details)`,
 						"access_key": {
 							Type:        schema.TypeString,
 							Required:    true,
+							Sensitive:   true,
 							Description: "Access key",
 						},
 						"secret_key": {
 							Type:        schema.TypeString,
 							Required:    true,
+							Sensitive:   true,
 							Description: "Secret key",
 						},
 						"bucket": {

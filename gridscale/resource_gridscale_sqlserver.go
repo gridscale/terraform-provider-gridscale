@@ -135,11 +135,13 @@ func resourceGridscaleMSSQLServer() *schema.Resource {
 						"backup_access_key": {
 							Type:        schema.TypeString,
 							Required:    true,
+							Sensitive:   true,
 							Description: "Access key used to authenticate against Object Storage server.",
 						},
 						"backup_secret_key": {
 							Type:        schema.TypeString,
 							Required:    true,
+							Sensitive:   true,
 							Description: "Secret key used to authenticate against Object Storage server.",
 						},
 						"backup_server_url": {
