@@ -17,7 +17,7 @@ The following example shows how one might use this resource to add a MySQL servi
 ```terraform
 resource "gridscale_mysql" "terra-mysql-test" {
     name = "my mysql"
-	release = "10.5"
+	release = "5.7"
 	performance_class = "insane"
     max_core_count = 20
     mysql_query_cache_limit = "2M"
