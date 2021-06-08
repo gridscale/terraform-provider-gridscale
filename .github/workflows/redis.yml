@@ -1,4 +1,4 @@
-name: Test Redis store rs
+name: Test Redis store/cache rs
 
 on:
   push:
@@ -19,7 +19,7 @@ on:
 
 jobs:
   build:
-    name: GS Redis store AccTest
+    name: GS Redis store/cache AccTest
     runs-on: ubuntu-latest
     env:
       GOPATH: /home/runner/go
@@ -38,3 +38,6 @@ jobs:
 
       - name: Run TestAccResourceGridscaleRedisStore_Basic
         run: make testacc TEST=./gridscale TESTARGS='-run=TestAccResourceGridscaleRedisStore_Basic'
+
+      - name: Run TestAccResourceGridscaleRedisCache_Basic
+        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccResourceGridscaleRedisCache_Basic'
