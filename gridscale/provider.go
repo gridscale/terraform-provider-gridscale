@@ -89,6 +89,7 @@ func Provider() *schema.Provider {
 			"gridscale_snapshotschedule":               resourceGridscaleStorageSnapshotSchedule(),
 			"gridscale_backupschedule":                 resourceGridscaleStorageBackupSchedule(),
 			"gridscale_paas":                           resourceGridscalePaaS(),
+			"gridscale_redis_store":                    resourceGridscaleRedisStore(),
 			"gridscale_k8s":                            resourceGridscaleK8s(),
 			"gridscale_paas_securityzone":              resourceGridscalePaaSSecurityZone(),
 			"gridscale_postgresql":                     resourceGridscalePostgreSQL(),
