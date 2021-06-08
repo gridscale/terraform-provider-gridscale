@@ -19,7 +19,7 @@ on:
 
 jobs:
   build:
-    name: GS PostgreSQLAccTest
+    name: GS MS SQL AccTest
     runs-on: ubuntu-latest
     env:
       GOPATH: /home/runner/go
