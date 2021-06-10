@@ -10,7 +10,7 @@ on:
     branches:
       - master
     paths:
-      - "**gridscale_redis_store**"
+      - "**gridscale_redis**"
       - "gridscale/error-handler/**"
       - "gridscale/common.go"
       - "gridscale/config.go"
