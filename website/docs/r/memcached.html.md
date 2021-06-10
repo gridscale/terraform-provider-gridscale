@@ -60,6 +60,7 @@ This resource exports the following attributes:
 * `password` - Password for PaaS service. It is used to connect to the Memcached instance.
 * `listen_port` - The port numbers where this Memcached service accepts connections.
   * `name` - Name of a port.
+  * `host` - Host address.
   * `listen_port` - Port number.
 * `security_zone_uuid` - See Argument Reference above.
 * `network_uuid` - Network UUID containing security zone.
