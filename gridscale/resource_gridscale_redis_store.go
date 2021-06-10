@@ -98,6 +98,10 @@ func resourceGridscaleRedisStore() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
+						"host": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
 						"port": {
 							Type:     schema.TypeInt,
 							Computed: true,
@@ -204,10 +208,11 @@ func resourceGridscaleRedisStoreRead(d *schema.ResourceData, meta interface{}) e
 
 	//Get listen ports
 	listenPorts := make([]interface{}, 0)
-	for _, value := range props.ListenPorts {
+	for host, value := range props.ListenPorts {
 		for k, portValue := range value {
 			port := map[string]interface{}{
 				"name": k,
+				"host": host,
 				"port": portValue,
 			}
 			listenPorts = append(listenPorts, port)
