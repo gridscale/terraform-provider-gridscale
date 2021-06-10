@@ -12,7 +12,7 @@ import (
 
 func TestAccResourceGridscaleMSSQLServer_Basic(t *testing.T) {
 	var object gsclient.PaaSService
-	name := fmt.Sprintf("postgres-%s", acctest.RandString(10))
+	name := fmt.Sprintf("MSSQLServer-%s", acctest.RandString(10))
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
