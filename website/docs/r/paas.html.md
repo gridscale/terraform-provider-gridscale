@@ -68,6 +68,7 @@ This resource exports the following attributes:
 * `password` - Password for PaaS service.
 * `listen_port` - Ports that PaaS service listens to.
   * `name` - Name of a port.
+  * `host` - Host address.
   * `listen_port` - Port number.
 * `security_zone_uuid` - See Argument Reference above.
 * `network_uuid` - Network UUID containing security zone.

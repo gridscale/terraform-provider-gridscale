@@ -67,6 +67,7 @@ This resource exports the following attributes:
 * `password` - Password for PaaS service. It is used to connect to the MS SQL server instance.
 * `listen_port` - The port numbers where this MS SQL server service accepts connections.
   * `name` - Name of a port.
+  * `host` - Host address.
   * `listen_port` - Port number.
 * `s3_backup` - See Argument Reference above.
   * `backup_bucket` - See Argument Reference above.

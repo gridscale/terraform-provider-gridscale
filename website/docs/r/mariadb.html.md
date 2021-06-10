@@ -16,11 +16,11 @@ The following example shows how one might use this resource to add a MariaDB ser
 
 ```terraform
 resource "gridscale_mariadb" "terra-mariadb-test" {
-    name = "my mariadb"
+  name = "my mariadb"
 	release = "10.5"
 	performance_class = "insane"
-    max_core_count = 20
-    mariadb_query_cache_limit = "2M"
+  max_core_count = 20
+  mariadb_query_cache_limit = "2M"
 	mariadb_default_time_zone = "Europe/Berlin"
 	mariadb_server_id = 2
 	mariadb_binlog_format = "STATEMENT"
@@ -93,6 +93,7 @@ This resource exports the following attributes:
 * `password` - Password for PaaS service. It is used to connect to the MariaDB instance.
 * `listen_port` - The port numbers where this MariaDB service accepts connections.
   * `name` - Name of a port.
+  * `host` - Host address.
   * `listen_port` - Port number.
 * `security_zone_uuid` - See Argument Reference above.
 * `network_uuid` - Network UUID containing security zone.

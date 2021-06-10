@@ -16,11 +16,11 @@ The following example shows how one might use this resource to add a MySQL servi
 
 ```terraform
 resource "gridscale_mysql" "terra-mysql-test" {
-    name = "my mysql"
+  name = "my mysql"
 	release = "5.7"
 	performance_class = "insane"
-    max_core_count = 20
-    mysql_query_cache_limit = "2M"
+  max_core_count = 20
+  mysql_query_cache_limit = "2M"
 	mysql_default_time_zone = "Europe/Berlin"
 	mysql_server_id = 2
 	mysql_binlog_format = "STATEMENT"
@@ -93,6 +93,7 @@ This resource exports the following attributes:
 * `password` - Password for PaaS service. It is used to connect to the mysql instance.
 * `listen_port` - The port numbers where this mysql service accepts connections.
   * `name` - Name of a port.
+  * `host` - Host address.
   * `listen_port` - Port number.
 * `security_zone_uuid` - See Argument Reference above.
 * `network_uuid` - Network UUID containing security zone.
