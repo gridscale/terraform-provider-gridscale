@@ -6,6 +6,7 @@ on:
       - master
     paths:
       - "**.go"
+      - ".github/workflows/server.yml"
   pull_request:
     branches:
       - master
@@ -19,6 +20,7 @@ on:
       - "gridscale/config.go"
       - "gridscale/provider.go"
       - "gridscale/provider_test.go"
+      - ".github/workflows/server.yml"
 
 jobs:
   build:
