@@ -2,13 +2,14 @@ package gridscale
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 
 	"github.com/gridscale/gsclient-go/v3"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/customdiff"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	errHandler "github.com/terraform-providers/terraform-provider-gridscale/gridscale/error-handler"
@@ -30,38 +31,37 @@ func resourceGridscaleMSSQLServer() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-		CustomizeDiff: customdiff.All(
-			customdiff.ValidateChange("release", func(ctx context.Context, old, new, meta interface{}) error {
-				client := meta.(*gsclient.Client)
-				newReleaseVal := new.(string)
-				paasTemplates, err := client.GetPaaSTemplateList(ctx)
-				if err != nil {
-					return err
-				}
-				var isReleaseValid bool
-				var releaseList []string
-			TEMPLATELOOP:
-				for _, template := range paasTemplates {
-					if template.Properties.Flavour == msSQLTemplateFlavourName {
-						// check if release already presents in the release list.
-						// If so, ignore it.
-						for _, release := range releaseList {
-							if release == template.Properties.Release {
-								continue TEMPLATELOOP
-							}
-						}
-						releaseList = append(releaseList, template.Properties.Release)
-						if template.Properties.Release == newReleaseVal {
-							isReleaseValid = true
-						}
+		CustomizeDiff: func(ctx context.Context, d *schema.ResourceDiff, meta interface{}) error {
+			client := meta.(*gsclient.Client)
+			paasTemplates, err := client.GetPaaSTemplateList(ctx)
+			if err != nil {
+				return err
+			}
+
+			releaseVal := d.Get("release").(string)
+			perfClassVal := d.Get("performance_class").(string)
+			var chosenTemplate gsclient.PaaSTemplate
+			var isReleasePerfClassValid bool
+			releaseWPerfClasess := make(map[string][]string)
+			for _, template := range paasTemplates {
+				if template.Properties.Flavour == msSQLTemplateFlavourName {
+					perfClasses := releaseWPerfClasess[template.Properties.Release]
+					releaseWPerfClasess[template.Properties.Release] = append(perfClasses, template.Properties.PerformanceClass)
+					if template.Properties.Release == releaseVal && template.Properties.PerformanceClass == perfClassVal {
+						isReleasePerfClassValid = true
+						chosenTemplate = template
 					}
 				}
-				if !isReleaseValid {
-					return fmt.Errorf("%v is not a valid MS SQL Server release. Valid releases are: %v\n", newReleaseVal, strings.Join(releaseList, ", "))
+			}
+			if !isReleasePerfClassValid {
+				errMess := fmt.Sprintf("release %v with performance class %s is not a valid MSSQL release/performance class. Valid releases with corresponding performance classes are:\n\t", releaseVal, perfClassVal)
+				for release, perfClasses := range releaseWPerfClasess {
+					errMess += fmt.Sprintf("release %s has following perfomance classes: %s\n\t", release, strings.Join(perfClasses, ", "))
 				}
-				return nil
-			}),
-		),
+				return errors.New(errMess)
+			}
+			return validateMSSQLParameters(d, chosenTemplate)
+		},
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:         schema.TypeString,
@@ -138,6 +138,12 @@ func resourceGridscaleMSSQLServer() *schema.Resource {
 							Type:        schema.TypeString,
 							Required:    true,
 							Description: "Object Storage bucket to upload backups to and restore backups from.",
+						},
+						"backup_retention": {
+							Type:        schema.TypeInt,
+							Optional:    true,
+							Default:     0,
+							Description: "Retention (in seconds) for local originals of backups. (0 for immediate removal once uploaded to Object Storage (default), higher values for delayed removal after the given time and once uploaded to Object Storage).",
 						},
 						"backup_access_key": {
 							Type:        schema.TypeString,
@@ -283,6 +289,7 @@ func resourceGridscaleMSSQLServerRead(d *schema.ResourceData, meta interface{}) 
 		var s3Backup []interface{}
 		s3Backup = append(s3Backup, map[string]interface{}{
 			"backup_bucket":     props.Parameters["backup_bucket"],
+			"backup_retention":  props.Parameters["backup_retention"],
 			"backup_access_key": props.Parameters["backup_access_key"],
 			"backup_secret_key": props.Parameters["backup_secret_key"],
 			"backup_server_url": props.Parameters["backup_server_url"],
@@ -340,6 +347,7 @@ func resourceGridscaleMSSQLServerCreate(d *schema.ResourceData, meta interface{}
 	if _, ok := d.GetOk("s3_backup"); ok {
 		params := make(map[string]interface{})
 		params["backup_bucket"] = d.Get("s3_backup.0.backup_bucket")
+		params["backup_retention"] = d.Get("s3_backup.0.backup_retention")
 		params["backup_access_key"] = d.Get("s3_backup.0.backup_access_key")
 		params["backup_secret_key"] = d.Get("s3_backup.0.backup_secret_key")
 		params["backup_server_url"] = d.Get("s3_backup.0.backup_server_url")
@@ -379,17 +387,15 @@ func resourceGridscaleMSSQLServerUpdate(d *schema.ResourceData, meta interface{}
 		requestBody.PaaSServiceTemplateUUID = templateUUID
 	}
 
-	if d.HasChange("s3_backup") {
-		params := make(map[string]interface{})
-		if _, ok := d.GetOk("s3_backup"); ok {
-			params := make(map[string]interface{})
-			params["backup_bucket"] = d.Get("s3_backup.0.backup_bucket")
-			params["backup_access_key"] = d.Get("s3_backup.0.backup_access_key")
-			params["backup_secret_key"] = d.Get("s3_backup.0.backup_secret_key")
-			params["backup_server_url"] = d.Get("s3_backup.0.backup_server_url")
-		}
-		requestBody.Parameters = params
+	params := make(map[string]interface{})
+	if _, ok := d.GetOk("s3_backup"); ok {
+		params["backup_bucket"] = d.Get("s3_backup.0.backup_bucket")
+		params["backup_retention"] = d.Get("s3_backup.0.backup_retention")
+		params["backup_access_key"] = d.Get("s3_backup.0.backup_access_key")
+		params["backup_secret_key"] = d.Get("s3_backup.0.backup_secret_key")
+		params["backup_server_url"] = d.Get("s3_backup.0.backup_server_url")
 	}
+	requestBody.Parameters = params
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
 	defer cancel()
@@ -439,4 +445,43 @@ func getMSSQLTemplateUUID(client *gsclient.Client, release, performanceClass str
 	}
 
 	return uTemplate.Properties.ObjectUUID, nil
+}
+
+func validateMSSQLParameters(d *schema.ResourceDiff, template gsclient.PaaSTemplate) error {
+	var errorMessages []string
+	if backupBucket, ok := d.GetOk("s3_backup.0.backup_bucket"); ok {
+		if scheme, ok := template.Properties.ParametersSchema["backup_bucket"]; ok {
+			validMode := regexp.MustCompile(scheme.Regex)
+			if !validMode.MatchString(backupBucket.(string)) {
+				errorMessages = append(errorMessages, "Invalid 'backup_bucket' value.\n")
+			}
+		}
+	}
+	if rentation, ok := d.GetOk("s3_backup.0.backup_retention"); ok {
+		if scheme, ok := template.Properties.ParametersSchema["backup_retention"]; ok {
+			if scheme.Min > rentation.(int) || rentation.(int) > scheme.Max {
+				errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'backup_retention' value. Value must stays between %d and %d\n", scheme.Min, scheme.Max))
+			}
+		}
+	}
+	if accessKey, ok := d.GetOk("s3_backup.0.backup_access_key"); ok {
+		if scheme, ok := template.Properties.ParametersSchema["backup_access_key"]; ok {
+			validMode := regexp.MustCompile(scheme.Regex)
+			if !validMode.MatchString(accessKey.(string)) {
+				errorMessages = append(errorMessages, "Invalid 'backup_access_key' value.\n")
+			}
+		}
+	}
+	if secretKey, ok := d.GetOk("s3_backup.0.backup_secret_key"); ok {
+		if scheme, ok := template.Properties.ParametersSchema["backup_secret_key"]; ok {
+			validMode := regexp.MustCompile(scheme.Regex)
+			if !validMode.MatchString(secretKey.(string)) {
+				errorMessages = append(errorMessages, "Invalid 'backup_secret_key' value.\n")
+			}
+		}
+	}
+	if len(errorMessages) != 0 {
+		return errors.New(strings.Join(errorMessages, ""))
+	}
+	return nil
 }
