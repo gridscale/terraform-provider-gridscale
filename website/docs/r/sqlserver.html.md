@@ -41,6 +41,8 @@ The following arguments are supported:
 
   * `backup_bucket` - (Required) Object Storage bucket to upload backups to and restore backups from.
 
+  * `backup_retention` - (Optional) Retention (in seconds) for local originals of backups. (0 for immediate removal once uploaded to Object Storage (default), higher values for delayed removal after the given time and once uploaded to Object Storage).
+
   * `backup_access_key` - (Required) Access key used to authenticate against Object Storage server.
 
   * `backup_secret_key` - (Required) Secret key used to authenticate against Object Storage server.
