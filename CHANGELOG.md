@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.11.0 (Jun 24, 2021)
+
+IMPROVEMENTS:
+- Add more upfront validations [#170](https://github.com/gridscale/terraform-provider-gridscale/pull/170).
+- Add field `backup_retention` to MS SQL server backup [#170](https://github.com/gridscale/terraform-provider-gridscale/pull/170).
+- Add field `host` to PaaS resource and PaaS-type resources (e.g. postgres, MySQL, etc.) [#169](https://github.com/gridscale/terraform-provider-gridscale/pull/169).
+
+FEATURES:
+- Add MySQL resource [#166](https://github.com/gridscale/terraform-provider-gridscale/pull/166).
+- Add Memcached resource [#167](https://github.com/gridscale/terraform-provider-gridscale/pull/167).
+- Add Redis store/cache resources [#168](https://github.com/gridscale/terraform-provider-gridscale/pull/168).
+
+BUG FIXES:
+- Fix MS SQL server backup's params cannot be updated [#170](https://github.com/gridscale/terraform-provider-gridscale/pull/170).
+
 ## 1.10.0 (Jun 01, 2021)
 
 IMPROVEMENTS:
