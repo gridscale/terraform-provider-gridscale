@@ -2,6 +2,7 @@ package gridscale
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -24,7 +25,15 @@ func resourceGridscaleStorage() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-
+		CustomizeDiff: func(ctx context.Context, d *schema.ResourceDiff, meta interface{}) error {
+			storageVariant := d.Get("storage_variant").(string)
+			if storageVariant == "local" {
+				if d.HasChange("storage_type") {
+					return errors.New("storage_type cannot be set when storage_variant is set to \"local\"")
+				}
+			}
+			return nil
+		},
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:        schema.TypeString,
@@ -46,7 +55,7 @@ func resourceGridscaleStorage() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "(one of storage, storage_high, storage_insane)",
 				Optional:    true,
-				Default:     "storage",
+				Computed:    true,
 				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
 					valid := false
 					for _, stype := range storageTypes {
@@ -283,7 +292,7 @@ func resourceGridscaleStorageUpdate(d *schema.ResourceData, meta interface{}) er
 	storageVariant := d.Get("storage_variant").(string)
 	if storageVariant == "" || storageVariant == "distributed" {
 		storageType := d.Get("storage_type").(string)
-		if storageType == "storage" {
+		if storageType == "storage" || storageType == "" {
 			requestBody.StorageType = gsclient.DefaultStorageType
 		} else if storageType == "storage_high" {
 			requestBody.StorageType = gsclient.HighStorageType
@@ -333,7 +342,7 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 	storageVariant := d.Get("storage_variant").(string)
 	if storageVariant == "" || storageVariant == "distributed" {
 		storageType := d.Get("storage_type").(string)
-		if storageType == "storage" {
+		if storageType == "storage" || storageType == "" {
 			requestBody.StorageType = gsclient.DefaultStorageType
 		} else if storageType == "storage_high" {
 			requestBody.StorageType = gsclient.HighStorageType
