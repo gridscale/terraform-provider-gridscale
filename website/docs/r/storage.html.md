@@ -39,7 +39,7 @@ The following arguments are supported:
 
 * `capacity` - (Required) required (integer - minimum: 1 - maximum: 4096).
 
-* `storage_type` - (Optional) (one of storage, storage_high, storage_insane). **Note**: This field will be skipped, if `storage_variant` is set to `local`.
+* `storage_type` - (Optional) (one of storage, storage_high, storage_insane).
 
 * `storage_variant` - (Optional) Storage variant (one of local or distributed).
 
