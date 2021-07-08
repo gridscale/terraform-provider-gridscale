@@ -41,7 +41,7 @@ The following arguments are supported:
 
 * `storage_type` - (Optional) (one of storage, storage_high, storage_insane).
 
-* `storage_variant` - (Optional) Storage variant (one of local or distributed).
+* `storage_variant` - (Optional) Storage variant (one of local or distributed). Default: "distributed".
 
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
 
