@@ -41,6 +41,8 @@ The following arguments are supported:
 
 * `storage_type` - (Optional) (one of storage, storage_high, storage_insane).
 
+* `storage_variant` - (Optional) Storage variant (one of local or distributed).
+
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
 
 * `rollback_from_backup_uuid` - (Optional) Rollback the storage from a specific storage backup.
@@ -75,6 +77,7 @@ This resource exports the following attributes:
 * `name` - See Argument Reference above.
 * `capacity` - See Argument Reference above.
 * `storage_type` - See Argument Reference above.
+* `storage_variant` - See Argument Reference above.
 * `location_uuid` - The location this storage is placed. The location of a resource is determined by it's project.
 * `labels` - See Argument Reference above.
 * `rollback_from_backup_uuid` - See Argument Reference above.
