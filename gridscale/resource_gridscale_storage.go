@@ -61,6 +61,25 @@ func resourceGridscaleStorage() *schema.Resource {
 					return
 				},
 			},
+			"storage_variant": {
+				Type:        schema.TypeString,
+				Description: "Storage variant (one of local or distributed).",
+				Optional:    true,
+				ForceNew:    true,
+				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
+					valid := false
+					for _, sVariant := range storageVariants {
+						if v.(string) == sVariant {
+							valid = true
+							break
+						}
+					}
+					if !valid {
+						errors = append(errors, fmt.Errorf("%v is not a valid storage variant. Valid variants are: %v", v.(string), strings.Join(storageTypes, ",")))
+					}
+					return
+				},
+			},
 			"license_product_no": {
 				Type:        schema.TypeInt,
 				Description: "If a template has been used that requires a license key (e.g. Windows Servers) this shows the product_no of the license (see the /prices endpoint for more details).",
@@ -259,13 +278,18 @@ func resourceGridscaleStorageUpdate(d *schema.ResourceData, meta interface{}) er
 		Labels:   &labels,
 	}
 
-	storageType := d.Get("storage_type").(string)
-	if storageType == "storage" {
-		requestBody.StorageType = gsclient.DefaultStorageType
-	} else if storageType == "storage_high" {
-		requestBody.StorageType = gsclient.HighStorageType
-	} else if storageType == "storage_insane" {
-		requestBody.StorageType = gsclient.InsaneStorageType
+	// Only distributed storage variant allows
+	// to set storage type.
+	storageVariant := d.Get("storage_variant").(string)
+	if storageVariant == "" || storageVariant == "distributed" {
+		storageType := d.Get("storage_type").(string)
+		if storageType == "storage" {
+			requestBody.StorageType = gsclient.DefaultStorageType
+		} else if storageType == "storage_high" {
+			requestBody.StorageType = gsclient.HighStorageType
+		} else if storageType == "storage_insane" {
+			requestBody.StorageType = gsclient.InsaneStorageType
+		}
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
@@ -304,13 +328,20 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 		Labels:   convSOStrings(d.Get("labels").(*schema.Set).List()),
 	}
 
-	storageType := d.Get("storage_type").(string)
-	if storageType == "storage" {
-		requestBody.StorageType = gsclient.DefaultStorageType
-	} else if storageType == "storage_high" {
-		requestBody.StorageType = gsclient.HighStorageType
-	} else if storageType == "storage_insane" {
-		requestBody.StorageType = gsclient.InsaneStorageType
+	// Only distributed storage variant allows
+	// to set storage type.
+	storageVariant := d.Get("storage_variant").(string)
+	if storageVariant == "" || storageVariant == "distributed" {
+		storageType := d.Get("storage_type").(string)
+		if storageType == "storage" {
+			requestBody.StorageType = gsclient.DefaultStorageType
+		} else if storageType == "storage_high" {
+			requestBody.StorageType = gsclient.HighStorageType
+		} else if storageType == "storage_insane" {
+			requestBody.StorageType = gsclient.InsaneStorageType
+		}
+	} else if storageVariant == "local" {
+		requestBody.StorageVariant = gsclient.LocalStorageVariant
 	}
 
 	//since only one template can be used, we can just look at index 0
