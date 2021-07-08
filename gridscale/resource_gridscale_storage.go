@@ -74,6 +74,7 @@ func resourceGridscaleStorage() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "Storage variant (one of local or distributed).",
 				Optional:    true,
+				Default:     "distributed",
 				ForceNew:    true,
 				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
 					valid := false
