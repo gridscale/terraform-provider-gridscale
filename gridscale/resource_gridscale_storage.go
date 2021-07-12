@@ -74,7 +74,6 @@ func resourceGridscaleStorage() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "Storage variant (one of local or distributed).",
 				Optional:    true,
-				Default:     "distributed",
 				ForceNew:    true,
 				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
 					valid := false
@@ -290,7 +289,7 @@ func resourceGridscaleStorageUpdate(d *schema.ResourceData, meta interface{}) er
 
 	// Only distributed storage variant allows
 	// to set storage type.
-	storageVariant := d.Get("storage_variant").(string)
+	storageVariant, _ := d.Get("storage_variant").(string)
 	if storageVariant == "" || storageVariant == "distributed" {
 		storageType := d.Get("storage_type").(string)
 		if storageType == "storage" || storageType == "" {
@@ -340,7 +339,7 @@ func resourceGridscaleStorageCreate(d *schema.ResourceData, meta interface{}) er
 
 	// Only distributed storage variant allows
 	// to set storage type.
-	storageVariant := d.Get("storage_variant").(string)
+	storageVariant, _ := d.Get("storage_variant").(string)
 	if storageVariant == "" || storageVariant == "distributed" {
 		storageType := d.Get("storage_type").(string)
 		if storageType == "storage" || storageType == "" {
