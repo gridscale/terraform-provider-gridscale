@@ -189,8 +189,7 @@ func resourceGridscaleServer() *schema.Resource {
 						},
 						"ordering": {
 							Type:     schema.TypeInt,
-							Optional: true,
-							Default:  0,
+							Required: true,
 						},
 						"create_time": {
 							Type:     schema.TypeString,
