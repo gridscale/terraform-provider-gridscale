@@ -47,7 +47,6 @@ The following attributes are exported:
 * `location_country` - The human-readable name of the country where the storage locates.
 * `usage_in_minutes` - Total minutes the the storage has been running.
 * `last_used_template` - The UUID of the last used template on the storage.
-* `current_price` - The price for the current period since the last bill.
 * `capacity` - The capacity (GB) of the storage.
 * `location_uuid` - The UUID of the location where the storage locates.
 * `storage_type` - The type of the storage.

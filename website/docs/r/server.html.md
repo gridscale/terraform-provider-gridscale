@@ -280,4 +280,3 @@ This resource exports the following attributes:
 * `usage_in_minutes_cores` - Total minutes of cores used.
 * `create_time` - Defines the date and time the object was initially created.
 * `change_time` - Defines the date and time of the last object change.
-* `current_price` - The price for the current period since the last bill.

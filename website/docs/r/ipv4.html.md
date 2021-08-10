@@ -63,4 +63,3 @@ This resource exports the following attributes:
 * `location_name` - The location name.
 * `delete_block` - Defines if the object is administratively blocked. If true, it can not be deleted by the user.
 * `usage_in_minutes` - The amount of minutes the IP address has been in use.
-* `current_price` - The price for the current period since the last bill.

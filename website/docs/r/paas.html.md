@@ -75,7 +75,6 @@ This resource exports the following attributes:
 * `service_template_uuid` - See Argument Reference above.
 * `service_template_uuid_computed` - Template that PaaS service uses. The `service_template_uuid_computed` will be different from `service_template_uuid`, when `service_template_uuid` is updated outside of terraform.
 * `usage_in_minute` - Number of minutes that PaaS service is in use.
-* `current_price` - Current price of PaaS service.
 * `change_time` - Time of the last change.
 * `create_time` - Time of the creation.
 * `status` - Current status of PaaS service.
