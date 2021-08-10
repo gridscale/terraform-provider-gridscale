@@ -58,7 +58,7 @@ func resourceGridscaleServer() *schema.Resource {
 				Description: "The number of server cores.",
 				Optional:    true,
 				ForceNew:    true,
-				Default:     "default",
+				Default:     "q35",
 				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
 					valid := false
 					for _, profile := range hardwareProfiles {
