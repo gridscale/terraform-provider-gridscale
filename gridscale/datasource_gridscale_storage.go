@@ -82,10 +82,6 @@ func dataSourceGridscaleStorage() *schema.Resource {
 				Description: "Uses IATA airport code, which works as a location identifier.",
 				Computed:    true,
 			},
-			"current_price": {
-				Type:     schema.TypeFloat,
-				Computed: true,
-			},
 			"usage_in_minutes": {
 				Type:     schema.TypeInt,
 				Computed: true,
@@ -132,9 +128,6 @@ func dataSourceGridscaleStorageRead(d *schema.ResourceData, meta interface{}) er
 	}
 	if err = d.Set("last_used_template", storage.Properties.LastUsedTemplate); err != nil {
 		return fmt.Errorf("%s error setting last_used_template: %v", errorPrefix, err)
-	}
-	if err = d.Set("current_price", storage.Properties.CurrentPrice); err != nil {
-		return fmt.Errorf("%s error setting current_price: %v", errorPrefix, err)
 	}
 	if err = d.Set("capacity", storage.Properties.Capacity); err != nil {
 		return fmt.Errorf("%s error setting capacity: %v", errorPrefix, err)

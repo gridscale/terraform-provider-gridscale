@@ -98,11 +98,6 @@ func resourceGridscalePaaS() *schema.Resource {
 				Description: "Number of minutes that PaaS service is in use",
 				Computed:    true,
 			},
-			"current_price": {
-				Type:        schema.TypeFloat,
-				Description: "Current price of PaaS service",
-				Computed:    true,
-			},
 			"change_time": {
 				Type:        schema.TypeString,
 				Description: "Time of the last change",
@@ -221,9 +216,6 @@ func resourceGridscalePaaSServiceRead(d *schema.ResourceData, meta interface{}) 
 	}
 	if err = d.Set("usage_in_minute", props.UsageInMinutes); err != nil {
 		return fmt.Errorf("%s error setting usage_in_minute: %v", errorPrefix, err)
-	}
-	if err = d.Set("current_price", props.CurrentPrice); err != nil {
-		return fmt.Errorf("%s error setting current_price: %v", errorPrefix, err)
 	}
 	if err = d.Set("change_time", props.ChangeTime.String()); err != nil {
 		return fmt.Errorf("%s error setting change_time: %v", errorPrefix, err)

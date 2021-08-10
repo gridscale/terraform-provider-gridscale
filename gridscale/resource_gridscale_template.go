@@ -114,11 +114,6 @@ func resourceGridscaleTemplate() *schema.Resource {
 				Description: "The capacity of a storage/ISO image/template/snapshot in GB.",
 				Computed:    true,
 			},
-			"current_price": {
-				Type:        schema.TypeFloat,
-				Description: "Defines the price for the current period since the last bill.",
-				Computed:    true,
-			},
 		},
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(5 * time.Minute),
@@ -190,10 +185,6 @@ func resourceGridscaleTemplateRead(d *schema.ResourceData, meta interface{}) err
 	if err = d.Set("capacity", props.Capacity); err != nil {
 		return fmt.Errorf("%s error setting capacity: %v", errorPrefix, err)
 	}
-	if err = d.Set("current_price", props.CurrentPrice); err != nil {
-		return fmt.Errorf("%s error setting current_price: %v", errorPrefix, err)
-	}
-
 	if err = d.Set("labels", props.Labels); err != nil {
 		return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
 	}

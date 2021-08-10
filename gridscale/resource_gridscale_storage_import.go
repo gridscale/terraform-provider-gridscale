@@ -109,10 +109,6 @@ func resourceGridscaleStorageImport() *schema.Resource {
 				Description: "Uses IATA airport code, which works as a location identifier.",
 				Computed:    true,
 			},
-			"current_price": {
-				Type:     schema.TypeFloat,
-				Computed: true,
-			},
 			"usage_in_minutes": {
 				Type:     schema.TypeInt,
 				Computed: true,
