@@ -221,10 +221,6 @@ func resourceGridscaleServer() *schema.Resource {
 				Optional:    true,
 				Computed:    true,
 			},
-			"current_price": {
-				Type:     schema.TypeFloat,
-				Computed: true,
-			},
 			"auto_recovery": {
 				Type:        schema.TypeBool,
 				Description: "If the server should be auto-started in case of a failure (default=true).",
@@ -422,9 +418,6 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 	}
 	if err = d.Set("change_time", server.Properties.ChangeTime.String()); err != nil {
 		return fmt.Errorf("%s error setting change_time: %v", errorPrefix, err)
-	}
-	if err = d.Set("current_price", server.Properties.CurrentPrice); err != nil {
-		return fmt.Errorf("%s error setting current_price: %v", errorPrefix, err)
 	}
 	if err = d.Set("availability_zone", server.Properties.AvailabilityZone); err != nil {
 		return fmt.Errorf("%s error setting availability_zone: %v", errorPrefix, err)

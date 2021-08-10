@@ -93,11 +93,6 @@ func dataSourceGridscaleIpv6() *schema.Resource {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"current_price": {
-				Type:        schema.TypeFloat,
-				Description: "Defines the price for the current period since the last bill.",
-				Computed:    true,
-			},
 		},
 	}
 }
@@ -155,9 +150,6 @@ func dataSourceGridscaleIpv6Read(d *schema.ResourceData, meta interface{}) error
 	}
 	if err = d.Set("usage_in_minutes", ip.Properties.UsagesInMinutes); err != nil {
 		return fmt.Errorf("%s error setting usage_in_minutes: %v", errorPrefix, err)
-	}
-	if err = d.Set("current_price", ip.Properties.CurrentPrice); err != nil {
-		return fmt.Errorf("%s error setting current_price: %v", errorPrefix, err)
 	}
 	if err = d.Set("labels", ip.Properties.Labels); err != nil {
 		return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)

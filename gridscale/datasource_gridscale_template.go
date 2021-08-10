@@ -102,11 +102,6 @@ func dataSourceGridscaleTemplate() *schema.Resource {
 				Description: "The capacity of a storage/ISO image/template/snapshot in GB.",
 				Computed:    true,
 			},
-			"current_price": {
-				Type:        schema.TypeFloat,
-				Description: "Defines the price for the current period since the last bill.",
-				Computed:    true,
-			},
 		},
 	}
 }
@@ -168,10 +163,6 @@ func dataSourceGridscaleTemplateRead(d *schema.ResourceData, meta interface{}) e
 	if err = d.Set("capacity", template.Properties.Capacity); err != nil {
 		return fmt.Errorf("%s error setting capacity: %v", errorPrefix, err)
 	}
-	if err = d.Set("current_price", template.Properties.CurrentPrice); err != nil {
-		return fmt.Errorf("%s error setting current_price: %v", errorPrefix, err)
-	}
-
 	if err = d.Set("labels", template.Properties.Labels); err != nil {
 		return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
 	}

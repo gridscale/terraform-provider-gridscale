@@ -95,11 +95,6 @@ func resourceGridscaleIpv6() *schema.Resource {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"current_price": {
-				Type:        schema.TypeFloat,
-				Description: "Defines the price for the current period since the last bill.",
-				Computed:    true,
-			},
 		},
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(5 * time.Minute),

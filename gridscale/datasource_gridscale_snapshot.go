@@ -76,11 +76,6 @@ func dataSourceGridscaleStorageSnapshot() *schema.Resource {
 				Description: `If a template has been used that requires a license key (e.g. Windows Servers) this shows
 the product_no of the license (see the /prices endpoint for more details)`,
 			},
-			"current_price": {
-				Type:        schema.TypeFloat,
-				Computed:    true,
-				Description: "The price for the current period since the last bill",
-			},
 			"capacity": {
 				Type:        schema.TypeInt,
 				Computed:    true,
@@ -139,9 +134,6 @@ func dataSourceGridscaleSnapshotRead(d *schema.ResourceData, meta interface{}) e
 	}
 	if err = d.Set("license_product_no", props.LicenseProductNo); err != nil {
 		return fmt.Errorf("%s error setting license_product_no: %v", errorPrefix, err)
-	}
-	if err = d.Set("current_price", props.CurrentPrice); err != nil {
-		return fmt.Errorf("%s error setting current_price: %v", errorPrefix, err)
 	}
 	if err = d.Set("capacity", props.Capacity); err != nil {
 		return fmt.Errorf("%s error setting capacity: %v", errorPrefix, err)
