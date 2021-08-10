@@ -51,7 +51,6 @@ The following attributes are exported:
 * `create_time` - The date and time the ip was initially created.
 * `change_time` - The date and time of the last snapshot change.
 * `usage_in_minutes` - Total minutes the ip has been running.
-* `current_price` - The price for the current period since the last bill.
 * `capacity` - The capacity of the snapshot in GB.
 * `license_product_no` - If a template has been used that requires a license key (e.g. Windows Servers) this shows the product_no of the license (see the /prices endpoint for more details).
 * `labels` - The list of labels.

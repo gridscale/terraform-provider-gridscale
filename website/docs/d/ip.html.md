@@ -56,5 +56,4 @@ The following attributes are exported:
 * `change_time` - The date and time of the last ip change.
 * `delete_block` - Defines if the IP is administratively blocked.
 * `usage_in_minutes` - Total minutes the IP has been running.
-* `current_price` - The price for the current period since the last bill.
 * `labels` - The list of labels.

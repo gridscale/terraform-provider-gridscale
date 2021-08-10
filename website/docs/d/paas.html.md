@@ -45,7 +45,6 @@ The following attributes are exported:
 * `network_uuid` - Network UUID containing security zone.
 * `service_template_uuid` - The template used to create the service.
 * `usage_in_minute` - Number of minutes that PaaS service is in use.
-* `current_price` - Current price of PaaS service.
 * `change_time` - Time of the last change.
 * `create_time` - Time of the creation.
 * `status` - Current status of PaaS service.
