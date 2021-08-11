@@ -2,10 +2,12 @@ package gridscale
 
 import (
 	"context"
+	"errors"
 	"log"
 	"os"
 
 	"github.com/gridscale/gsclient-go/v3"
+	"gopkg.in/yaml.v2"
 )
 
 //Arrays can't be constants in Go, but these will be used as constants
@@ -75,4 +77,33 @@ func (c *Config) Client() (*gsclient.Client, error) {
 	err := initGlobalServerStatusList(context.Background(), client)
 
 	return client, err
+}
+
+// GSCloudAccountEntry represents a single account in the config file of gscloud.
+type GSCloudAccountEntry struct {
+	Name   string `yaml:"name"`
+	UserID string `yaml:"userId"`
+	Token  string `yaml:"token"`
+	URL    string `yaml:"url"`
+}
+
+// GSCloudConfig are all configuration settings parsed from a configuration file of gscloud.
+type GSCloudConfig struct {
+	Accounts []GSCloudAccountEntry `yaml:"accounts"`
+}
+
+func getGSCloudConfigFromPath(configFile string) (GSCloudConfig, error) {
+	config := GSCloudConfig{}
+	fileContent, err := os.ReadFile(configFile)
+	if err != nil {
+		return GSCloudConfig{}, err
+	}
+	err = yaml.Unmarshal(fileContent, &config)
+	if err != nil {
+		return GSCloudConfig{}, err
+	}
+	if len(config.Accounts) == 0 {
+		return GSCloudConfig{}, errors.New("no configuration in the config file.")
+	}
+	return config, nil
 }

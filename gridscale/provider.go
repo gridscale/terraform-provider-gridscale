@@ -2,10 +2,12 @@ package gridscale
 
 import (
 	"fmt"
+	"log"
 	"runtime"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/kirsle/configdir"
 )
 
 var (
@@ -33,6 +35,11 @@ func Provider() *schema.Provider {
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("GRIDSCALE_URL", nil),
 				Description: "the url for the gridscale API.",
+			},
+			"config_file": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Path of the compatible config file, e.g., gscloud's config file. Note: Only the first configured account is used.",
 			},
 			"http_headers": {
 				Type:        schema.TypeString,
@@ -114,10 +121,32 @@ func Provider() *schema.Provider {
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	headers := convertStrToHeaderMap(d.Get("http_headers").(string))
 	headers["User-Agent"] = fmt.Sprintf("terraform-provider-gridscale/%s-%s-%s", version, commit, runtime.GOOS)
+	uuid := d.Get("uuid").(string)
+	token := d.Get("token").(string)
+	apiURL := d.Get("api_url").(string)
+	if uuid == "" && token == "" {
+		log.Println("uuid, token are not set. Getting authentication information from gscloud config file...")
+		var configFile string
+		configFileInf, ok := d.GetOk("config_file")
+		if !ok {
+			configFile = configdir.LocalConfig("gscloud") + "/config.yaml"
+		} else {
+			configFile = configFileInf.(string)
+		}
+		log.Printf("Reading gscloud config from \"%s\"\n", configFile)
+		gscloudCfg, err := getGSCloudConfigFromPath(configFile)
+		if err != nil {
+			return nil, err
+		}
+		// get the 1st gscloud account config to use for tf config.
+		firstGSCloudAccount := gscloudCfg.Accounts[0]
+		uuid, token, apiURL = firstGSCloudAccount.UserID, firstGSCloudAccount.Token, firstGSCloudAccount.URL
+	}
+
 	config := Config{
-		UserUUID:    d.Get("uuid").(string),
-		APIToken:    d.Get("token").(string),
-		APIUrl:      d.Get("api_url").(string),
+		UserUUID:    uuid,
+		APIToken:    token,
+		APIUrl:      apiURL,
 		DelayIntMs:  d.Get("request_delay_interval").(int),
 		MaxNRetries: d.Get("max_n_retries").(int),
 		HTTPHeaders: headers,
