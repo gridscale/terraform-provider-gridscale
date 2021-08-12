@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.12.0 (Aug 12, 2021)
+
+FEATURES:
+- Allow setting storage variant [#171](https://github.com/gridscale/terraform-provider-gridscale/pull/171).
+
 ## 1.11.0 (Jun 24, 2021)
 
 IMPROVEMENTS:
