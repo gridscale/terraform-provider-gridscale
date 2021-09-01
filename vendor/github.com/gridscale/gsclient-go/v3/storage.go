@@ -73,8 +73,13 @@ type StorageProperties struct {
 	// Helps to identify which data center an object belongs to.
 	LocationUUID string `json:"location_uuid"`
 
-	//(one of storage, storage_high, storage_insane).
+	// Storage type.
+	// (one of storage, storage_high, storage_insane).
 	StorageType string `json:"storage_type"`
+
+	// Storage variant.
+	// (one of local or distributed).
+	StorageVariant string `json:"storage_variant"`
 
 	// The UUID of the Storage used to create this Snapshot.
 	ParentUUID string `json:"parent_uuid"`

@@ -304,7 +304,6 @@ const (
 	SophosUTMServerHardware ServerHardwareProfile = "sophos_utm"
 	F5BigipServerHardware   ServerHardwareProfile = "f5_bigip"
 	Q35ServerHardware       ServerHardwareProfile = "q35"
-	Q35NestedServerHardware ServerHardwareProfile = "q35_nested"
 )
 
 // GetServer gets a specific server based on given list.

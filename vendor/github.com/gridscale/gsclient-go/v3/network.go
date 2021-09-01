@@ -71,6 +71,26 @@ type NetworkProperties struct {
 	// It will be true if the network is public, and false if the network is private.
 	L2Security bool `json:"l2security"`
 
+	// Defines the information if dhcp is activated for this network or not.
+	DHCPActive bool `json:"dhcp_active"`
+
+	// The general IP Range configured for this network (/24 for private networks).
+	DHCPRange string `json:"dhcp_range"`
+
+	// The ip reserved and communicated by the dhcp service to be the default gateway.
+	DHCPGateway string `json:"dhcp_gateway"`
+
+	DHCPDNS string `json:"dhcp_dns"`
+
+	// Subrange within the ip range.
+	DHCPReservedSubnet []string `json:"dhcp_reserved_subnet"`
+
+	// Contains ips of all servers in the network which got a designated IP by the DHCP server.
+	AutoAssignedServers []ServerWithIP `json:"auto_assigned_servers"`
+
+	// Contains ips of all servers in the network which got a designated IP by the user.
+	PinnedServers []ServerWithIP `json:"pinned_servers"`
+
 	// Defines the date and time of the last object change.
 	ChangeTime GSTime `json:"change_time"`
 
@@ -88,6 +108,15 @@ type NetworkProperties struct {
 
 	// The information about other object which are related to this network. the object could be servers and/or vlans.
 	Relations NetworkRelations `json:"relations"`
+}
+
+// ServerWithIP holds a server's UUID and a corresponding IP address
+type ServerWithIP struct {
+	// UUID of the server
+	ServerUUID string `json:"server_uuid"`
+
+	// IP which is assigned to the server
+	IP string `json:"ip"`
 }
 
 // NetworkRelations holds a list of a network's relations.
@@ -167,6 +196,20 @@ type NetworkCreateRequest struct {
 	// It can only be (de-)activated on a private network - the public network always has l2security enabled.
 	// It will be true if the network is public, and false if the network is private.
 	L2Security bool `json:"l2security,omitempty"`
+
+	// Defines the information if dhcp is activated for this network or not.
+	DHCPActive bool `json:"dhcp_active,omitempty"`
+
+	// The general IP Range configured for this network (/24 for private networks).
+	DHCPRange string `json:"dhcp_range,omitempty"`
+
+	// The ip reserved and communicated by the dhcp service to be the default gateway.
+	DHCPGateway string `json:"dhcp_gateway,omitempty"`
+
+	DHCPDNS string `json:"dhcp_dns,omitempty"`
+
+	// Subrange within the ip range.
+	DHCPReservedSubnet []string `json:"dhcp_reserved_subnet,omitempty"`
 }
 
 // NetworkCreateResponse represents a response for creating a network.
@@ -188,6 +231,20 @@ type NetworkUpdateRequest struct {
 
 	// List of labels. Can be empty.
 	Labels *[]string `json:"labels,omitempty"`
+
+	// Defines the information if dhcp is activated for this network or not.
+	DHCPActive *bool `json:"dhcp_active,omitempty"`
+
+	// The general IP Range configured for this network (/24 for private networks).
+	DHCPRange *string `json:"dhcp_range,omitempty"`
+
+	// The ip reserved and communicated by the dhcp service to be the default gateway.
+	DHCPGateway *string `json:"dhcp_gateway,omitempty"`
+
+	DHCPDNS *string `json:"dhcp_dns,omitempty"`
+
+	// Subrange within the ip range.
+	DHCPReservedSubnet *[]string `json:"dhcp_reserved_subnet,omitempty"`
 }
 
 // GetNetwork get a specific network based on given id.
