@@ -44,6 +44,17 @@ The following attributes are exported:
 * `name` - The UUID of the network.
 * `location_uuid` - The UUID of the location, that helps to identify which datacenter the network belongs to.
 * `l2security` - Defines information about MAC spoofing protection.
+* `dhcp_active` - Tell if DHCP is enabled.
+* `dhcp_gateway` - The general IP Range configured for this network (/24 for private networks). 
+* `dhcp_dns` - The IP address reserved and communicated by the dhcp service to be the default gateway.
+* `dhcp_range` -  DHCP DNS.
+* `dhcp_reserved_subnet` -  Subrange within the IP range.
+* `auto_assigned_servers` - Contains IP addresses of all servers in the network which got a designated IP by the DHCP server.
+  * `server_uuid` - UUID of the server.
+  * `ip` - IP which is assigned to the server.
+* `pinned_servers` - Contains IP addresses of all servers in the network which got a designated IP by the user.
+  * `server_uuid` - UUID of the server.
+  * `ip` - IP which is assigned to the server.
 * `status` - The status of the network.
 * `network_type` - The type of the network.
 * `location_country` - The human-readable name of the country where the network is located.
