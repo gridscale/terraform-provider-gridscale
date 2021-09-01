@@ -57,7 +57,7 @@ func resourceGridscaleNetwork() *schema.Resource {
 			},
 			"dhcp_reserved_subnet": {
 				Type:        schema.TypeSet,
-				Description: "Subrange within the IP range",
+				Description: "Subrange within the IP range.",
 				Optional:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
