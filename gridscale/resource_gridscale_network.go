@@ -79,7 +79,7 @@ func resourceGridscaleNetwork() *schema.Resource {
 				},
 			},
 			"pinned_servers": {
-				Type:        schema.TypeString,
+				Type:        schema.TypeSet,
 				Description: "Contains IP addresses of all servers in the network which got a designated IP by the user.",
 				Computed:    true,
 				Elem: &schema.Resource{
