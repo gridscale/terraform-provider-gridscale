@@ -193,6 +193,31 @@ func resourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) erro
 	if err = d.Set("dhcp_reserved_subnet", network.Properties.DHCPReservedSubnet); err != nil {
 		return fmt.Errorf("%s error setting dhcp_reserved_subnet: %v", errorPrefix, err)
 	}
+
+	autoAssignedServers := make([]interface{}, 0)
+	for _, value := range network.Properties.AutoAssignedServers {
+		serverWIP := map[string]interface{}{
+			"server_uuid": value.ServerUUID,
+			"ip":          value.IP,
+		}
+		autoAssignedServers = append(autoAssignedServers, serverWIP)
+	}
+	if err = d.Set("auto_assigned_servers", autoAssignedServers); err != nil {
+		return fmt.Errorf("%s error setting auto_assigned_servers: %v", errorPrefix, err)
+	}
+
+	pinnedServers := make([]interface{}, 0)
+	for _, value := range network.Properties.PinnedServers {
+		serverWIP := map[string]interface{}{
+			"server_uuid": value.ServerUUID,
+			"ip":          value.IP,
+		}
+		pinnedServers = append(pinnedServers, serverWIP)
+	}
+	if err = d.Set("pinned_servers", pinnedServers); err != nil {
+		return fmt.Errorf("%s error setting pinned_servers: %v", errorPrefix, err)
+	}
+
 	if err = d.Set("status", network.Properties.Status); err != nil {
 		return fmt.Errorf("%s error setting status: %v", errorPrefix, err)
 	}
