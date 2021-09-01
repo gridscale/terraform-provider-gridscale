@@ -35,9 +35,69 @@ func resourceGridscaleNetwork() *schema.Resource {
 				Optional:    true,
 				Default:     false,
 			},
+			"dhcp_active": {
+				Type:        schema.TypeBool,
+				Description: "Enable DHCP.",
+				Optional:    true,
+			},
+			"dhcp_range": {
+				Type:        schema.TypeString,
+				Description: "The general IP Range configured for this network (/24 for private networks). If it is not set, gridscale internal default range is used.",
+				Optional:    true,
+			},
+			"dhcp_gateway": {
+				Type:        schema.TypeString,
+				Description: "The IP address reserved and communicated by the dhcp service to be the default gateway.",
+				Optional:    true,
+			},
+			"dhcp_dns": {
+				Type:        schema.TypeString,
+				Description: "DHCP DNS.",
+				Optional:    true,
+			},
+			"dhcp_reserved_subnet": {
+				Type:        schema.TypeSet,
+				Description: "Subrange within the IP range",
+				Optional:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+			},
+			"auto_assigned_servers": {
+				Type:        schema.TypeSet,
+				Description: "Contains IP addresses of all servers in the network which got a designated IP by the DHCP server.",
+				Computed:    true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"server_uuid": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"ip": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+					},
+				},
+			},
+			"pinned_servers": {
+				Type:        schema.TypeString,
+				Description: "Contains IP addresses of all servers in the network which got a designated IP by the user.",
+				Computed:    true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"server_uuid": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"ip": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+					},
+				},
+			},
 			"status": {
 				Type:        schema.TypeString,
-				Description: "status indicates the status of the object",
+				Description: "status indicates the status of the object.",
 				Computed:    true,
 			},
 			"network_type": {
@@ -118,6 +178,21 @@ func resourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) erro
 	if err = d.Set("l2security", network.Properties.L2Security); err != nil {
 		return fmt.Errorf("%s error setting l2security: %v", errorPrefix, err)
 	}
+	if err = d.Set("dhcp_active", network.Properties.DHCPActive); err != nil {
+		return fmt.Errorf("%s error setting dhcp_active: %v", errorPrefix, err)
+	}
+	if err = d.Set("dhcp_range", network.Properties.DHCPRange); err != nil {
+		return fmt.Errorf("%s error setting dhcp_range: %v", errorPrefix, err)
+	}
+	if err = d.Set("dhcp_gateway", network.Properties.DHCPGateway); err != nil {
+		return fmt.Errorf("%s error setting dhcp_gateway: %v", errorPrefix, err)
+	}
+	if err = d.Set("dhcp_dns", network.Properties.DHCPDNS); err != nil {
+		return fmt.Errorf("%s error setting dhcp_dns: %v", errorPrefix, err)
+	}
+	if err = d.Set("dhcp_reserved_subnet", network.Properties.DHCPReservedSubnet); err != nil {
+		return fmt.Errorf("%s error setting dhcp_reserved_subnet: %v", errorPrefix, err)
+	}
 	if err = d.Set("status", network.Properties.Status); err != nil {
 		return fmt.Errorf("%s error setting status: %v", errorPrefix, err)
 	}
@@ -160,6 +235,26 @@ func resourceGridscaleNetworkUpdate(d *schema.ResourceData, meta interface{}) er
 		L2Security: d.Get("l2security").(bool),
 		Labels:     &labels,
 	}
+	if d.HasChange("dhcp_active") {
+		dhcpActive := d.Get("dhcp_active").(bool)
+		requestBody.DHCPActive = &dhcpActive
+	}
+	if d.HasChange("dhcp_range") {
+		dhcpRange := d.Get("dhcp_range").(string)
+		requestBody.DHCPRange = &dhcpRange
+	}
+	if d.HasChange("dhcp_gateway") {
+		dhcpGateway := d.Get("dhcp_gateway").(string)
+		requestBody.DHCPGateway = &dhcpGateway
+	}
+	if d.HasChange("dhcp_dns") {
+		dhcpDNS := d.Get("dhcp_dns").(string)
+		requestBody.DHCPDNS = &dhcpDNS
+	}
+	if d.HasChange("dhcp_reserved_subnet") {
+		dhcpReservedSubnet := convSOStrings(d.Get("dhcp_reserved_subnet").(*schema.Set).List())
+		requestBody.DHCPReservedSubnet = &dhcpReservedSubnet
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
 	defer cancel()
@@ -178,6 +273,22 @@ func resourceGridscaleNetworkCreate(d *schema.ResourceData, meta interface{}) er
 		Name:       d.Get("name").(string),
 		L2Security: d.Get("l2security").(bool),
 		Labels:     convSOStrings(d.Get("labels").(*schema.Set).List()),
+	}
+
+	if dhcpActiveIntf, ok := d.GetOk("dhcp_active"); ok {
+		requestBody.DHCPActive = dhcpActiveIntf.(bool)
+	}
+	if dhcpRangeIntf, ok := d.GetOk("dhcp_range"); ok {
+		requestBody.DHCPRange = dhcpRangeIntf.(string)
+	}
+	if dhcpGatewayIntf, ok := d.GetOk("dhcp_gateway"); ok {
+		requestBody.DHCPGateway = dhcpGatewayIntf.(string)
+	}
+	if dhcpDNSIntf, ok := d.GetOk("dhcp_dns"); ok {
+		requestBody.DHCPDNS = dhcpDNSIntf.(string)
+	}
+	if dhcpReservedSubnetIntf, ok := d.GetOk("dhcp_reserved_subnet"); ok {
+		requestBody.DHCPReservedSubnet = convSOStrings(dhcpReservedSubnetIntf.(*schema.Set).List())
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
