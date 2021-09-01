@@ -17,11 +17,11 @@ var supportedPrimTypes = []string{boolInterfaceType, intInterfaceType, floatInte
 
 //convSOStrings converts slice of interfaces to slice of strings
 func convSOStrings(interfaceList []interface{}) []string {
-	labels := make([]string, 0)
-	for _, labelInterface := range interfaceList {
-		labels = append(labels, labelInterface.(string))
+	strList := make([]string, 0)
+	for _, strIntf := range interfaceList {
+		strList = append(strList, strIntf.(string))
 	}
-	return labels
+	return strList
 }
 
 //convStrToTypeInterface converts a string to a primitive type (in the form of interface{})
