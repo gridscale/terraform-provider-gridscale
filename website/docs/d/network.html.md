@@ -49,10 +49,10 @@ The following attributes are exported:
 * `dhcp_dns` - The IP address reserved and communicated by the dhcp service to be the default gateway.
 * `dhcp_range` -  DHCP DNS.
 * `dhcp_reserved_subnet` -  Subrange within the IP range.
-* `auto_assigned_servers` - Contains IP addresses of all servers in the network which got a designated IP by the DHCP server.
+* `auto_assigned_servers` - A list of server UUIDs with the corresponding IPs that are designated by the DHCP server.
   * `server_uuid` - UUID of the server.
   * `ip` - IP which is assigned to the server.
-* `pinned_servers` - Contains IP addresses of all servers in the network which got a designated IP by the user.
+* `pinned_servers` - A list of server UUIDs with the corresponding IPs that are designated by the user.
   * `server_uuid` - UUID of the server.
   * `ip` - IP which is assigned to the server.
 * `status` - The status of the network.

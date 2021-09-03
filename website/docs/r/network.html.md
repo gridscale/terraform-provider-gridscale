@@ -70,10 +70,10 @@ This resource exports the following attributes:
 * `dhcp_dns` - See Argument Reference above.
 * `dhcp_range` - See Argument Reference above.
 * `dhcp_reserved_subnet` - See Argument Reference above.
-* `auto_assigned_servers` - Contains IP addresses of all servers in the network which got a designated IP by the DHCP server.
+* `auto_assigned_servers` - A list of server UUIDs with the corresponding IPs that are designated by the DHCP server.
   * `server_uuid` - UUID of the server.
   * `ip` - IP which is assigned to the server.
-* `pinned_servers` - Contains IP addresses of all servers in the network which got a designated IP by the user.
+* `pinned_servers` - A list of server UUIDs with the corresponding IPs that are designated by the user.
   * `server_uuid` - UUID of the server.
   * `ip` - IP which is assigned to the server.
 * `status` - status indicates the status of the object.

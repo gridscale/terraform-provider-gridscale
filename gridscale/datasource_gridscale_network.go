@@ -58,7 +58,7 @@ func dataSourceGridscaleNetwork() *schema.Resource {
 			},
 			"auto_assigned_servers": {
 				Type:        schema.TypeSet,
-				Description: "Contains IP addresses of all servers in the network which got a designated IP by the DHCP server.",
+				Description: "A list of server UUIDs with the corresponding IPs that are designated by the DHCP server.",
 				Computed:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -75,7 +75,7 @@ func dataSourceGridscaleNetwork() *schema.Resource {
 			},
 			"pinned_servers": {
 				Type:        schema.TypeSet,
-				Description: "Contains IP addresses of all servers in the network which got a designated IP by the user.",
+				Description: "A list of server UUIDs with the corresponding IPs that are designated by the user.",
 				Computed:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
