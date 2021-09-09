@@ -76,7 +76,7 @@ github.com/golang/protobuf/ptypes/timestamp
 github.com/google/uuid
 # github.com/googleapis/gax-go/v2 v2.0.5
 github.com/googleapis/gax-go/v2
-# github.com/gridscale/gsclient-go/v3 v3.6.3
+# github.com/gridscale/gsclient-go/v3 v3.7.0
 ## explicit
 github.com/gridscale/gsclient-go/v3
 # github.com/hashicorp/errwrap v1.0.0

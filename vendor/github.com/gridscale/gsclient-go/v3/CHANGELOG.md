@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.7.0 (Aug 30, 2021)
+
+FEATURES:
+
+* Add DHCP options to network create/update operations ([#206](https://github.com/gridscale/gsclient-go/issues/206)).
+* Add DHCP-relating properties to network's properties ([#206](https://github.com/gridscale/gsclient-go/issues/206)).
+
 ## 3.6.3 (May 11, 2021)
 
 BUG FIXES:

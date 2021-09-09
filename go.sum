@@ -157,8 +157,8 @@ github.com/google/uuid v1.2.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+
 github.com/googleapis/gax-go/v2 v2.0.4/go.mod h1:0Wqv26UfaUD9n4G6kQubkQ+KchISgw+vpHVxEJEs9eg=
 github.com/googleapis/gax-go/v2 v2.0.5 h1:sjZBwGj9Jlw33ImPtvFviGYvseOtDM7hkSKB7+Tv3SM=
 github.com/googleapis/gax-go/v2 v2.0.5/go.mod h1:DWXyrwAJ9X0FpwwEdw+IPEYBICEFu5mhpdKc/us6bOk=
-github.com/gridscale/gsclient-go/v3 v3.6.3 h1:YF3/088C/zLed+BANMOdfh6KKrhsDJOjCsh4iHY+fzk=
-github.com/gridscale/gsclient-go/v3 v3.6.3/go.mod h1:A9+Af0aJL+uei0DwAEnZ3G6gZgdC5oOyw2ZUPxUfvTs=
+github.com/gridscale/gsclient-go/v3 v3.7.0 h1:t3ZzAj9VUW8idmOz1AScYJm+4kd/SP5jYRI2YNROaw8=
+github.com/gridscale/gsclient-go/v3 v3.7.0/go.mod h1:A9+Af0aJL+uei0DwAEnZ3G6gZgdC5oOyw2ZUPxUfvTs=
 github.com/hashicorp/errwrap v1.0.0 h1:hLrqtEDnRye3+sgx6z4qVLNuviH3MR5aQ0ykNJa/UYA=
 github.com/hashicorp/errwrap v1.0.0/go.mod h1:YH+1FKiLXxHSkmPseP+kNlulaMuP3n2brvKWEqk/Jc4=
 github.com/hashicorp/go-checkpoint v0.5.0 h1:MFYpPZCnQqQTE18jFwSII6eUQrD/oxMFp3mlgcqk5mU=

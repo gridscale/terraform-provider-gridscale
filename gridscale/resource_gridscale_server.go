@@ -616,8 +616,6 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		requestBody.HardwareProfile = gsclient.F5BigipServerHardware
 	} else if profile == "q35" {
 		requestBody.HardwareProfile = gsclient.Q35ServerHardware
-	} else if profile == "q35_nested" {
-		requestBody.HardwareProfile = gsclient.Q35NestedServerHardware
 	} else {
 		requestBody.HardwareProfile = gsclient.DefaultServerHardware
 	}

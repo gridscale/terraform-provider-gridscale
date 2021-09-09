@@ -21,6 +21,14 @@ func TestAccdataSourceGridscaleNetwork_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.gridscale_network.foo", "id"),
 					resource.TestCheckResourceAttr("data.gridscale_network.foo", "name", name),
+					resource.TestCheckResourceAttr(
+						"data.gridscale_network.foo", "dhcp_active", "true"),
+					resource.TestCheckResourceAttr(
+						"data.gridscale_network.foo", "dhcp_gateway", "192.168.121.1"),
+					resource.TestCheckResourceAttr(
+						"data.gridscale_network.foo", "dhcp_dns", "192.168.121.2"),
+					resource.TestCheckResourceAttr(
+						"data.gridscale_network.foo", "dhcp_reserved_subnet.#", "1"),
 				),
 			},
 		},
@@ -33,6 +41,11 @@ func testAccCheckDataSourceNetworkConfig_basic(name string) string {
 
 resource "gridscale_network" "foo" {
   name   = "%s"
+  dhcp_active = true
+  dhcp_gateway = "192.168.121.1"
+  dhcp_dns = "192.168.121.2"
+  dhcp_range = "192.168.121.0/27"
+  dhcp_reserved_subnet = ["192.168.121.0/31"]
 }
 
 data "gridscale_network" "foo" {

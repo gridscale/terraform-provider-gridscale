@@ -30,6 +30,66 @@ func dataSourceGridscaleNetwork() *schema.Resource {
 				Description: "MAC spoofing protection - filters layer2 and ARP traffic based on source MAC",
 				Computed:    true,
 			},
+			"dhcp_active": {
+				Type:        schema.TypeBool,
+				Description: "Enable DHCP.",
+				Computed:    true,
+			},
+			"dhcp_range": {
+				Type:        schema.TypeString,
+				Description: "The general IP Range configured for this network (/24 for private networks). If it is not set, gridscale internal default range is used.",
+				Computed:    true,
+			},
+			"dhcp_gateway": {
+				Type:        schema.TypeString,
+				Description: "The IP address reserved and communicated by the dhcp service to be the default gateway.",
+				Computed:    true,
+			},
+			"dhcp_dns": {
+				Type:        schema.TypeString,
+				Description: "DHCP DNS.",
+				Computed:    true,
+			},
+			"dhcp_reserved_subnet": {
+				Type:        schema.TypeSet,
+				Description: "Subrange within the IP range",
+				Computed:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+			},
+			"auto_assigned_servers": {
+				Type:        schema.TypeSet,
+				Description: "A list of server UUIDs with the corresponding IPs that are designated by the DHCP server.",
+				Computed:    true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"server_uuid": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"ip": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+					},
+				},
+			},
+			"pinned_servers": {
+				Type:        schema.TypeSet,
+				Description: "A list of server UUIDs with the corresponding IPs that are designated by the user.",
+				Computed:    true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"server_uuid": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"ip": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+					},
+				},
+			},
 			"status": {
 				Type:        schema.TypeString,
 				Description: "status indicates the status of the object",
@@ -105,6 +165,46 @@ func dataSourceGridscaleNetworkRead(d *schema.ResourceData, meta interface{}) er
 	}
 	if err = d.Set("l2security", network.Properties.L2Security); err != nil {
 		return fmt.Errorf("%s error setting l2security: %v", errorPrefix, err)
+	}
+	if err = d.Set("dhcp_active", network.Properties.DHCPActive); err != nil {
+		return fmt.Errorf("%s error setting dhcp_active: %v", errorPrefix, err)
+	}
+	if err = d.Set("dhcp_range", network.Properties.DHCPRange); err != nil {
+		return fmt.Errorf("%s error setting dhcp_range: %v", errorPrefix, err)
+	}
+	if err = d.Set("dhcp_gateway", network.Properties.DHCPGateway); err != nil {
+		return fmt.Errorf("%s error setting dhcp_gateway: %v", errorPrefix, err)
+	}
+	if err = d.Set("dhcp_dns", network.Properties.DHCPDNS); err != nil {
+		return fmt.Errorf("%s error setting dhcp_dns: %v", errorPrefix, err)
+	}
+	if err = d.Set("dhcp_reserved_subnet", network.Properties.DHCPReservedSubnet); err != nil {
+		return fmt.Errorf("%s error setting dhcp_reserved_subnet: %v", errorPrefix, err)
+	}
+
+	autoAssignedServers := make([]interface{}, 0)
+	for _, value := range network.Properties.AutoAssignedServers {
+		serverWIP := map[string]interface{}{
+			"server_uuid": value.ServerUUID,
+			"ip":          value.IP,
+		}
+		autoAssignedServers = append(autoAssignedServers, serverWIP)
+	}
+	if err = d.Set("auto_assigned_servers", autoAssignedServers); err != nil {
+		return fmt.Errorf("%s error setting auto_assigned_servers: %v", errorPrefix, err)
+	}
+
+	pinnedServers := make([]interface{}, 0)
+	for _, value := range network.Properties.PinnedServers {
+		serverWIP := map[string]interface{}{
+			"server_uuid": value.ServerUUID,
+			"ip":          value.IP,
+		}
+		pinnedServers = append(pinnedServers, serverWIP)
+	}
+
+	if err = d.Set("pinned_servers", pinnedServers); err != nil {
+		return fmt.Errorf("%s error setting pinned_servers: %v", errorPrefix, err)
 	}
 	if err = d.Set("status", network.Properties.Status); err != nil {
 		return fmt.Errorf("%s error setting status: %v", errorPrefix, err)

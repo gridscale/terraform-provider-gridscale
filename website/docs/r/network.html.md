@@ -17,6 +17,11 @@ The following example shows how one might use this resource to add a network to 
 ```terraform
 resource "gridscale_network" "networkname"{
   name = "terraform-network"
+  dhcp_active = true
+  dhcp_gateway = "192.168.121.1"
+  dhcp_dns = "192.168.121.2"
+  dhcp_range = "192.168.121.0/27"
+  dhcp_reserved_subnet = ["192.168.121.0/31"]
   timeouts {
       create="10m"
   }
@@ -32,6 +37,16 @@ The following arguments are supported:
 * `l2security` - (Optional) Defines information about MAC spoofing protection (filters layer2 and ARP traffic based on MAC source). It can only be (de-)activated on a private network - the public network always has l2security enabled. It will be true if the network is public, and false if the network is private.
 
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
+
+* `dhcp_active` - (Optional) Enable DHCP.
+
+* `dhcp_gateway` - (Optional) The general IP Range configured for this network (/24 for private networks). If it is not set, gridscale internal default range is used.
+
+* `dhcp_dns` - (Optional) The IP address reserved and communicated by the dhcp service to be the default gateway.
+
+* `dhcp_range` - (Optional) DHCP DNS.
+
+* `dhcp_reserved_subnet` - (Optional) Subrange within the IP range.
 
 ## Timeouts
 
@@ -50,6 +65,17 @@ This resource exports the following attributes:
 * `location_uuid` - The location this network is placed. The location of a resource is determined by it's project.
 * `l2security` - See Argument Reference above.
 * `labels` - See Argument Reference above.
+* `dhcp_active` - See Argument Reference above.
+* `dhcp_gateway` - See Argument Reference above.
+* `dhcp_dns` - See Argument Reference above.
+* `dhcp_range` - See Argument Reference above.
+* `dhcp_reserved_subnet` - See Argument Reference above.
+* `auto_assigned_servers` - A list of server UUIDs with the corresponding IPs that are designated by the DHCP server.
+  * `server_uuid` - UUID of the server.
+  * `ip` - IP which is assigned to the server.
+* `pinned_servers` - A list of server UUIDs with the corresponding IPs that are designated by the user.
+  * `server_uuid` - UUID of the server.
+  * `ip` - IP which is assigned to the server.
 * `status` - status indicates the status of the object.
 * `create_time` - The time the object was created.
 * `change_time` - Defines the date and time of the last object change.
