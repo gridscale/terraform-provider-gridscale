@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.13.0 (Sept 09, 2021)
+
+FEATURES:
+
+- Add DHCP properties/options to the network resource/data source [#180](https://github.com/gridscale/terraform-provider-gridscale/pull/180).
+
+IMPROVEMENTS:
+
+- Update the network's docs.
+
 ## 1.12.0 (Aug 12, 2021)
 
 FEATURES:
