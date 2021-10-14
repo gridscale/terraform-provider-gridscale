@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/gridscale/gsclient-go/v3"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/customdiff"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	errHandler "github.com/terraform-providers/terraform-provider-gridscale/gridscale/error-handler"
@@ -31,38 +30,42 @@ func resourceGridscaleK8s() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-		CustomizeDiff: customdiff.All(
-			customdiff.ValidateChange("release", func(ctx context.Context, old, new, meta interface{}) error {
-				client := meta.(*gsclient.Client)
-				newReleaseVal := new.(string)
-				paasTemplates, err := client.GetPaaSTemplateList(ctx)
-				if err != nil {
-					return err
-				}
-				var isReleaseValid bool
-				var releaseList []string
-			TEMPLATELOOP:
-				for _, template := range paasTemplates {
-					if template.Properties.Flavour == k8sTemplateFlavourName {
-						// check if release already presents in the release list.
-						// If so, ignore it.
-						for _, release := range releaseList {
-							if release == template.Properties.Release {
-								continue TEMPLATELOOP
-							}
-						}
-						releaseList = append(releaseList, template.Properties.Release)
-						if template.Properties.Release == newReleaseVal {
-							isReleaseValid = true
+		CustomizeDiff: func(ctx context.Context, d *schema.ResourceDiff, meta interface{}) error {
+			client := meta.(*gsclient.Client)
+			newReleaseVal := d.Get("release").(string)
+			paasTemplates, err := client.GetPaaSTemplateList(ctx)
+			if err != nil {
+				return err
+			}
+			var isReleaseValid bool
+			var releaseList []string
+			var selectedTemplate gsclient.PaaSTemplate
+		TEMPLATELOOP:
+			for _, template := range paasTemplates {
+				if template.Properties.Flavour == k8sTemplateFlavourName {
+					// check if release already presents in the release list.
+					// If so, ignore it.
+					for _, release := range releaseList {
+						if release == template.Properties.Release {
+							continue TEMPLATELOOP
 						}
 					}
+					releaseList = append(releaseList, template.Properties.Release)
+					if template.Properties.Release == newReleaseVal {
+						isReleaseValid = true
+						selectedTemplate = template
+					}
 				}
-				if !isReleaseValid {
-					return fmt.Errorf("%v is not a valid Kubernetes release. Valid releases are: %v\n", newReleaseVal, strings.Join(releaseList, ", "))
-				}
-				return nil
-			}),
-		),
+			}
+			if !isReleaseValid {
+				return fmt.Errorf("%v is not a valid Kubernetes release. Valid releases are: %v\n", newReleaseVal, strings.Join(releaseList, ", "))
+			}
+			// check if nod pool parameters are valid
+			if err := validateK8sNodePoolParameters(selectedTemplate.Properties.ParametersSchema, d); err != nil {
+				return err
+			}
+			return nil
+		},
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:         schema.TypeString,
@@ -132,63 +135,26 @@ func resourceGridscaleK8s() *schema.Resource {
 							Type:        schema.TypeInt,
 							Description: "Number of worker nodes.",
 							Required:    true,
-							ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
-								if 1 > v.(int) || v.(int) > 30 {
-									errors = append(errors, fmt.Errorf("%v is not a valid value for number of \"node_count\". Valid value should be between 1 and 30\n", v.(int)))
-								}
-								return
-							},
 						},
 						"cores": {
 							Type:        schema.TypeInt,
 							Description: "Cores per worker node.",
 							Required:    true,
-							ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
-								if 1 > v.(int) || v.(int) > 32 {
-									errors = append(errors, fmt.Errorf("%v is not a valid value for number of \"cores\". Valid value should be between 1 and 32\n", v.(int)))
-								}
-								return
-							},
 						},
 						"memory": {
 							Type:        schema.TypeInt,
 							Description: "Memory per worker node (in GiB).",
 							Required:    true,
-							ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
-								if 2 > v.(int) || v.(int) > 192 {
-									errors = append(errors, fmt.Errorf("%v is not a valid value for number of \"memory\". Valid value should be between 2 and 192\n", v.(int)))
-								}
-								return
-							},
 						},
 						"storage": {
 							Type:        schema.TypeInt,
 							Description: "Storage per worker node (in GiB).",
 							Required:    true,
-							ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
-								if 30 > v.(int) || v.(int) > 1024 {
-									errors = append(errors, fmt.Errorf("%v is not a valid value for number of \"storage\". Valid value should be between 30 and 1024\n", v.(int)))
-								}
-								return
-							},
 						},
 						"storage_type": {
 							Type:        schema.TypeString,
 							Description: "Storage type (one of storage, `storage_high, storage_insane).",
 							Required:    true,
-							ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
-								valid := false
-								for _, stype := range storageTypes {
-									if v.(string) == stype {
-										valid = true
-										break
-									}
-								}
-								if !valid {
-									errors = append(errors, fmt.Errorf("%v is not a valid storage type. Valid types are: %v", v.(string), strings.Join(storageTypes, ",")))
-								}
-								return
-							},
 						},
 					},
 				},
@@ -443,4 +409,52 @@ func getK8sTemplateUUID(client *gsclient.Client, release string) (string, error)
 	}
 
 	return uTemplate.Properties.ObjectUUID, nil
+}
+
+func validateK8sNodePoolParameters(paramScheme map[string]gsclient.Parameter, d *schema.ResourceDiff) error {
+	nodePoolList := d.Get("node_pool").([]interface{})
+	var errMessage string
+	for i, node := range nodePoolList {
+		nodePool := node.(map[string]interface{})
+		if nodePool["memory"].(int) < paramScheme["k8s_worker_node_ram"].Min {
+			errMessage = fmt.Sprintf("%snode_pool.%d.memory must be at least %d\n", errMessage, i, paramScheme["k8s_worker_node_ram"].Min)
+		}
+		if nodePool["memory"].(int) > paramScheme["k8s_worker_node_ram"].Max {
+			errMessage = fmt.Sprintf("%snode_pool.%d.memory must be at most %d\n", errMessage, i, paramScheme["k8s_worker_node_ram"].Max)
+		}
+		if nodePool["cores"].(int) < paramScheme["k8s_worker_node_cores"].Min {
+			errMessage = fmt.Sprintf("%snode_pool.%d.cores must be at least %d\n", errMessage, i, paramScheme["k8s_worker_node_cores"].Min)
+		}
+		if nodePool["cores"].(int) > paramScheme["k8s_worker_node_cores"].Max {
+			errMessage = fmt.Sprintf("%snode_pool.%d.cores must be at most %d\n", errMessage, i, paramScheme["k8s_worker_node_cores"].Max)
+		}
+		if nodePool["node_count"].(int) < paramScheme["k8s_worker_node_count"].Min {
+			errMessage = fmt.Sprintf("%snode_pool.%d.node_count must be at least %d\n", errMessage, i, paramScheme["k8s_worker_node_count"].Min)
+		}
+		if nodePool["node_count"].(int) > paramScheme["k8s_worker_node_count"].Max {
+			errMessage = fmt.Sprintf("%snode_pool.%d.node_count must be at most %d\n", errMessage, i, paramScheme["k8s_worker_node_count"].Max)
+		}
+		if nodePool["storage"].(int) < paramScheme["k8s_worker_node_storage"].Min {
+			errMessage = fmt.Sprintf("%snode_pool.%d.storage must be at least %d\n", errMessage, i, paramScheme["k8s_worker_node_storage"].Min)
+		}
+		if nodePool["storage"].(int) > paramScheme["k8s_worker_node_storage"].Max {
+			errMessage = fmt.Sprintf("%snode_pool.%d.storage must be at most %d\n", errMessage, i, paramScheme["k8s_worker_node_storage"].Max)
+		}
+		// Check if storage type is allowed
+		var storageTypeValid bool
+	STORAGE_TYPE_VALIDATE:
+		for _, stype := range paramScheme["k8s_worker_node_storage_type"].Allowed {
+			if nodePool["storage_type"].(string) == stype {
+				storageTypeValid = true
+				break STORAGE_TYPE_VALIDATE
+			}
+		}
+		if !storageTypeValid {
+			errMessage = fmt.Sprintf("%snode_pool.%d.storage_type must be one of %v\n", errMessage, i, paramScheme["k8s_worker_node_storage_type"].Allowed)
+		}
+	}
+	if errMessage != "" {
+		return fmt.Errorf(errMessage)
+	}
+	return nil
 }
