@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/gridscale/gsclient-go/v3"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
@@ -126,6 +127,11 @@ func resourceGridscaleK8s() *schema.Resource {
 				Description: `Node pool's specification.`,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
+						"uuid": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "UUID of node pool.",
+						},
 						"name": {
 							Type:        schema.TypeString,
 							Required:    true,
@@ -262,6 +268,17 @@ func resourceGridscaleK8sRead(d *schema.ResourceData, meta interface{}) error {
 		"memory":       props.Parameters["k8s_worker_node_ram"],
 		"storage":      props.Parameters["k8s_worker_node_storage"],
 		"storage_type": props.Parameters["k8s_worker_node_storage_type"],
+	}
+	// Set a new UUID to the node pool, if
+	// it has not been set yet.
+	// NOTE: Currently gridscale tf provider generates
+	// node pool UUID via google uuid lib. In the future,
+	// gridscale backend might generates node pool UUID.
+	currentNodePoolUUID, hasUUID := d.GetOk("node_pool.0.uuid")
+	nodePool["uuid"] = currentNodePoolUUID
+	if !hasUUID {
+		newUUID := uuid.NewString()
+		nodePool["uuid"] = newUUID
 	}
 	nodePoolList = append(nodePoolList, nodePool)
 	if err = d.Set("node_pool", nodePoolList); err != nil {
@@ -412,9 +429,34 @@ func getK8sTemplateUUID(client *gsclient.Client, release string) (string, error)
 }
 
 func validateK8sNodePoolParameters(paramScheme map[string]gsclient.Parameter, d *schema.ResourceDiff) error {
-	nodePoolList := d.Get("node_pool").([]interface{})
+	oldNodePoolListInf, newNodePoolListInf := d.GetChange("node_pool")
 	var errMessage string
-	for i, node := range nodePoolList {
+	// Check if the updated parameters are allowed to be updated.
+	for _, newNodePool := range newNodePoolListInf.([]interface{}) {
+		for _, oldNodePool := range oldNodePoolListInf.([]interface{}) {
+			newNodePoolParams := newNodePool.(map[string]interface{})
+			oldNodePoolParams := oldNodePool.(map[string]interface{})
+			if newNodePoolParams["uuid"] == oldNodePoolParams["uuid"] {
+				if newNodePoolParams["memory"] != oldNodePoolParams["memory"] && paramScheme["k8s_worker_node_ram"].Immutable {
+					errMessage = fmt.Sprintf("%snode_pool \"%s\"'s memory is not mutable\n", errMessage, newNodePoolParams["name"])
+				}
+				if newNodePoolParams["cores"] != oldNodePoolParams["cores"] && paramScheme["k8s_worker_node_cores"].Immutable {
+					errMessage = fmt.Sprintf("%snode_pool \"%s\"'s cores is not mutable\n", errMessage, newNodePoolParams["name"])
+				}
+				if newNodePoolParams["node_count"] != oldNodePoolParams["node_count"] && paramScheme["k8s_worker_node_count"].Immutable {
+					errMessage = fmt.Sprintf("%snode_pool \"%s\"'s node_count is not mutable\n", errMessage, newNodePoolParams["name"])
+				}
+				if newNodePoolParams["storage"] != oldNodePoolParams["storage"] && paramScheme["k8s_worker_node_storage"].Immutable {
+					errMessage = fmt.Sprintf("%snode_pool \"%s\"'s storage is not mutable\n", errMessage, newNodePoolParams["name"])
+				}
+				if newNodePoolParams["storage_type"] != oldNodePoolParams["storage_type"] && paramScheme["k8s_worker_node_storage_type"].Immutable {
+					errMessage = fmt.Sprintf("%snode_pool \"%s\"'s storage_type is not mutable\n", errMessage, newNodePoolParams["name"])
+				}
+			}
+		}
+	}
+	// Check if prameters are valid (within range).
+	for i, node := range newNodePoolListInf.([]interface{}) {
 		nodePool := node.(map[string]interface{})
 		if nodePool["memory"].(int) < paramScheme["k8s_worker_node_ram"].Min {
 			errMessage = fmt.Sprintf("%snode_pool.%d.memory must be at least %d\n", errMessage, i, paramScheme["k8s_worker_node_ram"].Min)
