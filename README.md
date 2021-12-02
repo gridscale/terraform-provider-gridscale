@@ -33,27 +33,27 @@ Alternatively, this documentation can also be found within this repository. Chec
 
 ## Available Features
 
-| Feature | Availability |
-|---|:---:|
-| Server (CRUD) | :heavy_check_mark: |
-| Server dependency (link/unlink) | :heavy_check_mark: |
-| Load balancer (CRUD) | :heavy_check_mark: |
-| PaaS (CRUD) | :heavy_check_mark: |
-| Storage (CRUD) | :heavy_check_mark: |
-| Object storage (CRUD) | :heavy_check_mark: |
-| IP address (CRUD) | :heavy_check_mark: |
-| Network (CRUD) | :heavy_check_mark: |
-| Security zone (PaaS) (CRUD) | :heavy_check_mark: |
-| Firewall (CRUD) | :heavy_check_mark: |
-| SSH key (CRUD) | :heavy_check_mark: |
-| ISO Image (CRUD) | :heavy_check_mark: |
-| Snapshot (CRUD) | :heavy_check_mark: |
-| Snapshot rollback | :heavy_check_mark: |
-| Snapshot to S3 | :heavy_check_mark: |
-| Snapshot schedule (CRUD) | :heavy_check_mark: |
-| Template (CRUD) | :heavy_check_mark: |
+| Feature | Availability | Test |
+|---|:---:|:---:|
+| Server (CRUD) | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml) |
+| Server dependency (link/unlink) | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml) |
+| Load balancer (CRUD) | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml) |
+| PaaS (CRUD) | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml) |
+| Storage (CRUD) | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml) |
+| Object storage (CRUD) | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml) |
+| IP address (CRUD) | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml) |
+| Network (CRUD) | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml) |
+| Security zone (PaaS) (CRUD) | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml) |
+| Firewall (CRUD) | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml) |
+| SSH key (CRUD) | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml) |
+| ISO Image (CRUD) | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml) |
+| Snapshot (CRUD) | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml) |
+| Snapshot rollback | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml) |
+| Snapshot to S3 | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml) |
+| Snapshot schedule (CRUD) | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml) |
+| Template (CRUD) | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml) |
 | Multiple project support ([Workaround](https://github.com/gridscale/terraform-examples/tree/master/multi-project)) | :x: |
-| Marketplace | :heavy_check_mark: |
+| Marketplace | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/server.yml) |
 
 ## Development
 
