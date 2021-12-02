@@ -1,6 +1,7 @@
 name: Test template ds/rs
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master

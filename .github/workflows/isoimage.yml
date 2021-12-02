@@ -1,6 +1,7 @@
 name: Test ISO image ds/rs
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master

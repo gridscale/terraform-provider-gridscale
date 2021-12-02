@@ -1,6 +1,7 @@
 name: Test IPv4/IPv6 ds/rs
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master

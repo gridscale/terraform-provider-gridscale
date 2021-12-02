@@ -1,6 +1,7 @@
 name: Test snapshot/snapshot schedule ds/rs
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master

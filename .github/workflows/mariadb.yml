@@ -1,6 +1,7 @@
 name: Test MariaDB rs
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master

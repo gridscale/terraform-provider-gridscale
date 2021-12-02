@@ -1,6 +1,7 @@
 name: Test Redis store/cache rs
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master

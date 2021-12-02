@@ -1,6 +1,7 @@
 name: Test marketplace application ds/rs
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master

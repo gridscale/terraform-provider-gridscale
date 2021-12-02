@@ -1,6 +1,7 @@
 name: Test k8s rs
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master

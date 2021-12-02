@@ -1,6 +1,7 @@
 name: Test SSH key ds/rs
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master

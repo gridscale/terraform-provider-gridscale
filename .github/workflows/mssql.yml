@@ -1,6 +1,7 @@
 name: Test MS SQL rs
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master

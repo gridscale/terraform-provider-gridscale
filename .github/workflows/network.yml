@@ -1,6 +1,7 @@
 name: Test network ds/rs
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master

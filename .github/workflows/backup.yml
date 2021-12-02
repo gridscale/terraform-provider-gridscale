@@ -1,6 +1,7 @@
 name: Test backup/backup schedule ds
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master

@@ -1,6 +1,7 @@
 name: Test postgreSQL rs
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
