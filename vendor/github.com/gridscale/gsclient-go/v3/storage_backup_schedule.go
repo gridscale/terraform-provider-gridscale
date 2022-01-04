@@ -16,7 +16,7 @@ type StorageBackupScheduleOperator interface {
 	DeleteStorageBackupSchedule(ctx context.Context, storageID, scheduleID string) error
 }
 
-// StorageBackupScheduleList holds a list of storage backup schedules.
+// StorageBackupScheduleList contains a list of storage backup schedules.
 type StorageBackupScheduleList struct {
 	List map[string]StorageBackupScheduleProperties `json:"schedule_storage_backups"`
 }
@@ -26,7 +26,7 @@ type StorageBackupSchedule struct {
 	Properties StorageBackupScheduleProperties `json:"schedule_storage_backup"`
 }
 
-// StorageBackupScheduleProperties holds properties of a storage backup schedule.
+// StorageBackupScheduleProperties contains properties of a storage backup schedule.
 type StorageBackupScheduleProperties struct {
 	// Defines the date and time of the last object change.
 	ChangeTime GSTime `json:"change_time"`
@@ -62,9 +62,15 @@ type StorageBackupScheduleProperties struct {
 
 	// Status of the schedule.
 	Active bool `json:"active"`
+
+	// The UUID of the location where your backup is stored.
+	BackupLocationUUID string `json:"backup_location_uuid"`
+
+	// The human-readable name of backup location. It supports the full UTF-8 character set, with a maximum of 64 characters.
+	BackupLocationName string `json:"backup_location_name"`
 }
 
-// StorageBackupScheduleRelations holds a list of relations between a storage backup schedule and storage backups.
+// StorageBackupScheduleRelations contains a list of relations between a storage backup schedule and storage backups.
 type StorageBackupScheduleRelations struct {
 	// Array of all related backups (backups taken by this storage backup schedule).
 	StorageBackups []StorageBackupScheduleRelation `json:"storages_backups"`
@@ -100,6 +106,9 @@ type StorageBackupScheduleCreateRequest struct {
 
 	// Status of the schedule.
 	Active bool `json:"active"`
+
+	// The UUID of the location where your backup is stored.
+	BackupLocationUUID string `json:"backup_location_uuid,omitempty"`
 }
 
 // StorageBackupScheduleCreateResponse represents a response for creating a storage backup schedule.
@@ -132,7 +141,26 @@ type StorageBackupScheduleUpdateRequest struct {
 	Active *bool `json:"active,omitempty"`
 }
 
-// GetStorageBackupScheduleList gets a list of available storage backup schedules based on a given storage's id.
+// StorageBackupLocationList contains a list of available location to store your backup.
+type StorageBackupLocationList struct {
+	List map[string]StorageBackupLocationProperties `json:"backup_locations"`
+}
+
+//StorageBackupLocation represents a backup location.
+type StorageBackupLocation struct {
+	Properties StorageBackupLocationProperties
+}
+
+// StorageBackupLocationProperties represents a backup location's properties.
+type StorageBackupLocationProperties struct {
+	// UUID of the location.
+	ObjectUUID string `json:"object_uuid"`
+
+	// Name of the location.
+	Name string `json:"name"`
+}
+
+// GetStorageBackupScheduleList returns a list of available storage backup schedules based on a given storage's id.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getStorageBackupSchedules
 func (c *Client) GetStorageBackupScheduleList(ctx context.Context, id string) ([]StorageBackupSchedule, error) {
@@ -153,7 +181,7 @@ func (c *Client) GetStorageBackupScheduleList(ctx context.Context, id string) ([
 	return schedules, err
 }
 
-// GetStorageBackupSchedule gets a specific storage backup schedule based on a given storage's id and a backup schedule's id.
+// GetStorageBackupSchedule returns a specific storage backup schedule based on a given storage's id and a backup schedule's id.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getStorageBackupSchedules
 func (c *Client) GetStorageBackupSchedule(ctx context.Context, storageID, scheduleID string) (StorageBackupSchedule, error) {
@@ -216,4 +244,24 @@ func (c *Client) DeleteStorageBackupSchedule(ctx context.Context, storageID, sch
 		method: http.MethodDelete,
 	}
 	return r.execute(ctx, *c, nil)
+}
+
+// GetStorageBackupLocationList returns a list of available locations to store your backup.
+//
+// See: https://gridscale.io/en//api-documentation/index.html#operation/GetBackupLocations
+func (c *Client) GetStorageBackupLocationList(ctx context.Context) ([]StorageBackupLocation, error) {
+	r := gsRequest{
+		uri:                 apiBackupLocationBase,
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
+	}
+	var response StorageBackupLocationList
+	var locationList []StorageBackupLocation
+	err := r.execute(ctx, *c, &response)
+	for _, locationProperties := range response.List {
+		locationList = append(locationList, StorageBackupLocation{
+			Properties: locationProperties,
+		})
+	}
+	return locationList, err
 }

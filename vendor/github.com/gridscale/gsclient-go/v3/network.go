@@ -19,6 +19,9 @@ type NetworkOperator interface {
 	GetNetworkPublic(ctx context.Context) (Network, error)
 	GetNetworksByLocation(ctx context.Context, id string) ([]Network, error)
 	GetDeletedNetworks(ctx context.Context) ([]Network, error)
+	GetPinnedServerList(ctx context.Context, networkUUID string) (PinnedServerList, error)
+	UpdateNetworkPinnedServer(ctx context.Context, networkUUID, serverUUID string, body PinServerRequest) error
+	DeleteNetworkPinnedServer(ctx context.Context, networkUUID, serverUUID string) error
 }
 
 // NetworkList holds a list of available networks.
@@ -247,6 +250,18 @@ type NetworkUpdateRequest struct {
 	DHCPReservedSubnet *[]string `json:"dhcp_reserved_subnet,omitempty"`
 }
 
+// PinnedServerList hold a list of pinned server with corresponding DCHP IP.
+type PinnedServerList struct {
+	// List of server and it's assigned DHCP IP
+	List []ServerWithIP `json:"pinned_servers"`
+}
+
+// PinServerRequest represents a request assigning DHCP IP to a server
+type PinServerRequest struct {
+	// IP which is assigned to the server
+	IP string `json:"ip"`
+}
+
 // GetNetwork get a specific network based on given id.
 //
 // See: https://gridscale.io/en//api-documentation/index.html#operation/getNetwork
@@ -399,4 +414,56 @@ func (c *Client) GetDeletedNetworks(ctx context.Context) ([]Network, error) {
 		networks = append(networks, Network{Properties: properties})
 	}
 	return networks, err
+}
+
+// GetPinnedServerList returns a list of pinned servers in a specific network.
+//
+// See: https://gridscale.io/en//api-documentation/index.html#operation/getNetworkPinnedServers
+func (c *Client) GetPinnedServerList(ctx context.Context, networkUUID string) (PinnedServerList, error) {
+	if !isValidUUID(networkUUID) {
+		return PinnedServerList{}, errors.New("'networkUUID' is invalid")
+	}
+	r := gsRequest{
+		uri:                 path.Join(apiNetworkBase, networkUUID, "pinned_servers"),
+		method:              http.MethodGet,
+		skipCheckingRequest: true,
+	}
+	var response PinnedServerList
+	err := r.execute(ctx, *c, &response)
+	return response, err
+}
+
+// UpdateNetworkPinnedServer assigns DHCP IP to a server.
+//
+// See: https://gridscale.io/en//api-documentation/index.html#operation/updateNetworkPinnedServer
+func (c *Client) UpdateNetworkPinnedServer(ctx context.Context, networkUUID, serverUUID string, body PinServerRequest) error {
+	if !isValidUUID(networkUUID) {
+		return errors.New("'networkUUID' is invalid")
+	}
+	if !isValidUUID(serverUUID) {
+		return errors.New("'serverUUID' is invalid")
+	}
+	r := gsRequest{
+		uri:    path.Join(apiNetworkBase, networkUUID, "pinned_servers", serverUUID),
+		method: http.MethodPatch,
+		body:   body,
+	}
+	return r.execute(ctx, *c, nil)
+}
+
+// DeleteNetworkPinnedServer removes DHCP IP from a server.
+//
+// See: https://gridscale.io/en//api-documentation/index.html#operation/updateNetworkPinnedServer
+func (c *Client) DeleteNetworkPinnedServer(ctx context.Context, networkUUID, serverUUID string) error {
+	if !isValidUUID(networkUUID) {
+		return errors.New("'networkUUID' is invalid")
+	}
+	if !isValidUUID(serverUUID) {
+		return errors.New("'serverUUID' is invalid")
+	}
+	r := gsRequest{
+		uri:    path.Join(apiNetworkBase, networkUUID, "pinned_servers", serverUUID),
+		method: http.MethodDelete,
+	}
+	return r.execute(ctx, *c, nil)
 }

@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.8.0 (Dec 16, 2021)
+
+FEATURES:
+
+* Add network's `pinned_server` API endpoints. Servers in a DHCP-enabled network can be assigned to a specific DHCP IP address ([#207](https://github.com/gridscale/gsclient-go/issues/207)).
+* Add missing location API endpoints ([#208](https://github.com/gridscale/gsclient-go/issues/208)).
+* Add `usage` API endpoints ([#208](https://github.com/gridscale/gsclient-go/issues/208)).
+* Add storage backup location. Backup schedule can be set to run in a specific location ([#210](https://github.com/gridscale/gsclient-go/issues/210)).
+
 ## 3.7.0 (Aug 30, 2021)
 
 FEATURES:

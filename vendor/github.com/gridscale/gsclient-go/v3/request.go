@@ -22,6 +22,7 @@ type gsRequest struct {
 	uri                 string
 	method              string
 	body                interface{}
+	queryParameters     map[string]string
 	skipCheckingRequest bool
 }
 
@@ -169,6 +170,13 @@ func (r *gsRequest) prepareHTTPRequest(ctx context.Context, cfg *Config) (*http.
 		request.Header.Set(k, v)
 	}
 
+	// Set query parameters if there are any of them.
+	query := request.URL.Query()
+	for k, v := range r.queryParameters {
+		query.Add(k, v)
+	}
+	request.URL.RawQuery = query.Encode()
+	logger.Debugf("Finished Preparing %v request sent to URL: %v://%v%v", request.Method, request.URL.Scheme, request.URL.Host, request.URL.RequestURI())
 	return request, nil
 }
 
