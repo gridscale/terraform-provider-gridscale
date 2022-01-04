@@ -1,0 +1,43 @@
+name: Test Filesystem rs
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - "**.go"
+      - ".github/workflows/filesystem.yml"
+  pull_request:
+    branches:
+      - master
+    paths:
+      - "**gridscale_filesystem**"
+      - "gridscale/error-handler/**"
+      - "gridscale/common.go"
+      - "gridscale/config.go"
+      - "gridscale/provider.go"
+      - "gridscale/provider_test.go"
+      - ".github/workflows/filesystem.yml"
+
+jobs:
+  build:
+    name: GS Filesystem AccTest
+    runs-on: ubuntu-latest
+    env:
+      GOPATH: /home/runner/go
+      GRIDSCALE_UUID: ${{ secrets.CI_USER_UUID }}
+      GRIDSCALE_TOKEN: ${{ secrets.CI_API_TOKEN }}
+      GRIDSCALE_URL: ${{ secrets.CI_API_URL }}
+    steps:
+      - name: Set up Go 1.16
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.16
+        id: go
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+
+      - name: Run TestAccResourceGridscaleFilesystem_Basic
+        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccResourceGridscaleFilesystem_Basic'
