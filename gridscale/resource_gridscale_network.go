@@ -69,7 +69,7 @@ func resourceGridscaleNetwork() *schema.Resource {
 					Schema: map[string]*schema.Schema{
 						"server_uuid": {
 							Type:     schema.TypeString,
-							Required: true,
+							Computed: true,
 						},
 						"ip": {
 							Type:     schema.TypeString,
@@ -86,7 +86,7 @@ func resourceGridscaleNetwork() *schema.Resource {
 					Schema: map[string]*schema.Schema{
 						"server_uuid": {
 							Type:     schema.TypeString,
-							Required: true,
+							Computed: true,
 						},
 						"ip": {
 							Type:     schema.TypeString,
