@@ -81,6 +81,7 @@ func Provider() *schema.Provider {
 			"gridscale_storage_clone":                  resourceGridscaleStorageClone(),
 			"gridscale_storage_import":                 resourceGridscaleStorageImport(),
 			"gridscale_network":                        resourceGridscaleNetwork(),
+			"gridscale_server_DHCP_IP":                 resourceGridscaleServerDHCPIP(),
 			"gridscale_ipv4":                           resourceGridscaleIpv4(),
 			"gridscale_ipv6":                           resourceGridscaleIpv6(),
 			"gridscale_sshkey":                         resourceGridscaleSshkey(),
