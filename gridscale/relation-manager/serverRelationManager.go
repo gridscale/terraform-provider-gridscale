@@ -127,7 +127,7 @@ func (c *ServerRelationManger) LinkNetworks(ctx context.Context) error {
 	d := c.getData()
 	client := c.getGSClient()
 	if attrNetRel, ok := d.GetOk("network"); ok {
-		for _, value := range attrNetRel.([]interface{}) {
+		for idx, value := range attrNetRel.([]interface{}) {
 			// customFwRulesPtr is nil initially, that mean the fw is inactive
 			var customFwRulesPtr *gsclient.FirewallRules
 			network := value.(map[string]interface{})
@@ -143,7 +143,7 @@ func (c *ServerRelationManger) LinkNetworks(ctx context.Context) error {
 				network["object_uuid"].(string),
 				network["firewall_template_uuid"].(string),
 				network["bootdevice"].(bool),
-				network["ordering"].(int),
+				idx,
 				nil,
 				customFwRulesPtr,
 			)

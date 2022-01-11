@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"sort"
 	"strings"
 	"time"
 
@@ -188,9 +189,9 @@ func resourceGridscaleServer() *schema.Resource {
 							Optional: true,
 						},
 						"ordering": {
-							Type:     schema.TypeInt,
-							Optional: true,
-							Default:  0,
+							Type:       schema.TypeInt,
+							Optional:   true,
+							Deprecated: "This field `ordering` is deprecated. The ordering of the networks corresponds with the defined network ordering.",
 						},
 						"create_time": {
 							Type:     schema.TypeString,
@@ -474,6 +475,8 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 
 	//Get networks
 	netWODefaultRules := server.Properties.Relations.Networks
+	// Sort the network list by their ordering
+	sort.Slice(netWODefaultRules, func(i, j int) bool { return netWODefaultRules[i].Ordering < netWODefaultRules[j].Ordering })
 	for i := 0; i < len(netWODefaultRules); i++ { // Remove all default rules, we don't want to display them
 		netWODefaultRules[i].
 			Firewall.RulesV4In = fwu.RemoveDefaultFirewallInboundRules(netWODefaultRules[i].Firewall.RulesV4In)
@@ -524,7 +527,6 @@ func readServerNetworkRels(serverNetRels []gsclient.ServerNetworkRelationPropert
 			"firewall_template_uuid": rel.FirewallTemplateUUID,
 			"object_name":            rel.ObjectName,
 			"network_type":           rel.NetworkType,
-			"ordering":               rel.Ordering,
 		}
 		//Init all types of firewall rule
 		v4InRuleProps := make([]interface{}, 0)
