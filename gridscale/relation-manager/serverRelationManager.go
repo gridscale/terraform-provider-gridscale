@@ -329,16 +329,11 @@ func (c *ServerRelationManger) UpdateNetworksRel(ctx context.Context) error {
 	// If there are only changes in server-network relations' properties,
 	// update the relations.
 	if d.HasChange("network") {
-		networkList := d.Get("network").([]map[string]interface{})
-		for idx, network := range networkList {
-			// customFwRulesPtr is nil initially, that mean the fw is inactive
-			var customFwRulesPtr *gsclient.FirewallRules
+		networkListIntf := d.Get("network").([]interface{})
+		for idx, networkIntf := range networkListIntf {
+			network := networkIntf.(map[string]interface{})
 			//Read custom firewall rules from `network` property (field)
 			customFwRules := readCustomFirewallRules(network)
-			// if customFwRules is not empty, customFwRulesPtr is not nil (fw is active)
-			if !reflect.DeepEqual(customFwRules, gsclient.FirewallRules{}) {
-				customFwRulesPtr = &customFwRules
-			}
 			err := client.UpdateServerNetwork(
 				ctx,
 				d.Id(),
@@ -346,7 +341,7 @@ func (c *ServerRelationManger) UpdateNetworksRel(ctx context.Context) error {
 				gsclient.ServerNetworkRelationUpdateRequest{
 					Ordering:             idx,
 					BootDevice:           network["bootdevice"].(bool),
-					Firewall:             customFwRulesPtr,
+					Firewall:             &customFwRules,
 					FirewallTemplateUUID: network["firewall_template_uuid"].(string),
 				},
 			)
