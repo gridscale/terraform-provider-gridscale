@@ -304,15 +304,16 @@ func (c *ServerRelationManger) UpdateIPv6Rel(ctx context.Context) error {
 func (c *ServerRelationManger) UpdateNetworksRel(ctx context.Context) error {
 	d := c.getData()
 	client := c.getGSClient()
-	var err error
-	if d.HasChange("network") {
+	// If a network is being attached/detached to/from
+	// the server, relink all networks (if applicable)
+	if c.hasServerNetworkListChanged(ctx) {
 		oldNetworks, _ := d.GetChange("network")
 		//Unlink all old networks if there are any networks linked to the server
 		for _, value := range oldNetworks.([]interface{}) {
 			network := value.(map[string]interface{})
 			if network["object_uuid"].(string) != "" {
 				//If 404 or 409, that means network is already deleted => the relation between network and server is deleted automatically
-				err = errHandler.RemoveErrorContainsHTTPCodes(
+				err := errHandler.RemoveErrorContainsHTTPCodes(
 					client.UnlinkNetwork(ctx, d.Id(), network["object_uuid"].(string)),
 					http.StatusConflict,
 					http.StatusNotFound,
@@ -323,9 +324,43 @@ func (c *ServerRelationManger) UpdateNetworksRel(ctx context.Context) error {
 			}
 		}
 		//Links all new networks (if there are some)
-		err = c.LinkNetworks(ctx)
+		return c.LinkNetworks(ctx)
 	}
-	return err
+	// If there are only changes in server-network relations' properties,
+	// update the relations.
+	if d.HasChange("network") {
+		networkList := d.Get("network").([]map[string]interface{})
+		for idx, network := range networkList {
+			// customFwRulesPtr is nil initially, that mean the fw is inactive
+			var customFwRulesPtr *gsclient.FirewallRules
+			//Read custom firewall rules from `network` property (field)
+			customFwRules := readCustomFirewallRules(network)
+			// if customFwRules is not empty, customFwRulesPtr is not nil (fw is active)
+			if !reflect.DeepEqual(customFwRules, gsclient.FirewallRules{}) {
+				customFwRulesPtr = &customFwRules
+			}
+			err := client.UpdateServerNetwork(
+				ctx,
+				d.Id(),
+				network["object_uuid"].(string),
+				gsclient.ServerNetworkRelationUpdateRequest{
+					Ordering:             idx,
+					BootDevice:           network["bootdevice"].(bool),
+					Firewall:             customFwRulesPtr,
+					FirewallTemplateUUID: network["firewall_template_uuid"].(string),
+				},
+			)
+			if err != nil {
+				return fmt.Errorf(
+					"error waiting for server(%s)-network(%s) relation to be updated: %s",
+					d.Id(),
+					network["object_uuid"],
+					err,
+				)
+			}
+		}
+	}
+	return nil
 }
 
 //UpdateStoragesRel updates relationship between a server and storages
