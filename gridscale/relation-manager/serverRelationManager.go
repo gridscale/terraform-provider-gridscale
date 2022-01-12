@@ -213,7 +213,8 @@ func readCustomFirewallRules(netData map[string]interface{}) gsclient.FirewallRu
 func (c *ServerRelationManger) IsShutdownRequired(ctx context.Context) bool {
 	var shutdownRequired bool
 	d := c.getData()
-	if d.HasChanges("cores", "memory", "ipv4", "ipv6", "storage", "network") {
+	hasServerNetListChange := c.hasServerNetworkListChanged(ctx)
+	if d.HasChanges("cores", "memory", "ipv4", "ipv6") || hasServerNetListChange {
 		shutdownRequired = true
 	}
 	return shutdownRequired
@@ -352,4 +353,30 @@ func (c *ServerRelationManger) UpdateStoragesRel(ctx context.Context) error {
 		err = c.LinkStorages(ctx)
 	}
 	return err
+}
+
+// hasServerNetworkListChanged checks if a new network is being attached to the server,
+// or a network is being detached from the server.
+func (c *ServerRelationManger) hasServerNetworkListChanged(ctx context.Context) bool {
+	d := c.getData()
+	oldNetList, newNetList := d.GetChange("network")
+	oldNetUUIDList := make(map[string]bool)
+	newNetUUIDList := make(map[string]bool)
+	for _, net := range oldNetList.([]map[string]interface{}) {
+		oldNetUUIDList[net["object_uuid"].(string)] = true
+	}
+	for _, net := range newNetList.([]map[string]interface{}) {
+		newNetUUIDList[net["object_uuid"].(string)] = true
+	}
+	// check if length of network list has changed.
+	if len(oldNetUUIDList) != len(newNetUUIDList) {
+		return true
+	}
+	// check if the attached network list has changed.
+	for netUUID := range oldNetUUIDList {
+		if _, ok := newNetUUIDList[netUUID]; !ok {
+			return true
+		}
+	}
+	return false
 }
