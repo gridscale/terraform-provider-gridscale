@@ -385,28 +385,28 @@ func (c *ServerRelationManger) UpdateStoragesRel(ctx context.Context) error {
 	return err
 }
 
-// hasServerNetworkListChanged checks if a new network is being attached to the server,
-// or a network is being detached from the server.
+// hasServerNetworkListChanged checks if a new network is being attached/detached
+// to/from the server, or network ordering is changed.
 func (c *ServerRelationManger) hasServerNetworkListChanged(ctx context.Context) bool {
 	d := c.getData()
 	oldNetList, newNetList := d.GetChange("network")
-	oldNetUUIDList := make(map[string]bool)
-	newNetUUIDList := make(map[string]bool)
-	for _, net := range oldNetList.([]map[string]interface{}) {
-		oldNetUUIDList[net["object_uuid"].(string)] = true
+	var oldNetUUIDList []string
+	var newNetUUIDList []string
+	for _, netIntf := range oldNetList.([]interface{}) {
+		net := netIntf.(map[string]interface{})
+		oldNetUUIDList = append(oldNetUUIDList, net["object_uuid"].(string))
 	}
-	for _, net := range newNetList.([]map[string]interface{}) {
-		newNetUUIDList[net["object_uuid"].(string)] = true
+	for _, netIntf := range newNetList.([]interface{}) {
+		net := netIntf.(map[string]interface{})
+		newNetUUIDList = append(newNetUUIDList, net["object_uuid"].(string))
 	}
 	// check if length of network list has changed.
 	if len(oldNetUUIDList) != len(newNetUUIDList) {
 		return true
 	}
 	// check if the attached network list has changed.
-	for netUUID := range oldNetUUIDList {
-		if _, ok := newNetUUIDList[netUUID]; !ok {
-			return true
-		}
+	if !reflect.DeepEqual(oldNetUUIDList, newNetUUIDList) {
+		return true
 	}
 	return false
 }
