@@ -743,9 +743,7 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 				return err
 			}
 
-			//Update relationship between the server and storages
-			err = serverDepClient.UpdateStoragesRel(ctx)
-			return err
+			return nil
 		}
 		err = globalServerStatusList.runActionRequireServerOff(ctxWTimeout, gsc, d.Id(), true, updateSequence)
 		if err != nil {
@@ -758,13 +756,24 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
+
+		//Update relationship between the server and networks
+		err = serverDepClient.UpdateNetworksRel(ctxWTimeout)
+		if err != nil {
+			return fmt.Errorf("%s error: %v", errorPrefix, err)
+		}
 	}
 
 	//Update relationship between the server and an ISO image
 	err = serverDepClient.UpdateISOImageRel(ctxWTimeout)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
+	}
 
+	//Update relationship between the server and storages
+	err = serverDepClient.UpdateStoragesRel(ctxWTimeout)
+	if err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
 	// Make sure the server in is the expected power state.
