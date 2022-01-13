@@ -148,6 +148,16 @@ func resourceGridscaleServer() *schema.Resource {
 							Optional: true,
 							Computed: true,
 						},
+						"ip": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Description: `Manually assign DHCP IP to the server.`,
+						},
+						"auto_assigned_ip": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: `DHCP IP which is automatically assigned to the server.`,
+						},
 						"object_name": {
 							Type:     schema.TypeString,
 							Computed: true,
@@ -484,7 +494,10 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 		netWODefaultRules[i].
 			Firewall.RulesV6In = fwu.RemoveDefaultFirewallInboundRules(netWODefaultRules[i].Firewall.RulesV6In)
 	}
-	networks := readServerNetworkRels(netWODefaultRules)
+	networks, err := readServerNetworkRels(context.Background(), client, d.Id(), netWODefaultRules)
+	if err != nil {
+		return fmt.Errorf("%s error reading server-network relations: %v", errorPrefix, err)
+	}
 	if err = d.Set("network", networks); err != nil {
 		return fmt.Errorf("%s error setting network: %v", errorPrefix, err)
 	}
@@ -517,9 +530,27 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 }
 
 //readServerNetworkRels extract relationships between server and networks
-func readServerNetworkRels(serverNetRels []gsclient.ServerNetworkRelationProperties) []interface{} {
+func readServerNetworkRels(ctx context.Context, client *gsclient.Client, serverUUID string, serverNetRels []gsclient.ServerNetworkRelationProperties) ([]interface{}, error) {
 	networks := make([]interface{}, 0)
 	for _, rel := range serverNetRels {
+		// Get DHCP IP information (if applicable)
+		networkProps, err := client.GetNetwork(ctx, rel.ObjectUUID)
+		if err != nil {
+			return nil, err
+		}
+		var dhcpIP string
+		var autoAssignedDHCPIP string
+		for _, serverDHCPIP := range networkProps.Properties.PinnedServers {
+			if serverDHCPIP.ServerUUID == serverUUID {
+				dhcpIP = serverDHCPIP.IP
+			}
+		}
+		for _, serverDHCPIP := range networkProps.Properties.AutoAssignedServers {
+			if serverDHCPIP.ServerUUID == serverUUID {
+				autoAssignedDHCPIP = serverDHCPIP.IP
+			}
+		}
+
 		network := map[string]interface{}{
 			"object_uuid":            rel.ObjectUUID,
 			"bootdevice":             rel.BootDevice,
@@ -529,6 +560,8 @@ func readServerNetworkRels(serverNetRels []gsclient.ServerNetworkRelationPropert
 			"object_name":            rel.ObjectName,
 			"network_type":           rel.NetworkType,
 			"ordering":               rel.Ordering,
+			"ip":                     dhcpIP,
+			"auto_assigned_ip":       autoAssignedDHCPIP,
 		}
 		//Init all types of firewall rule
 		v4InRuleProps := make([]interface{}, 0)
@@ -566,7 +599,7 @@ func readServerNetworkRels(serverNetRels []gsclient.ServerNetworkRelationPropert
 
 		networks = append(networks, network)
 	}
-	return networks
+	return networks, nil
 }
 
 //flattenFirewallRuleProperties converts variable of type gsclient.FirewallRuleProperties to

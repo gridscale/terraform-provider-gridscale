@@ -155,6 +155,27 @@ func (c *ServerRelationManger) LinkNetworks(ctx context.Context) error {
 					err,
 				)
 			}
+
+			if network["ip"].(string) != "" {
+				// Assign DHCP IP to the server (if applicable).
+				if err := client.UpdateNetworkPinnedServer(
+					ctx,
+					network["object_uuid"].(string),
+					d.Id(),
+					gsclient.PinServerRequest{
+						IP: network["ip"].(string),
+					},
+				); err != nil {
+					return fmt.Errorf(
+						"Error waiting for assigning DHCP IP (%s) to server (%s) in network (%s): %s",
+						network["ip"].(string),
+						d.Id(),
+						network["object_uuid"],
+						err,
+					)
+				}
+			}
+
 		}
 	}
 	return nil
@@ -352,6 +373,46 @@ func (c *ServerRelationManger) UpdateNetworksRel(ctx context.Context) error {
 					network["object_uuid"],
 					err,
 				)
+			}
+
+			// Update DHCP IP assignment.
+			if d.HasChange(fmt.Sprintf("network.%d.ip", idx)) {
+				if network["ip"].(string) != "" {
+					// Assign DHCP IP to the server (if applicable).
+					if err := client.UpdateNetworkPinnedServer(
+						ctx,
+						network["object_uuid"].(string),
+						d.Id(),
+						gsclient.PinServerRequest{
+							IP: network["ip"].(string),
+						},
+					); err != nil {
+						return fmt.Errorf(
+							"Error waiting for assigning DHCP IP (%s) to server (%s) in network (%s): %s",
+							network["ip"].(string),
+							d.Id(),
+							network["object_uuid"],
+							err,
+						)
+					}
+				} else {
+					if err := errHandler.RemoveErrorContainsHTTPCodes(
+						client.DeleteNetworkPinnedServer(
+							ctx,
+							network["object_uuid"].(string),
+							d.Id(),
+						),
+						http.StatusNotFound,
+					); err != nil {
+						return fmt.Errorf(
+							"Error waiting for removing DHCP IP (%s) from server (%s) in network (%s): %s",
+							network["ip"].(string),
+							d.Id(),
+							network["object_uuid"],
+							err,
+						)
+					}
+				}
 			}
 		}
 	}
