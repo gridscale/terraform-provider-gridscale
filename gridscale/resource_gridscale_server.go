@@ -202,7 +202,7 @@ func resourceGridscaleServer() *schema.Resource {
 							Type:       schema.TypeInt,
 							Optional:   true,
 							Computed:   true,
-							Deprecated: "This field `ordering` is deprecated. The ordering of the networks corresponds with the defined network ordering.",
+							Deprecated: "This field `ordering` is deprecated. The network ordering of the server corresponds to the order of the networks in the server resource block.",
 						},
 						"create_time": {
 							Type:     schema.TypeString,
