@@ -19,6 +19,7 @@ var firewallActionTypes = []string{"accept", "drop"}
 var firewallRuleProtocols = []string{"udp", "tcp"}
 var marketplaceAppCategories = []string{"CMS", "project management", "Adminpanel", "Collaboration", "Cloud Storage", "Archiving"}
 var postgreSQLPerformanceClasses = []string{"standard", "high", "insane", "ultra"}
+var filesystemPerformanceClasses = []string{"standard", "high", "insane", "ultra"}
 var msSQLServerPerformanceClasses = []string{"standard", "high", "insane", "ultra"}
 var mariaDBPerformanceClasses = []string{"standard", "high", "insane", "ultra"}
 
