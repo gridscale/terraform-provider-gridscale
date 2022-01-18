@@ -16,11 +16,11 @@ The following example shows how one might use this resource to add a Filesystem 
 
 ```terraform
 resource "gridscale_filesystem" "terra-filesystem-test" {
-    name = "my filesystem"
-	release = "1"
-    performance_class = "standard"
-	root_squash = true
-    allowed_ip_ranges = ["192.14.2.2", "192.168.0.0/16"]
+  name = "my filesystem"
+  release = "1"
+  performance_class = "standard"
+  root_squash = true
+  allowed_ip_ranges = ["192.14.2.2", "192.168.0.0/16"]
 }
 ```
 

@@ -51,9 +51,9 @@ func testAccCheckResourceGridscaleFilesystemConfig_basic(name string) string {
 resource "gridscale_filesystem" "test" {
 	name = "%s"
 	release = "1"
-    performance_class = "standard"
+	performance_class = "standard"
 	root_squash = true
-    allowed_ip_ranges = ["192.14.2.2", "192.168.0.0/16"]
+	allowed_ip_ranges = ["192.14.2.2", "192.168.0.0/16"]
 }
 `, name)
 }
@@ -64,8 +64,8 @@ resource "gridscale_filesystem" "test" {
 	name = "newname"
 	root_squash = false
 	release = "1"
-    performance_class = "standard"
-    allowed_ip_ranges = ["192.14.15.15"]
+	performance_class = "standard"
+	allowed_ip_ranges = ["192.14.15.15"]
 	labels = ["test"]
 }
 `)
