@@ -770,8 +770,8 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 				return err
 			}
 
-			//Update relationship between the server and networks
-			err = serverDepClient.UpdateNetworksRel(ctx)
+			// Relink networks to the server (if there are changes).
+			err = serverDepClient.RelinkAllNetworks(ctx)
 			if err != nil {
 				return err
 			}
@@ -790,8 +790,8 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
 
-		//Update relationship between the server and networks
-		err = serverDepClient.UpdateNetworksRel(ctxWTimeout)
+		// Update properties of the server-network relations.
+		err = serverDepClient.UpdateNetRelsProperties(ctxWTimeout)
 		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
