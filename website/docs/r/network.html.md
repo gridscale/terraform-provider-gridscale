@@ -44,7 +44,7 @@ The following arguments are supported:
 
 * `dhcp_dns` - (Optional) The IP address reserved and communicated by the dhcp service to be the default gateway.
 
-* `dhcp_range` - (Optional) DHCP DNS.
+* `dhcp_range` - (Optional, Computed) DHCP DNS. If it is not set and DHCP is enabled, `dhcp_range` will be set by the backend automatically.
 
 * `dhcp_reserved_subnet` - (Optional) Subrange within the IP range.
 

@@ -116,8 +116,17 @@ func dataSourceGridscaleServer() *schema.Resource {
 						},
 						"bootdevice": {
 							Type:     schema.TypeBool,
-							Optional: true,
 							Computed: true,
+						},
+						"ip": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: `DHCP IP which is manually assigned to the server.`,
+						},
+						"auto_assigned_ip": {
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: `DHCP IP which is automatically assigned to the server.`,
 						},
 						"object_name": {
 							Type:     schema.TypeString,
@@ -340,7 +349,10 @@ func dataSourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) err
 		netWODefaultRules[i].
 			Firewall.RulesV6In = fwu.RemoveDefaultFirewallInboundRules(netWODefaultRules[i].Firewall.RulesV6In)
 	}
-	networks := readServerNetworkRels(netWODefaultRules)
+	networks, err := readServerNetworkRels(context.Background(), client, id, netWODefaultRules)
+	if err != nil {
+		return fmt.Errorf("%s error reading server-network relations: %v", errorPrefix, err)
+	}
 	if err = d.Set("network", networks); err != nil {
 		return fmt.Errorf("%s error setting network: %v", errorPrefix, err)
 	}

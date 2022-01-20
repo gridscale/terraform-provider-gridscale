@@ -90,8 +90,10 @@ This resource exports the following attributes:
 * `network` - Connects a network to the server.
     * `object_uuid` - The object UUID or id of the network.
     * `bootdevice` - Make this network the boot device. This can only be set for one network.
+    * `ip` - DHCP IP which is manually assigned to the server (if applicable).
+    * `auto_assigned_ip` - DHCP IP which is automatically assigned to the server (if applicable).
     * `object_name` - Name of the network.
-    * `ordering` - Defines the ordering of the network interfaces. Lower numbers have lower PCI-IDs.
+    * `ordering` - *DEPRECATED* Defines the ordering of the network interfaces. Lower numbers have lower PCI-IDs.
     * `create_time` - Defines the date and time the object was initially created.
     * `network_type` - One of network, network_high, network_insane.
     * `mac` - network_mac defines the MAC address of the network interface.

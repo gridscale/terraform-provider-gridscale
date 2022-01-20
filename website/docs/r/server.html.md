@@ -107,13 +107,15 @@ The following arguments are supported:
 
     * `object_uuid` - (Required) The object UUID or id of the storage.
 
-* `network` - (Optional) Connects a network to the server. **NOTE: Due to a known issue ([issue #142](https://github.com/gridscale/terraform-provider-gridscale/issues/142)) about network ordering, the argument `ordering` should be set and the network list should be sorted by their name. Another workaround is to use [lifecycle.ignore_changes](https://www.terraform.io/docs/language/meta-arguments/lifecycle.html#ignore_changes) temporarily to prevent the server from being rebooted.
+* `network` - (Optional) Connects a network to the server. The network ordering of the server corresponds to the order of the networks in the server resource block.
 
     * `object_uuid` - (Required) The object UUID or id of the network.
 
-    * `ordering` - (Optional) Defines the ordering of the network interfaces. Lower numbers have lower PCI-IDs.
+    * `ordering` - *DEPRECATED* (Optional) Defines the ordering of the network interfaces. Lower numbers have lower PCI-IDs. 
 
     * `bootdevice` - (Optional, Computed) Make this network the boot device. This can only be set for one network.
+
+    * `ip` - (Optional) Manually assign DHCP IP to the server (if applicable).
 
     * `firewall_template_uuid` - (Optional) The UUID of firewall template.
 
@@ -225,8 +227,10 @@ This resource exports the following attributes:
 * `network` - Connects a network to the server.
     * `object_uuid` - The object UUID or id of the network.
     * `bootdevice` - Make this network the boot device. This can only be set for one network.
+    * `ip` - DHCP IP which is manually assigned to the server (if applicable).
+    * `auto_assigned_ip` - DHCP IP which is automatically assigned to the server (if applicable).
     * `object_name` - Name of the network.
-    * `ordering` - Defines the ordering of the network interfaces. Lower numbers have lower PCI-IDs.
+    * `ordering` - *DEPRECATED* Defines the ordering of the network interfaces. Lower numbers have lower PCI-IDs.
     * `create_time` - Defines the date and time the object was initially created.
     * `network_type` - One of network, network_high, network_insane.
     * `mac` - network_mac defines the MAC address of the network interface.

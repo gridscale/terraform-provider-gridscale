@@ -30,3 +30,8 @@ func (t *GSTime) UnmarshalJSON(b []byte) error {
 func (t GSTime) MarshalJSON() ([]byte, error) {
 	return json.Marshal(t.Time.Format(gsTimeLayout))
 }
+
+// String returns string representation of GSTime.
+func (t GSTime) String() string {
+	return t.Time.Format(gsTimeLayout)
+}

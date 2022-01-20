@@ -127,7 +127,7 @@ func (c *ServerRelationManger) LinkNetworks(ctx context.Context) error {
 	d := c.getData()
 	client := c.getGSClient()
 	if attrNetRel, ok := d.GetOk("network"); ok {
-		for _, value := range attrNetRel.([]interface{}) {
+		for idx, value := range attrNetRel.([]interface{}) {
 			// customFwRulesPtr is nil initially, that mean the fw is inactive
 			var customFwRulesPtr *gsclient.FirewallRules
 			network := value.(map[string]interface{})
@@ -143,7 +143,7 @@ func (c *ServerRelationManger) LinkNetworks(ctx context.Context) error {
 				network["object_uuid"].(string),
 				network["firewall_template_uuid"].(string),
 				network["bootdevice"].(bool),
-				network["ordering"].(int),
+				idx,
 				nil,
 				customFwRulesPtr,
 			)
@@ -155,6 +155,27 @@ func (c *ServerRelationManger) LinkNetworks(ctx context.Context) error {
 					err,
 				)
 			}
+
+			if network["ip"].(string) != "" {
+				// Assign DHCP IP to the server (if applicable).
+				if err := client.UpdateNetworkPinnedServer(
+					ctx,
+					network["object_uuid"].(string),
+					d.Id(),
+					gsclient.PinServerRequest{
+						IP: network["ip"].(string),
+					},
+				); err != nil {
+					return fmt.Errorf(
+						"Error waiting for assigning DHCP IP (%s) to server (%s) in network (%s): %s",
+						network["ip"].(string),
+						d.Id(),
+						network["object_uuid"],
+						err,
+					)
+				}
+			}
+
 		}
 	}
 	return nil
@@ -213,7 +234,8 @@ func readCustomFirewallRules(netData map[string]interface{}) gsclient.FirewallRu
 func (c *ServerRelationManger) IsShutdownRequired(ctx context.Context) bool {
 	var shutdownRequired bool
 	d := c.getData()
-	if d.HasChanges("cores", "memory", "ipv4", "ipv6", "storage", "network") {
+	hasServerNetListChange := c.hasServerNetworkListChanged(ctx)
+	if d.HasChanges("cores", "memory", "ipv4", "ipv6") || hasServerNetListChange {
 		shutdownRequired = true
 	}
 	return shutdownRequired
@@ -299,32 +321,111 @@ func (c *ServerRelationManger) UpdateIPv6Rel(ctx context.Context) error {
 	return err
 }
 
-//UpdateNetworksRel updates relationship between a server and networks
-func (c *ServerRelationManger) UpdateNetworksRel(ctx context.Context) error {
+// RelinkAllNetworks relinks networks to the server. If there are no changes in
+// server-network links, return without doing anything.
+// Note: This action requires the server to be off.
+func (c *ServerRelationManger) RelinkAllNetworks(ctx context.Context) error {
 	d := c.getData()
 	client := c.getGSClient()
-	var err error
-	if d.HasChange("network") {
-		oldNetworks, _ := d.GetChange("network")
-		//Unlink all old networks if there are any networks linked to the server
-		for _, value := range oldNetworks.([]interface{}) {
-			network := value.(map[string]interface{})
-			if network["object_uuid"].(string) != "" {
-				//If 404 or 409, that means network is already deleted => the relation between network and server is deleted automatically
-				err = errHandler.RemoveErrorContainsHTTPCodes(
-					client.UnlinkNetwork(ctx, d.Id(), network["object_uuid"].(string)),
-					http.StatusConflict,
+	// If there is no changes in server-net relations, return.
+	if !d.HasChange("network") {
+		return nil
+	}
+	//Unlink all old networks if there are any networks linked to the server
+	oldNetworks, _ := d.GetChange("network")
+	for _, value := range oldNetworks.([]interface{}) {
+		network := value.(map[string]interface{})
+		if network["object_uuid"].(string) != "" {
+			//If 404 or 409, that means network is already deleted => the relation between network and server is deleted automatically
+			err := errHandler.RemoveErrorContainsHTTPCodes(
+				client.UnlinkNetwork(ctx, d.Id(), network["object_uuid"].(string)),
+				http.StatusConflict,
+				http.StatusNotFound,
+			)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	//Links all new networks (if there are some)
+	return c.LinkNetworks(ctx)
+}
+
+// UpdateNetRelsProperties update the properties of the server-network relations.
+// If no changes, return without doing anything.
+func (c *ServerRelationManger) UpdateNetRelsProperties(ctx context.Context) error {
+	d := c.getData()
+	client := c.getGSClient()
+	// If there is no changes in server-net relations, return.
+	if !d.HasChange("network") {
+		return nil
+	}
+	networkListIntf := d.Get("network").([]interface{})
+	for idx, networkIntf := range networkListIntf {
+		network := networkIntf.(map[string]interface{})
+		//Read custom firewall rules from `network` property (field)
+		customFwRules := readCustomFirewallRules(network)
+		err := client.UpdateServerNetwork(
+			ctx,
+			d.Id(),
+			network["object_uuid"].(string),
+			gsclient.ServerNetworkRelationUpdateRequest{
+				Ordering:             idx,
+				BootDevice:           network["bootdevice"].(bool),
+				Firewall:             &customFwRules,
+				FirewallTemplateUUID: network["firewall_template_uuid"].(string),
+			},
+		)
+		if err != nil {
+			return fmt.Errorf(
+				"error waiting for server(%s)-network(%s) relation to be updated: %s",
+				d.Id(),
+				network["object_uuid"],
+				err,
+			)
+		}
+
+		// Update DHCP IP assignment.
+		if d.HasChange(fmt.Sprintf("network.%d.ip", idx)) {
+			if network["ip"].(string) != "" {
+				// Assign DHCP IP to the server (if applicable).
+				if err := client.UpdateNetworkPinnedServer(
+					ctx,
+					network["object_uuid"].(string),
+					d.Id(),
+					gsclient.PinServerRequest{
+						IP: network["ip"].(string),
+					},
+				); err != nil {
+					return fmt.Errorf(
+						"Error waiting for assigning DHCP IP (%s) to server (%s) in network (%s): %s",
+						network["ip"].(string),
+						d.Id(),
+						network["object_uuid"],
+						err,
+					)
+				}
+			} else {
+				if err := errHandler.RemoveErrorContainsHTTPCodes(
+					client.DeleteNetworkPinnedServer(
+						ctx,
+						network["object_uuid"].(string),
+						d.Id(),
+					),
 					http.StatusNotFound,
-				)
-				if err != nil {
-					return err
+				); err != nil {
+					return fmt.Errorf(
+						"Error waiting for removing DHCP IP (%s) from server (%s) in network (%s): %s",
+						network["ip"].(string),
+						d.Id(),
+						network["object_uuid"],
+						err,
+					)
 				}
 			}
 		}
-		//Links all new networks (if there are some)
-		err = c.LinkNetworks(ctx)
 	}
-	return err
+	return nil
 }
 
 //UpdateStoragesRel updates relationship between a server and storages
@@ -352,4 +453,30 @@ func (c *ServerRelationManger) UpdateStoragesRel(ctx context.Context) error {
 		err = c.LinkStorages(ctx)
 	}
 	return err
+}
+
+// hasServerNetworkListChanged checks if a new network is being attached/detached
+// to/from the server, or network ordering is changed.
+func (c *ServerRelationManger) hasServerNetworkListChanged(ctx context.Context) bool {
+	d := c.getData()
+	oldNetList, newNetList := d.GetChange("network")
+	var oldNetUUIDList []string
+	var newNetUUIDList []string
+	for _, netIntf := range oldNetList.([]interface{}) {
+		net := netIntf.(map[string]interface{})
+		oldNetUUIDList = append(oldNetUUIDList, net["object_uuid"].(string))
+	}
+	for _, netIntf := range newNetList.([]interface{}) {
+		net := netIntf.(map[string]interface{})
+		newNetUUIDList = append(newNetUUIDList, net["object_uuid"].(string))
+	}
+	// check if length of network list has changed.
+	if len(oldNetUUIDList) != len(newNetUUIDList) {
+		return true
+	}
+	// check if the attached network list has changed.
+	if !reflect.DeepEqual(oldNetUUIDList, newNetUUIDList) {
+		return true
+	}
+	return false
 }

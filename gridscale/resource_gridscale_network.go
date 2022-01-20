@@ -41,9 +41,11 @@ func resourceGridscaleNetwork() *schema.Resource {
 				Optional:    true,
 			},
 			"dhcp_range": {
-				Type:        schema.TypeString,
-				Description: "The general IP Range configured for this network (/24 for private networks). If it is not set, gridscale internal default range is used.",
-				Optional:    true,
+				Type: schema.TypeString,
+				Description: `The general IP Range configured for this network (/24 for private networks). If it is not set, gridscale internal default range is used. 
+				If it is not set and DHCP is enabled, dhcp_range will be set by the backend automatically.`,
+				Optional: true,
+				Computed: true,
 			},
 			"dhcp_gateway": {
 				Type:        schema.TypeString,
