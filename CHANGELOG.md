@@ -11,7 +11,7 @@ IMPROVEMENTS:
 - Update server's docs.
 
 BUG FIXES:
-- Fix network ordering of a server issue [#142](https://github.com/gridscale/terraform-provider-gridscale/issues/142).
+- Fix network ordering of a server issue [#142](https://github.com/gridscale/terraform-provider-gridscale/issues/142). **NOTE**: The network ordering of the server now corresponds to the order of the networks in the server resource block. The field `ordering` is deprecated. 
 - Fix the field `dhcp_range` is not set automatically by the backend, when it is not set manually in terraform [#190](https://github.com/gridscale/terraform-provider-gridscale/pull/190).
 - Updating server-storage relations and server-network relations' properties (except the order) will no longer require the server to be shutdown [#190](https://github.com/gridscale/terraform-provider-gridscale/pull/190).
 
