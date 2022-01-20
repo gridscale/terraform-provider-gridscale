@@ -1,5 +1,28 @@
 # Changelog
 
+## 1.14.0 (Jan 20, 20212)
+
+FEATURES:
+- Add filesystem resource [#189](https://github.com/gridscale/terraform-provider-gridscale/pull/189).
+- Allow assigning DHCP IP to a server [#190](https://github.com/gridscale/terraform-provider-gridscale/pull/190).
+
+IMPROVEMENTS:
+- Update network's docs.
+- Update server's docs.
+
+BUG FIXES:
+- Fix network ordering of a server issue [#142](https://github.com/gridscale/terraform-provider-gridscale/issues/142).
+- Fix the field `dhcp_range` is not set automatically by the backend, when it is not set manually in terraform [#190](https://github.com/gridscale/terraform-provider-gridscale/pull/190).
+- Updating server-storage relations and server-network relations' properties (except the order) will no longer require the server to be shutdown [#190](https://github.com/gridscale/terraform-provider-gridscale/pull/190).
+
+## 1.13.0 (Sept 9, 2021)
+
+FEATURES:
+- Add DHCP properties/options to the network resource/data source [#180](https://github.com/gridscale/terraform-provider-gridscale/pull/180).
+
+IMPROVEMENTS:
+- Update the network's docs.
+
 ## 1.12.0 (Aug 12, 2021)
 
 FEATURES:
