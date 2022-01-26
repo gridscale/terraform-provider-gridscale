@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.8.1 (Jan 26, 2022)
+
+IMPROVEMENTS:
+- Allow update server's hw profile, according to the official API docs [#215](https://github.com/gridscale/gsclient-go/pull/215).
+
+BUG FIXES:
+- Allow to remove DHCP options (except DHCPRange) [#214](https://github.com/gridscale/gsclient-go/pull/214).
+
 ## 3.8.0 (Dec 16, 2021)
 
 FEATURES:
