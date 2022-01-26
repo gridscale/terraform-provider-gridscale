@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.14.0 (Jan 20, 20212)
+## 1.14.0 (Jan 20, 2022)
 
 FEATURES:
 - Add filesystem resource [#189](https://github.com/gridscale/terraform-provider-gridscale/pull/189).
