@@ -750,6 +750,20 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	if shutdownRequired {
+		profile := d.Get("hardware_profile").(string)
+		if profile == "legacy" {
+			requestBody.HardwareProfile = gsclient.LegacyServerHardware
+		} else if profile == "nested" {
+			requestBody.HardwareProfile = gsclient.NestedServerHardware
+		} else if profile == "cisco_csr" {
+			requestBody.HardwareProfile = gsclient.CiscoCSRServerHardware
+		} else if profile == "sophos_utm" {
+			requestBody.HardwareProfile = gsclient.SophosUTMServerHardware
+		} else if profile == "f5_bigip" {
+			requestBody.HardwareProfile = gsclient.F5BigipServerHardware
+		} else if profile == "q35" {
+			requestBody.HardwareProfile = gsclient.Q35ServerHardware
+		}
 		updateSequence := func(ctx context.Context) error {
 			//Execute the update request
 			err = gsc.UpdateServer(ctx, d.Id(), requestBody)
