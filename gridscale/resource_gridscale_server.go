@@ -652,8 +652,6 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		requestBody.HardwareProfile = gsclient.F5BigipServerHardware
 	} else if profile == "q35" {
 		requestBody.HardwareProfile = gsclient.Q35ServerHardware
-	} else {
-		requestBody.HardwareProfile = gsclient.DefaultServerHardware
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
