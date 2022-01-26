@@ -640,18 +640,21 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	profile := d.Get("hardware_profile").(string)
-	if profile == "legacy" {
+	switch profile {
+	case "legacy":
 		requestBody.HardwareProfile = gsclient.LegacyServerHardware
-	} else if profile == "nested" {
+	case "nested":
 		requestBody.HardwareProfile = gsclient.NestedServerHardware
-	} else if profile == "cisco_csr" {
+	case "cisco_csr":
 		requestBody.HardwareProfile = gsclient.CiscoCSRServerHardware
-	} else if profile == "sophos_utm" {
+	case "sophos_utm":
 		requestBody.HardwareProfile = gsclient.SophosUTMServerHardware
-	} else if profile == "f5_bigip" {
+	case "f5_bigip":
 		requestBody.HardwareProfile = gsclient.F5BigipServerHardware
-	} else if profile == "q35" {
+	case "q35":
 		requestBody.HardwareProfile = gsclient.Q35ServerHardware
+	case "default":
+		requestBody.HardwareProfile = gsclient.DefaultServerHardware
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
@@ -751,18 +754,21 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 
 	if shutdownRequired {
 		profile := d.Get("hardware_profile").(string)
-		if profile == "legacy" {
+		switch profile {
+		case "legacy":
 			requestBody.HardwareProfile = gsclient.LegacyServerHardware
-		} else if profile == "nested" {
+		case "nested":
 			requestBody.HardwareProfile = gsclient.NestedServerHardware
-		} else if profile == "cisco_csr" {
+		case "cisco_csr":
 			requestBody.HardwareProfile = gsclient.CiscoCSRServerHardware
-		} else if profile == "sophos_utm" {
+		case "sophos_utm":
 			requestBody.HardwareProfile = gsclient.SophosUTMServerHardware
-		} else if profile == "f5_bigip" {
+		case "f5_bigip":
 			requestBody.HardwareProfile = gsclient.F5BigipServerHardware
-		} else if profile == "q35" {
+		case "q35":
 			requestBody.HardwareProfile = gsclient.Q35ServerHardware
+		case "default":
+			requestBody.HardwareProfile = gsclient.DefaultServerHardware
 		}
 		updateSequence := func(ctx context.Context) error {
 			//Execute the update request
