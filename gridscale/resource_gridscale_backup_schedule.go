@@ -65,6 +65,7 @@ func resourceGridscaleStorageBackupSchedule() *schema.Resource {
 			"backup_location_uuid": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				ForceNew:    true,
 				Description: "UUID of the location where your backup is stored.",
 			},
