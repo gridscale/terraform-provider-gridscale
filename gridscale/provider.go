@@ -74,6 +74,7 @@ func Provider() *schema.Provider {
 			"gridscale_firewall":                 dataSourceGridscaleFirewall(),
 			"gridscale_marketplace_application":  dataSourceGridscaleMarketplaceApplication(),
 			"gridscale_ssl_certificate":          dataSourceGridscaleSSLCert(),
+			"gridscale_location":                 dataSourceGridscaleLocation(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"gridscale_server":                         resourceGridscaleServer(),
