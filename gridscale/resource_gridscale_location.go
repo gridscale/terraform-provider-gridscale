@@ -77,7 +77,7 @@ func resourceGridscaleLocation() *schema.Resource {
 				Computed:    true,
 			},
 			"parent_location_uuid_change_requested": {
-				Type:        schema.TypeInt,
+				Type:        schema.TypeString,
 				Description: "The location_uuid of an existing public location in which to create the private location.",
 				Computed:    true,
 			},
@@ -282,6 +282,16 @@ func resourceGridscaleLocationCreate(d *schema.ResourceData, meta interface{}) e
 func resourceGridscaleLocationUpdate(d *schema.ResourceData, meta interface{}) error {
 	errorPrefix := fmt.Sprintf("update location (%s) resource -", d.Id())
 	client := meta.(*gsclient.Client)
+
+	// Check if the location is active (approved) before requesting any updates.
+	loc, err := client.GetLocation(context.Background(), d.Id())
+	if err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
+	}
+	if !loc.Properties.Active {
+		return fmt.Errorf("%s error: %v", errorPrefix, "The location is inactive (not approved). Please wait for the location to be active.")
+	}
+
 	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
 	cpunodeCount := d.Get("cpunode_count").(int)
 	requestBody := gsclient.LocationUpdateRequest{
@@ -292,7 +302,7 @@ func resourceGridscaleLocationUpdate(d *schema.ResourceData, meta interface{}) e
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
 	defer cancel()
-	err := client.UpdateLocation(ctx, d.Id(), requestBody)
+	err = client.UpdateLocation(ctx, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
