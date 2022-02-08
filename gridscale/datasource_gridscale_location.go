@@ -3,7 +3,6 @@ package gridscale
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/gridscale/gsclient-go/v3"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -13,9 +12,6 @@ import (
 func dataSourceGridscaleLocation() *schema.Resource {
 	return &schema.Resource{
 		Read: dataSourceGridscaleLocationRead,
-		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
-		},
 
 		Schema: map[string]*schema.Schema{
 			"resource_id": {
@@ -155,11 +151,6 @@ func dataSourceGridscaleLocation() *schema.Resource {
 				Description: "The location_uuid of a backup location.",
 				Computed:    true,
 			},
-		},
-		Timeouts: &schema.ResourceTimeout{
-			Create: schema.DefaultTimeout(5 * time.Minute),
-			Update: schema.DefaultTimeout(5 * time.Minute),
-			Delete: schema.DefaultTimeout(5 * time.Minute),
 		},
 	}
 }
