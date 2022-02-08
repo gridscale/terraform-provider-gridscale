@@ -65,6 +65,16 @@ func dataSourceGridscaleStorageBackupSchedule() *schema.Resource {
 				Computed:    true,
 				Description: "The status of the schedule active or not",
 			},
+			"backup_location_uuid": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "UUID of the location where your backup is stored.",
+			},
+			"backup_location_name": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The human-readable name of backup location. It supports the full UTF-8 character set, with a maximum of 64 characters.",
+			},
 			"storage_backups": {
 				Type:        schema.TypeSet,
 				Computed:    true,
@@ -109,6 +119,12 @@ func dataSourceGridscaleBackupScheduleRead(d *schema.ResourceData, meta interfac
 	}
 	if err = d.Set("active", props.Active); err != nil {
 		return fmt.Errorf("%s error setting status: %v", errorPrefix, err)
+	}
+	if err = d.Set("backup_location_uuid", props.BackupLocationUUID); err != nil {
+		return fmt.Errorf("%s error setting backup_location_uuid: %v", errorPrefix, err)
+	}
+	if err = d.Set("backup_location_name", props.BackupLocationName); err != nil {
+		return fmt.Errorf("%s error setting backup_location_name: %v", errorPrefix, err)
 	}
 	if err = d.Set("name", props.Name); err != nil {
 		return fmt.Errorf("%s error setting name: %v", errorPrefix, err)
