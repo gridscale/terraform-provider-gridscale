@@ -46,6 +46,8 @@ The following arguments are supported:
 
 * `run_interval` - (Required) The interval at which the schedule will run (in minutes, >=60).
 
+* `backup_location_uuid` - (Optional, ForceNew) UUID of the location where your backup is stored.
+
 ## Timeouts
 
 Timeouts configuration options (in seconds):
@@ -63,6 +65,8 @@ The following attributes are exported:
 * `storage_uuid` - See Argument Reference above.
 * `status` - The status of the backup schedule.
 * `active` - See Argument Reference above.
+* `backup_location_uuid` - See Argument Reference above.
+* `backup_location_name` - The human-readable name of backup location. It supports the full UTF-8 character set, with a maximum of 64 characters.
 * `name` - See Argument Reference above.
 * `next_runtime` - See Argument Reference above.
 * `next_runtime_computed` - The date and time that the backup schedule will be run. This date and time is computed by gridscale's server.
