@@ -47,6 +47,8 @@ The following attributes are exported:
 * `storage_uuid` - UUID of the storage that the backup schedule belongs to.
 * `status` - The status of the backup schedule.
 * `active` - The status of the schedule active or not.
+* `backup_location_uuid` - UUID of the location where your backup is stored.
+* `backup_location_name` - The human-readable name of backup location. It supports the full UTF-8 character set, with a maximum of 64 characters.
 * `name` - The human-readable name of the backup schedule.
 * `next_runtime` - The date and time that the backup schedule will be run.
 * `keep_backups` - The amount of Snapshots to keep before overwriting the last created Snapshot.

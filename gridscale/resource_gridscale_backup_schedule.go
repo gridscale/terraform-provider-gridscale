@@ -62,6 +62,18 @@ func resourceGridscaleStorageBackupSchedule() *schema.Resource {
 				Required:    true,
 				Description: "The status of the schedule active or not",
 			},
+			"backup_location_uuid": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				ForceNew:    true,
+				Description: "UUID of the location where your backup is stored.",
+			},
+			"backup_location_name": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The human-readable name of backup location. It supports the full UTF-8 character set, with a maximum of 64 characters.",
+			},
 			"create_time": {
 				Type:        schema.TypeString,
 				Computed:    true,
@@ -128,6 +140,12 @@ func resourceGridscaleBackupScheduleRead(d *schema.ResourceData, meta interface{
 	if err = d.Set("active", props.Active); err != nil {
 		return fmt.Errorf("%s error setting status: %v", errorPrefix, err)
 	}
+	if err = d.Set("backup_location_uuid", props.BackupLocationUUID); err != nil {
+		return fmt.Errorf("%s error setting backup_location_uuid: %v", errorPrefix, err)
+	}
+	if err = d.Set("backup_location_name", props.BackupLocationName); err != nil {
+		return fmt.Errorf("%s error setting backup_location_name: %v", errorPrefix, err)
+	}
 	if err = d.Set("name", props.Name); err != nil {
 		return fmt.Errorf("%s error setting name: %v", errorPrefix, err)
 	}
@@ -168,10 +186,11 @@ func resourceGridscaleBackupScheduleRead(d *schema.ResourceData, meta interface{
 func resourceGridscaleBackupScheduleCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	requestBody := gsclient.StorageBackupScheduleCreateRequest{
-		Name:        d.Get("name").(string),
-		RunInterval: d.Get("run_interval").(int),
-		KeepBackups: d.Get("keep_backups").(int),
-		Active:      d.Get("active").(bool),
+		Name:               d.Get("name").(string),
+		RunInterval:        d.Get("run_interval").(int),
+		KeepBackups:        d.Get("keep_backups").(int),
+		Active:             d.Get("active").(bool),
+		BackupLocationUUID: d.Get("backup_location_uuid").(string),
 	}
 	nextRuntime, err := time.Parse(timeLayout, d.Get("next_runtime").(string))
 	if err != nil {
