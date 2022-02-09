@@ -58,8 +58,7 @@ func resourceGridscaleServer() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "The number of server cores.",
 				Optional:    true,
-				ForceNew:    true,
-				Default:     "default",
+				Computed:    true,
 				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
 					valid := false
 					for _, profile := range hardwareProfiles {
@@ -641,19 +640,20 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	profile := d.Get("hardware_profile").(string)
-	if profile == "legacy" {
+	switch profile {
+	case "legacy":
 		requestBody.HardwareProfile = gsclient.LegacyServerHardware
-	} else if profile == "nested" {
+	case "nested":
 		requestBody.HardwareProfile = gsclient.NestedServerHardware
-	} else if profile == "cisco_csr" {
+	case "cisco_csr":
 		requestBody.HardwareProfile = gsclient.CiscoCSRServerHardware
-	} else if profile == "sophos_utm" {
+	case "sophos_utm":
 		requestBody.HardwareProfile = gsclient.SophosUTMServerHardware
-	} else if profile == "f5_bigip" {
+	case "f5_bigip":
 		requestBody.HardwareProfile = gsclient.F5BigipServerHardware
-	} else if profile == "q35" {
+	case "q35":
 		requestBody.HardwareProfile = gsclient.Q35ServerHardware
-	} else {
+	case "default":
 		requestBody.HardwareProfile = gsclient.DefaultServerHardware
 	}
 
@@ -753,6 +753,23 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	if shutdownRequired {
+		profile := d.Get("hardware_profile").(string)
+		switch profile {
+		case "legacy":
+			requestBody.HardwareProfile = gsclient.LegacyServerHardware
+		case "nested":
+			requestBody.HardwareProfile = gsclient.NestedServerHardware
+		case "cisco_csr":
+			requestBody.HardwareProfile = gsclient.CiscoCSRServerHardware
+		case "sophos_utm":
+			requestBody.HardwareProfile = gsclient.SophosUTMServerHardware
+		case "f5_bigip":
+			requestBody.HardwareProfile = gsclient.F5BigipServerHardware
+		case "q35":
+			requestBody.HardwareProfile = gsclient.Q35ServerHardware
+		case "default":
+			requestBody.HardwareProfile = gsclient.DefaultServerHardware
+		}
 		updateSequence := func(ctx context.Context) error {
 			//Execute the update request
 			err = gsc.UpdateServer(ctx, d.Id(), requestBody)

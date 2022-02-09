@@ -248,6 +248,9 @@ type ServerUpdateRequest struct {
 	// If the server should be auto-started in case of a failure (default=true).
 	// Leave it if you do not want to update this feature of the server.
 	AutoRecovery *bool `json:"auto_recovery,omitempty"`
+
+	// Specifies the hardware settings for the virtual machine.
+	HardwareProfile ServerHardwareProfile `json:"hardware_profile,omitempty"`
 }
 
 // ServerMetricList holds a list of a server's metrics.
