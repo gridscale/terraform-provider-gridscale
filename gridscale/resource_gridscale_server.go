@@ -76,7 +76,6 @@ func resourceGridscaleServer() *schema.Resource {
 			"storage": {
 				Type:        schema.TypeList,
 				Optional:    true,
-				MaxItems:    8,
 				Description: `A list of storages attached to the server. The first storage in the list is always set as the boot storage of the server.`,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -135,7 +134,6 @@ func resourceGridscaleServer() *schema.Resource {
 			"network": {
 				Type:     schema.TypeList,
 				Optional: true,
-				MaxItems: 7,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"object_uuid": {
