@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gridscale/gsclient-go/v3"
+	errHandler "github.com/terraform-providers/terraform-provider-gridscale/gridscale/error-handler"
 )
 
 type serverStatus struct {
@@ -121,7 +122,10 @@ func (l *serverStatusList) startServerSynchronously(ctx context.Context, c *gscl
 			log.Printf("[DEBUG] LOCK RELEASED! Starting server (%v) is done", id)
 		}()
 		if !s.deleted {
-			err := c.StartServer(ctx, id)
+			err := errHandler.RemoveErrorContainsHTTPCodes(
+				c.StartServer(ctx, id),
+				http.StatusBadRequest,
+			)
 			if err != nil {
 				return err
 			}
@@ -149,7 +153,10 @@ func (l *serverStatusList) shutdownServerSynchronously(ctx context.Context, c *g
 			//set the shutdown timeout specifically
 			shutdownCtx, cancel := context.WithTimeout(context.Background(), serverShutdownTimeoutSecs*time.Second)
 			defer cancel()
-			err := c.ShutdownServer(shutdownCtx, id)
+			err := errHandler.RemoveErrorContainsHTTPCodes(
+				c.ShutdownServer(shutdownCtx, id),
+				http.StatusBadRequest,
+			)
 			//if error is returned and it is not caused by an expired context, returns error
 			if err != nil && err != shutdownCtx.Err() {
 				return err
@@ -164,7 +171,10 @@ func (l *serverStatusList) shutdownServerSynchronously(ctx context.Context, c *g
 				default:
 				}
 				//force the sever to stop
-				return c.StopServer(ctx, id)
+				return errHandler.RemoveErrorContainsHTTPCodes(
+					c.StopServer(ctx, id),
+					http.StatusBadRequest,
+				)
 			}
 			return nil
 		}
