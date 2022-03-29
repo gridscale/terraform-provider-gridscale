@@ -411,7 +411,7 @@ func resourceGridscaleStorageDelete(d *schema.ResourceData, meta interface{}) er
 	defer cancel()
 	storage, err := client.GetStorage(ctx, d.Id())
 	//In case of 404, don't catch the error
-	if errHandler.RemoveErrorContainsHTTPCodes(err, http.StatusNotFound) != nil {
+	if errHandler.SuppressHTTPErrorCodes(err, http.StatusNotFound) != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
@@ -419,7 +419,7 @@ func resourceGridscaleStorageDelete(d *schema.ResourceData, meta interface{}) er
 	for _, server := range storage.Properties.Relations.Servers {
 		unlinkStorageAction := func(ctx context.Context) error {
 			//No need to unlink when server returns 409 or 404
-			err := errHandler.RemoveErrorContainsHTTPCodes(
+			err := errHandler.SuppressHTTPErrorCodes(
 				client.UnlinkStorage(ctx, server.ObjectUUID, d.Id()),
 				http.StatusConflict,
 				http.StatusNotFound,
@@ -433,7 +433,7 @@ func resourceGridscaleStorageDelete(d *schema.ResourceData, meta interface{}) er
 		}
 	}
 
-	err = errHandler.RemoveErrorContainsHTTPCodes(
+	err = errHandler.SuppressHTTPErrorCodes(
 		client.DeleteStorage(ctx, d.Id()),
 		http.StatusNotFound,
 	)

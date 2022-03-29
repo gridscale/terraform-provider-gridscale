@@ -233,7 +233,7 @@ func resourceGridscaleIpDelete(d *schema.ResourceData, meta interface{}) error {
 
 	ip, err := client.GetIP(ctx, d.Id())
 	//In case of 404, don't catch the error
-	if errHandler.RemoveErrorContainsHTTPCodes(err, http.StatusNotFound) != nil {
+	if errHandler.SuppressHTTPErrorCodes(err, http.StatusNotFound) != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 	//Stop the server relating to this IP address if there is one
@@ -242,7 +242,7 @@ func resourceGridscaleIpDelete(d *schema.ResourceData, meta interface{}) error {
 		server := ip.Properties.Relations.Servers[0]
 		unlinkIPAction := func(ctx context.Context) error {
 			//No need to unlink when server returns 409 or 404
-			err := errHandler.RemoveErrorContainsHTTPCodes(
+			err := errHandler.SuppressHTTPErrorCodes(
 				client.UnlinkIP(ctx, server.ServerUUID, d.Id()),
 				http.StatusConflict,
 				http.StatusNotFound,
@@ -256,7 +256,7 @@ func resourceGridscaleIpDelete(d *schema.ResourceData, meta interface{}) error {
 		}
 	}
 
-	err = errHandler.RemoveErrorContainsHTTPCodes(
+	err = errHandler.SuppressHTTPErrorCodes(
 		client.DeleteIP(ctx, d.Id()),
 		http.StatusNotFound,
 	)

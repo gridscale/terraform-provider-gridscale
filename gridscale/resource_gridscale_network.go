@@ -340,7 +340,7 @@ func resourceGridscaleNetworkDelete(d *schema.ResourceData, meta interface{}) er
 	defer cancel()
 	net, err := client.GetNetwork(ctx, d.Id())
 	//In case of 404, don't catch the error
-	if errHandler.RemoveErrorContainsHTTPCodes(err, http.StatusNotFound) != nil {
+	if errHandler.SuppressHTTPErrorCodes(err, http.StatusNotFound) != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
@@ -348,7 +348,7 @@ func resourceGridscaleNetworkDelete(d *schema.ResourceData, meta interface{}) er
 	for _, server := range net.Properties.Relations.Servers {
 		unlinkNetAction := func(ctx context.Context) error {
 			//No need to unlink when server returns 409 or 404
-			err := errHandler.RemoveErrorContainsHTTPCodes(
+			err := errHandler.SuppressHTTPErrorCodes(
 				client.UnlinkNetwork(ctx, server.ObjectUUID, d.Id()),
 				http.StatusConflict,
 				http.StatusNotFound,
@@ -362,7 +362,7 @@ func resourceGridscaleNetworkDelete(d *schema.ResourceData, meta interface{}) er
 		}
 	}
 
-	err = errHandler.RemoveErrorContainsHTTPCodes(
+	err = errHandler.SuppressHTTPErrorCodes(
 		client.DeleteNetwork(ctx, d.Id()),
 		http.StatusNotFound,
 	)

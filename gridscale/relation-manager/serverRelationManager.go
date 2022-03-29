@@ -253,7 +253,7 @@ func (c *ServerRelationManger) UpdateISOImageRel(ctx context.Context) error {
 		//Unlink it
 		if oldIso != "" {
 			//If 404 or 409, that means ISO image is already deleted => the relation between ISO image and server is deleted automatically
-			err = errHandler.RemoveErrorContainsHTTPCodes(
+			err = errHandler.SuppressHTTPErrorCodes(
 				client.UnlinkIsoImage(ctx, d.Id(), oldIso.(string)),
 				http.StatusConflict,
 				http.StatusNotFound,
@@ -280,7 +280,7 @@ func (c *ServerRelationManger) UpdateIPv4Rel(ctx context.Context) error {
 		//Unlink it
 		if oldIp != "" {
 			//If 404 or 409, that means IP is already deleted => the relation between IP and server is deleted automatically
-			err = errHandler.RemoveErrorContainsHTTPCodes(
+			err = errHandler.SuppressHTTPErrorCodes(
 				client.UnlinkIP(ctx, d.Id(), oldIp.(string)),
 				http.StatusConflict,
 				http.StatusNotFound,
@@ -306,7 +306,7 @@ func (c *ServerRelationManger) UpdateIPv6Rel(ctx context.Context) error {
 		//Unlink it
 		if oldIp != "" {
 			//If 404 or 409, that means IP is already deleted => the relation between IP and server is deleted automatically
-			err = errHandler.RemoveErrorContainsHTTPCodes(
+			err = errHandler.SuppressHTTPErrorCodes(
 				client.UnlinkIP(ctx, d.Id(), oldIp.(string)),
 				http.StatusConflict,
 				http.StatusNotFound,
@@ -337,7 +337,7 @@ func (c *ServerRelationManger) RelinkAllNetworks(ctx context.Context) error {
 		network := value.(map[string]interface{})
 		if network["object_uuid"].(string) != "" {
 			//If 404 or 409, that means network is already deleted => the relation between network and server is deleted automatically
-			err := errHandler.RemoveErrorContainsHTTPCodes(
+			err := errHandler.SuppressHTTPErrorCodes(
 				client.UnlinkNetwork(ctx, d.Id(), network["object_uuid"].(string)),
 				http.StatusConflict,
 				http.StatusNotFound,
@@ -406,7 +406,7 @@ func (c *ServerRelationManger) UpdateNetRelsProperties(ctx context.Context) erro
 					)
 				}
 			} else {
-				if err := errHandler.RemoveErrorContainsHTTPCodes(
+				if err := errHandler.SuppressHTTPErrorCodes(
 					client.DeleteNetworkPinnedServer(
 						ctx,
 						network["object_uuid"].(string),
@@ -439,7 +439,7 @@ func (c *ServerRelationManger) UpdateStoragesRel(ctx context.Context) error {
 			storage := value.(map[string]interface{})
 			if storage["object_uuid"].(string) != "" {
 				//If 404 or 409, that means storage is already deleted => the relation between storage and server is deleted automatically
-				err = errHandler.RemoveErrorContainsHTTPCodes(
+				err = errHandler.SuppressHTTPErrorCodes(
 					client.UnlinkStorage(ctx, d.Id(), storage["object_uuid"].(string)),
 					http.StatusConflict,
 					http.StatusNotFound,

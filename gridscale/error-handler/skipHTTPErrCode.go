@@ -2,9 +2,9 @@ package errorhandler
 
 import "github.com/gridscale/gsclient-go/v3"
 
-//RemoveErrorContainsHTTPCodes returns nil, if the error of HTTP error
-//has status code that is in the given list of http status codes
-func RemoveErrorContainsHTTPCodes(err error, errorCodes ...int) error {
+// SuppressHTTPErrorCodes suppresses the error, if the error
+// is in the list errorCodes.
+func SuppressHTTPErrorCodes(err error, errorCodes ...int) error {
 	if requestError, ok := err.(gsclient.RequestError); ok {
 		if containsInt(errorCodes, requestError.StatusCode) {
 			err = nil

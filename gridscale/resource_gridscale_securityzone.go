@@ -180,7 +180,7 @@ func resourceGridscalePaaSSecurityZoneDelete(d *schema.ResourceData, meta interf
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
 	defer cancel()
-	err := errHandler.RemoveErrorContainsHTTPCodes(
+	err := errHandler.SuppressHTTPErrorCodes(
 		client.DeletePaaSSecurityZone(ctx, d.Id()),
 		http.StatusNotFound,
 	)

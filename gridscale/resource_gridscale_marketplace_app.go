@@ -427,7 +427,7 @@ func resourceGridscaleMarketplaceApplicationDelete(d *schema.ResourceData, meta 
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
 	defer cancel()
-	err := errHandler.RemoveErrorContainsHTTPCodes(
+	err := errHandler.SuppressHTTPErrorCodes(
 		client.DeleteMarketplaceApplication(ctx, d.Id()),
 		http.StatusNotFound,
 	)

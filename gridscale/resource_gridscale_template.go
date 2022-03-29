@@ -250,7 +250,7 @@ func resourceGridscaleTemplateDelete(d *schema.ResourceData, meta interface{}) e
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
 	defer cancel()
-	err := errHandler.RemoveErrorContainsHTTPCodes(
+	err := errHandler.SuppressHTTPErrorCodes(
 		client.DeleteTemplate(ctx, d.Id()),
 		http.StatusNotFound,
 	)

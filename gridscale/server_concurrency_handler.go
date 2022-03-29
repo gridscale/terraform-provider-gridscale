@@ -122,7 +122,7 @@ func (l *serverStatusList) startServerSynchronously(ctx context.Context, c *gscl
 			log.Printf("[DEBUG] LOCK RELEASED! Starting server (%v) is done", id)
 		}()
 		if !s.deleted {
-			err := errHandler.RemoveErrorContainsHTTPCodes(
+			err := errHandler.SuppressHTTPErrorCodes(
 				c.StartServer(ctx, id),
 				http.StatusBadRequest,
 			)
@@ -153,7 +153,7 @@ func (l *serverStatusList) shutdownServerSynchronously(ctx context.Context, c *g
 			//set the shutdown timeout specifically
 			shutdownCtx, cancel := context.WithTimeout(context.Background(), serverShutdownTimeoutSecs*time.Second)
 			defer cancel()
-			err := errHandler.RemoveErrorContainsHTTPCodes(
+			err := errHandler.SuppressHTTPErrorCodes(
 				c.ShutdownServer(shutdownCtx, id),
 				http.StatusBadRequest,
 			)
@@ -171,7 +171,7 @@ func (l *serverStatusList) shutdownServerSynchronously(ctx context.Context, c *g
 				default:
 				}
 				//force the sever to stop
-				return errHandler.RemoveErrorContainsHTTPCodes(
+				return errHandler.SuppressHTTPErrorCodes(
 					c.StopServer(ctx, id),
 					http.StatusBadRequest,
 				)
