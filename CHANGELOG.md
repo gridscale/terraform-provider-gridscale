@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.14.1 (Feb 10, 2022)
+
+IMPROVEMENTS:
+- Allow backend to set hardware profile when hardware_profile is not set (q35 at the time of writing) [#191](https://github.com/gridscale/terraform-provider-gridscale/pull/191)
+- Allow to set backup location when creating a backup schedule. [#193](https://github.com/gridscale/terraform-provider-gridscale/pull/193)
+
 ## 1.14.0 (Jan 20, 2022)
 
 FEATURES:
