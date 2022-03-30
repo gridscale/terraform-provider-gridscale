@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.14.2 (Mar 30, 2022)
+
+IMPROVEMENTS:
+- Suppress server-power-state update's error 400. [#196](https://github.com/gridscale/terraform-provider-gridscale/pull/196)
+
+BUG FIXES:
+- Fix incorrect maximum number of networks that can be connected to a server. [#197](https://github.com/gridscale/terraform-provider-gridscale/pull/197)
+
 ## 1.14.1 (Feb 10, 2022)
 
 IMPROVEMENTS:
