@@ -250,7 +250,7 @@ func resourceGridscaleBackupScheduleDelete(d *schema.ResourceData, meta interfac
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
 	defer cancel()
-	err := errHandler.RemoveErrorContainsHTTPCodes(
+	err := errHandler.SuppressHTTPErrorCodes(
 		client.DeleteStorageBackupSchedule(ctx, storageUUID, d.Id()),
 		http.StatusNotFound,
 	)

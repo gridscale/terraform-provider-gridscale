@@ -470,7 +470,7 @@ func resourceGridscaleMySQLDelete(d *schema.ResourceData, meta interface{}) erro
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
 	defer cancel()
-	err := errHandler.RemoveErrorContainsHTTPCodes(
+	err := errHandler.SuppressHTTPErrorCodes(
 		client.DeletePaaSService(ctx, d.Id()),
 		http.StatusNotFound,
 	)

@@ -721,7 +721,7 @@ func resourceGridscaleServerDelete(d *schema.ResourceData, meta interface{}) err
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
 	defer cancel()
 	//remove the server
-	err := errHandler.RemoveErrorContainsHTTPCodes(
+	err := errHandler.SuppressHTTPErrorCodes(
 		globalServerStatusList.removeServerSynchronously(ctx, client, d.Id()),
 		http.StatusNotFound,
 	)

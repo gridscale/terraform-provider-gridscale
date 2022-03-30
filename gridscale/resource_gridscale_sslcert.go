@@ -205,7 +205,7 @@ func resourceGridscaleSSLCertDelete(d *schema.ResourceData, meta interface{}) er
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
 	defer cancel()
-	err := errHandler.RemoveErrorContainsHTTPCodes(
+	err := errHandler.SuppressHTTPErrorCodes(
 		client.DeleteSSLCertificate(ctx, d.Id()),
 		http.StatusNotFound,
 	)

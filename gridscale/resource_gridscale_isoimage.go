@@ -272,13 +272,13 @@ func resourceGridscaleISOImageDelete(d *schema.ResourceData, meta interface{}) e
 
 	isoimage, err := client.GetISOImage(ctx, d.Id())
 	//In case of 404, don't catch the error
-	if errHandler.RemoveErrorContainsHTTPCodes(err, http.StatusNotFound) != nil {
+	if errHandler.SuppressHTTPErrorCodes(err, http.StatusNotFound) != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 	//Remove all links between this ISO-Image and all servers.
 	for _, server := range isoimage.Properties.Relations.Servers {
 		//No need to unlink when server returns 409 or 404
-		err = errHandler.RemoveErrorContainsHTTPCodes(
+		err = errHandler.SuppressHTTPErrorCodes(
 			client.UnlinkIsoImage(ctx, server.ObjectUUID, d.Id()),
 			http.StatusConflict,
 			http.StatusNotFound,
@@ -287,7 +287,7 @@ func resourceGridscaleISOImageDelete(d *schema.ResourceData, meta interface{}) e
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
 	}
-	err = errHandler.RemoveErrorContainsHTTPCodes(
+	err = errHandler.SuppressHTTPErrorCodes(
 		client.DeleteISOImage(ctx, d.Id()),
 		http.StatusNotFound,
 	)

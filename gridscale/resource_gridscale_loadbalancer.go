@@ -268,7 +268,7 @@ func resourceGridscaleLoadBalancerDelete(d *schema.ResourceData, meta interface{
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
 	defer cancel()
-	err := errHandler.RemoveErrorContainsHTTPCodes(
+	err := errHandler.SuppressHTTPErrorCodes(
 		client.DeleteLoadBalancer(ctx, d.Id()),
 		http.StatusNotFound,
 	)
