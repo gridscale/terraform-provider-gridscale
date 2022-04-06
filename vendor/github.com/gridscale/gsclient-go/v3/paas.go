@@ -57,15 +57,21 @@ type PaaSServiceProperties struct {
 	// Defines the date and time the object was initially created.
 	CreateTime GSTime `json:"create_time"`
 
-	// Contains the IPv6 address and port that the Service will listen to,
+	// Contains the IPv6/IPv4 address and port that the Service will listen to,
 	// you can use these details to connect internally to a service.
 	ListenPorts map[string]map[string]int `json:"listen_ports"`
 
-	// The UUID of the security zone that the service is running in.
+	// The UUID of the security zone that the service is attached to.
 	SecurityZoneUUID string `json:"security_zone_uuid"`
+
+	// The UUID of the network that the service is attached to.
+	NetworkUUID string `json:"network_uuid"`
 
 	// The template used to create the service, you can find an available list at the /service_templates endpoint.
 	ServiceTemplateUUID string `json:"service_template_uuid"`
+
+	// The template category used to create the service.
+	ServiceTemplateCategory string `json:"service_template_category"`
 
 	// Total minutes the object has been running.
 	UsageInMinutes int `json:"usage_in_minutes"`
@@ -118,8 +124,11 @@ type PaaSServiceCreateRequest struct {
 	// The list of labels.
 	Labels []string `json:"labels,omitempty"`
 
-	// The UUID of the security zone that the service is running in.
+	// The UUID of the security zone that the service is attached to.
 	PaaSSecurityZoneUUID string `json:"paas_security_zone_uuid,omitempty"`
+
+	// The UUID of the network that the service is attached to.
+	NetworkUUID string `json:"network_uuid,omitempty"`
 
 	// A list of service resource limits.
 	ResourceLimits []ResourceLimit `json:"resource_limits,omitempty"`
@@ -314,6 +323,9 @@ type PaaSServiceUpdateRequest struct {
 
 	// The template that you want to use in the service, you can find an available list at the /service_templates endpoint.
 	PaaSServiceTemplateUUID string `json:"service_template_uuid,omitempty"`
+
+	// The UUID of the network that the service is attached to.
+	NetworkUUID string `json:"network_uuid,omitempty"`
 }
 
 // PaaSServiceMetrics represents a list of metrics of a PaaS service.

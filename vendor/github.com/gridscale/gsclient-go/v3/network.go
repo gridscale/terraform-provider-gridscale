@@ -133,6 +133,9 @@ type NetworkRelations struct {
 
 	// Array of object (NetworkPaaSSecurityZone).
 	PaaSSecurityZones []NetworkPaaSSecurityZone `json:"paas_security_zones"`
+
+	// Array of PaaS services that are connected to this network.
+	PaaSServices []NetworkPaaSService `json:"paas_services"`
 }
 
 // NetworkVlan represents a relation between a network and a VLAN.
@@ -185,6 +188,25 @@ type NetworkPaaSSecurityZone struct {
 
 	// The UUID of an object is always unique, and refers to a specific object.
 	ObjectUUID string `json:"object_uuid"`
+}
+
+// NetworkPaaSService represents a relation between a network and a Network.
+type NetworkPaaSService struct {
+	// The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
+	ObjectName string `json:"object_name"`
+
+	// The UUID of an object is always unique, and refers to a specific object.
+	ObjectUUID string `json:"object_uuid"`
+
+	// Category of the PaaS service.
+	ServiceTemplateCategory string `json:"service_template_category"`
+
+	// The template used to create the service, you can find an available list at the /service_templates endpoint.
+	ServiceTemplateUUID string `json:"service_template_uuid"`
+
+	// Contains the IPv6/IPv4 address and port that the Service will listen to,
+	// you can use these details to connect internally to a service.
+	ListenPorts map[string]map[string]int `json:"listen_ports"`
 }
 
 // NetworkCreateRequest represents a request for creating a network.
@@ -242,12 +264,12 @@ type NetworkUpdateRequest struct {
 	DHCPRange *string `json:"dhcp_range,omitempty"`
 
 	// The ip reserved and communicated by the dhcp service to be the default gateway.
-	DHCPGateway *string `json:"dhcp_gateway"`
+	DHCPGateway *string `json:"dhcp_gateway,omitempty"`
 
-	DHCPDNS *string `json:"dhcp_dns"`
+	DHCPDNS *string `json:"dhcp_dns,omitempty"`
 
 	// Subrange within the ip range.
-	DHCPReservedSubnet *[]string `json:"dhcp_reserved_subnet"`
+	DHCPReservedSubnet *[]string `json:"dhcp_reserved_subnet,omitempty"`
 }
 
 // PinnedServerList hold a list of pinned server with corresponding DCHP IP.
