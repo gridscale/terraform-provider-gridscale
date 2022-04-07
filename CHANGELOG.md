@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.14.3 (Apr 7, 2022)
+
+BUG FIXES:
+
+* (Hot fix) Fix updating a network's `name`, `labels` and `l2security` locks a server which is attached to that network until the update is finished. The issue is fixed in [gsclient-go v3.9.1](https://github.com/gridscale/gsclient-go/releases/tag/v3.9.1).
+
 ## 1.14.2 (Mar 30, 2022)
 
 IMPROVEMENTS:
