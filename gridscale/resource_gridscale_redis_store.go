@@ -112,19 +112,26 @@ func resourceGridscaleRedisStore() *schema.Resource {
 			"security_zone_uuid": {
 				Type:        schema.TypeString,
 				Description: "Security zone UUID linked to Redis store service.",
+				Deprecated:  "Security zone is deprecated for gridSQL, gridStore, and gridFs. Please consider to use private network instead.",
 				Optional:    true,
 				ForceNew:    true,
 				Computed:    true,
 			},
 			"network_uuid": {
 				Type:        schema.TypeString,
-				Description: "Network UUID containing security zone.",
+				Description: "The UUID of the network that the service is attached to.",
+				Optional:    true,
 				Computed:    true,
 			},
 			"service_template_uuid": {
 				Type:        schema.TypeString,
 				Description: "PaaS service template that Redis store service uses.",
 				Computed:    true,
+			},
+			"service_template_category": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The template service's category used to create the service.",
 			},
 			"usage_in_minutes": {
 				Type:        schema.TypeInt,
@@ -190,8 +197,14 @@ func resourceGridscaleRedisStoreRead(d *schema.ResourceData, meta interface{}) e
 	if err = d.Set("security_zone_uuid", props.SecurityZoneUUID); err != nil {
 		return fmt.Errorf("%s error setting security_zone_uuid: %v", errorPrefix, err)
 	}
+	if err = d.Set("network_uuid", props.NetworkUUID); err != nil {
+		return fmt.Errorf("%s error setting network_uuid: %v", errorPrefix, err)
+	}
 	if err = d.Set("service_template_uuid", props.ServiceTemplateUUID); err != nil {
 		return fmt.Errorf("%s error setting service_template_uuid: %v", errorPrefix, err)
+	}
+	if err = d.Set("service_template_category", props.ServiceTemplateCategory); err != nil {
+		return fmt.Errorf("%s error setting service_template_category: %v", errorPrefix, err)
 	}
 	if err = d.Set("usage_in_minutes", props.UsageInMinutes); err != nil {
 		return fmt.Errorf("%s error setting usage_in_minutes: %v", errorPrefix, err)
@@ -227,7 +240,11 @@ func resourceGridscaleRedisStoreRead(d *schema.ResourceData, meta interface{}) e
 		return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
 	}
 
-	//Get all available networks
+	// Look for security zone's network that the PaaS service is connected to
+	// (if the paas is connected to security zone. O.w skip)
+	if props.SecurityZoneUUID == "" {
+		return nil
+	}
 	networks, err := client.GetNetworkList(context.Background())
 	if err != nil {
 		return fmt.Errorf("%s error getting networks: %v", errorPrefix, err)
@@ -263,9 +280,15 @@ func resourceGridscaleRedisStoreCreate(d *schema.ResourceData, meta interface{})
 		Name:                    d.Get("name").(string),
 		PaaSServiceTemplateUUID: templateUUID,
 		Labels:                  convSOStrings(d.Get("labels").(*schema.Set).List()),
-		PaaSSecurityZoneUUID:    d.Get("security_zone_uuid").(string),
 	}
-
+	networkUUIDInf, isNetworkSet := d.GetOk("network_uuid")
+	if isNetworkSet {
+		requestBody.NetworkUUID = networkUUIDInf.(string)
+	}
+	// If network_uuid is set, skip setting security_zone_uuid.
+	if secZoneUUIDInf, ok := d.GetOk("security_zone_uuid"); ok && !isNetworkSet {
+		requestBody.PaaSSecurityZoneUUID = secZoneUUIDInf.(string)
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
 	defer cancel()
 	response, err := client.CreatePaaSService(ctx, requestBody)
@@ -286,7 +309,9 @@ func resourceGridscaleRedisStoreUpdate(d *schema.ResourceData, meta interface{})
 		Name:   d.Get("name").(string),
 		Labels: &labels,
 	}
-
+	if d.HasChange("network_uuid") {
+		requestBody.NetworkUUID = d.Get("network_uuid").(string)
+	}
 	// Only update templateUUID, when `release` or `performance_class` is changed
 	if d.HasChange("release") || d.HasChange("performance_class") {
 		// Get redisStore template UUID
