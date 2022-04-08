@@ -59,7 +59,7 @@ The following arguments are supported:
 
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
 
-* `security_zone_uuid` - (Optional) The UUID of the security zone that the service is running in.
+* `security_zone_uuid` - (Optional) The UUID of the security zone that the service is attached to.
 
 * `max_core_count` - (Optional) Maximum CPU core count. The mysql instance's CPU core count will be autoscaled based on the workload. The number of cores stays between 1 and `max_core_count`.
 

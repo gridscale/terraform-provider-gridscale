@@ -41,7 +41,7 @@ The following attributes are exported:
 * `listen_port` - Ports that PaaS service listens to.
   * `name` - Name of a port.
   * `listen_port` - Port number.
-* `security_zone_uuid` - The UUID of the security zone that the service is running in.
+* `security_zone_uuid` - The UUID of the security zone that the service is attached to.
 * `network_uuid` - Network UUID containing security zone.
 * `service_template_uuid` - The template used to create the service.
 * `usage_in_minute` - Number of minutes that PaaS service is in use.

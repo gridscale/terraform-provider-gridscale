@@ -1,12 +1,12 @@
 ---
 layout: "gridscale"
-page_title: "gridscale: gridscale_sqlserver"
+page_title: "gridscale: gridscale_mssql"
 sidebar_current: "docs-gridscale-resource-sqlserver"
 description: |-
   Manage a MS SQL server service in gridscale.
 ---
 
-# gridscale_sqlserver
+# gridscale_mssql
 
 Provides a MS SQL server resource. This can be used to create, modify, and delete MS SQL server instances.
 
@@ -15,7 +15,7 @@ Provides a MS SQL server resource. This can be used to create, modify, and delet
 The following example shows how one might use this resource to add a MS SQL server service to gridscale:
 
 ```terraform
-resource "gridscale_sqlserver" "terra-sqlserver-test" {
+resource "gridscale_mssql" "terra-sqlserver-test" {
   name = "test"
   release = "2019"
   performance_class = "standard"
@@ -35,19 +35,17 @@ The following arguments are supported:
 
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
 
-* `security_zone_uuid` - (Optional) The UUID of the security zone that the service is attached to.
+* `security_zone_uuid` - (Optional) The UUID of the security zone that the service is running in.
 
 * `s3_backup` - (Optional) Allow backup/restore MS SQL server to/from a S3 bucket.
 
   * `backup_bucket` - (Required) Object Storage bucket to upload backups to and restore backups from.
 
-  * `backup_retention` - (Optional) Retention (in seconds) for local originals of backups. (0 for immediate removal once uploaded to Object Storage (default), higher values for delayed removal after the given time and once uploaded to Object Storage).
-
   * `backup_access_key` - (Required) Access key used to authenticate against Object Storage server.
 
   * `backup_secret_key` - (Required) Secret key used to authenticate against Object Storage server.
 
-  * `backup_server_url` - (Optional, Default: "https://gos3.io/") Object Storage server URL the bucket is located on. **Note**: Currently, only object storage host "https://gos3.io/" is supported.
+  * `backup_server_url` - (Required) Object Storage server URL the bucket is located on.
 
 ## Timeouts
 
@@ -69,7 +67,6 @@ This resource exports the following attributes:
 * `password` - Password for PaaS service. It is used to connect to the MS SQL server instance.
 * `listen_port` - The port numbers where this MS SQL server service accepts connections.
   * `name` - Name of a port.
-  * `host` - Host address.
   * `listen_port` - Port number.
 * `s3_backup` - See Argument Reference above.
   * `backup_bucket` - See Argument Reference above.
