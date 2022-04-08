@@ -35,6 +35,8 @@ The following arguments are supported:
 
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
 
+* `network_uuid` - (Optional) The UUID of the network that the service is attached to.
+
 * `security_zone_uuid` -  *DEPRECATED* (Optional, Forcenew) The UUID of the security zone that the service is attached to.
 
 * `s3_backup` - (Optional) Allow backup/restore MS SQL server to/from a S3 bucket.
@@ -77,7 +79,7 @@ This resource exports the following attributes:
   * `backup_secret_key` - See Argument Reference above.
   * `backup_server_url` - See Argument Reference above.
 * `security_zone_uuid` - See Argument Reference above.
-* `network_uuid` - Network UUID containing security zone.
+* `network_uuid` -  The UUID of the network that the service is attached to or network UUID containing security zone.
 * `service_template_uuid` - PaaS service template that MS SQL server service uses.
 * `usage_in_minutes` - Number of minutes that PaaS service is in use.
 * `change_time` - Time of the last change.
