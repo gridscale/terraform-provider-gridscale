@@ -35,7 +35,7 @@ The following arguments are supported:
 
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
 
-* `security_zone_uuid` - (Optional) The UUID of the security zone that the service is attached to.
+* `security_zone_uuid` -  *DEPRECATED* (Optional, Forcenew) The UUID of the security zone that the service is attached to.
 
 * `s3_backup` - (Optional) Allow backup/restore MS SQL server to/from a S3 bucket.
 
