@@ -80,7 +80,7 @@ func resourceGridscalePaaS() *schema.Resource {
 			},
 			"network_uuid": {
 				Type:        schema.TypeString,
-				Description: "Network UUID containing security zone",
+				Description: "The UUID of the network that the service is attached to.",
 				Optional:    true,
 				Computed:    true,
 			},
