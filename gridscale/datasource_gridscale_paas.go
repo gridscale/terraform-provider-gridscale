@@ -59,6 +59,11 @@ func dataSourceGridscalePaaS() *schema.Resource {
 				Description: "Security zone UUID linked to PaaS service",
 				Computed:    true,
 			},
+			"service_template_category": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The template service's category used to create the service.",
+			},
 			"network_uuid": {
 				Type:        schema.TypeString,
 				Description: "Network UUID containing security zone",
