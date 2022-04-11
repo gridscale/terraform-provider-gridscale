@@ -170,7 +170,7 @@ func resourceGridscaleRedisCache() *schema.Resource {
 
 func resourceGridscaleRedisCacheRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	errorPrefix := fmt.Sprintf("read paas (%s) resource -", d.Id())
+	errorPrefix := fmt.Sprintf("read redis cache (%s) resource -", d.Id())
 	paas, err := client.GetPaaSService(context.Background(), d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
@@ -266,7 +266,7 @@ func resourceGridscaleRedisCacheRead(d *schema.ResourceData, meta interface{}) e
 
 func resourceGridscaleRedisCacheCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	errorPrefix := fmt.Sprintf("create k8s (%s) resource -", d.Id())
+	errorPrefix := fmt.Sprintf("create redis cache (%s) resource -", d.Id())
 
 	// Get redisCache template UUID
 	release := d.Get("release").(string)
@@ -302,7 +302,7 @@ func resourceGridscaleRedisCacheCreate(d *schema.ResourceData, meta interface{})
 
 func resourceGridscaleRedisCacheUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	errorPrefix := fmt.Sprintf("update k8s (%s) resource -", d.Id())
+	errorPrefix := fmt.Sprintf("update redis cache (%s) resource -", d.Id())
 
 	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
 	requestBody := gsclient.PaaSServiceUpdateRequest{
@@ -335,7 +335,7 @@ func resourceGridscaleRedisCacheUpdate(d *schema.ResourceData, meta interface{})
 
 func resourceGridscaleRedisCacheDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	errorPrefix := fmt.Sprintf("delete paas (%s) resource -", d.Id())
+	errorPrefix := fmt.Sprintf("delete redis cache (%s) resource -", d.Id())
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
 	defer cancel()

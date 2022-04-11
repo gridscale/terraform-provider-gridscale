@@ -179,7 +179,7 @@ func resourceGridscaleMemcached() *schema.Resource {
 
 func resourceGridscaleMemcachedRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	errorPrefix := fmt.Sprintf("read paas (%s) resource -", d.Id())
+	errorPrefix := fmt.Sprintf("read memcached (%s) resource -", d.Id())
 	paas, err := client.GetPaaSService(context.Background(), d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
@@ -284,7 +284,7 @@ func resourceGridscaleMemcachedRead(d *schema.ResourceData, meta interface{}) er
 
 func resourceGridscaleMemcachedCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	errorPrefix := fmt.Sprintf("create k8s (%s) resource -", d.Id())
+	errorPrefix := fmt.Sprintf("create memcached (%s) resource -", d.Id())
 
 	// Get memcached template UUID
 	release := d.Get("release").(string)
@@ -330,7 +330,7 @@ func resourceGridscaleMemcachedCreate(d *schema.ResourceData, meta interface{}) 
 
 func resourceGridscaleMemcachedUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	errorPrefix := fmt.Sprintf("update k8s (%s) resource -", d.Id())
+	errorPrefix := fmt.Sprintf("update memcached (%s) resource -", d.Id())
 
 	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
 	requestBody := gsclient.PaaSServiceUpdateRequest{
@@ -373,7 +373,7 @@ func resourceGridscaleMemcachedUpdate(d *schema.ResourceData, meta interface{}) 
 
 func resourceGridscaleMemcachedDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	errorPrefix := fmt.Sprintf("delete paas (%s) resource -", d.Id())
+	errorPrefix := fmt.Sprintf("delete memcached (%s) resource -", d.Id())
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
 	defer cancel()

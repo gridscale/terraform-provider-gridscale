@@ -240,7 +240,7 @@ func resourceGridscaleMariaDB() *schema.Resource {
 
 func resourceGridscaleMariaDBRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	errorPrefix := fmt.Sprintf("read paas (%s) resource -", d.Id())
+	errorPrefix := fmt.Sprintf("read mariadb (%s) resource -", d.Id())
 	paas, err := client.GetPaaSService(context.Background(), d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
@@ -376,7 +376,7 @@ func resourceGridscaleMariaDBRead(d *schema.ResourceData, meta interface{}) erro
 
 func resourceGridscaleMariaDBCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	errorPrefix := fmt.Sprintf("create k8s (%s) resource -", d.Id())
+	errorPrefix := fmt.Sprintf("create mariadb (%s) resource -", d.Id())
 
 	// Get mariadb template UUID
 	release := d.Get("release").(string)
@@ -435,7 +435,7 @@ func resourceGridscaleMariaDBCreate(d *schema.ResourceData, meta interface{}) er
 
 func resourceGridscaleMariaDBUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	errorPrefix := fmt.Sprintf("update k8s (%s) resource -", d.Id())
+	errorPrefix := fmt.Sprintf("update mariadb (%s) resource -", d.Id())
 
 	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
 	requestBody := gsclient.PaaSServiceUpdateRequest{
@@ -491,7 +491,7 @@ func resourceGridscaleMariaDBUpdate(d *schema.ResourceData, meta interface{}) er
 
 func resourceGridscaleMariaDBDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	errorPrefix := fmt.Sprintf("delete paas (%s) resource -", d.Id())
+	errorPrefix := fmt.Sprintf("delete mariadb (%s) resource -", d.Id())
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
 	defer cancel()

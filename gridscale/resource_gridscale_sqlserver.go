@@ -233,7 +233,7 @@ func resourceGridscaleMSSQLServer() *schema.Resource {
 
 func resourceGridscaleMSSQLServerRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	errorPrefix := fmt.Sprintf("read paas (%s) resource -", d.Id())
+	errorPrefix := fmt.Sprintf("read mssql (%s) resource -", d.Id())
 	paas, err := client.GetPaaSService(context.Background(), d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
@@ -343,7 +343,7 @@ func resourceGridscaleMSSQLServerRead(d *schema.ResourceData, meta interface{}) 
 
 func resourceGridscaleMSSQLServerCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	errorPrefix := fmt.Sprintf("create k8s (%s) resource -", d.Id())
+	errorPrefix := fmt.Sprintf("create mssql (%s) resource -", d.Id())
 
 	// get ms sql template UUID
 	release := d.Get("release").(string)
@@ -390,7 +390,7 @@ func resourceGridscaleMSSQLServerCreate(d *schema.ResourceData, meta interface{}
 
 func resourceGridscaleMSSQLServerUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	errorPrefix := fmt.Sprintf("update k8s (%s) resource -", d.Id())
+	errorPrefix := fmt.Sprintf("update mssql (%s) resource -", d.Id())
 
 	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
 	requestBody := gsclient.PaaSServiceUpdateRequest{
@@ -433,7 +433,7 @@ func resourceGridscaleMSSQLServerUpdate(d *schema.ResourceData, meta interface{}
 
 func resourceGridscaleMSSQLServerDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	errorPrefix := fmt.Sprintf("delete paas (%s) resource -", d.Id())
+	errorPrefix := fmt.Sprintf("delete mssql (%s) resource -", d.Id())
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
 	defer cancel()

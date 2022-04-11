@@ -194,7 +194,7 @@ func resourceGridscaleFilesystem() *schema.Resource {
 
 func resourceGridscaleFilesystemRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	errorPrefix := fmt.Sprintf("read paas (%s) resource -", d.Id())
+	errorPrefix := fmt.Sprintf("read gridFs (%s) resource -", d.Id())
 	paas, err := client.GetPaaSService(context.Background(), d.Id())
 	if err != nil {
 		if requestError, ok := err.(gsclient.RequestError); ok {
@@ -295,7 +295,7 @@ func resourceGridscaleFilesystemRead(d *schema.ResourceData, meta interface{}) e
 
 func resourceGridscaleFilesystemCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	errorPrefix := fmt.Sprintf("create k8s (%s) resource -", d.Id())
+	errorPrefix := fmt.Sprintf("create gridFs (%s) resource -", d.Id())
 
 	release := d.Get("release").(string)
 	performanceClass := d.Get("performance_class").(string)
@@ -346,7 +346,7 @@ func resourceGridscaleFilesystemCreate(d *schema.ResourceData, meta interface{})
 
 func resourceGridscaleFilesystemUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	errorPrefix := fmt.Sprintf("update k8s (%s) resource -", d.Id())
+	errorPrefix := fmt.Sprintf("update gridFs (%s) resource -", d.Id())
 
 	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
 	requestBody := gsclient.PaaSServiceUpdateRequest{
