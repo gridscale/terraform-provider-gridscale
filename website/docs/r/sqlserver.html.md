@@ -81,6 +81,7 @@ This resource exports the following attributes:
 * `security_zone_uuid` - See Argument Reference above.
 * `network_uuid` -  The UUID of the network that the service is attached to or network UUID containing security zone.
 * `service_template_uuid` - PaaS service template that MS SQL server service uses.
+* `service_template_category` - The template service's category used to create the service.
 * `usage_in_minutes` - Number of minutes that PaaS service is in use.
 * `change_time` - Time of the last change.
 * `create_time` - Date time this service has been created.
