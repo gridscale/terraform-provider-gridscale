@@ -59,6 +59,11 @@ func dataSourceGridscalePaaS() *schema.Resource {
 				Description: "Security zone UUID linked to PaaS service",
 				Computed:    true,
 			},
+			"service_template_category": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The template service's category used to create the service.",
+			},
 			"network_uuid": {
 				Type:        schema.TypeString,
 				Description: "Network UUID containing security zone",
@@ -169,8 +174,14 @@ func dataSourceGridscalePaaSRead(d *schema.ResourceData, meta interface{}) error
 	if err = d.Set("security_zone_uuid", props.SecurityZoneUUID); err != nil {
 		return fmt.Errorf("%s error setting security_zone_uuid: %v", errorPrefix, err)
 	}
+	if err = d.Set("network_uuid", props.NetworkUUID); err != nil {
+		return fmt.Errorf("%s error setting network_uuid: %v", errorPrefix, err)
+	}
 	if err = d.Set("service_template_uuid", props.ServiceTemplateUUID); err != nil {
 		return fmt.Errorf("%s error setting service_template_uuid: %v", errorPrefix, err)
+	}
+	if err = d.Set("service_template_category", props.ServiceTemplateCategory); err != nil {
+		return fmt.Errorf("%s error setting service_template_category: %v", errorPrefix, err)
 	}
 	if err = d.Set("usage_in_minute", props.UsageInMinutes); err != nil {
 		return fmt.Errorf("%s error setting usage_in_minute: %v", errorPrefix, err)
@@ -240,7 +251,11 @@ func dataSourceGridscalePaaSRead(d *schema.ResourceData, meta interface{}) error
 		return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
 	}
 
-	//Get all available networks
+	// Look for security zone's network that the PaaS service is connected to
+	// (if the paas is connected to security zone. O.w skip)
+	if props.SecurityZoneUUID == "" {
+		return nil
+	}
 	networks, err := client.GetNetworkList(context.Background())
 	if err != nil {
 		return fmt.Errorf("%s error getting networks: %v", errorPrefix, err)

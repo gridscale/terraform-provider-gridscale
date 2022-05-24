@@ -73,13 +73,15 @@ func resourceGridscalePaaS() *schema.Resource {
 			"security_zone_uuid": {
 				Type:        schema.TypeString,
 				Description: "Security zone UUID linked to PaaS service",
+				Deprecated:  "Security zone is deprecated for gridSQL, gridStore, and gridFs. Please consider to use private network instead.",
 				Optional:    true,
 				ForceNew:    true,
 				Computed:    true,
 			},
 			"network_uuid": {
 				Type:        schema.TypeString,
-				Description: "Network UUID containing security zone",
+				Description: "The UUID of the network that the service is attached to.",
+				Optional:    true,
 				Computed:    true,
 			},
 			"service_template_uuid": {
@@ -92,6 +94,11 @@ func resourceGridscalePaaS() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Description: "Template that PaaS service uses. The `service_template_uuid_computed` will be different from `service_template_uuid`, when `service_template_uuid` is updated outside of terraform.",
+			},
+			"service_template_category": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The template service's category used to create the service.",
 			},
 			"usage_in_minute": {
 				Type:        schema.TypeInt,
@@ -216,8 +223,14 @@ func resourceGridscalePaaSServiceRead(d *schema.ResourceData, meta interface{}) 
 	if err = d.Set("security_zone_uuid", props.SecurityZoneUUID); err != nil {
 		return fmt.Errorf("%s error setting security_zone_uuid: %v", errorPrefix, err)
 	}
+	if err = d.Set("network_uuid", props.NetworkUUID); err != nil {
+		return fmt.Errorf("%s error setting network_uuid: %v", errorPrefix, err)
+	}
 	if err = d.Set("service_template_uuid_computed", props.ServiceTemplateUUID); err != nil {
 		return fmt.Errorf("%s error setting service_template_uuid_computed: %v", errorPrefix, err)
+	}
+	if err = d.Set("service_template_category", props.ServiceTemplateCategory); err != nil {
+		return fmt.Errorf("%s error setting service_template_category: %v", errorPrefix, err)
 	}
 	if err = d.Set("usage_in_minute", props.UsageInMinutes); err != nil {
 		return fmt.Errorf("%s error setting usage_in_minute: %v", errorPrefix, err)
@@ -288,12 +301,15 @@ func resourceGridscalePaaSServiceRead(d *schema.ResourceData, meta interface{}) 
 		return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
 	}
 
-	//Get all available networks
+	// Look for security zone's network that the PaaS service is connected to
+	// (if the paas is connected to security zone. O.w skip)
+	if props.SecurityZoneUUID == "" {
+		return nil
+	}
 	networks, err := client.GetNetworkList(context.Background())
 	if err != nil {
 		return fmt.Errorf("%s error getting networks: %v", errorPrefix, err)
 	}
-	//look for a network that the PaaS service is in
 	for _, network := range networks {
 		securityZones := network.Properties.Relations.PaaSSecurityZones
 		//Each network can contain only one security zone
@@ -314,7 +330,14 @@ func resourceGridscalePaaSServiceCreate(d *schema.ResourceData, meta interface{}
 		Name:                    d.Get("name").(string),
 		PaaSServiceTemplateUUID: d.Get("service_template_uuid").(string),
 		Labels:                  convSOStrings(d.Get("labels").(*schema.Set).List()),
-		PaaSSecurityZoneUUID:    d.Get("security_zone_uuid").(string),
+	}
+	networkUUIDInf, isNetworkSet := d.GetOk("network_uuid")
+	if isNetworkSet {
+		requestBody.NetworkUUID = networkUUIDInf.(string)
+	}
+	// If network_uuid is set, skip setting security_zone_uuid.
+	if secZoneUUIDInf, ok := d.GetOk("security_zone_uuid"); ok && !isNetworkSet {
+		requestBody.PaaSSecurityZoneUUID = secZoneUUIDInf.(string)
 	}
 
 	params := make(map[string]interface{}, 0)
@@ -363,7 +386,9 @@ func resourceGridscalePaaSServiceUpdate(d *schema.ResourceData, meta interface{}
 		Name:   d.Get("name").(string),
 		Labels: &labels,
 	}
-
+	if d.HasChange("network_uuid") {
+		requestBody.NetworkUUID = d.Get("network_uuid").(string)
+	}
 	// Only update service_template_uuid, when it is changed
 	// NOTE: remember to check if service_template_uuid is changed,
 	// otherwise tf will force to update service_template_uuid every time Update is executed.

@@ -37,7 +37,7 @@ The following arguments are supported:
 
 * `name` - (Required) The human-readable name of the object. It supports the full UTF-8 character set, with a maximum of 64 characters.
 
-* `security_zone_uuid` - (Optional) Security zone UUID linked to the Kubernetes resource. If `security_zone_uuid` is not set, the default security zone will be created (if it doesn't exist) and linked. A change of this argument necessitates the re-creation of the resource.
+* `security_zone_uuid` -  *DEPRECATED* (Optional, Forcenew) Security zone UUID linked to the Kubernetes resource. If `security_zone_uuid` is not set, the default security zone will be created (if it doesn't exist) and linked. A change of this argument necessitates the re-creation of the resource.
 
 * `release` - (Required) The Kubernetes release of this instance. Define which release will be used to create the cluster. For convenience, please use [gscloud](https://github.com/gridscale/gscloud) to get the list of available release numbers.
 
@@ -68,6 +68,7 @@ This resource exports the following attributes:
 * `security_zone_uuid` - See Argument Reference above.
 * `release` - See Argument Reference above.
 * `service_template_uuid` - PaaS service template that k8s service uses. The `service_template_uuid` may not relate to `release`, if `service_template_uuid`/`release` is updated outside of terraform (e.g. the k8s service is upgraded by gridscale staffs).
+* `service_template_category` - The template service's category used to create the service.
 * `labels` - See Argument Reference above.
 * `network_uuid` - Network UUID containing security zone, which is linked to the k8s cluster.
 * `node_pool` - See Argument Reference above.

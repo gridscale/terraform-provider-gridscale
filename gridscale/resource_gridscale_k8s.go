@@ -96,6 +96,7 @@ func resourceGridscaleK8s() *schema.Resource {
 			"security_zone_uuid": {
 				Type:        schema.TypeString,
 				Description: "Security zone UUID linked to PaaS service.",
+				Deprecated:  "Security zone is deprecated for gridSQL, gridStore, and gridFs. Please consider to use private network instead.",
 				Optional:    true,
 				ForceNew:    true,
 				Computed:    true,

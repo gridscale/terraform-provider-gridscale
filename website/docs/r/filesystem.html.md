@@ -36,7 +36,9 @@ The following arguments are supported:
 
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
 
-* `security_zone_uuid` - (Optional) The UUID of the security zone that the service is running in.
+* `network_uuid` - (Optional) The UUID of the network that the service is attached to.
+
+* `security_zone_uuid` -  *DEPRECATED* (Optional, Forcenew) The UUID of the security zone that the service is attached to.
 
 * `root_squash` - (Optional) Map root user/group ownership to anon_uid/anon_gid.
 
@@ -71,8 +73,9 @@ This resource exports the following attributes:
   * `host` - Host address.
   * `listen_port` - Port number.
 * `security_zone_uuid` - See Argument Reference above.
-* `network_uuid` - Network UUID containing security zone.
+* `network_uuid` -  The UUID of the network that the service is attached to or network UUID containing security zone.
 * `service_template_uuid` - PaaS service template that filesystem service uses.
+* `service_template_category` - The template service's category used to create the service.
 * `usage_in_minutes` - Number of minutes that PaaS service is in use.
 * `change_time` - Time of the last change.
 * `create_time` - Date time this service has been created.
