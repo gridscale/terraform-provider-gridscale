@@ -133,49 +133,25 @@ func resourceGridscaleK8s() *schema.Resource {
 							Type:        schema.TypeInt,
 							Description: "Number of worker nodes.",
 							Required:    true,
-							ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
-								if 1 > v.(int) || v.(int) > 30 {
-									errors = append(errors, fmt.Errorf("%v is not a valid value for number of \"node_count\". Valid value should be between 1 and 30\n", v.(int)))
-								}
-								return
-							},
 						},
 						"cores": {
 							Type:        schema.TypeInt,
 							Description: "Cores per worker node.",
 							Required:    true,
-							ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
-								if 1 > v.(int) || v.(int) > 32 {
-									errors = append(errors, fmt.Errorf("%v is not a valid value for number of \"cores\". Valid value should be between 1 and 32\n", v.(int)))
-								}
-								return
-							},
 						},
 						"memory": {
 							Type:        schema.TypeInt,
 							Description: "Memory per worker node (in GiB).",
 							Required:    true,
-							ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
-								if 2 > v.(int) || v.(int) > 192 {
-									errors = append(errors, fmt.Errorf("%v is not a valid value for number of \"memory\". Valid value should be between 2 and 192\n", v.(int)))
-								}
-								return
-							},
 						},
 						"storage": {
 							Type:        schema.TypeInt,
 							Description: "Storage per worker node (in GiB).",
 							Required:    true,
-							ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
-								if 30 > v.(int) || v.(int) > 1024 {
-									errors = append(errors, fmt.Errorf("%v is not a valid value for number of \"storage\". Valid value should be between 30 and 1024\n", v.(int)))
-								}
-								return
-							},
 						},
 						"storage_type": {
 							Type:        schema.TypeString,
-							Description: "Storage type (one of storage, `storage_high, storage_insane).",
+							Description: "Storage type (one of storage, storage_high, storage_insane).",
 							Required:    true,
 							ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
 								valid := false
