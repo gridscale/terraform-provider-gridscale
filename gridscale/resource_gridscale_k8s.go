@@ -2,13 +2,13 @@ package gridscale
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/gridscale/gsclient-go/v3"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/customdiff"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	errHandler "github.com/terraform-providers/terraform-provider-gridscale/gridscale/error-handler"
@@ -31,38 +31,38 @@ func resourceGridscaleK8s() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-		CustomizeDiff: customdiff.All(
-			customdiff.ValidateChange("release", func(ctx context.Context, old, new, meta interface{}) error {
-				client := meta.(*gsclient.Client)
-				newReleaseVal := new.(string)
-				paasTemplates, err := client.GetPaaSTemplateList(ctx)
-				if err != nil {
-					return err
-				}
-				var isReleaseValid bool
-				var releaseList []string
-			TEMPLATELOOP:
-				for _, template := range paasTemplates {
-					if template.Properties.Flavour == k8sTemplateFlavourName {
-						// check if release already presents in the release list.
-						// If so, ignore it.
-						for _, release := range releaseList {
-							if release == template.Properties.Release {
-								continue TEMPLATELOOP
-							}
-						}
-						releaseList = append(releaseList, template.Properties.Release)
-						if template.Properties.Release == newReleaseVal {
-							isReleaseValid = true
+		CustomizeDiff: func(ctx context.Context, d *schema.ResourceDiff, meta interface{}) error {
+			client := meta.(*gsclient.Client)
+			newReleaseVal := d.Get("release").(string)
+			paasTemplates, err := client.GetPaaSTemplateList(ctx)
+			if err != nil {
+				return err
+			}
+			var isReleaseValid bool
+			var chosenTemplate gsclient.PaaSTemplate
+			var releaseList []string
+		TEMPLATELOOP:
+			for _, template := range paasTemplates {
+				if template.Properties.Flavour == k8sTemplateFlavourName {
+					// check if release already presents in the release list.
+					// If so, ignore it.
+					for _, release := range releaseList {
+						if release == template.Properties.Release {
+							continue TEMPLATELOOP
 						}
 					}
+					releaseList = append(releaseList, template.Properties.Release)
+					if template.Properties.Release == newReleaseVal {
+						isReleaseValid = true
+						chosenTemplate = template
+					}
 				}
-				if !isReleaseValid {
-					return fmt.Errorf("%v is not a valid Kubernetes release. Valid releases are: %v\n", newReleaseVal, strings.Join(releaseList, ", "))
-				}
-				return nil
-			}),
-		),
+			}
+			if !isReleaseValid {
+				return fmt.Errorf("%v is not a valid Kubernetes release. Valid releases are: %v\n", newReleaseVal, strings.Join(releaseList, ", "))
+			}
+			return validateK8sParameters(d, chosenTemplate)
+		},
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:         schema.TypeString,
@@ -151,21 +151,8 @@ func resourceGridscaleK8s() *schema.Resource {
 						},
 						"storage_type": {
 							Type:        schema.TypeString,
-							Description: "Storage type (one of storage, storage_high, storage_insane).",
+							Description: "Storage type.",
 							Required:    true,
-							ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
-								valid := false
-								for _, stype := range storageTypes {
-									if v.(string) == stype {
-										valid = true
-										break
-									}
-								}
-								if !valid {
-									errors = append(errors, fmt.Errorf("%v is not a valid storage type. Valid types are: %v", v.(string), strings.Join(storageTypes, ",")))
-								}
-								return
-							},
 						},
 					},
 				},
@@ -420,4 +407,61 @@ func getK8sTemplateUUID(client *gsclient.Client, release string) (string, error)
 	}
 
 	return uTemplate.Properties.ObjectUUID, nil
+}
+
+func validateK8sParameters(d *schema.ResourceDiff, template gsclient.PaaSTemplate) error {
+	var errorMessages []string
+	worker_memory_scheme, mem_ok := template.Properties.ParametersSchema["k8s_worker_node_ram"]
+	// TODO: The API scheme will be CHANGED in the future. There will be multiple node pools.
+	if memory, ok := d.GetOk("node_pool.0.memory"); ok && mem_ok {
+		if memory.(int) < worker_memory_scheme.Min || memory.(int) > worker_memory_scheme.Max {
+			errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'node_pool.0.memory' value. Value must stays between %d and %d\n", worker_memory_scheme.Min, worker_memory_scheme.Max))
+		}
+	}
+
+	worker_core_scheme, core_ok := template.Properties.ParametersSchema["k8s_worker_node_cores"]
+	// TODO: The API scheme will be CHANGED in the future. There will be multiple node pools.
+	if core, ok := d.GetOk("node_pool.0.cores"); ok && core_ok {
+		if core.(int) < worker_core_scheme.Min || core.(int) > worker_core_scheme.Max {
+			errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'node_pool.0.cores' value. Value must stays between %d and %d\n", worker_core_scheme.Min, worker_core_scheme.Max))
+		}
+	}
+
+	worker_count_scheme, worker_count_ok := template.Properties.ParametersSchema["k8s_worker_node_count"]
+	// TODO: The API scheme will be CHANGED in the future. There will be multiple node pools.
+	if node_count, ok := d.GetOk("node_pool.0.node_count"); ok && worker_count_ok {
+		if node_count.(int) < worker_count_scheme.Min || node_count.(int) > worker_count_scheme.Max {
+			errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'node_pool.0.node_count' value. Value must stays between %d and %d\n", worker_count_scheme.Min, worker_count_scheme.Max))
+		}
+	}
+
+	worker_storage_scheme, storage_ok := template.Properties.ParametersSchema["k8s_worker_node_storage"]
+	// TODO: The API scheme will be CHANGED in the future. There will be multiple node pools.
+	if storage, ok := d.GetOk("node_pool.0.storage"); ok && storage_ok {
+		if storage.(int) < worker_storage_scheme.Min || storage.(int) > worker_storage_scheme.Max {
+			errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'node_pool.0.storage' value. Value must stays between %d and %d\n", worker_storage_scheme.Min, worker_storage_scheme.Max))
+		}
+	}
+
+	worker_storage_type_scheme, storage_type_ok := template.Properties.ParametersSchema["k8s_worker_node_storage_type"]
+	if storage_type, ok := d.GetOk("node_pool.0.storage_type"); ok && storage_type_ok {
+		var isValid bool
+		for _, allowedValue := range worker_storage_type_scheme.Allowed {
+			if storage_type.(string) == allowedValue {
+				isValid = true
+			}
+		}
+		if !isValid {
+			errorMessages = append(errorMessages,
+				fmt.Sprintf("Invalid 'node_pool.0.storage_type' value. Value must be one of these:\n\t%s",
+					strings.Join(worker_storage_type_scheme.Allowed, "\n\t"),
+				),
+			)
+		}
+	}
+
+	if len(errorMessages) != 0 {
+		return errors.New(strings.Join(errorMessages, ""))
+	}
+	return nil
 }
