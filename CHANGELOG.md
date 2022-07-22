@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.15.0 (Jul 22, 2022)
+
+FEATURES:
+- Add private network support for PaaS resources [PR #99](https://github.com/gridscale/terraform-provider-gridscale/pull/199)
+
+IMPROVEMENTS:
+- K8S parameter validation is now dynamic [issue #205](https://github.com/gridscale/terraform-provider-gridscale/issues/205)
+- Correct names of some resources/datasources in the sidemenu [issue #200](https://github.com/gridscale/terraform-provider-gridscale/issues/200) & [issue #207](https://github.com/gridscale/terraform-provider-gridscale/issues/207).
+
 ## 1.14.3 (Apr 7, 2022)
 
 BUG FIXES:
