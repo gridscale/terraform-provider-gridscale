@@ -240,12 +240,18 @@ func resourceGridscaleIpDelete(d *schema.ResourceData, meta interface{}) error {
 	//ip server relation is 1-1 relation
 	if len(ip.Properties.Relations.Servers) == 1 {
 		server := ip.Properties.Relations.Servers[0]
-		//No need to unlink when server returns 409 or 404
-		if err := errHandler.SuppressHTTPErrorCodes(
-			client.UnlinkIP(ctx, server.ServerUUID, d.Id()),
-			http.StatusConflict,
-			http.StatusNotFound,
-		); err != nil {
+		unlinkIPAction := func(ctx context.Context) error {
+			//No need to unlink when server returns 409 or 404
+			err := errHandler.SuppressHTTPErrorCodes(
+				client.UnlinkIP(ctx, server.ServerUUID, d.Id()),
+				http.StatusConflict,
+				http.StatusNotFound,
+			)
+			return err
+		}
+		//DeleteIP requires the server to be off
+		err = globalServerStatusList.runActionRequireServerOff(ctx, client, server.ServerUUID, false, unlinkIPAction)
+		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
 	}

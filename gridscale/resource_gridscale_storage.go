@@ -417,12 +417,18 @@ func resourceGridscaleStorageDelete(d *schema.ResourceData, meta interface{}) er
 
 	//Stop all server relating to this IP address if there is one
 	for _, server := range storage.Properties.Relations.Servers {
-		//No need to unlink when server returns 409 or 404
-		if err := errHandler.SuppressHTTPErrorCodes(
-			client.UnlinkStorage(ctx, server.ObjectUUID, d.Id()),
-			http.StatusConflict,
-			http.StatusNotFound,
-		); err != nil {
+		unlinkStorageAction := func(ctx context.Context) error {
+			//No need to unlink when server returns 409 or 404
+			err := errHandler.SuppressHTTPErrorCodes(
+				client.UnlinkStorage(ctx, server.ObjectUUID, d.Id()),
+				http.StatusConflict,
+				http.StatusNotFound,
+			)
+			return err
+		}
+		//UnlinkStorage requires the server to be off
+		err = globalServerStatusList.runActionRequireServerOff(ctx, client, server.ObjectUUID, false, unlinkStorageAction)
+		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
 	}
