@@ -346,18 +346,12 @@ func resourceGridscaleNetworkDelete(d *schema.ResourceData, meta interface{}) er
 
 	//Stop all servers relating to this network address if there is one
 	for _, server := range net.Properties.Relations.Servers {
-		unlinkNetAction := func(ctx context.Context) error {
-			//No need to unlink when server returns 409 or 404
-			err := errHandler.SuppressHTTPErrorCodes(
-				client.UnlinkNetwork(ctx, server.ObjectUUID, d.Id()),
-				http.StatusConflict,
-				http.StatusNotFound,
-			)
-			return err
-		}
-		//UnlinkNetwork requires the server to be off
-		err = globalServerStatusList.runActionRequireServerOff(ctx, client, server.ObjectUUID, false, unlinkNetAction)
-		if err != nil {
+		//No need to unlink when server returns 409 or 404
+		if err := errHandler.SuppressHTTPErrorCodes(
+			client.UnlinkNetwork(ctx, server.ObjectUUID, d.Id()),
+			http.StatusConflict,
+			http.StatusNotFound,
+		); err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
 	}
