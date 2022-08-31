@@ -33,14 +33,26 @@ func resourceGridscaleK8s() *schema.Resource {
 		},
 		CustomizeDiff: func(ctx context.Context, d *schema.ResourceDiff, meta interface{}) error {
 			client := meta.(*gsclient.Client)
-			newReleaseVal := d.Get("release").(string)
+			newReleaseValInf, isReleaseSet := d.GetOk("release")
+			newReleaseVal := newReleaseValInf.(string)
+			newVersionValInf, isVersionSet := d.GetOk("gsk_version")
+			newVersionVal := newVersionValInf.(string)
+			if !isReleaseSet && !isVersionSet {
+				return errors.New("either \"release\" or \"gsk_version\" has to be defined.")
+			}
+			if isReleaseSet && isVersionSet {
+				return errors.New("\"release\" and \"gsk_version\" cannot be set at the same time. Only one of them is set at a time.")
+			}
+
 			paasTemplates, err := client.GetPaaSTemplateList(ctx)
 			if err != nil {
 				return err
 			}
 			var isReleaseValid bool
+			var isVersionValid bool
 			var chosenTemplate gsclient.PaaSTemplate
 			var releaseList []string
+			var versionList []string
 		TEMPLATELOOP:
 			for _, template := range paasTemplates {
 				if template.Properties.Flavour == k8sTemplateFlavourName {
@@ -52,14 +64,23 @@ func resourceGridscaleK8s() *schema.Resource {
 						}
 					}
 					releaseList = append(releaseList, template.Properties.Release)
-					if template.Properties.Release == newReleaseVal {
+					versionList = append(versionList, template.Properties.Version)
+
+					if template.Properties.Version == newVersionVal && isVersionSet {
+						isVersionValid = true
+						chosenTemplate = template
+					}
+					if template.Properties.Release == newReleaseVal && isReleaseSet {
 						isReleaseValid = true
 						chosenTemplate = template
 					}
 				}
 			}
-			if !isReleaseValid {
+			if !isReleaseValid && isReleaseSet {
 				return fmt.Errorf("%v is not a valid Kubernetes release. Valid releases are: %v\n", newReleaseVal, strings.Join(releaseList, ", "))
+			}
+			if !isVersionValid && isVersionSet {
+				return fmt.Errorf("%v is not a valid gridscale Kubernetes (GSK) version. Valid GSK versions are: %v\n", newVersionVal, strings.Join(versionList, ", "))
 			}
 			return validateK8sParameters(d, chosenTemplate)
 		},
@@ -109,7 +130,13 @@ func resourceGridscaleK8s() *schema.Resource {
 			"release": {
 				Type:         schema.TypeString,
 				Description:  "The k8s release of this instance.",
-				Required:     true,
+				Optional:     true,
+				ValidateFunc: validation.NoZeroValues,
+			},
+			"gsk_version": {
+				Type:         schema.TypeString,
+				Description:  "The gridscale k8s PaaS version (issued by gridscale) of this instance.",
+				Optional:     true,
 				ValidateFunc: validation.NoZeroValues,
 			},
 			"service_template_uuid": {
@@ -295,11 +322,23 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("create k8s (%s) resource -", d.Id())
 
-	// Validate k8s release
-	release := d.Get("release").(string)
-	templateUUID, err := getK8sTemplateUUID(client, release)
-	if err != nil {
-		return fmt.Errorf("%s error: %v", errorPrefix, err)
+	var templateUUID string
+	// Validate k8s release, and get template UUID from release
+	if release, isReleaseSet := d.GetOk("release"); isReleaseSet {
+		var err error
+		templateUUID, err = getK8sTemplateUUIDFromRelease(client, release.(string))
+		if err != nil {
+			return fmt.Errorf("%s error: %v", errorPrefix, err)
+		}
+	}
+
+	// Validate gsk version, and get template UUID from gsk version.
+	if version, isVersionSet := d.GetOk("gsk_version"); isVersionSet {
+		var err error
+		templateUUID, err = getK8sTemplateUUIDFromGSKVersion(client, version.(string))
+		if err != nil {
+			return fmt.Errorf("%s error: %v", errorPrefix, err)
+		}
 	}
 
 	requestBody := gsclient.PaaSServiceCreateRequest{
@@ -339,11 +378,19 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 		Labels: &labels,
 	}
 
-	// Only update release, when it is changed
+	// Only update release/gsk version, when it is changed
 	if d.HasChange("release") {
 		// Check if the k8s release number exists
 		release := d.Get("release").(string)
-		templateUUID, err := getK8sTemplateUUID(client, release)
+		templateUUID, err := getK8sTemplateUUIDFromRelease(client, release)
+		if err != nil {
+			return fmt.Errorf("%s error: %v", errorPrefix, err)
+		}
+		requestBody.PaaSServiceTemplateUUID = templateUUID
+	}
+	if d.HasChange("gsk_version") {
+		version := d.Get("gsk_version").(string)
+		templateUUID, err := getK8sTemplateUUIDFromGSKVersion(client, version)
 		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
@@ -384,8 +431,8 @@ func resourceGridscaleK8sDelete(d *schema.ResourceData, meta interface{}) error 
 	return nil
 }
 
-// getK8sTemplateUUID returns the UUID of the k8s service template.
-func getK8sTemplateUUID(client *gsclient.Client, release string) (string, error) {
+// getK8sTemplateUUIDFromRelease returns the UUID of the k8s service template from given release.
+func getK8sTemplateUUIDFromRelease(client *gsclient.Client, release string) (string, error) {
 	paasTemplates, err := client.GetPaaSTemplateList(context.Background())
 	if err != nil {
 		return "", err
@@ -404,6 +451,31 @@ func getK8sTemplateUUID(client *gsclient.Client, release string) (string, error)
 	}
 	if !isReleaseValid {
 		return "", fmt.Errorf("%v is not a valid Kubernetes release. Valid releases are: %v\n", release, strings.Join(releases, ", "))
+	}
+
+	return uTemplate.Properties.ObjectUUID, nil
+}
+
+// getK8sTemplateUUIDFromGSKVersion returns the UUID of the k8s service template from given GSK version.
+func getK8sTemplateUUIDFromGSKVersion(client *gsclient.Client, version string) (string, error) {
+	paasTemplates, err := client.GetPaaSTemplateList(context.Background())
+	if err != nil {
+		return "", err
+	}
+	var isVersionValid bool
+	var versions []string
+	var uTemplate gsclient.PaaSTemplate
+	for _, template := range paasTemplates {
+		if template.Properties.Flavour == k8sTemplateFlavourName {
+			versions = append(versions, template.Properties.Version)
+			if template.Properties.Version == version {
+				isVersionValid = true
+				uTemplate = template
+			}
+		}
+	}
+	if !isVersionValid {
+		return "", fmt.Errorf("%v is not a valid gridscale Kubernetes (GSK) version. Valid GSK versions are: %v\n", version, strings.Join(versions, ", "))
 	}
 
 	return uTemplate.Properties.ObjectUUID, nil
