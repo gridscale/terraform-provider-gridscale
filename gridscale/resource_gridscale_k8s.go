@@ -128,16 +128,14 @@ func resourceGridscaleK8s() *schema.Resource {
 				Computed:    true,
 			},
 			"release": {
-				Type:         schema.TypeString,
-				Description:  "The k8s release of this instance.",
-				Optional:     true,
-				ValidateFunc: validation.NoZeroValues,
+				Type:        schema.TypeString,
+				Description: "The k8s release of this instance.",
+				Optional:    true,
 			},
 			"gsk_version": {
-				Type:         schema.TypeString,
-				Description:  "The gridscale k8s PaaS version (issued by gridscale) of this instance.",
-				Optional:     true,
-				ValidateFunc: validation.NoZeroValues,
+				Type:        schema.TypeString,
+				Description: "The gridscale k8s PaaS version (issued by gridscale) of this instance.",
+				Optional:    true,
 			},
 			"service_template_uuid": {
 				Type:        schema.TypeString,
@@ -384,24 +382,30 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 		Name:   d.Get("name").(string),
 		Labels: &labels,
 	}
-
+	currentTemplateUUID := d.Get("service_template_uuid")
 	// Only update release/gsk version, when it is changed
-	if d.HasChange("release") {
+	if releaseValInf, isReleaseSet := d.GetOk("release"); d.HasChange("release") && isReleaseSet {
 		// Check if the k8s release number exists
-		release := d.Get("release").(string)
+		release := releaseValInf.(string)
 		templateUUID, err := getK8sTemplateUUIDFromRelease(client, release)
 		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
-		requestBody.PaaSServiceTemplateUUID = templateUUID
+		// Only add template UUID when it really has been changed.
+		if templateUUID != currentTemplateUUID.(string) {
+			requestBody.PaaSServiceTemplateUUID = templateUUID
+		}
 	}
-	if d.HasChange("gsk_version") {
-		version := d.Get("gsk_version").(string)
+	if versionValInf, isVersionSet := d.GetOk("gsk_version"); d.HasChange("gsk_version") && isVersionSet {
+		version := versionValInf.(string)
 		templateUUID, err := getK8sTemplateUUIDFromGSKVersion(client, version)
 		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
-		requestBody.PaaSServiceTemplateUUID = templateUUID
+		// Only add template UUID when it really has been changed.
+		if templateUUID != currentTemplateUUID.(string) {
+			requestBody.PaaSServiceTemplateUUID = templateUUID
+		}
 	}
 
 	// TODO: The API scheme will be CHANGED in the future. There will be multiple node pools.
