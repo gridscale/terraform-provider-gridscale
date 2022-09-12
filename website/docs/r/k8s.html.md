@@ -18,7 +18,7 @@ The following example shows how one might use this resource to add a k8s cluster
 ```terraform
 resource "gridscale_k8s" "k8s-test" {
   name   = "test"
-  release = "1.19"
+  release = "1.21" # instead, gsk_version can be set.
   node_pool {
   name = "my_node_pool"
     node_count = 2
@@ -39,7 +39,9 @@ The following arguments are supported:
 
 * `security_zone_uuid` -  *DEPRECATED* (Optional, Forcenew) Security zone UUID linked to the Kubernetes resource. If `security_zone_uuid` is not set, the default security zone will be created (if it doesn't exist) and linked. A change of this argument necessitates the re-creation of the resource.
 
-* `release` - (Required) The Kubernetes release of this instance. Define which release will be used to create the cluster. For convenience, please use [gscloud](https://github.com/gridscale/gscloud) to get the list of available release numbers.
+* `gsk_version` - (Optional) The gridscale's Kubernetes version of this instance (e.g. "1.21.14-gs1"). Define which gridscale k8s version will be used to create the cluster. For convenience, please use [gscloud](https://github.com/gridscale/gscloud) to get the list of available gridscale k8s version. **NOTE**: Either `gsk_version` or `release` is set at a time.
+
+* `release` - (Optional) The Kubernetes release of this instance. Define which release will be used to create the cluster. For convenience, please use [gscloud](https://github.com/gridscale/gscloud) to get the list of available releases. **NOTE**: Either `gsk_version` or `release` is set at a time.
 
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
 
@@ -50,6 +52,7 @@ The following arguments are supported:
     * `memory` - (Immutable) Memory per worker node (in GiB).
     * `storage` - (Immutable) Storage per worker node (in GiB).
     * `storage_type` - (Immutable) Storage type (one of storage, storage_high, storage_insane).
+    * `surge_node_count` - Number of surge nodes. Surge nodes are used to avoid resources shortage during the cluster upgrade..
 
 ## Timeouts
 
@@ -67,6 +70,7 @@ This resource exports the following attributes:
 * `name` - See Argument Reference above.
 * `security_zone_uuid` - See Argument Reference above.
 * `release` - See Argument Reference above.
+* `gsk_version` - See Argument Reference above.
 * `service_template_uuid` - PaaS service template that k8s service uses. The `service_template_uuid` may not relate to `release`, if `service_template_uuid`/`release` is updated outside of terraform (e.g. the k8s service is upgraded by gridscale staffs).
 * `service_template_category` - The template service's category used to create the service.
 * `labels` - See Argument Reference above.
@@ -77,6 +81,7 @@ This resource exports the following attributes:
     * `cores` - See Argument Reference above.
     * `memory` - See Argument Reference above.
     * `storage` - See Argument Reference above.
+    * `storage_type` - See Argument Reference above.
     * `storage_type` - See Argument Reference above.
 * `usage_in_minutes` - The amount of minutes the IP address has been in use.
 * `create_time` - The time the object was created.
