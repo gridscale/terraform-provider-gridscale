@@ -30,6 +30,7 @@ func (m *gridscaleS3Provider) IsExpired() bool { return false }
 func resourceGridscaleBucket() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceGridscaleBucketCreate,
+		Read:   resourceGridscaleBucketRead,
 		Delete: resourceGridscaleBucketDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
@@ -58,7 +59,7 @@ func resourceGridscaleBucket() *schema.Resource {
 			"s3_host": {
 				Type:        schema.TypeString,
 				Description: "The S3 host.",
-				Required:    true,
+				Optional:    true,
 				ForceNew:    true,
 				Default:     "gos3.io",
 			},
@@ -75,6 +76,10 @@ func resourceGridscaleBucket() *schema.Resource {
 			Delete: schema.DefaultTimeout(5 * time.Minute),
 		},
 	}
+}
+
+func resourceGridscaleBucketRead(d *schema.ResourceData, meta interface{}) error {
+	return nil
 }
 
 func resourceGridscaleBucketCreate(d *schema.ResourceData, meta interface{}) error {
