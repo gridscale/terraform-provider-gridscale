@@ -16,9 +16,15 @@ func TestAccResourceGridscaleBucket_Basic(t *testing.T) {
 				Config: testAccCheckResourceGridscaleBucketConfig_basic(),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet(
-						"gridscale_object_storage_accesskey.foo", "access_key"),
+						"gridscale_bucket.foo", "access_key"),
 					resource.TestCheckResourceAttrSet(
-						"gridscale_object_storage_accesskey.foo", "secret_key"),
+						"gridscale_bucket.foo", "secret_key"),
+					resource.TestCheckResourceAttrSet(
+						"gridscale_bucket.foo", "bucket_name"),
+					resource.TestCheckResourceAttrSet(
+						"gridscale_bucket.foo", "s3_host"),
+					resource.TestCheckResourceAttrSet(
+						"gridscale_bucket.foo", "loc_constrain"),
 				),
 			},
 		},
