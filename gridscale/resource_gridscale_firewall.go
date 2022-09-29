@@ -325,7 +325,7 @@ func resourceGridscaleFirewallDelete(d *schema.ResourceData, meta interface{}) e
 	return nil
 }
 
-//convFirewallRuleSliceToInterfaceSlice converts slice of firewall rules to slice of interface
+// convFirewallRuleSliceToInterfaceSlice converts slice of firewall rules to slice of interface
 func convFirewallRuleSliceToInterfaceSlice(rules []gsclient.FirewallRuleProperties) []interface{} {
 	res := make([]interface{}, 0)
 	for _, value := range rules {
@@ -349,7 +349,7 @@ func convFirewallRuleSliceToInterfaceSlice(rules []gsclient.FirewallRuleProperti
 	return res
 }
 
-//convInterfaceSliceToFirewallRulesSlice converts slice of interface to slice of firewall rules
+// convInterfaceSliceToFirewallRulesSlice converts slice of interface to slice of firewall rules
 func convInterfaceSliceToFirewallRulesSlice(interfaceRules []interface{}) []gsclient.FirewallRuleProperties {
 	var firewallRules []gsclient.FirewallRuleProperties
 	for _, value := range interfaceRules {

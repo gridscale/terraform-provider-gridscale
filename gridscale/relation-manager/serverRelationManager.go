@@ -13,33 +13,33 @@ import (
 	errHandler "github.com/terraform-providers/terraform-provider-gridscale/gridscale/error-handler"
 )
 
-//firewallRuleTypes defines all types of firewall rules
+// firewallRuleTypes defines all types of firewall rules
 var firewallRuleTypes = []string{"rules_v4_in", "rules_v4_out", "rules_v6_in", "rules_v6_out"}
 
-//ServerRelationManger is an wrapper of gsclient which is used for
-//managing relations of a server in gridscale terraform provider
+// ServerRelationManger is an wrapper of gsclient which is used for
+// managing relations of a server in gridscale terraform provider
 type ServerRelationManger struct {
 	gsc  *gsclient.Client
 	data *schema.ResourceData
 }
 
-//NewServerRelationManger creates a new instance ServerRelationManger
+// NewServerRelationManger creates a new instance ServerRelationManger
 func NewServerRelationManger(gsc *gsclient.Client, d *schema.ResourceData) *ServerRelationManger {
 	return &ServerRelationManger{gsc, d}
 }
 
-//getGSClient returns gsclient from server relation manager
+// getGSClient returns gsclient from server relation manager
 func (c ServerRelationManger) getGSClient() *gsclient.Client {
 	return c.gsc
 }
 
-//getData returns resource data from server relation manager
+// getData returns resource data from server relation manager
 func (c ServerRelationManger) getData() *schema.ResourceData {
 	return c.data
 }
 
-//LinkStorages links storages to a server
-//**Note: The first storage in the list will be automatically set as the boot device
+// LinkStorages links storages to a server
+// **Note: The first storage in the list will be automatically set as the boot device
 func (c *ServerRelationManger) LinkStorages(ctx context.Context) error {
 	d := c.getData()
 	client := c.getGSClient()
@@ -60,7 +60,7 @@ func (c *ServerRelationManger) LinkStorages(ctx context.Context) error {
 	return nil
 }
 
-//LinkIPv4 links IPv4 address to a server
+// LinkIPv4 links IPv4 address to a server
 func (c *ServerRelationManger) LinkIPv4(ctx context.Context) error {
 	d := c.getData()
 	client := c.getGSClient()
@@ -82,7 +82,7 @@ func (c *ServerRelationManger) LinkIPv4(ctx context.Context) error {
 	return nil
 }
 
-//LinkIPv6 link an IPv6 address to a server
+// LinkIPv6 link an IPv6 address to a server
 func (c *ServerRelationManger) LinkIPv6(ctx context.Context) error {
 	d := c.getData()
 	client := c.getGSClient()
@@ -104,7 +104,7 @@ func (c *ServerRelationManger) LinkIPv6(ctx context.Context) error {
 	return nil
 }
 
-//LinkISOImage links an ISO image to a server
+// LinkISOImage links an ISO image to a server
 func (c *ServerRelationManger) LinkISOImage(ctx context.Context) error {
 	d := c.getData()
 	client := c.getGSClient()
@@ -122,7 +122,7 @@ func (c *ServerRelationManger) LinkISOImage(ctx context.Context) error {
 	return nil
 }
 
-//LinkNetworks links networks to server
+// LinkNetworks links networks to server
 func (c *ServerRelationManger) LinkNetworks(ctx context.Context) error {
 	d := c.getData()
 	client := c.getGSClient()
@@ -181,8 +181,8 @@ func (c *ServerRelationManger) LinkNetworks(ctx context.Context) error {
 	return nil
 }
 
-//readCustomFirewallRules reads custom firewall rules from a specific network
-//returns `gsclient.FirewallRules` type variable
+// readCustomFirewallRules reads custom firewall rules from a specific network
+// returns `gsclient.FirewallRules` type variable
 func readCustomFirewallRules(netData map[string]interface{}) gsclient.FirewallRules {
 	//Init firewall rule variable
 	var fwRules gsclient.FirewallRules
@@ -230,7 +230,7 @@ func readCustomFirewallRules(netData map[string]interface{}) gsclient.FirewallRu
 	return fwRules
 }
 
-//IsShutdownRequired checks if server is needed to be shutdown when updating
+// IsShutdownRequired checks if server is needed to be shutdown when updating
 func (c *ServerRelationManger) IsShutdownRequired(ctx context.Context) bool {
 	var shutdownRequired bool
 	d := c.getData()
@@ -241,7 +241,7 @@ func (c *ServerRelationManger) IsShutdownRequired(ctx context.Context) bool {
 	return shutdownRequired
 }
 
-//UpdateISOImageRel updates relationship between a server and an ISO image
+// UpdateISOImageRel updates relationship between a server and an ISO image
 func (c *ServerRelationManger) UpdateISOImageRel(ctx context.Context) error {
 	d := c.getData()
 	client := c.getGSClient()
@@ -268,7 +268,7 @@ func (c *ServerRelationManger) UpdateISOImageRel(ctx context.Context) error {
 	return err
 }
 
-//UpdateIPv4Rel updates relationship between a server and an IPv4 address
+// UpdateIPv4Rel updates relationship between a server and an IPv4 address
 func (c *ServerRelationManger) UpdateIPv4Rel(ctx context.Context) error {
 	d := c.getData()
 	client := c.getGSClient()
@@ -295,7 +295,7 @@ func (c *ServerRelationManger) UpdateIPv4Rel(ctx context.Context) error {
 	return err
 }
 
-//UpdateIPv6Rel updates relationship between a server and an IPv6 address
+// UpdateIPv6Rel updates relationship between a server and an IPv6 address
 func (c *ServerRelationManger) UpdateIPv6Rel(ctx context.Context) error {
 	d := c.getData()
 	client := c.getGSClient()
@@ -428,7 +428,7 @@ func (c *ServerRelationManger) UpdateNetRelsProperties(ctx context.Context) erro
 	return nil
 }
 
-//UpdateStoragesRel updates relationship between a server and storages
+// UpdateStoragesRel updates relationship between a server and storages
 func (c *ServerRelationManger) UpdateStoragesRel(ctx context.Context) error {
 	d := c.getData()
 	client := c.getGSClient()

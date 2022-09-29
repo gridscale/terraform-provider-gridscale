@@ -15,7 +15,7 @@ const (
 
 var supportedPrimTypes = []string{boolInterfaceType, intInterfaceType, floatInterfaceType, stringInterfaceType}
 
-//convSOStrings converts slice of interfaces to slice of strings
+// convSOStrings converts slice of interfaces to slice of strings
 func convSOStrings(interfaceList []interface{}) []string {
 	strList := make([]string, 0)
 	for _, strIntf := range interfaceList {
@@ -24,7 +24,7 @@ func convSOStrings(interfaceList []interface{}) []string {
 	return strList
 }
 
-//convStrToTypeInterface converts a string to a primitive type (in the form of interface{})
+// convStrToTypeInterface converts a string to a primitive type (in the form of interface{})
 func convStrToTypeInterface(interfaceType, str string) (interface{}, error) {
 	switch interfaceType {
 	case boolInterfaceType:
@@ -40,7 +40,7 @@ func convStrToTypeInterface(interfaceType, str string) (interface{}, error) {
 	}
 }
 
-//getInterfaceType gets interface type
+// getInterfaceType gets interface type
 func getInterfaceType(value interface{}) (string, error) {
 	switch value.(type) {
 	case bool:
@@ -58,7 +58,7 @@ func getInterfaceType(value interface{}) (string, error) {
 	}
 }
 
-//convInterfaceToString converts an interface of any primitive types to a  string value
+// convInterfaceToString converts an interface of any primitive types to a  string value
 func convInterfaceToString(interfaceType string, val interface{}) (string, error) {
 	switch interfaceType {
 	case boolInterfaceType:

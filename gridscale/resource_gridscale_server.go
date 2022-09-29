@@ -304,9 +304,9 @@ func resourceGridscaleServer() *schema.Resource {
 	}
 }
 
-//getFirewallRuleCommonSchema returns schema for custom firewall rules.
-//**Note: Every time `getFirewallRuleCommonSchema()` is called,
-//all `*schema.Schema` in `map[string]*schema.Schema` are different.
+// getFirewallRuleCommonSchema returns schema for custom firewall rules.
+// **Note: Every time `getFirewallRuleCommonSchema()` is called,
+// all `*schema.Schema` in `map[string]*schema.Schema` are different.
 func getFirewallRuleCommonSchema() map[string]*schema.Schema {
 	commonSchema := map[string]schema.Schema{
 		"order": {
@@ -526,7 +526,7 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 	return nil
 }
 
-//readServerNetworkRels extract relationships between server and networks
+// readServerNetworkRels extract relationships between server and networks
 func readServerNetworkRels(ctx context.Context, client *gsclient.Client, serverUUID string, serverNetRels []gsclient.ServerNetworkRelationProperties) ([]interface{}, error) {
 	networks := make([]interface{}, 0)
 	for _, rel := range serverNetRels {
@@ -599,8 +599,8 @@ func readServerNetworkRels(ctx context.Context, client *gsclient.Client, serverU
 	return networks, nil
 }
 
-//flattenFirewallRuleProperties converts variable of type gsclient.FirewallRuleProperties to
-//map[string]interface{}
+// flattenFirewallRuleProperties converts variable of type gsclient.FirewallRuleProperties to
+// map[string]interface{}
 func flattenFirewallRuleProperties(props gsclient.FirewallRuleProperties) map[string]interface{} {
 	rule := map[string]interface{}{
 		"order":    props.Order,

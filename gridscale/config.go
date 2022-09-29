@@ -8,7 +8,7 @@ import (
 	"github.com/gridscale/gsclient-go/v3"
 )
 
-//Arrays can't be constants in Go, but these will be used as constants
+// Arrays can't be constants in Go, but these will be used as constants
 var hardwareProfiles = []string{"default", "legacy", "nested", "cisco_csr", "sophos_utm", "f5_bigip", "q35"}
 var storageTypes = []string{"storage", "storage_high", "storage_insane"}
 var storageVariants = []string{"distributed", "local"}

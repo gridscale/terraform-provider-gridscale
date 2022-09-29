@@ -13,7 +13,7 @@ func SuppressHTTPErrorCodes(err error, errorCodes ...int) error {
 	return err
 }
 
-//containsInt check if an int array contains a specific int.
+// containsInt check if an int array contains a specific int.
 func containsInt(arr []int, target int) bool {
 	for _, a := range arr {
 		if a == target {

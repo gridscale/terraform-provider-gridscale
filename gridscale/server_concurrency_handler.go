@@ -24,20 +24,20 @@ type serverStatus struct {
 	wg sync.WaitGroup
 }
 
-//serverStatusList represents a list of power states of
-//all servers (declared in terraform).
-//mutex is used to lock when adding or removing servers or modifying servers' power states.
-//***NOTE: servers declared outside terraform are not included.
+// serverStatusList represents a list of power states of
+// all servers (declared in terraform).
+// mutex is used to lock when adding or removing servers or modifying servers' power states.
+// ***NOTE: servers declared outside terraform are not included.
 type serverStatusList struct {
 	list map[string]*serverStatus
 	mux  sync.Mutex
 }
 
-//actionRequireServerOff signature of a function that requires a server to be off
-//in order to run
+// actionRequireServerOff signature of a function that requires a server to be off
+// in order to run
 type actionRequireServerOff func(ctx context.Context) error
 
-//addServer adds a server power state to the list
+// addServer adds a server power state to the list
 func (l *serverStatusList) addServer(id string) error {
 	//lock the list
 	//*Note: we don't need to lock the list anywhere else as
@@ -57,8 +57,8 @@ func (l *serverStatusList) addServer(id string) error {
 	return fmt.Errorf("server (%s) ALREADY exists in current list of servers in terraform", id)
 }
 
-//removeServerSynchronously removes a server and set `deleted` to true
-//when `terraform apply` command finishes, the serverStatusList will be automatically flushed
+// removeServerSynchronously removes a server and set `deleted` to true
+// when `terraform apply` command finishes, the serverStatusList will be automatically flushed
 func (l *serverStatusList) removeServerSynchronously(ctx context.Context, c *gsclient.Client, id string) error {
 	//check if the server is in the list and it is not deleted
 	if s, ok := l.list[id]; ok {
@@ -108,8 +108,8 @@ func (l *serverStatusList) removeServerSynchronously(ctx context.Context, c *gsc
 	return nil
 }
 
-//startServerSynchronously starts the servers synchronously. That means the server
-//can only be started by one goroutine at a time.
+// startServerSynchronously starts the servers synchronously. That means the server
+// can only be started by one goroutine at a time.
 func (l *serverStatusList) startServerSynchronously(ctx context.Context, c *gsclient.Client, id string) error {
 	//check if the server is in the list and it is not deleted
 	if s, ok := l.list[id]; ok {
@@ -136,8 +136,8 @@ func (l *serverStatusList) startServerSynchronously(ctx context.Context, c *gscl
 	return fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
 }
 
-//shutdownServerSynchronously stop the servers synchronously. That means the server
-//can only be stopped by one goroutine at a time.
+// shutdownServerSynchronously stop the servers synchronously. That means the server
+// can only be stopped by one goroutine at a time.
 func (l *serverStatusList) shutdownServerSynchronously(ctx context.Context, c *gsclient.Client, id string) error {
 	//check if the server is in the list and it is not deleted
 	if s, ok := l.list[id]; ok {
@@ -183,10 +183,10 @@ func (l *serverStatusList) shutdownServerSynchronously(ctx context.Context, c *g
 	return fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
 }
 
-//runActionRequireServerOff runs a specific action (function) after shutting down (synchronously) the server successfully.
-//Some actions are NOT necessary if the server is already deleted (such as `UnlinkXXX` methods), that means they do
-//not need the server to exist strictly.
-//However, the are still some others requiring the server's presence (such as some server update sequences).
+// runActionRequireServerOff runs a specific action (function) after shutting down (synchronously) the server successfully.
+// Some actions are NOT necessary if the server is already deleted (such as `UnlinkXXX` methods), that means they do
+// not need the server to exist strictly.
+// However, the are still some others requiring the server's presence (such as some server update sequences).
 func (l *serverStatusList) runActionRequireServerOff(
 	ctx context.Context,
 	c *gsclient.Client,
@@ -252,7 +252,7 @@ func (l *serverStatusList) runActionRequireServerOff(
 	return fmt.Errorf("server (%s) does not exist in current list of servers in terraform", id)
 }
 
-//initGlobalServerStatusList fetches server list and init `globalServerStatusList`
+// initGlobalServerStatusList fetches server list and init `globalServerStatusList`
 func initGlobalServerStatusList(ctx context.Context, c *gsclient.Client) error {
 	servers, err := c.GetServerList(ctx)
 	if err != nil {
@@ -266,7 +266,7 @@ func initGlobalServerStatusList(ctx context.Context, c *gsclient.Client) error {
 	return nil
 }
 
-//globalServerStatusList global list of all servers' status states in terraform
+// globalServerStatusList global list of all servers' status states in terraform
 var globalServerStatusList = serverStatusList{
 	list: make(map[string]*serverStatus),
 }
