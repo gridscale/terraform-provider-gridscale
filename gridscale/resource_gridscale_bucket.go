@@ -63,13 +63,6 @@ func resourceGridscaleBucket() *schema.Resource {
 				ForceNew:    true,
 				Default:     "gos3.io",
 			},
-			"loc_constrain": {
-				Type:        schema.TypeString,
-				Description: "The Location Constrain. Default: eu",
-				Optional:    true,
-				ForceNew:    true,
-				Default:     "eu",
-			},
 		},
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(5 * time.Minute),
@@ -93,8 +86,7 @@ func resourceGridscaleBucketCreate(d *schema.ResourceData, meta interface{}) err
 		SecretKey: secretKey.(string),
 	}, s3HostStr)
 
-	loc := d.Get("loc_constrain")
-	locStr := loc.(string)
+	locStr := ""
 	bucketName := d.Get("bucket_name")
 	bucketNameStr := bucketName.(string)
 	bucketInput := s3.CreateBucketInput{

@@ -18,6 +18,12 @@ resource "gridscale_object_storage_accesskey" "foo" {
       create="10m"
   }
 }
+
+resource "gridscale_bucket" "foo-bucket" {
+   access_key = gridscale_object_storage_accesskey.foo.access_key
+   secret_key = gridscale_object_storage_accesskey.foo.secret_key
+   bucket_name = "my-bucket"
+}
 ```
 
 ## Timeouts
@@ -35,5 +41,4 @@ The following arguments are supported:
 * `access_key` - (Required, Force New) Access key.
 * `secret_key` - (Required, Force New) Secret key.
 * `s3_host` - (Required, Force New) Host of the s3. Default: "gos3.io".
-* `loc_constrain` - (Required, Force New) Location constrain. Default: "eu". Note: a different s3 host in gridscale uses a different location constrain.
 * `bucket_name` - (Required, Force New) Name of the bucket.
