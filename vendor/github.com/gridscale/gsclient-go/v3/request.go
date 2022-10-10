@@ -235,7 +235,7 @@ func (r *gsRequest) retryHTTPRequest(ctx context.Context, cfg *Config) (string, 
 			json.Unmarshal(responseBodyBytes, &errorMessage)
 
 			switch statusCode {
-			case http.StatusServiceUnavailable:
+			case http.StatusServiceUnavailable, http.StatusFailedDependency, http.StatusInternalServerError:
 				// Get the delay (in second) for the next retry
 				delayDurationStr := resp.Header.Get(retryAfterHeader)
 				delayDuration, err := strconv.Atoi(delayDurationStr)

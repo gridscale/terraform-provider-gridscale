@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.16.0 (Sept 12, 2022)
+
+FEATURES:
+- Allow to set `gsk_version` in k8s resource.
+- Allow switching between `release` and `gsk_version` in k8s resource.
+- Add surge node feature to k8s resource.
+
 ## 1.15.0 (Jul 22, 2022)
 
 FEATURES:
