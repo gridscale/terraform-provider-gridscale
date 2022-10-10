@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.10.0 (Apr 28, 2022)
+
+IMPROVEMENTS:
+- Add `StorageType` to PaaS template properties [#219](https://github.com/gridscale/gsclient-go/pull/219)
+- Add retry when API backend returns error code 424, 500 [#218](https://github.com/gridscale/gsclient-go/pull/218)
+
 ## 3.9.1 (Apr 6, 2022)
 
 BUG FIXES:

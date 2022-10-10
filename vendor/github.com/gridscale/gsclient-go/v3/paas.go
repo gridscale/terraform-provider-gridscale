@@ -304,6 +304,9 @@ type Resource struct {
 
 	// The amount of concurrent connections for the service.
 	Connections int `json:"connections"`
+
+	// Storage type (one of storage, storage_high, storage_insane).
+	StorageType string `json:"storage_type"`
 }
 
 // PaaSServiceUpdateRequest represetns a request for updating a PaaS service.
