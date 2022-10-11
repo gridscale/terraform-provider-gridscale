@@ -3,12 +3,12 @@ layout: "gridscale"
 page_title: "gridscale: bucket"
 sidebar_current: "docs-gridscale-resource-bucket"
 description: |-
-   Manages a bucket in gridscale.
+   Manages an object storage bucket in gridscale.
 ---
 
-# gridscale_object_storage_accesskey
+# gridscale_object_storage_bucket
 
-Provides a bucket. This can be used to create, and delete buckets.
+Provides an object storage bucket in gridscale. This can be used to create, and delete object storage buckets.
 
 ## Example Usage
 
