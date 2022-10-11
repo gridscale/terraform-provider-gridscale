@@ -82,7 +82,7 @@ This resource exports the following attributes:
     * `memory` - See Argument Reference above.
     * `storage` - See Argument Reference above.
     * `storage_type` - See Argument Reference above.
-    * `storage_type` - See Argument Reference above.
+    * `surge_node_count` - See Argument Reference above.
 * `usage_in_minutes` - The amount of minutes the IP address has been in use.
 * `create_time` - The time the object was created.
 * `change_time` - Defines the date and time of the last object change.
