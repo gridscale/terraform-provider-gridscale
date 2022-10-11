@@ -106,6 +106,7 @@ func Provider() *schema.Provider {
 			"gridscale_marketplace_application":        resourceGridscaleMarketplaceApplication(),
 			"gridscale_marketplace_application_import": resourceGridscaleImportedMarketplaceApplication(),
 			"gridscale_ssl_certificate":                resourceGridscaleSSLCert(),
+			"gridscale_object_storage_bucket":          resourceGridscaleBucket(),
 		},
 
 		ConfigureFunc: providerConfigure,
