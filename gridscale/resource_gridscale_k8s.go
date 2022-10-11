@@ -77,10 +77,10 @@ func resourceGridscaleK8s() *schema.Resource {
 				}
 			}
 			if !isReleaseValid && isReleaseSet {
-				return fmt.Errorf("%v is not a valid Kubernetes release. Valid releases are: %v\n", newReleaseVal, strings.Join(releaseList, ", "))
+				return fmt.Errorf("%v is an INVALID Kubernetes minor release. Valid releases are: %v\n", newReleaseVal, strings.Join(releaseList, ", "))
 			}
 			if !isVersionValid && isVersionSet {
-				return fmt.Errorf("%v is not a valid gridscale Kubernetes (GSK) version. Valid GSK versions are: %v\n", newVersionVal, strings.Join(versionList, ", "))
+				return fmt.Errorf("%v is an INVALID gridscale Kubernetes (GSK) version. Valid GSK versions are: %v\n", newVersionVal, strings.Join(versionList, ", "))
 			}
 			return validateK8sParameters(d, chosenTemplate)
 		},
@@ -458,11 +458,12 @@ func getK8sTemplateUUIDFromRelease(client *gsclient.Client, release string) (str
 			if template.Properties.Release == release {
 				isReleaseValid = true
 				uTemplate = template
+				break
 			}
 		}
 	}
 	if !isReleaseValid {
-		return "", fmt.Errorf("%v is not a valid Kubernetes release. Valid releases are: %v\n", release, strings.Join(releases, ", "))
+		return "", fmt.Errorf("%v is an INVALID Kubernetes minor release. Valid releases are: %v\n", release, strings.Join(releases, ", "))
 	}
 
 	return uTemplate.Properties.ObjectUUID, nil
@@ -483,11 +484,12 @@ func getK8sTemplateUUIDFromGSKVersion(client *gsclient.Client, version string) (
 			if template.Properties.Version == version {
 				isVersionValid = true
 				uTemplate = template
+				break
 			}
 		}
 	}
 	if !isVersionValid {
-		return "", fmt.Errorf("%v is not a valid gridscale Kubernetes (GSK) version. Valid GSK versions are: %v\n", version, strings.Join(versions, ", "))
+		return "", fmt.Errorf("%v is an INVALID gridscale Kubernetes (GSK) version. Valid GSK versions are: %v\n", version, strings.Join(versions, ", "))
 	}
 
 	return uTemplate.Properties.ObjectUUID, nil
