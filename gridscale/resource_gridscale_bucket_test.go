@@ -16,15 +16,15 @@ func TestAccResourceGridscaleBucket_Basic(t *testing.T) {
 				Config: testAccCheckResourceGridscaleBucketConfig_basic(),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet(
-						"gridscale_bucket.foo", "access_key"),
+						"gridscale_object_storage_bucket.foo", "access_key"),
 					resource.TestCheckResourceAttrSet(
-						"gridscale_bucket.foo", "secret_key"),
+						"gridscale_object_storage_bucket.foo", "secret_key"),
 					resource.TestCheckResourceAttrSet(
-						"gridscale_bucket.foo", "bucket_name"),
+						"gridscale_object_storage_bucket.foo", "bucket_name"),
 					resource.TestCheckResourceAttrSet(
-						"gridscale_bucket.foo", "s3_host"),
+						"gridscale_object_storage_bucket.foo", "s3_host"),
 					resource.TestCheckResourceAttrSet(
-						"gridscale_bucket.foo", "loc_constrain"),
+						"gridscale_object_storage_bucket.foo", "loc_constrain"),
 				),
 			},
 		},
@@ -39,7 +39,7 @@ resource "gridscale_object_storage_accesskey" "test" {
   }
 }
 
-resource "gridscale_bucket" "foo" {
+resource "gridscale_object_storage_bucket" "foo" {
    access_key = gridscale_object_storage_accesskey.test.access_key
    secret_key = gridscale_object_storage_accesskey.test.secret_key
    bucket_name = "myterraformbucket"

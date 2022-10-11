@@ -19,7 +19,7 @@ resource "gridscale_object_storage_accesskey" "foo" {
   }
 }
 
-resource "gridscale_bucket" "foo-bucket" {
+resource "gridscale_object_storage_bucket" "foo-bucket" {
    access_key = gridscale_object_storage_accesskey.foo.access_key
    secret_key = gridscale_object_storage_accesskey.foo.secret_key
    bucket_name = "my-bucket"
