@@ -52,7 +52,7 @@ The following arguments are supported:
     * `memory` - (Immutable) Memory per worker node (in GiB).
     * `storage` - (Immutable) Storage per worker node (in GiB).
     * `storage_type` - (Immutable) Storage type (one of storage, storage_high, storage_insane).
-    * `surge_node_count` - Number of surge nodes. Surge nodes are used to avoid resources shortage during the cluster upgrade..
+    * `surge_node` - Enable surge node to avoid resources shortage during the cluster upgrade (Default: true).
 
 ## Timeouts
 
@@ -82,7 +82,7 @@ This resource exports the following attributes:
     * `memory` - See Argument Reference above.
     * `storage` - See Argument Reference above.
     * `storage_type` - See Argument Reference above.
-    * `surge_node_count` - See Argument Reference above.
+    * `surge_node` - See Argument Reference above.
 * `usage_in_minutes` - The amount of minutes the IP address has been in use.
 * `create_time` - The time the object was created.
 * `change_time` - Defines the date and time of the last object change.

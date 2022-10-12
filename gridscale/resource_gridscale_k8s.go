@@ -179,10 +179,11 @@ func resourceGridscaleK8s() *schema.Resource {
 							Description: "Storage type.",
 							Required:    true,
 						},
-						"surge_node_count": {
-							Type:        schema.TypeInt,
-							Description: "Number of surge nodes. Surge nodes are used to avoid resources shortage during the cluster upgrade.",
+						"surge_node": {
+							Type:        schema.TypeBool,
+							Description: "Enable surge node to avoid resources shortage during the cluster upgrade.",
 							Optional:    true,
+							Default:     true,
 						},
 					},
 				},
@@ -284,14 +285,17 @@ func resourceGridscaleK8sRead(d *schema.ResourceData, meta interface{}) error {
 	nodePoolList := make([]interface{}, 0)
 	// TODO: The API scheme will be CHANGED in the future. There will be multiple node pools.
 	nodePool := map[string]interface{}{
-		"name":             d.Get("node_pool.0.name"),
-		"node_count":       props.Parameters["k8s_worker_node_count"],
-		"cores":            props.Parameters["k8s_worker_node_cores"],
-		"memory":           props.Parameters["k8s_worker_node_ram"],
-		"storage":          props.Parameters["k8s_worker_node_storage"],
-		"storage_type":     props.Parameters["k8s_worker_node_storage_type"],
-		"surge_node_count": props.Parameters["k8s_surge_node_count"],
+		"name":         d.Get("node_pool.0.name"),
+		"node_count":   props.Parameters["k8s_worker_node_count"],
+		"cores":        props.Parameters["k8s_worker_node_cores"],
+		"memory":       props.Parameters["k8s_worker_node_ram"],
+		"storage":      props.Parameters["k8s_worker_node_storage"],
+		"storage_type": props.Parameters["k8s_worker_node_storage_type"],
 	}
+	// Surge node feature is enable if k8s_surge_node_count > 0
+	surgeNodeCount := props.Parameters["k8s_surge_node_count"].(float64)
+	nodePool["surge_node"] = surgeNodeCount > 0
+
 	nodePoolList = append(nodePoolList, nodePool)
 	if err = d.Set("node_pool", nodePoolList); err != nil {
 		return fmt.Errorf("%s error setting node_pool: %v", errorPrefix, err)
@@ -359,7 +363,12 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 	params["k8s_worker_node_count"] = d.Get("node_pool.0.node_count")
 	params["k8s_worker_node_storage"] = d.Get("node_pool.0.storage")
 	params["k8s_worker_node_storage_type"] = d.Get("node_pool.0.storage_type")
-	params["k8s_surge_node_count"] = d.Get("node_pool.0.surge_node_count")
+	isSurgeNodeEnabled := d.Get("node_pool.0.surge_node").(bool)
+	if isSurgeNodeEnabled {
+		params["k8s_surge_node_count"] = 1
+	} else {
+		params["k8s_surge_node_count"] = 0
+	}
 	requestBody.Parameters = params
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
@@ -415,7 +424,12 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 	params["k8s_worker_node_count"] = d.Get("node_pool.0.node_count")
 	params["k8s_worker_node_storage"] = d.Get("node_pool.0.storage")
 	params["k8s_worker_node_storage_type"] = d.Get("node_pool.0.storage_type")
-	params["k8s_surge_node_count"] = d.Get("node_pool.0.surge_node_count")
+	isSurgeNodeEnabled := d.Get("node_pool.0.surge_node").(bool)
+	if isSurgeNodeEnabled {
+		params["k8s_surge_node_count"] = 1
+	} else {
+		params["k8s_surge_node_count"] = 0
+	}
 	requestBody.Parameters = params
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
