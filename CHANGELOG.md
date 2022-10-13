@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.16.0 (Sept 12, 2022)
+## 1.16.0 (Oct 13, 2022)
 
 FEATURES:
 - Allow to set `gsk_version` in k8s resource.
