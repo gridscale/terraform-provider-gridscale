@@ -1,11 +1,14 @@
 # Changelog
 
-## 1.16.0 (Oct 13, 2022)
+## 1.16.0 (Oct 14, 2022)
 
 FEATURES:
 - Allow to set `gsk_version` in k8s resource.
 - Allow switching between `release` and `gsk_version` in k8s resource.
 - Add surge node feature to k8s resource.
+
+IMPROVEMENTS:
+- Add retry when API backend returns error code 424, 500 via [gsclient-go v3.10.0](https://github.com/gridscale/gsclient-go/releases/tag/v3.10.0).
 
 ## 1.15.0 (Jul 22, 2022)
 
