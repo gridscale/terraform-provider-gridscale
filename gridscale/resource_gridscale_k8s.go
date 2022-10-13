@@ -33,14 +33,26 @@ func resourceGridscaleK8s() *schema.Resource {
 		},
 		CustomizeDiff: func(ctx context.Context, d *schema.ResourceDiff, meta interface{}) error {
 			client := meta.(*gsclient.Client)
-			newReleaseVal := d.Get("release").(string)
+			newReleaseValInf, isReleaseSet := d.GetOk("release")
+			newReleaseVal := newReleaseValInf.(string)
+			newVersionValInf, isVersionSet := d.GetOk("gsk_version")
+			newVersionVal := newVersionValInf.(string)
+			if !isReleaseSet && !isVersionSet {
+				return errors.New("either \"release\" or \"gsk_version\" has to be defined.")
+			}
+			if isReleaseSet && isVersionSet {
+				return errors.New("\"release\" and \"gsk_version\" cannot be set at the same time. Only one of them is set at a time.")
+			}
+
 			paasTemplates, err := client.GetPaaSTemplateList(ctx)
 			if err != nil {
 				return err
 			}
 			var isReleaseValid bool
+			var isVersionValid bool
 			var chosenTemplate gsclient.PaaSTemplate
 			var releaseList []string
+			var versionList []string
 		TEMPLATELOOP:
 			for _, template := range paasTemplates {
 				if template.Properties.Flavour == k8sTemplateFlavourName {
@@ -52,14 +64,23 @@ func resourceGridscaleK8s() *schema.Resource {
 						}
 					}
 					releaseList = append(releaseList, template.Properties.Release)
-					if template.Properties.Release == newReleaseVal {
+					versionList = append(versionList, template.Properties.Version)
+
+					if template.Properties.Version == newVersionVal && isVersionSet {
+						isVersionValid = true
+						chosenTemplate = template
+					}
+					if template.Properties.Release == newReleaseVal && isReleaseSet {
 						isReleaseValid = true
 						chosenTemplate = template
 					}
 				}
 			}
-			if !isReleaseValid {
-				return fmt.Errorf("%v is not a valid Kubernetes release. Valid releases are: %v\n", newReleaseVal, strings.Join(releaseList, ", "))
+			if !isReleaseValid && isReleaseSet {
+				return fmt.Errorf("%v is an INVALID Kubernetes minor release. Valid releases are: %v\n", newReleaseVal, strings.Join(releaseList, ", "))
+			}
+			if !isVersionValid && isVersionSet {
+				return fmt.Errorf("%v is an INVALID gridscale Kubernetes (GSK) version. Valid GSK versions are: %v\n", newVersionVal, strings.Join(versionList, ", "))
 			}
 			return validateK8sParameters(d, chosenTemplate)
 		},
@@ -107,10 +128,14 @@ func resourceGridscaleK8s() *schema.Resource {
 				Computed:    true,
 			},
 			"release": {
-				Type:         schema.TypeString,
-				Description:  "The k8s release of this instance.",
-				Required:     true,
-				ValidateFunc: validation.NoZeroValues,
+				Type:        schema.TypeString,
+				Description: "The k8s release of this instance.",
+				Optional:    true,
+			},
+			"gsk_version": {
+				Type:        schema.TypeString,
+				Description: "The gridscale k8s PaaS version (issued by gridscale) of this instance.",
+				Optional:    true,
 			},
 			"service_template_uuid": {
 				Type:        schema.TypeString,
@@ -153,6 +178,12 @@ func resourceGridscaleK8s() *schema.Resource {
 							Type:        schema.TypeString,
 							Description: "Storage type.",
 							Required:    true,
+						},
+						"surge_node": {
+							Type:        schema.TypeBool,
+							Description: "Enable surge node to avoid resources shortage during the cluster upgrade.",
+							Optional:    true,
+							Default:     true,
 						},
 					},
 				},
@@ -261,6 +292,10 @@ func resourceGridscaleK8sRead(d *schema.ResourceData, meta interface{}) error {
 		"storage":      props.Parameters["k8s_worker_node_storage"],
 		"storage_type": props.Parameters["k8s_worker_node_storage_type"],
 	}
+	// Surge node feature is enable if k8s_surge_node_count > 0
+	surgeNodeCount := props.Parameters["k8s_surge_node_count"].(float64)
+	nodePool["surge_node"] = surgeNodeCount > 0
+
 	nodePoolList = append(nodePoolList, nodePool)
 	if err = d.Set("node_pool", nodePoolList); err != nil {
 		return fmt.Errorf("%s error setting node_pool: %v", errorPrefix, err)
@@ -295,11 +330,23 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("create k8s (%s) resource -", d.Id())
 
-	// Validate k8s release
-	release := d.Get("release").(string)
-	templateUUID, err := getK8sTemplateUUID(client, release)
-	if err != nil {
-		return fmt.Errorf("%s error: %v", errorPrefix, err)
+	var templateUUID string
+	// Validate k8s release, and get template UUID from release
+	if release, isReleaseSet := d.GetOk("release"); isReleaseSet {
+		var err error
+		templateUUID, err = getK8sTemplateUUIDFromRelease(client, release.(string))
+		if err != nil {
+			return fmt.Errorf("%s error: %v", errorPrefix, err)
+		}
+	}
+
+	// Validate gsk version, and get template UUID from gsk version.
+	if version, isVersionSet := d.GetOk("gsk_version"); isVersionSet {
+		var err error
+		templateUUID, err = getK8sTemplateUUIDFromGSKVersion(client, version.(string))
+		if err != nil {
+			return fmt.Errorf("%s error: %v", errorPrefix, err)
+		}
 	}
 
 	requestBody := gsclient.PaaSServiceCreateRequest{
@@ -316,6 +363,12 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 	params["k8s_worker_node_count"] = d.Get("node_pool.0.node_count")
 	params["k8s_worker_node_storage"] = d.Get("node_pool.0.storage")
 	params["k8s_worker_node_storage_type"] = d.Get("node_pool.0.storage_type")
+	isSurgeNodeEnabled := d.Get("node_pool.0.surge_node").(bool)
+	if isSurgeNodeEnabled {
+		params["k8s_surge_node_count"] = 1
+	} else {
+		params["k8s_surge_node_count"] = 0
+	}
 	requestBody.Parameters = params
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
@@ -338,16 +391,30 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 		Name:   d.Get("name").(string),
 		Labels: &labels,
 	}
-
-	// Only update release, when it is changed
-	if d.HasChange("release") {
+	currentTemplateUUID := d.Get("service_template_uuid")
+	// Only update release/gsk version, when it is changed
+	if releaseValInf, isReleaseSet := d.GetOk("release"); d.HasChange("release") && isReleaseSet {
 		// Check if the k8s release number exists
-		release := d.Get("release").(string)
-		templateUUID, err := getK8sTemplateUUID(client, release)
+		release := releaseValInf.(string)
+		templateUUID, err := getK8sTemplateUUIDFromRelease(client, release)
 		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
-		requestBody.PaaSServiceTemplateUUID = templateUUID
+		// Only add template UUID when it really has been changed.
+		if templateUUID != currentTemplateUUID.(string) {
+			requestBody.PaaSServiceTemplateUUID = templateUUID
+		}
+	}
+	if versionValInf, isVersionSet := d.GetOk("gsk_version"); d.HasChange("gsk_version") && isVersionSet {
+		version := versionValInf.(string)
+		templateUUID, err := getK8sTemplateUUIDFromGSKVersion(client, version)
+		if err != nil {
+			return fmt.Errorf("%s error: %v", errorPrefix, err)
+		}
+		// Only add template UUID when it really has been changed.
+		if templateUUID != currentTemplateUUID.(string) {
+			requestBody.PaaSServiceTemplateUUID = templateUUID
+		}
 	}
 
 	// TODO: The API scheme will be CHANGED in the future. There will be multiple node pools.
@@ -357,6 +424,12 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 	params["k8s_worker_node_count"] = d.Get("node_pool.0.node_count")
 	params["k8s_worker_node_storage"] = d.Get("node_pool.0.storage")
 	params["k8s_worker_node_storage_type"] = d.Get("node_pool.0.storage_type")
+	isSurgeNodeEnabled := d.Get("node_pool.0.surge_node").(bool)
+	if isSurgeNodeEnabled {
+		params["k8s_surge_node_count"] = 1
+	} else {
+		params["k8s_surge_node_count"] = 0
+	}
 	requestBody.Parameters = params
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
@@ -384,8 +457,8 @@ func resourceGridscaleK8sDelete(d *schema.ResourceData, meta interface{}) error 
 	return nil
 }
 
-// getK8sTemplateUUID returns the UUID of the k8s service template.
-func getK8sTemplateUUID(client *gsclient.Client, release string) (string, error) {
+// getK8sTemplateUUIDFromRelease returns the UUID of the k8s service template from given release.
+func getK8sTemplateUUIDFromRelease(client *gsclient.Client, release string) (string, error) {
 	paasTemplates, err := client.GetPaaSTemplateList(context.Background())
 	if err != nil {
 		return "", err
@@ -399,11 +472,38 @@ func getK8sTemplateUUID(client *gsclient.Client, release string) (string, error)
 			if template.Properties.Release == release {
 				isReleaseValid = true
 				uTemplate = template
+				break
 			}
 		}
 	}
 	if !isReleaseValid {
-		return "", fmt.Errorf("%v is not a valid Kubernetes release. Valid releases are: %v\n", release, strings.Join(releases, ", "))
+		return "", fmt.Errorf("%v is an INVALID Kubernetes minor release. Valid releases are: %v\n", release, strings.Join(releases, ", "))
+	}
+
+	return uTemplate.Properties.ObjectUUID, nil
+}
+
+// getK8sTemplateUUIDFromGSKVersion returns the UUID of the k8s service template from given GSK version.
+func getK8sTemplateUUIDFromGSKVersion(client *gsclient.Client, version string) (string, error) {
+	paasTemplates, err := client.GetPaaSTemplateList(context.Background())
+	if err != nil {
+		return "", err
+	}
+	var isVersionValid bool
+	var versions []string
+	var uTemplate gsclient.PaaSTemplate
+	for _, template := range paasTemplates {
+		if template.Properties.Flavour == k8sTemplateFlavourName {
+			versions = append(versions, template.Properties.Version)
+			if template.Properties.Version == version {
+				isVersionValid = true
+				uTemplate = template
+				break
+			}
+		}
+	}
+	if !isVersionValid {
+		return "", fmt.Errorf("%v is an INVALID gridscale Kubernetes (GSK) version. Valid GSK versions are: %v\n", version, strings.Join(versions, ", "))
 	}
 
 	return uTemplate.Properties.ObjectUUID, nil
