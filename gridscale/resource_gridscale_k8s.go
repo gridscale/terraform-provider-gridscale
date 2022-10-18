@@ -293,8 +293,9 @@ func resourceGridscaleK8sRead(d *schema.ResourceData, meta interface{}) error {
 		"storage_type": props.Parameters["k8s_worker_node_storage_type"],
 	}
 	// Surge node feature is enable if k8s_surge_node_count > 0
-	surgeNodeCount := props.Parameters["k8s_surge_node_count"].(float64)
-	nodePool["surge_node"] = surgeNodeCount > 0
+	if surgeNodeCount, ok := props.Parameters["k8s_surge_node_count"].(float64); ok {
+		nodePool["surge_node"] = surgeNodeCount > 0
+	}
 
 	nodePoolList = append(nodePoolList, nodePool)
 	if err = d.Set("node_pool", nodePoolList); err != nil {
