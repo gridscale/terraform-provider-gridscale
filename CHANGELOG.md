@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.16.1 (Oct 19, 2022)
+
+BUG FIXES:
+
+* (Hot fix) Fix type assertion bug caused by non-existent k8s_surge_node_count [PR #212](https://github.com/gridscale/terraform-provider-gridscale/pull/212).
+
 ## 1.16.0 (Oct 14, 2022)
 
 FEATURES:
