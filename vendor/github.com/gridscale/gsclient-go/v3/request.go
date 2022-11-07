@@ -183,7 +183,7 @@ func (r *gsRequest) prepareHTTPRequest(ctx context.Context, cfg *Config) (*http.
 // retryHTTPRequest prepares and sends a HTTP request.
 // If 429 error code is returned from the server, retry after the rate-limit is reset.
 // If 503 error code is returned and Retry-After response header is defined (x seconds),
-//retry after x seconds.
+// retry after x seconds.
 // If 503 error code is returned and Retry-After response header is NOT defined,
 // the next retry depends on the config of gsclient-go (delayIntervalMilliSecs and maxNumberOfRetries).
 // Returns UUID (string), response body ([]byte), error
@@ -235,7 +235,7 @@ func (r *gsRequest) retryHTTPRequest(ctx context.Context, cfg *Config) (string, 
 			json.Unmarshal(responseBodyBytes, &errorMessage)
 
 			switch statusCode {
-			case http.StatusServiceUnavailable, http.StatusFailedDependency, http.StatusInternalServerError:
+			case http.StatusServiceUnavailable, http.StatusFailedDependency, http.StatusInternalServerError, http.StatusConflict:
 				// Get the delay (in second) for the next retry
 				delayDurationStr := resp.Header.Get(retryAfterHeader)
 				delayDuration, err := strconv.Atoi(delayDurationStr)

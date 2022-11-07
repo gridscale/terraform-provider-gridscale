@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.10.1 (Oct 25, 2022)
+
+IMPROVEMENTS:
+- Add retry when API backend returns error code 409 [#222](https://github.com/gridscale/gsclient-go/pull/222)
+
 ## 3.10.0 (Apr 28, 2022)
 
 IMPROVEMENTS:
