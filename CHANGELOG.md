@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.16.2 (Nov 7, 2022)
+
+IMPROVEMENTS:
+- Upgrade `gsclient-go` v3.10.1 (Add retry when API backend returns error code 409 via [gsclient-go v3.10.0](https://github.com/gridscale/gsclient-go/releases/tag/v3.10.0)).
+
 ## 1.16.1 (Oct 19, 2022)
 
 BUG FIXES:
