@@ -1,7 +1,7 @@
 ---
 layout: "gridscale"
-page_title: "gridscale: object storage"
-sidebar_current: "docs-gridscale-datasource-object-storage"
+page_title: "gridscale: object storage access key"
+sidebar_current: "docs-gridscale-datasource-object-storage-accesskey"
 description: |-
   Gets the data of an access key of an object storage.
 ---
