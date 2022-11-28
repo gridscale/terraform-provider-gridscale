@@ -197,7 +197,7 @@ func dataSourceGridscaleServer() *schema.Resource {
 			},
 			"power": {
 				Type:        schema.TypeBool,
-				Description: "The number of server cores.",
+				Description: "The power state of the server. Set this to true to will boot the server, false will shut it down.",
 				Computed:    true,
 			},
 			"current_price": {
