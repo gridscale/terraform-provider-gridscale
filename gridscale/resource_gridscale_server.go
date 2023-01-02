@@ -768,43 +768,43 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 
 		machineType := d.Get("hardware_profile_config.0.machine_type").(string)
 		switch machineType {
-		case "i440fx":
+		case string(gsclient.I440fxMachineType):
 			config.Machinetype = gsclient.I440fxMachineType
-		case "q35_bios":
+		case string(gsclient.Q35BiosMachineType):
 			config.Machinetype = gsclient.Q35BiosMachineType
-		case "q35_uefi":
+		case string(gsclient.Q35Uefi):
 			config.Machinetype = gsclient.Q35Uefi
 		}
 
 		storageDevice := d.Get("hardware_profile_config.0.storage_device").(string)
 		switch storageDevice {
-		case "ide":
+		case string(gsclient.IDEStorageDevice):
 			config.StorageDevice = gsclient.IDEStorageDevice
-		case "sata":
+		case string(gsclient.SATAStorageDevice):
 			config.StorageDevice = gsclient.SATAStorageDevice
-		case "virtio_scsi":
+		case string(gsclient.VirtIOSCSItorageDevice):
 			config.StorageDevice = gsclient.VirtIOSCSItorageDevice
-		case "virtio_block":
+		case string(gsclient.VirtIOBlockStorageDevice):
 			config.StorageDevice = gsclient.VirtIOBlockStorageDevice
 		}
 
 		usbController := d.Get("hardware_profile_config.0.usb_controller").(string)
 		switch usbController {
-		case "nec_xhci":
+		case string(gsclient.NecXHCIUSBController):
 			config.USBController = gsclient.NecXHCIUSBController
-		case "piix3_uhci":
+		case string(gsclient.Piix3UHCIUSBController):
 			config.USBController = gsclient.Piix3UHCIUSBController
 		}
 
 		networkModel := d.Get("hardware_profile_config.0.network_model").(string)
 		switch networkModel {
-		case "e1000":
+		case string(gsclient.E1000NetworkModel):
 			config.NetworkModel = gsclient.E1000NetworkModel
-		case "e1000e":
+		case string(gsclient.E1000ENetworkModel):
 			config.NetworkModel = gsclient.E1000ENetworkModel
-		case "virtio":
+		case string(gsclient.VirtIONetworkModel):
 			config.NetworkModel = gsclient.VirtIONetworkModel
-		case "vmxnet3":
+		case string(gsclient.VmxNet3NetworkModel):
 			config.NetworkModel = gsclient.VmxNet3NetworkModel
 		}
 
@@ -936,43 +936,43 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 
 			machineType := d.Get("hardware_profile_config.0.machine_type").(string)
 			switch machineType {
-			case "i440fx":
+			case string(gsclient.I440fxMachineType):
 				config.Machinetype = gsclient.I440fxMachineType
-			case "q35_bios":
+			case string(gsclient.Q35BiosMachineType):
 				config.Machinetype = gsclient.Q35BiosMachineType
-			case "q35_uefi":
+			case string(gsclient.Q35Uefi):
 				config.Machinetype = gsclient.Q35Uefi
 			}
 
 			storageDevice := d.Get("hardware_profile_config.0.storage_device").(string)
 			switch storageDevice {
-			case "ide":
+			case string(gsclient.IDEStorageDevice):
 				config.StorageDevice = gsclient.IDEStorageDevice
-			case "sata":
+			case string(gsclient.SATAStorageDevice):
 				config.StorageDevice = gsclient.SATAStorageDevice
-			case "virtio_scsi":
+			case string(gsclient.VirtIOSCSItorageDevice):
 				config.StorageDevice = gsclient.VirtIOSCSItorageDevice
-			case "virtio_block":
+			case string(gsclient.VirtIOBlockStorageDevice):
 				config.StorageDevice = gsclient.VirtIOBlockStorageDevice
 			}
 
 			usbController := d.Get("hardware_profile_config.0.usb_controller").(string)
 			switch usbController {
-			case "nec_xhci":
+			case string(gsclient.NecXHCIUSBController):
 				config.USBController = gsclient.NecXHCIUSBController
-			case "piix3_uhci":
+			case string(gsclient.Piix3UHCIUSBController):
 				config.USBController = gsclient.Piix3UHCIUSBController
 			}
 
 			networkModel := d.Get("hardware_profile_config.0.network_model").(string)
 			switch networkModel {
-			case "e1000":
+			case string(gsclient.E1000NetworkModel):
 				config.NetworkModel = gsclient.E1000NetworkModel
-			case "e1000e":
+			case string(gsclient.E1000ENetworkModel):
 				config.NetworkModel = gsclient.E1000ENetworkModel
-			case "virtio":
+			case string(gsclient.VirtIONetworkModel):
 				config.NetworkModel = gsclient.VirtIONetworkModel
-			case "vmxnet3":
+			case string(gsclient.VmxNet3NetworkModel):
 				config.NetworkModel = gsclient.VmxNet3NetworkModel
 			}
 
