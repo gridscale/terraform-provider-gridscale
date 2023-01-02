@@ -56,7 +56,7 @@ func resourceGridscaleServer() *schema.Resource {
 			},
 			"hardware_profile": {
 				Type:        schema.TypeString,
-				Description: "The number of server cores.",
+				Description: "Specifies the hardware settings for the virtual machine.",
 				Optional:    true,
 				Computed:    true,
 				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
