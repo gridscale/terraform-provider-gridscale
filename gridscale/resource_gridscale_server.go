@@ -74,7 +74,7 @@ func resourceGridscaleServer() *schema.Resource {
 				},
 			},
 			"hardware_profile_config": {
-				Type:        schema.TypeString,
+				Type:        schema.TypeList,
 				MaxItems:    1,
 				Optional:    true,
 				Description: `Specifies the custom hardware settings for the virtual machine. Note: hardware_profile and hardware_profile_config parameters can't be used at the same time.`,
