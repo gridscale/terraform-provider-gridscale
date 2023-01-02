@@ -756,58 +756,60 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		requestBody.HardwareProfile = gsclient.DefaultServerHardware
 	}
 
-	// Since only one hardware profile config can be set when can just use the index 0
-	if _, ok := d.GetOk("hardware_profile_config"); ok {
-		config := gsclient.ServerHardwareProfileConfig{
-			NestedVirtualization: d.Get("hardware_profile_config.0.nested_virtualization").(bool),
-			HyperVExtensions:     d.Get("hardware_profile_config.0.hyperv_extensions").(bool),
-			SerialInterface:      d.Get("hardware_profile_config.0.serial_interface").(bool),
-			ServerRenice:         d.Get("hardware_profile_config.0.server_renice").(bool),
-		}
+	if attr, ok := d.GetOk("hardware_profile_config"); ok {
+		for _, requestProps := range attr.(*schema.Set).List() {
+			exportReqData := requestProps.(map[string]interface{})
+			config := gsclient.ServerHardwareProfileConfig{
+				NestedVirtualization: exportReqData["nested_virtualization"].(bool),
+				HyperVExtensions:     exportReqData["hyperv_extensions"].(bool),
+				SerialInterface:      exportReqData["serial_interface"].(bool),
+				ServerRenice:         exportReqData["server_renice"].(bool),
+			}
 
-		machineType := d.Get("hardware_profile_config.0.machine_type").(string)
-		switch machineType {
-		case string(gsclient.I440fxMachineType):
-			config.Machinetype = gsclient.I440fxMachineType
-		case string(gsclient.Q35BiosMachineType):
-			config.Machinetype = gsclient.Q35BiosMachineType
-		case string(gsclient.Q35Uefi):
-			config.Machinetype = gsclient.Q35Uefi
-		}
+			machineType := exportReqData["machine_type"].(string)
+			switch machineType {
+			case string(gsclient.I440fxMachineType):
+				config.Machinetype = gsclient.I440fxMachineType
+			case string(gsclient.Q35BiosMachineType):
+				config.Machinetype = gsclient.Q35BiosMachineType
+			case string(gsclient.Q35Uefi):
+				config.Machinetype = gsclient.Q35Uefi
+			}
 
-		storageDevice := d.Get("hardware_profile_config.0.storage_device").(string)
-		switch storageDevice {
-		case string(gsclient.IDEStorageDevice):
-			config.StorageDevice = gsclient.IDEStorageDevice
-		case string(gsclient.SATAStorageDevice):
-			config.StorageDevice = gsclient.SATAStorageDevice
-		case string(gsclient.VirtIOSCSItorageDevice):
-			config.StorageDevice = gsclient.VirtIOSCSItorageDevice
-		case string(gsclient.VirtIOBlockStorageDevice):
-			config.StorageDevice = gsclient.VirtIOBlockStorageDevice
-		}
+			storageDevice := exportReqData["storage_device"].(string)
+			switch storageDevice {
+			case string(gsclient.IDEStorageDevice):
+				config.StorageDevice = gsclient.IDEStorageDevice
+			case string(gsclient.SATAStorageDevice):
+				config.StorageDevice = gsclient.SATAStorageDevice
+			case string(gsclient.VirtIOSCSItorageDevice):
+				config.StorageDevice = gsclient.VirtIOSCSItorageDevice
+			case string(gsclient.VirtIOBlockStorageDevice):
+				config.StorageDevice = gsclient.VirtIOBlockStorageDevice
+			}
 
-		usbController := d.Get("hardware_profile_config.0.usb_controller").(string)
-		switch usbController {
-		case string(gsclient.NecXHCIUSBController):
-			config.USBController = gsclient.NecXHCIUSBController
-		case string(gsclient.Piix3UHCIUSBController):
-			config.USBController = gsclient.Piix3UHCIUSBController
-		}
+			usbController := exportReqData["usb_controller"].(string)
+			switch usbController {
+			case string(gsclient.NecXHCIUSBController):
+				config.USBController = gsclient.NecXHCIUSBController
+			case string(gsclient.Piix3UHCIUSBController):
+				config.USBController = gsclient.Piix3UHCIUSBController
+			}
 
-		networkModel := d.Get("hardware_profile_config.0.network_model").(string)
-		switch networkModel {
-		case string(gsclient.E1000NetworkModel):
-			config.NetworkModel = gsclient.E1000NetworkModel
-		case string(gsclient.E1000ENetworkModel):
-			config.NetworkModel = gsclient.E1000ENetworkModel
-		case string(gsclient.VirtIONetworkModel):
-			config.NetworkModel = gsclient.VirtIONetworkModel
-		case string(gsclient.VmxNet3NetworkModel):
-			config.NetworkModel = gsclient.VmxNet3NetworkModel
-		}
+			networkModel := exportReqData["network_model"].(string)
+			switch networkModel {
+			case string(gsclient.E1000NetworkModel):
+				config.NetworkModel = gsclient.E1000NetworkModel
+			case string(gsclient.E1000ENetworkModel):
+				config.NetworkModel = gsclient.E1000ENetworkModel
+			case string(gsclient.VirtIONetworkModel):
+				config.NetworkModel = gsclient.VirtIONetworkModel
+			case string(gsclient.VmxNet3NetworkModel):
+				config.NetworkModel = gsclient.VmxNet3NetworkModel
+			}
 
-		requestBody.HardwareProfileConfig = config
+			requestBody.HardwareProfileConfig = config
+		}
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
@@ -924,58 +926,60 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 			requestBody.HardwareProfile = gsclient.DefaultServerHardware
 		}
 
-		// Since only one hardware profile config can be set when can just use the index 0
-		if _, ok := d.GetOk("hardware_profile_config"); ok {
-			config := gsclient.ServerHardwareProfileConfig{
-				NestedVirtualization: d.Get("hardware_profile_config.0.nested_virtualization").(bool),
-				HyperVExtensions:     d.Get("hardware_profile_config.0.hyperv_extensions").(bool),
-				SerialInterface:      d.Get("hardware_profile_config.0.serial_interface").(bool),
-				ServerRenice:         d.Get("hardware_profile_config.0.server_renice").(bool),
-			}
+		if attr, ok := d.GetOk("hardware_profile_config"); ok {
+			for _, requestProps := range attr.(*schema.Set).List() {
+				exportReqData := requestProps.(map[string]interface{})
+				config := gsclient.ServerHardwareProfileConfig{
+					NestedVirtualization: exportReqData["nested_virtualization"].(bool),
+					HyperVExtensions:     exportReqData["hyperv_extensions"].(bool),
+					SerialInterface:      exportReqData["serial_interface"].(bool),
+					ServerRenice:         exportReqData["server_renice"].(bool),
+				}
 
-			machineType := d.Get("hardware_profile_config.0.machine_type").(string)
-			switch machineType {
-			case string(gsclient.I440fxMachineType):
-				config.Machinetype = gsclient.I440fxMachineType
-			case string(gsclient.Q35BiosMachineType):
-				config.Machinetype = gsclient.Q35BiosMachineType
-			case string(gsclient.Q35Uefi):
-				config.Machinetype = gsclient.Q35Uefi
-			}
+				machineType := exportReqData["machine_type"].(string)
+				switch machineType {
+				case string(gsclient.I440fxMachineType):
+					config.Machinetype = gsclient.I440fxMachineType
+				case string(gsclient.Q35BiosMachineType):
+					config.Machinetype = gsclient.Q35BiosMachineType
+				case string(gsclient.Q35Uefi):
+					config.Machinetype = gsclient.Q35Uefi
+				}
 
-			storageDevice := d.Get("hardware_profile_config.0.storage_device").(string)
-			switch storageDevice {
-			case string(gsclient.IDEStorageDevice):
-				config.StorageDevice = gsclient.IDEStorageDevice
-			case string(gsclient.SATAStorageDevice):
-				config.StorageDevice = gsclient.SATAStorageDevice
-			case string(gsclient.VirtIOSCSItorageDevice):
-				config.StorageDevice = gsclient.VirtIOSCSItorageDevice
-			case string(gsclient.VirtIOBlockStorageDevice):
-				config.StorageDevice = gsclient.VirtIOBlockStorageDevice
-			}
+				storageDevice := exportReqData["storage_device"].(string)
+				switch storageDevice {
+				case string(gsclient.IDEStorageDevice):
+					config.StorageDevice = gsclient.IDEStorageDevice
+				case string(gsclient.SATAStorageDevice):
+					config.StorageDevice = gsclient.SATAStorageDevice
+				case string(gsclient.VirtIOSCSItorageDevice):
+					config.StorageDevice = gsclient.VirtIOSCSItorageDevice
+				case string(gsclient.VirtIOBlockStorageDevice):
+					config.StorageDevice = gsclient.VirtIOBlockStorageDevice
+				}
 
-			usbController := d.Get("hardware_profile_config.0.usb_controller").(string)
-			switch usbController {
-			case string(gsclient.NecXHCIUSBController):
-				config.USBController = gsclient.NecXHCIUSBController
-			case string(gsclient.Piix3UHCIUSBController):
-				config.USBController = gsclient.Piix3UHCIUSBController
-			}
+				usbController := exportReqData["usb_controller"].(string)
+				switch usbController {
+				case string(gsclient.NecXHCIUSBController):
+					config.USBController = gsclient.NecXHCIUSBController
+				case string(gsclient.Piix3UHCIUSBController):
+					config.USBController = gsclient.Piix3UHCIUSBController
+				}
 
-			networkModel := d.Get("hardware_profile_config.0.network_model").(string)
-			switch networkModel {
-			case string(gsclient.E1000NetworkModel):
-				config.NetworkModel = gsclient.E1000NetworkModel
-			case string(gsclient.E1000ENetworkModel):
-				config.NetworkModel = gsclient.E1000ENetworkModel
-			case string(gsclient.VirtIONetworkModel):
-				config.NetworkModel = gsclient.VirtIONetworkModel
-			case string(gsclient.VmxNet3NetworkModel):
-				config.NetworkModel = gsclient.VmxNet3NetworkModel
-			}
+				networkModel := exportReqData["network_model"].(string)
+				switch networkModel {
+				case string(gsclient.E1000NetworkModel):
+					config.NetworkModel = gsclient.E1000NetworkModel
+				case string(gsclient.E1000ENetworkModel):
+					config.NetworkModel = gsclient.E1000ENetworkModel
+				case string(gsclient.VirtIONetworkModel):
+					config.NetworkModel = gsclient.VirtIONetworkModel
+				case string(gsclient.VmxNet3NetworkModel):
+					config.NetworkModel = gsclient.VmxNet3NetworkModel
+				}
 
-			requestBody.HardwareProfileConfig = config
+				requestBody.HardwareProfileConfig = config
+			}
 		}
 
 		updateSequence := func(ctx context.Context) error {
