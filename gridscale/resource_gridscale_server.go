@@ -75,6 +75,7 @@ func resourceGridscaleServer() *schema.Resource {
 			},
 			"hardware_profile_config": {
 				Type:        schema.TypeString,
+				MaxItems:    1,
 				Optional:    true,
 				Description: `Specifies the custom hardware settings for the virtual machine. Note: hardware_profile and hardware_profile_config parameters can't be used at the same time.`,
 				Elem: &schema.Resource{
@@ -756,6 +757,60 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		requestBody.HardwareProfile = gsclient.DefaultServerHardware
 	}
 
+	// Since only one hardware profile config can be set when can just use the index 0
+	if _, ok := d.GetOk("hardware_profile_config"); ok {
+		config := gsclient.ServerHardwareProfileConfig{
+			NestedVirtualization: d.Get("hardware_profile_config.0.nested_virtualization").(bool),
+			HyperVExtensions:     d.Get("hardware_profile_config.0.hyperv_extensions").(bool),
+			SerialInterface:      d.Get("hardware_profile_config.0.serial_interface").(bool),
+			ServerRenice:         d.Get("hardware_profile_config.0.server_renice").(bool),
+		}
+
+		machineType := d.Get("hardware_profile_config.0.machine_type").(string)
+		switch machineType {
+		case "i440fx":
+			config.Machinetype = gsclient.I440fxMachineType
+		case "q35_bios":
+			config.Machinetype = gsclient.Q35BiosMachineType
+		case "q35_uefi":
+			config.Machinetype = gsclient.Q35Uefi
+		}
+
+		storageDevice := d.Get("hardware_profile_config.0.storage_device").(string)
+		switch storageDevice {
+		case "ide":
+			config.StorageDevice = gsclient.IDEStorageDevice
+		case "sata":
+			config.StorageDevice = gsclient.SATAStorageDevice
+		case "virtio_scsi":
+			config.StorageDevice = gsclient.VirtIOSCSItorageDevice
+		case "virtio_block":
+			config.StorageDevice = gsclient.VirtIOBlockStorageDevice
+		}
+
+		usbController := d.Get("hardware_profile_config.0.usb_controller").(string)
+		switch usbController {
+		case "nec_xhci":
+			config.USBController = gsclient.NecXHCIUSBController
+		case "piix3_uhci":
+			config.USBController = gsclient.Piix3UHCIUSBController
+		}
+
+		networkModel := d.Get("hardware_profile_config.0.network_model").(string)
+		switch networkModel {
+		case "e1000":
+			config.NetworkModel = gsclient.E1000NetworkModel
+		case "e1000e":
+			config.NetworkModel = gsclient.E1000ENetworkModel
+		case "virtio":
+			config.NetworkModel = gsclient.VirtIONetworkModel
+		case "vmxnet3":
+			config.NetworkModel = gsclient.VmxNet3NetworkModel
+		}
+
+		requestBody.HardwareProfileConfig = config
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
 	defer cancel()
 	response, err := gsc.CreateServer(ctx, requestBody)
@@ -869,6 +924,61 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 		case "default":
 			requestBody.HardwareProfile = gsclient.DefaultServerHardware
 		}
+
+		// Since only one hardware profile config can be set when can just use the index 0
+		if _, ok := d.GetOk("hardware_profile_config"); ok {
+			config := gsclient.ServerHardwareProfileConfig{
+				NestedVirtualization: d.Get("hardware_profile_config.0.nested_virtualization").(bool),
+				HyperVExtensions:     d.Get("hardware_profile_config.0.hyperv_extensions").(bool),
+				SerialInterface:      d.Get("hardware_profile_config.0.serial_interface").(bool),
+				ServerRenice:         d.Get("hardware_profile_config.0.server_renice").(bool),
+			}
+
+			machineType := d.Get("hardware_profile_config.0.machine_type").(string)
+			switch machineType {
+			case "i440fx":
+				config.Machinetype = gsclient.I440fxMachineType
+			case "q35_bios":
+				config.Machinetype = gsclient.Q35BiosMachineType
+			case "q35_uefi":
+				config.Machinetype = gsclient.Q35Uefi
+			}
+
+			storageDevice := d.Get("hardware_profile_config.0.storage_device").(string)
+			switch storageDevice {
+			case "ide":
+				config.StorageDevice = gsclient.IDEStorageDevice
+			case "sata":
+				config.StorageDevice = gsclient.SATAStorageDevice
+			case "virtio_scsi":
+				config.StorageDevice = gsclient.VirtIOSCSItorageDevice
+			case "virtio_block":
+				config.StorageDevice = gsclient.VirtIOBlockStorageDevice
+			}
+
+			usbController := d.Get("hardware_profile_config.0.usb_controller").(string)
+			switch usbController {
+			case "nec_xhci":
+				config.USBController = gsclient.NecXHCIUSBController
+			case "piix3_uhci":
+				config.USBController = gsclient.Piix3UHCIUSBController
+			}
+
+			networkModel := d.Get("hardware_profile_config.0.network_model").(string)
+			switch networkModel {
+			case "e1000":
+				config.NetworkModel = gsclient.E1000NetworkModel
+			case "e1000e":
+				config.NetworkModel = gsclient.E1000ENetworkModel
+			case "virtio":
+				config.NetworkModel = gsclient.VirtIONetworkModel
+			case "vmxnet3":
+				config.NetworkModel = gsclient.VmxNet3NetworkModel
+			}
+
+			requestBody.HardwareProfileConfig = config
+		}
+
 		updateSequence := func(ctx context.Context) error {
 			//Execute the update request
 			err = gsc.UpdateServer(ctx, d.Id(), requestBody)
