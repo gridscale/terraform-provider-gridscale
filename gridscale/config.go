@@ -22,6 +22,10 @@ var postgreSQLPerformanceClasses = []string{"standard", "high", "insane", "ultra
 var filesystemPerformanceClasses = []string{"standard", "high", "insane", "ultra"}
 var msSQLServerPerformanceClasses = []string{"standard", "high", "insane", "ultra"}
 var mariaDBPerformanceClasses = []string{"standard", "high", "insane", "ultra"}
+var machineTypes = []string{"i440fx", "q35_bios", "q35_uefi"}
+var storageDevices = []string{"ide", "sata", "virtio_scsi", "virtio_block"}
+var usbControllers = []string{"nec_xhci", "piix3_uhci"}
+var networkModels = []string{"e1000", "e1000e", "virtio", "vmxnet3"}
 
 const timeLayout = "2006-01-02 15:04:05"
 const (

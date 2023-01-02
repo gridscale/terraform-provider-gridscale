@@ -56,7 +56,7 @@ func resourceGridscaleServer() *schema.Resource {
 			},
 			"hardware_profile": {
 				Type:        schema.TypeString,
-				Description: "Specifies the hardware settings for the virtual machine.",
+				Description: "Specifies the hardware settings for the virtual machine. Note: hardware_profile and hardware_profile_config parameters can't be used at the same time.",
 				Optional:    true,
 				Computed:    true,
 				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
@@ -71,6 +71,107 @@ func resourceGridscaleServer() *schema.Resource {
 						errors = append(errors, fmt.Errorf("%v is not a valid hardware profile. Valid hardware profiles are: %v", v.(string), strings.Join(hardwareProfiles, ",")))
 					}
 					return
+				},
+			},
+			"hardware_profile_config": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: `Specifies the custom hardware settings for the virtual machine. Note: hardware_profile and hardware_profile_config parameters can't be used at the same time.`,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"machinetype": {
+							Type:     schema.TypeString,
+							Optional: true,
+							Computed: true,
+							ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
+								valid := false
+								for _, machine := range machineTypes {
+									if v.(string) == machine {
+										valid = true
+										break
+									}
+								}
+								if !valid {
+									errors = append(errors, fmt.Errorf("%v is not a valid machine type. Valid machine types are: %v", v.(string), strings.Join(machineTypes, ",")))
+								}
+								return
+							},
+						},
+						"storage_device": {
+							Type:     schema.TypeString,
+							Optional: true,
+							Computed: true,
+							ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
+								valid := false
+								for _, device := range storageDevices {
+									if v.(string) == device {
+										valid = true
+										break
+									}
+								}
+								if !valid {
+									errors = append(errors, fmt.Errorf("%v is not a valid storage device. Valid storage devices are: %v", v.(string), strings.Join(storageDevices, ",")))
+								}
+								return
+							},
+						},
+						"usb_controller": {
+							Type:     schema.TypeString,
+							Optional: true,
+							Computed: true,
+							ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
+								valid := false
+								for _, controller := range usbControllers {
+									if v.(string) == controller {
+										valid = true
+										break
+									}
+								}
+								if !valid {
+									errors = append(errors, fmt.Errorf("%v is not a valid USB controller. Valid USB controllers are: %v", v.(string), strings.Join(usbControllers, ",")))
+								}
+								return
+							},
+						},
+						"nested_virtualization": {
+							Type:     schema.TypeBool,
+							Optional: true,
+							Computed: true,
+						},
+						"hyperv_extensions": {
+							Type:     schema.TypeBool,
+							Optional: true,
+							Computed: true,
+						},
+						"network_model": {
+							Type:     schema.TypeString,
+							Optional: true,
+							Computed: true,
+							ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
+								valid := false
+								for _, network := range networkModels {
+									if v.(string) == network {
+										valid = true
+										break
+									}
+								}
+								if !valid {
+									errors = append(errors, fmt.Errorf("%v is not a valid network model. Valid network models are: %v", v.(string), strings.Join(networkModels, ",")))
+								}
+								return
+							},
+						},
+						"serial_interface": {
+							Type:     schema.TypeBool,
+							Optional: true,
+							Computed: true,
+						},
+						"server_renice": {
+							Type:     schema.TypeBool,
+							Optional: true,
+							Computed: true,
+						},
+					},
 				},
 			},
 			"storage": {
