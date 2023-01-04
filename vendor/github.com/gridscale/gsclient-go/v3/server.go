@@ -145,7 +145,7 @@ type ServerCreateRequest struct {
 
 	// Specifies the custom hardware settings for the virtual machine.
 	// Note: hardware_profile and hardware_profile_config parameters can't be used at the same time.
-	HardwareProfileConfig ServerHardwareProfileConfig `json:"hardware_profile_config,omitempty"`
+	HardwareProfileConfig *ServerHardwareProfileConfig `json:"hardware_profile_config,omitempty"`
 
 	// Defines which Availability-Zone the Server is placed. Can be empty.
 	AvailablityZone string `json:"availability_zone,omitempty"`
@@ -265,7 +265,7 @@ type ServerUpdateRequest struct {
 
 	// Specifies the custom hardware settings for the virtual machine.
 	// Note: hardware_profile and hardware_profile_config parameters can't be used at the same time.
-	HardwareProfileConfig ServerHardwareProfileConfig `json:"hardware_profile_config,omitempty"`
+	HardwareProfileConfig *ServerHardwareProfileConfig `json:"hardware_profile_config,omitempty"`
 }
 
 // ServerMetricList holds a list of a server's metrics.

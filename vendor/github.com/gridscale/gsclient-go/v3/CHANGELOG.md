@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.11.1 (Jan 04, 2023)
+
+BUG FIXES:
+
+* (Hot fix) Omit `HardwareProfileConfig` when it is not set during server creation/update.
 
 ## 3.11.0 (Dec 21, 2022)
 
