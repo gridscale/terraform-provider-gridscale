@@ -56,7 +56,7 @@ func resourceGridscaleServer() *schema.Resource {
 			},
 			"hardware_profile": {
 				Type:        schema.TypeString,
-				Description: "The number of server cores.",
+				Description: "Specifies the hardware settings for the virtual machine. Note: hardware_profile and hardware_profile_config parameters can't be used at the same time.",
 				Optional:    true,
 				Computed:    true,
 				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
@@ -71,6 +71,107 @@ func resourceGridscaleServer() *schema.Resource {
 						errors = append(errors, fmt.Errorf("%v is not a valid hardware profile. Valid hardware profiles are: %v", v.(string), strings.Join(hardwareProfiles, ",")))
 					}
 					return
+				},
+			},
+			"hardware_profile_config": {
+				Type:        schema.TypeSet,
+				Optional:    true,
+				Description: `Specifies the custom hardware settings for the virtual machine. Note: hardware_profile and hardware_profile_config parameters can't be used at the same time.`,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"machinetype": {
+							Type:     schema.TypeString,
+							Optional: true,
+							Computed: true,
+							ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
+								valid := false
+								for _, machine := range machineTypes {
+									if v.(string) == machine {
+										valid = true
+										break
+									}
+								}
+								if !valid {
+									errors = append(errors, fmt.Errorf("%v is not a valid machine type. Valid machine types are: %v", v.(string), strings.Join(machineTypes, ",")))
+								}
+								return
+							},
+						},
+						"storage_device": {
+							Type:     schema.TypeString,
+							Optional: true,
+							Computed: true,
+							ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
+								valid := false
+								for _, device := range storageDevices {
+									if v.(string) == device {
+										valid = true
+										break
+									}
+								}
+								if !valid {
+									errors = append(errors, fmt.Errorf("%v is not a valid storage device. Valid storage devices are: %v", v.(string), strings.Join(storageDevices, ",")))
+								}
+								return
+							},
+						},
+						"usb_controller": {
+							Type:     schema.TypeString,
+							Optional: true,
+							Computed: true,
+							ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
+								valid := false
+								for _, controller := range usbControllers {
+									if v.(string) == controller {
+										valid = true
+										break
+									}
+								}
+								if !valid {
+									errors = append(errors, fmt.Errorf("%v is not a valid USB controller. Valid USB controllers are: %v", v.(string), strings.Join(usbControllers, ",")))
+								}
+								return
+							},
+						},
+						"nested_virtualization": {
+							Type:     schema.TypeBool,
+							Optional: true,
+							Computed: true,
+						},
+						"hyperv_extensions": {
+							Type:     schema.TypeBool,
+							Optional: true,
+							Computed: true,
+						},
+						"network_model": {
+							Type:     schema.TypeString,
+							Optional: true,
+							Computed: true,
+							ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
+								valid := false
+								for _, network := range networkModels {
+									if v.(string) == network {
+										valid = true
+										break
+									}
+								}
+								if !valid {
+									errors = append(errors, fmt.Errorf("%v is not a valid network model. Valid network models are: %v", v.(string), strings.Join(networkModels, ",")))
+								}
+								return
+							},
+						},
+						"serial_interface": {
+							Type:     schema.TypeBool,
+							Optional: true,
+							Computed: true,
+						},
+						"server_renice": {
+							Type:     schema.TypeBool,
+							Optional: true,
+							Computed: true,
+						},
+					},
 				},
 			},
 			"storage": {
@@ -655,6 +756,62 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		requestBody.HardwareProfile = gsclient.DefaultServerHardware
 	}
 
+	if attr, ok := d.GetOk("hardware_profile_config"); ok {
+		for _, requestProps := range attr.(*schema.Set).List() {
+			exportReqData := requestProps.(map[string]interface{})
+			config := gsclient.ServerHardwareProfileConfig{
+				NestedVirtualization: exportReqData["nested_virtualization"].(bool),
+				HyperVExtensions:     exportReqData["hyperv_extensions"].(bool),
+				SerialInterface:      exportReqData["serial_interface"].(bool),
+				ServerRenice:         exportReqData["server_renice"].(bool),
+			}
+
+			machineType := exportReqData["machine_type"].(string)
+			switch machineType {
+			case string(gsclient.I440fxMachineType):
+				config.Machinetype = gsclient.I440fxMachineType
+			case string(gsclient.Q35BiosMachineType):
+				config.Machinetype = gsclient.Q35BiosMachineType
+			case string(gsclient.Q35Uefi):
+				config.Machinetype = gsclient.Q35Uefi
+			}
+
+			storageDevice := exportReqData["storage_device"].(string)
+			switch storageDevice {
+			case string(gsclient.IDEStorageDevice):
+				config.StorageDevice = gsclient.IDEStorageDevice
+			case string(gsclient.SATAStorageDevice):
+				config.StorageDevice = gsclient.SATAStorageDevice
+			case string(gsclient.VirtIOSCSItorageDevice):
+				config.StorageDevice = gsclient.VirtIOSCSItorageDevice
+			case string(gsclient.VirtIOBlockStorageDevice):
+				config.StorageDevice = gsclient.VirtIOBlockStorageDevice
+			}
+
+			usbController := exportReqData["usb_controller"].(string)
+			switch usbController {
+			case string(gsclient.NecXHCIUSBController):
+				config.USBController = gsclient.NecXHCIUSBController
+			case string(gsclient.Piix3UHCIUSBController):
+				config.USBController = gsclient.Piix3UHCIUSBController
+			}
+
+			networkModel := exportReqData["network_model"].(string)
+			switch networkModel {
+			case string(gsclient.E1000NetworkModel):
+				config.NetworkModel = gsclient.E1000NetworkModel
+			case string(gsclient.E1000ENetworkModel):
+				config.NetworkModel = gsclient.E1000ENetworkModel
+			case string(gsclient.VirtIONetworkModel):
+				config.NetworkModel = gsclient.VirtIONetworkModel
+			case string(gsclient.VmxNet3NetworkModel):
+				config.NetworkModel = gsclient.VmxNet3NetworkModel
+			}
+
+			requestBody.HardwareProfileConfig = config
+		}
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
 	defer cancel()
 	response, err := gsc.CreateServer(ctx, requestBody)
@@ -768,6 +925,63 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 		case "default":
 			requestBody.HardwareProfile = gsclient.DefaultServerHardware
 		}
+
+		if attr, ok := d.GetOk("hardware_profile_config"); ok {
+			for _, requestProps := range attr.(*schema.Set).List() {
+				exportReqData := requestProps.(map[string]interface{})
+				config := gsclient.ServerHardwareProfileConfig{
+					NestedVirtualization: exportReqData["nested_virtualization"].(bool),
+					HyperVExtensions:     exportReqData["hyperv_extensions"].(bool),
+					SerialInterface:      exportReqData["serial_interface"].(bool),
+					ServerRenice:         exportReqData["server_renice"].(bool),
+				}
+
+				machineType := exportReqData["machine_type"].(string)
+				switch machineType {
+				case string(gsclient.I440fxMachineType):
+					config.Machinetype = gsclient.I440fxMachineType
+				case string(gsclient.Q35BiosMachineType):
+					config.Machinetype = gsclient.Q35BiosMachineType
+				case string(gsclient.Q35Uefi):
+					config.Machinetype = gsclient.Q35Uefi
+				}
+
+				storageDevice := exportReqData["storage_device"].(string)
+				switch storageDevice {
+				case string(gsclient.IDEStorageDevice):
+					config.StorageDevice = gsclient.IDEStorageDevice
+				case string(gsclient.SATAStorageDevice):
+					config.StorageDevice = gsclient.SATAStorageDevice
+				case string(gsclient.VirtIOSCSItorageDevice):
+					config.StorageDevice = gsclient.VirtIOSCSItorageDevice
+				case string(gsclient.VirtIOBlockStorageDevice):
+					config.StorageDevice = gsclient.VirtIOBlockStorageDevice
+				}
+
+				usbController := exportReqData["usb_controller"].(string)
+				switch usbController {
+				case string(gsclient.NecXHCIUSBController):
+					config.USBController = gsclient.NecXHCIUSBController
+				case string(gsclient.Piix3UHCIUSBController):
+					config.USBController = gsclient.Piix3UHCIUSBController
+				}
+
+				networkModel := exportReqData["network_model"].(string)
+				switch networkModel {
+				case string(gsclient.E1000NetworkModel):
+					config.NetworkModel = gsclient.E1000NetworkModel
+				case string(gsclient.E1000ENetworkModel):
+					config.NetworkModel = gsclient.E1000ENetworkModel
+				case string(gsclient.VirtIONetworkModel):
+					config.NetworkModel = gsclient.VirtIONetworkModel
+				case string(gsclient.VmxNet3NetworkModel):
+					config.NetworkModel = gsclient.VmxNet3NetworkModel
+				}
+
+				requestBody.HardwareProfileConfig = config
+			}
+		}
+
 		updateSequence := func(ctx context.Context) error {
 			//Execute the update request
 			err = gsc.UpdateServer(ctx, d.Id(), requestBody)

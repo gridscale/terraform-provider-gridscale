@@ -1,5 +1,11 @@
 # Changelog
 
+
+## 3.11.0 (Dec 21, 2022)
+
+IMPROVEMENTS:
+- Allow to custom hardware profile configuration [#223](https://github.com/gridscale/gsclient-go/pull/223)
+
 ## 3.10.1 (Oct 25, 2022)
 
 IMPROVEMENTS:
