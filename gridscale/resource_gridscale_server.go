@@ -759,7 +759,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 	if attr, ok := d.GetOk("hardware_profile_config"); ok {
 		for _, requestProps := range attr.(*schema.Set).List() {
 			exportReqData := requestProps.(map[string]interface{})
-			config := gsclient.ServerHardwareProfileConfig{
+			config := &gsclient.ServerHardwareProfileConfig{
 				NestedVirtualization: exportReqData["nested_virtualization"].(bool),
 				HyperVExtensions:     exportReqData["hyperv_extensions"].(bool),
 				SerialInterface:      exportReqData["serial_interface"].(bool),
@@ -929,7 +929,7 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 		if attr, ok := d.GetOk("hardware_profile_config"); ok {
 			for _, requestProps := range attr.(*schema.Set).List() {
 				exportReqData := requestProps.(map[string]interface{})
-				config := gsclient.ServerHardwareProfileConfig{
+				config := &gsclient.ServerHardwareProfileConfig{
 					NestedVirtualization: exportReqData["nested_virtualization"].(bool),
 					HyperVExtensions:     exportReqData["hyperv_extensions"].(bool),
 					SerialInterface:      exportReqData["serial_interface"].(bool),
