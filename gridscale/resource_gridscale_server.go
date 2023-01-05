@@ -828,6 +828,8 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 
 			requestBody.HardwareProfileConfig = config
 		}
+		// if HardwareProfileConfig is set, ignore HardwareProfile
+		requestBody.HardwareProfile = ""
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
@@ -998,6 +1000,8 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 
 				requestBody.HardwareProfileConfig = config
 			}
+			// if HardwareProfileConfig is set, ignore HardwareProfile
+			requestBody.HardwareProfile = ""
 		}
 
 		updateSequence := func(ctx context.Context) error {
