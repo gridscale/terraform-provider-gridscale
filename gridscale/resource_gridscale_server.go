@@ -582,6 +582,23 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 		return fmt.Errorf("%s error setting storage: %v", errorPrefix, err)
 	}
 
+	// Get hardware_profile_config
+	hardwareProfileConfigList := make([]interface{}, 0)
+	hardwareProfileConfig := map[string]interface{}{
+		"machinetype":           server.Properties.HardwareProfileConfig.Machinetype,
+		"storage_device":        server.Properties.HardwareProfileConfig.StorageDevice,
+		"usb_controller":        server.Properties.HardwareProfileConfig.USBController,
+		"nested_virtualization": server.Properties.HardwareProfileConfig.NestedVirtualization,
+		"hyperv_extensions":     server.Properties.HardwareProfileConfig.HyperVExtensions,
+		"network_model":         server.Properties.HardwareProfileConfig.NetworkModel,
+		"serial_interface":      server.Properties.HardwareProfileConfig.SerialInterface,
+		"server_renice":         server.Properties.HardwareProfileConfig.ServerRenice,
+	}
+	hardwareProfileConfigList = append(hardwareProfileConfigList, hardwareProfileConfig)
+	if err = d.Set("hardware_profile_config", hardwareProfileConfigList); err != nil {
+		return fmt.Errorf("%s error setting hardware_profile_config: %v", errorPrefix, err)
+	}
+
 	//Get networks
 	netWODefaultRules := server.Properties.Relations.Networks
 	// Sort the network list by their ordering
