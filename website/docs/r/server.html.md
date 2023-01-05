@@ -103,7 +103,7 @@ The following arguments are supported:
 
 * `availability_zone` - (Optional, Computed) Defines which Availability-Zone the Server is placed.
 
-* `hardware_profile_config` - (Optional, Computed) Specifies the custom hardware settings for the virtual machine. Note: hardware_profile and hardware_profile_config parameters can't be used at the same time. **Note**: If `hardware_profile_config` is set, all fields of `hardware_profile_config` MUST be set.
+* `hardware_profile_config` - (Optional, Computed) Specifies the custom hardware settings for the virtual machine. Note: hardware_profile and hardware_profile_config parameters can't be used at the same time. **Note**: If `hardware_profile_config` is set, all fields of `hardware_profile_config` MUST be set. **Note 2**: If `hardware_profile_config` is set, `hardware_profile` will be ignored (if it is set), and the future terraform apply will show the change of `hardware_profile`; therefore, you have better remove `hardware_profile`.
 
     * `machinetype` - (Optional, Computed) Allowed values: `"i440fx"`, `"q35_bios"`, `"q35_uefi"`.
 
