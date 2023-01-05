@@ -783,7 +783,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 				ServerRenice:         exportReqData["server_renice"].(bool),
 			}
 
-			machineType := exportReqData["machine_type"].(string)
+			machineType := exportReqData["machinetype"].(string)
 			switch machineType {
 			case string(gsclient.I440fxMachineType):
 				config.Machinetype = gsclient.I440fxMachineType
@@ -953,7 +953,7 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 					ServerRenice:         exportReqData["server_renice"].(bool),
 				}
 
-				machineType := exportReqData["machine_type"].(string)
+				machineType := exportReqData["machinetype"].(string)
 				switch machineType {
 				case string(gsclient.I440fxMachineType):
 					config.Machinetype = gsclient.I440fxMachineType
