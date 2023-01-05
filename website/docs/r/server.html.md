@@ -103,6 +103,24 @@ The following arguments are supported:
 
 * `availability_zone` - (Optional, Computed) Defines which Availability-Zone the Server is placed.
 
+* `hardware_profile_config` - (Optional, Computed) Specifies the custom hardware settings for the virtual machine. Note: hardware_profile and hardware_profile_config parameters can't be used at the same time. **Note**: If `hardware_profile_config` is set, all fields of `hardware_profile_config` MUST be set.
+
+    * `machinetype` - (Optional, Computed) Allowed values: `"i440fx"`, `"q35_bios"`, `"q35_uefi"`.
+
+    * `storage_device` - (Optional, Computed) Allowed values: `"ide"`, `"sata"`, `"virtio_scsi"`, `"virtio_block"`.
+
+    * `usb_controller` - (Optional, Computed) Allowed values: `"nec_xhci"`, `"piix3_uhci"`.
+
+    * `nested_virtualization` - (Optional, Computed) Boolean.
+
+    * `hyperv_extensions` - (Optional, Computed) Boolean.
+
+    * `network_model` - (Optional, Computed) Allowed values: `"e1000"`, `"e1000e"`, `"virtio"`, `"vmxnet3"`.
+    
+    * `serial_interface` - (Optional, Computed) Boolean.
+    
+    * `server_renice` - (Optional, Computed) Boolean.
+
 * `storage` - (Optional) Connects a storage to the server. **NOTE: The first storage is always the boot device.
 
     * `object_uuid` - (Required) The object UUID or id of the storage.
@@ -211,6 +229,15 @@ This resource exports the following attributes:
 * `location_uuid` - The location this server is placed. The location of a resource is determined by it's project.
 * `labels` - List of labels in the format [ "label1", "label2" ].
 * `hardware_profile` - The hardware profile of the server.
+* `hardware_profile_config` - (See Argument Reference above.
+    * `machinetype` - See Argument Reference above.
+    * `storage_device` - See Argument Reference above.
+    * `usb_controller` - See Argument Reference above.
+    * `nested_virtualization` - See Argument Reference above.
+    * `hyperv_extensions` - See Argument Reference above.
+    * `network_model` - See Argument Reference above.
+    * `serial_interface` - See Argument Reference above.
+    * `server_renice` - See Argument Reference above.
 * `storage` - Connects a storage to the server.
     * `object_uuid` - The object UUID or id of the storage.
     * `storage_type` - Indicates the speed of the storage. This may be (storage, storage_high or storage_insane).
