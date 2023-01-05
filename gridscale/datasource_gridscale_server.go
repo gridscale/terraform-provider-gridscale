@@ -47,6 +47,47 @@ func dataSourceGridscaleServer() *schema.Resource {
 				Description: "The number of server cores.",
 				Computed:    true,
 			},
+			"hardware_profile_config": {
+				Type:        schema.TypeSet,
+				Computed:    true,
+				Description: `Specifies the custom hardware settings for the virtual machine. Note: hardware_profile and hardware_profile_config parameters can't be used at the same time.`,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"machinetype": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"storage_device": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"usb_controller": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"nested_virtualization": {
+							Type:     schema.TypeBool,
+							Computed: true,
+						},
+						"hyperv_extensions": {
+							Type:     schema.TypeBool,
+							Computed: true,
+						},
+						"network_model": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"serial_interface": {
+							Type:     schema.TypeBool,
+							Computed: true,
+						},
+						"server_renice": {
+							Type:     schema.TypeBool,
+							Computed: true,
+						},
+					},
+				},
+			},
 			"storage": {
 				Type:        schema.TypeList,
 				Computed:    true,
@@ -339,6 +380,23 @@ func dataSourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) err
 			"capacity":           value.Capacity,
 		}
 		storages = append(storages, storage)
+	}
+
+	// Get hardware_profile_config
+	hardwareProfileConfigList := make([]interface{}, 0)
+	hardwareProfileConfig := map[string]interface{}{
+		"machinetype":           server.Properties.HardwareProfileConfig.Machinetype,
+		"storage_device":        server.Properties.HardwareProfileConfig.StorageDevice,
+		"usb_controller":        server.Properties.HardwareProfileConfig.USBController,
+		"nested_virtualization": server.Properties.HardwareProfileConfig.NestedVirtualization,
+		"hyperv_extensions":     server.Properties.HardwareProfileConfig.HyperVExtensions,
+		"network_model":         server.Properties.HardwareProfileConfig.NetworkModel,
+		"serial_interface":      server.Properties.HardwareProfileConfig.SerialInterface,
+		"server_renice":         server.Properties.HardwareProfileConfig.ServerRenice,
+	}
+	hardwareProfileConfigList = append(hardwareProfileConfigList, hardwareProfileConfig)
+	if err = d.Set("hardware_profile_config", hardwareProfileConfigList); err != nil {
+		return fmt.Errorf("%s error setting hardware_profile_config: %v", errorPrefix, err)
 	}
 
 	//Get networks
