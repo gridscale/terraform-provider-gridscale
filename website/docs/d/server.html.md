@@ -74,6 +74,15 @@ This resource exports the following attributes:
 * `location_uuid` - The location this server is placed. The location of a resource is determined by it's project.
 * `labels` - List of labels in the format [ "label1", "label2" ].
 * `hardware_profile` - The hardware profile of the server.
+* `hardware_profile_config` - Specifies the custom hardware settings for the virtual machine. Note: hardware_profile and hardware_profile_config parameters can't be used at the same time.
+    * `machinetype` - Values: `"i440fx"`, `"q35_bios"`, `"q35_uefi"`.
+    * `storage_device` - Values: `"ide"`, `"sata"`, `"virtio_scsi"`, `"virtio_block"`.
+    * `usb_controller` - Values: `"nec_xhci"`, `"piix3_uhci"`.
+    * `nested_virtualization` - Boolean.
+    * `hyperv_extensions` - Boolean.
+    * `network_model` - Values: `"e1000"`, `"e1000e"`, `"virtio"`, `"vmxnet3"`.
+    * `serial_interface` - Boolean.
+    * `server_renice` - Boolean.
 * `storage` - Connects a storage to the server.
     * `object_uuid` - The object UUID or id of the storage.
     * `storage_type` - Indicates the speed of the storage. This may be (storage, storage_high or storage_insane).

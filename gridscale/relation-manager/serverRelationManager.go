@@ -235,7 +235,7 @@ func (c *ServerRelationManger) IsShutdownRequired(ctx context.Context) bool {
 	var shutdownRequired bool
 	d := c.getData()
 	hasServerNetListChange := c.hasServerNetworkListChanged(ctx)
-	if d.HasChanges("cores", "memory", "ipv4", "ipv6", "hardware_profile") || hasServerNetListChange {
+	if d.HasChanges("cores", "memory", "ipv4", "ipv6", "hardware_profile", "hardware_profile_config") || hasServerNetListChange {
 		shutdownRequired = true
 	}
 	return shutdownRequired

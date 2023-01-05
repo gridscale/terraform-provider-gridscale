@@ -76,6 +76,7 @@ func resourceGridscaleServer() *schema.Resource {
 			"hardware_profile_config": {
 				Type:        schema.TypeSet,
 				Optional:    true,
+				Computed:    true,
 				Description: `Specifies the custom hardware settings for the virtual machine. Note: hardware_profile and hardware_profile_config parameters can't be used at the same time.`,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -582,6 +583,23 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 		return fmt.Errorf("%s error setting storage: %v", errorPrefix, err)
 	}
 
+	// Get hardware_profile_config
+	hardwareProfileConfigList := make([]interface{}, 0)
+	hardwareProfileConfig := map[string]interface{}{
+		"machinetype":           server.Properties.HardwareProfileConfig.Machinetype,
+		"storage_device":        server.Properties.HardwareProfileConfig.StorageDevice,
+		"usb_controller":        server.Properties.HardwareProfileConfig.USBController,
+		"nested_virtualization": server.Properties.HardwareProfileConfig.NestedVirtualization,
+		"hyperv_extensions":     server.Properties.HardwareProfileConfig.HyperVExtensions,
+		"network_model":         server.Properties.HardwareProfileConfig.NetworkModel,
+		"serial_interface":      server.Properties.HardwareProfileConfig.SerialInterface,
+		"server_renice":         server.Properties.HardwareProfileConfig.ServerRenice,
+	}
+	hardwareProfileConfigList = append(hardwareProfileConfigList, hardwareProfileConfig)
+	if err = d.Set("hardware_profile_config", hardwareProfileConfigList); err != nil {
+		return fmt.Errorf("%s error setting hardware_profile_config: %v", errorPrefix, err)
+	}
+
 	//Get networks
 	netWODefaultRules := server.Properties.Relations.Networks
 	// Sort the network list by their ordering
@@ -766,7 +784,7 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 				ServerRenice:         exportReqData["server_renice"].(bool),
 			}
 
-			machineType := exportReqData["machine_type"].(string)
+			machineType := exportReqData["machinetype"].(string)
 			switch machineType {
 			case string(gsclient.I440fxMachineType):
 				config.Machinetype = gsclient.I440fxMachineType
@@ -810,6 +828,8 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 
 			requestBody.HardwareProfileConfig = config
 		}
+		// if HardwareProfileConfig is set, ignore HardwareProfile
+		requestBody.HardwareProfile = ""
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
@@ -936,7 +956,7 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 					ServerRenice:         exportReqData["server_renice"].(bool),
 				}
 
-				machineType := exportReqData["machine_type"].(string)
+				machineType := exportReqData["machinetype"].(string)
 				switch machineType {
 				case string(gsclient.I440fxMachineType):
 					config.Machinetype = gsclient.I440fxMachineType
@@ -980,6 +1000,8 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 
 				requestBody.HardwareProfileConfig = config
 			}
+			// if HardwareProfileConfig is set, ignore HardwareProfile
+			requestBody.HardwareProfile = ""
 		}
 
 		updateSequence := func(ctx context.Context) error {
