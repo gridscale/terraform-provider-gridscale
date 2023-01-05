@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.17.0 (Jan 5, 2023)
+
+FEATURES:
+- Allow to set `hardware_profile_config` in server resource [PR #212](https://github.com/gridscale/terraform-provider-gridscale/pull/215).
+
 ## 1.16.2 (Nov 7, 2022)
 
 IMPROVEMENTS:
