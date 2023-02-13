@@ -132,7 +132,7 @@ func resourceGridscaleK8s() *schema.Resource {
 			},
 			"k8s_private_network_uuid": {
 				Type:        schema.TypeString,
-				Description: "Private network UUID which k8s nodes are attached to.",
+				Description: "Private network UUID which k8s nodes are attached to. It can be used to attach other PaaS/VMs.",
 				Computed:    true,
 			},
 			"release": {
