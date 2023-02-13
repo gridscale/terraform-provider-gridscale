@@ -120,7 +120,7 @@ func resourceGridscaleK8s() *schema.Resource {
 			"security_zone_uuid": {
 				Type:        schema.TypeString,
 				Description: "Security zone UUID linked to PaaS service.",
-				Deprecated:  "Security zone is deprecated for gridSQL, gridStore, and gridFs. Please consider to use private network instead.",
+				Deprecated:  "K8S do not support security zone.",
 				Optional:    true,
 				ForceNew:    true,
 				Computed:    true,
@@ -128,7 +128,9 @@ func resourceGridscaleK8s() *schema.Resource {
 			"network_uuid": {
 				Type:        schema.TypeString,
 				Description: "Network UUID containing security zone",
-				Computed:    true,
+				Deprecated: `network_uuid of a security zone is no more available for K8S.
+					Please consider to use k8s_private_network_uuid for connecting external services to the cluster.`,
+				Computed: true,
 			},
 			"k8s_private_network_uuid": {
 				Type:        schema.TypeString,
