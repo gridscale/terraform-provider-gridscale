@@ -16,7 +16,10 @@ import (
 	"log"
 )
 
-const k8sTemplateFlavourName = "kubernetes"
+const (
+	k8sTemplateFlavourName = "kubernetes"
+	k8sLabelPrefix         = "#gsk#"
+)
 
 const (
 	k8sReleaseValidationOpt = iota
@@ -117,7 +120,7 @@ func resourceGridscaleK8s() *schema.Resource {
 			"security_zone_uuid": {
 				Type:        schema.TypeString,
 				Description: "Security zone UUID linked to PaaS service.",
-				Deprecated:  "Security zone is deprecated for gridSQL, gridStore, and gridFs. Please consider to use private network instead.",
+				Deprecated:  "GSK service does not support security zone.",
 				Optional:    true,
 				ForceNew:    true,
 				Computed:    true,
@@ -125,6 +128,13 @@ func resourceGridscaleK8s() *schema.Resource {
 			"network_uuid": {
 				Type:        schema.TypeString,
 				Description: "Network UUID containing security zone",
+				Deprecated: `network_uuid of a security zone is no more available for GSK.
+					Please consider to use k8s_private_network_uuid for connecting external services to the cluster.`,
+				Computed: true,
+			},
+			"k8s_private_network_uuid": {
+				Type:        schema.TypeString,
+				Description: "Private network UUID which k8s nodes are attached to. It can be used to attach other PaaS/VMs.",
 				Computed:    true,
 			},
 			"release": {
@@ -321,6 +331,20 @@ func resourceGridscaleK8sRead(d *schema.ResourceData, meta interface{}) error {
 				if err = d.Set("network_uuid", network.Properties.ObjectUUID); err != nil {
 					return fmt.Errorf("%s error setting network_uuid: %v", errorPrefix, err)
 				}
+			}
+		}
+	}
+
+	k8sLabel := fmt.Sprintf("%s%s", k8sLabelPrefix, d.Id())
+	// look for a network having the defined k8sLabel.
+NETWORK_LOOOP:
+	for _, network := range networks {
+		for _, label := range network.Properties.Labels {
+			if label == k8sLabel {
+				if err = d.Set("k8s_private_network_uuid", network.Properties.ObjectUUID); err != nil {
+					return fmt.Errorf("%s error setting k8s_private_network_uuid: %v", errorPrefix, err)
+				}
+				break NETWORK_LOOOP
 			}
 		}
 	}

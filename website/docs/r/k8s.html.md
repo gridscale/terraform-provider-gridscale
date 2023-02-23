@@ -74,7 +74,8 @@ This resource exports the following attributes:
 * `service_template_uuid` - PaaS service template that k8s service uses. The `service_template_uuid` may not relate to `release`, if `service_template_uuid`/`release` is updated outside of terraform (e.g. the k8s service is upgraded by gridscale staffs).
 * `service_template_category` - The template service's category used to create the service.
 * `labels` - See Argument Reference above.
-* `network_uuid` - Network UUID containing security zone, which is linked to the k8s cluster.
+* `network_uuid` - *DEPRECATED*  Network UUID containing security zone, which is linked to the k8s cluster.
+* `k8s_private_network_uuid` - Private network UUID which k8s nodes are attached to. It can be used to attach other PaaS/VMs.
 * `node_pool` - See Argument Reference above.
     * `name` - See Argument Reference above.
     * `node_count` - See Argument Reference above.
