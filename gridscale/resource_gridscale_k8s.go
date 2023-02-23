@@ -337,12 +337,14 @@ func resourceGridscaleK8sRead(d *schema.ResourceData, meta interface{}) error {
 
 	k8sLabel := fmt.Sprintf("%s%s", k8sLabelPrefix, d.Id())
 	// look for a network having the defined k8sLabel.
+NETWORK_LOOOP:
 	for _, network := range networks {
 		for _, label := range network.Properties.Labels {
 			if label == k8sLabel {
 				if err = d.Set("k8s_private_network_uuid", network.Properties.ObjectUUID); err != nil {
 					return fmt.Errorf("%s error setting k8s_private_network_uuid: %v", errorPrefix, err)
 				}
+				break NETWORK_LOOOP
 			}
 		}
 	}
