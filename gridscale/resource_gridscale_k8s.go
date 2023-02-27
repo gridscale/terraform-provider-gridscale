@@ -617,7 +617,7 @@ func validateK8sParameters(d *schema.ResourceDiff, template gsclient.PaaSTemplat
 			// if cluster_cidr_template is immutable, return error if it is changed
 			if cluster_cidr_template.Immutable {
 				if d.HasChange("node_pool.0.cluster_cidr") {
-					errorMessages = append(errorMessages, "The template doesn't support changing cluster_cidr. Please remove it from your configuration.\n")
+					errorMessages = append(errorMessages, "Cannot change parameter cluster_cidr, because it is immutable.\n")
 				}
 			}
 		}
