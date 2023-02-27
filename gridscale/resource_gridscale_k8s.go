@@ -614,9 +614,11 @@ func validateK8sParameters(d *schema.ResourceDiff, template gsclient.PaaSTemplat
 					errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'node_pool.0.cluster_cidr' value. Value must be a valid CIDR.\n"))
 				}
 			}
-			// if cluster_cidr_template is immutable, return error if it is changed
+			// if cluster_cidr_template is immutable, return error if it is set during k8s creation
+			// and it is changed during k8s update
 			if cluster_cidr_template.Immutable {
-				if d.HasChange("node_pool.0.cluster_cidr") {
+				oldClusterCIDR, _ := d.GetChange("node_pool.0.cluster_cidr")
+				if oldClusterCIDR != "" && d.HasChange("node_pool.0.cluster_cidr") {
 					errorMessages = append(errorMessages, "Cannot change parameter cluster_cidr, because it is immutable.\n")
 				}
 			}
