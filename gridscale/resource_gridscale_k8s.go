@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net"
 	"net/http"
 	"strings"
 	"time"
@@ -195,6 +196,12 @@ func resourceGridscaleK8s() *schema.Resource {
 							Optional:    true,
 							Default:     true,
 						},
+						"cluster_cidr": {
+							Type:        schema.TypeString,
+							Description: "The cluster CIDR that will be used to generate the CIDR of nodes, services, and pods. The allowed CIDR prefix length is /16.",
+							Optional:    true,
+							Computed:    true,
+						},
 					},
 				},
 			},
@@ -302,6 +309,11 @@ func resourceGridscaleK8sRead(d *schema.ResourceData, meta interface{}) error {
 		"storage":      props.Parameters["k8s_worker_node_storage"],
 		"storage_type": props.Parameters["k8s_worker_node_storage_type"],
 	}
+	// Set cluster CIDR if it is set
+	if _, isClusterCIDRSet := props.Parameters["k8s_cluster_cidr"]; isClusterCIDRSet {
+		nodePool["cluster_cidr"] = props.Parameters["k8s_cluster_cidr"]
+	}
+
 	// Surge node feature is enable if k8s_surge_node_count > 0
 	if surgeNodeCount, ok := props.Parameters["k8s_surge_node_count"].(float64); ok {
 		nodePool["surge_node"] = surgeNodeCount > 0
@@ -388,6 +400,10 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 	params["k8s_worker_node_count"] = d.Get("node_pool.0.node_count")
 	params["k8s_worker_node_storage"] = d.Get("node_pool.0.storage")
 	params["k8s_worker_node_storage_type"] = d.Get("node_pool.0.storage_type")
+	// Set cluster CIDR if it is set
+	if clusterCIDR, isClusterCIDRSet := d.GetOk("node_pool.0.cluster_cidr"); isClusterCIDRSet {
+		params["k8s_cluster_cidr"] = clusterCIDR
+	}
 	isSurgeNodeEnabled := d.Get("node_pool.0.surge_node").(bool)
 	if isSurgeNodeEnabled {
 		params["k8s_surge_node_count"] = 1
@@ -582,6 +598,28 @@ func validateK8sParameters(d *schema.ResourceDiff, template gsclient.PaaSTemplat
 					strings.Join(worker_storage_type_scheme.Allowed, "\n\t"),
 				),
 			)
+		}
+	}
+
+	cluster_cidr_template, cluster_cidr_template_ok := template.Properties.ParametersSchema["k8s_cluster_cidr"]
+	if cluster_cidr, ok := d.GetOk("node_pool.0.cluster_cidr"); ok {
+		// if the template doesn't support cluster_cidr, return error if it is set
+		if !cluster_cidr_template_ok {
+			errorMessages = append(errorMessages, "The template doesn't support cluster_cidr. Please remove it from your configuration.\n")
+		} else {
+			// if the template supports cluster_cidr, validate the value
+			if cluster_cidr.(string) != "" {
+				_, _, err := net.ParseCIDR(cluster_cidr.(string))
+				if err != nil {
+					errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'node_pool.0.cluster_cidr' value. Value must be a valid CIDR.\n"))
+				}
+			}
+			// if cluster_cidr_template is immutable, return error if it is changed
+			if cluster_cidr_template.Immutable {
+				if d.HasChange("node_pool.0.cluster_cidr") {
+					errorMessages = append(errorMessages, "The template doesn't support changing cluster_cidr. Please remove it from your configuration.\n")
+				}
+			}
 		}
 	}
 
