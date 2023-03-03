@@ -198,7 +198,7 @@ func resourceGridscaleK8s() *schema.Resource {
 						},
 						"cluster_cidr": {
 							Type:        schema.TypeString,
-							Description: "The cluster CIDR that will be used to generate the CIDR of nodes, services, and pods. The allowed CIDR prefix length is /16.",
+							Description: "The cluster CIDR that will be used to generate the CIDR of nodes, services, and pods. The allowed CIDR prefix length is /16. If this field is empty, the default value is \"10.244.0.0/16\"",
 							Optional:    true,
 							Computed:    true,
 						},
