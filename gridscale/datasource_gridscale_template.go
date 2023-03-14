@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
@@ -117,9 +118,23 @@ func dataSourceGridscaleTemplateRead(d *schema.ResourceData, meta interface{}) e
 	name := d.Get("name").(string)
 	errorPrefix := fmt.Sprintf("read template (%s) datasource -", name)
 
-	template, err := client.GetTemplateByName(context.Background(), name)
+	templateList, err := client.GetTemplateList(context.Background())
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
+	}
+	var template gsclient.Template
+	for _, t := range templateList {
+		// trim spaces from name
+		name = strings.TrimSpace(name)
+		// trim spaces from template name
+		templateName := strings.TrimSpace(t.Properties.Name)
+		// do a case-insensitive comparison via EqualFold
+		if strings.EqualFold(name, templateName) {
+			template = t
+		}
+	}
+	if template.Properties.ObjectUUID == "" {
+		return fmt.Errorf("%s error: %v", errorPrefix, "no template found")
 	}
 
 	d.SetId(template.Properties.ObjectUUID)
