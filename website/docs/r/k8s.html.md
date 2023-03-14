@@ -53,6 +53,7 @@ The following arguments are supported:
     * `storage` - (Immutable) Storage per worker node (in GiB).
     * `storage_type` - (Immutable) Storage type (one of storage, storage_high, storage_insane).
     * `surge_node` - Enable surge node to avoid resources shortage during the cluster upgrade (Default: true).
+    * `cluster_cidr` - The cluster CIDR that will be used to generate the CIDR of nodes, services, and pods. The allowed CIDR prefix length is /16. If the cluster CIDR is not set, the cluster will use "10.244.0.0/16" as it default (even though the `cluster_cidr` in the k8s resource is empty).
 
 ## Timeouts
 
@@ -84,6 +85,7 @@ This resource exports the following attributes:
     * `storage` - See Argument Reference above.
     * `storage_type` - See Argument Reference above.
     * `surge_node` - See Argument Reference above.
+    * `cluster_cidr` - See Argument Reference above.
 * `usage_in_minutes` - The amount of minutes the IP address has been in use.
 * `create_time` - The time the object was created.
 * `change_time` - Defines the date and time of the last object change.
