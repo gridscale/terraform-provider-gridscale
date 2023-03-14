@@ -39,7 +39,7 @@ resource "gridscale_storage" "storage-test"{
 
 The following arguments are supported:
 
-* `name` - (Required) The exact name of the template as show in [the page Template](https://my.gridscale.io/Template).
+* `name` - (Required) The name of the template as show in [the page Template](https://my.gridscale.io/Template). **Note**: any leading and trailing white spaces will be trimmed. The name is case-insensitive.
 
 ## Attributes Reference
 
