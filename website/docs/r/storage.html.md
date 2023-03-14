@@ -49,7 +49,7 @@ The following arguments are supported:
 
 * `template` - (Optional) List of labels in the format [ "label1", "label2" ].
 
-    * `template_uuid` - (Required) The UUID of a template. This can be found in the [expert panel](https://my.gridscale.io/Expert/Template) by clicking more on the template or by using a gridscale_template datasource.
+    * `template_uuid` - (Required) The UUID of a template. This can be found in the [the page Template](https://my.gridscale.io/Template) by clicking more on the template or by using a gridscale_template datasource.
 
     * `password` - (Optional) The root (Linux) or Administrator (Windows) password to set for the installed storage. Valid only for public templates. The password has to be either plain-text or a crypt string (modular crypt format - MCF).
 

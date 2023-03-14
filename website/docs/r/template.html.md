@@ -38,7 +38,7 @@ resource "gridscale_template" "foo" {
 
 The following arguments are supported:
 
-* `name` - (Required) The exact name of the template as show in [the expert panel of gridscale](https://my.gridscale.io/Expert/Template).
+* `name` - (Required) The exact name of the template as show in [the page Template](https://my.gridscale.io/Template).
 
 * `snapshot_uuid` - (Required) Snapshot uuid for template.
 

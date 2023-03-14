@@ -39,7 +39,7 @@ resource "gridscale_storage" "storage-test"{
 
 The following arguments are supported:
 
-* `name` - (Required) The exact name of the template as show in [the expert panel of gridscale](https://my.gridscale.io/Expert/Template).
+* `name` - (Required) The exact name of the template as show in [the page Template](https://my.gridscale.io/Template).
 
 ## Attributes Reference
 
