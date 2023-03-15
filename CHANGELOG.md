@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.18.0 (Mar 15, 2023)
+
+FEATURES:
+- Expose k8s private network [PR #219](https://github.com/gridscale/terraform-provider-gridscale/pull/219).
+- Allow to set `cluster_cidr` for k8s cluster [PR #221](https://github.com/gridscale/terraform-provider-gridscale/pull/221).
+
 ## 1.17.0 (Jan 5, 2023)
 
 FEATURES:
