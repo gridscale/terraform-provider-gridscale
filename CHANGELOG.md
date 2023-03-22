@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.18.1 (Mar 22, 2023)
+
+BUG FIXES:
+- Fix missing `darwin/arm64 build` and `windows/arm64 build`.
+
 ## 1.18.0 (Mar 15, 2023)
 
 FEATURES:
