@@ -259,6 +259,19 @@ func resourceGridscaleK8sRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("%s error setting name: %v", errorPrefix, err)
 	}
 	if len(creds) > 0 {
+		// if expiration_time of kubeconfig is reached, renew it and get new kubeconfig
+		if creds[0].ExpirationTime.Before(time.Now()) {
+			err = client.RenewK8sCredentials(context.Background(), d.Id())
+			if err != nil {
+				return fmt.Errorf("%s error renewing k8s kubeconfig: %v", errorPrefix, err)
+			}
+			paas, err = client.GetPaaSService(context.Background(), d.Id())
+			if err != nil {
+				return fmt.Errorf("%s error: %v", errorPrefix, err)
+			}
+			props = paas.Properties
+			creds = props.Credentials
+		}
 		if err = d.Set("kubeconfig", creds[0].KubeConfig); err != nil {
 			return fmt.Errorf("%s error setting kubeconfig: %v", errorPrefix, err)
 		}
