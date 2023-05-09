@@ -108,6 +108,9 @@ type ServerProperties struct {
 
 	// Defines the date and time of the last object change.
 	ChangeTime GSTime `json:"change_time"`
+
+	// For system configuration on first boot. May contain cloud-config data or shell scripting, encoded as base64 string. Supported tools are cloud-init, Cloudbase-init, and Ignition.
+	UserData string `json:"user_data"`
 }
 
 // ServerRelations holds a list of server relations.
@@ -162,6 +165,9 @@ type ServerCreateRequest struct {
 	// The information about other object which are related to this server. the object could be ip, storage, network, and isoimage.
 	// **Caution**: This field is deprecated.
 	Relations *ServerCreateRequestRelations `json:"relations,omitempty"`
+
+	// For system configuration on first boot. May contain cloud-config data or shell scripting, encoded as base64 string. Supported tools are cloud-init, Cloudbase-init, and Ignition.
+	UserData *string `json:"user_data,omitempty"`
 }
 
 // ServerCreateRequestRelations holds a list of a server's relations.
@@ -266,6 +272,9 @@ type ServerUpdateRequest struct {
 	// Specifies the custom hardware settings for the virtual machine.
 	// Note: hardware_profile and hardware_profile_config parameters can't be used at the same time.
 	HardwareProfileConfig *ServerHardwareProfileConfig `json:"hardware_profile_config,omitempty"`
+
+	// For system configuration on first boot. May contain cloud-config data or shell scripting, encoded as base64 string. Supported tools are cloud-init, Cloudbase-init, and Ignition.
+	UserData *string `json:"user_data,omitempty"`
 }
 
 // ServerMetricList holds a list of a server's metrics.

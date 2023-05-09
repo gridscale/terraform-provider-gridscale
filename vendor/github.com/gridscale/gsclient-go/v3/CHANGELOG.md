@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.12.0 (May 09, 2023)
+
+FEATURES:
+- Allow to set `user-data` in server create/update operations [#225](https://github.com/gridscale/gsclient-go/pull/225).
+
 ## 3.11.1 (Jan 04, 2023)
 
 BUG FIXES:
