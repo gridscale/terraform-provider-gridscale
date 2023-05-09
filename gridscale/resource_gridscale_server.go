@@ -1004,6 +1004,11 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 			requestBody.HardwareProfile = ""
 		}
 
+		if val, ok := d.GetOk("auto_recovery"); ok {
+			autoRecovery := val.(bool)
+			requestBody.AutoRecovery = &autoRecovery
+		}
+
 		updateSequence := func(ctx context.Context) error {
 			//Execute the update request
 			err = gsc.UpdateServer(ctx, d.Id(), requestBody)
