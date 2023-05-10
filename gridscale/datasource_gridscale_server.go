@@ -2,6 +2,7 @@ package gridscale
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 
 	fwu "github.com/terraform-providers/terraform-provider-gridscale/gridscale/firewall-utils"
@@ -291,6 +292,11 @@ func dataSourceGridscaleServer() *schema.Resource {
 				Computed:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
+			"user_data": {
+				Type:        schema.TypeString,
+				Description: "For system configuration on first boot. May contain cloud-config data or shell scripting. Supported tools are cloud-init, Cloudbase-init, and Ignition.",
+				Computed:    true,
+			},
 			"user_data_base64": {
 				Type:        schema.TypeString,
 				Description: "For system configuration on first boot. May contain cloud-config data or shell scripting, encoded as base64 string. Supported tools are cloud-init, Cloudbase-init, and Ignition.",
@@ -369,6 +375,17 @@ func dataSourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) err
 
 	if err = d.Set("user_data_base64", server.Properties.UserData); err != nil {
 		return fmt.Errorf("%s error setting user_data_base64: %v", errorPrefix, err)
+	}
+
+	if server.Properties.UserData != "" {
+		// Decode base64 string
+		decoded, err := base64.StdEncoding.DecodeString(server.Properties.UserData)
+		if err != nil {
+			return fmt.Errorf("%s error decoding user_data_base64: %v", errorPrefix, err)
+		}
+		if err = d.Set("user_data", string(decoded)); err != nil {
+			return fmt.Errorf("%s error setting user_data: %v", errorPrefix, err)
+		}
 	}
 
 	//Get storages
