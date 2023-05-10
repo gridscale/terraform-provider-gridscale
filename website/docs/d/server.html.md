@@ -74,7 +74,7 @@ This resource exports the following attributes:
 * `location_uuid` - The location this server is placed. The location of a resource is determined by it's project.
 * `labels` - List of labels in the format [ "label1", "label2" ].
 * `hardware_profile` - The hardware profile of the server.
-* `user_data` - For system configuration on first boot. May contain cloud-config data or shell scripting, encoded as base64 string. Supported tools are cloud-init, Cloudbase-init, and Ignition.
+* `user_data_base64` - For system configuration on first boot. May contain cloud-config data or shell scripting, encoded as base64 string. Supported tools are cloud-init, Cloudbase-init, and Ignition.
 * `hardware_profile_config` - Specifies the custom hardware settings for the virtual machine. Note: hardware_profile and hardware_profile_config parameters can't be used at the same time.
     * `machinetype` - Values: `"i440fx"`, `"q35_bios"`, `"q35_uefi"`.
     * `storage_device` - Values: `"ide"`, `"sata"`, `"virtio_scsi"`, `"virtio_block"`.

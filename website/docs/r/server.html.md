@@ -91,7 +91,7 @@ The following arguments are supported:
 
 * `auto_recovery` - (Optional) If the server should be auto-started in case of a failure (default=true).
 
-* `user_data` - (Optional, Computed) For system configuration on first boot. May contain cloud-config data or shell scripting, encoded as base64 string. Supported tools are cloud-init, Cloudbase-init, and Ignition.
+* `user_data_base64` - (Optional, Computed) For system configuration on first boot. May contain cloud-config data or shell scripting, encoded as base64 string. Supported tools are cloud-init, Cloudbase-init, and Ignition.
 
 * `hardware_profile` - (Optional, Computed) The hardware profile of the Server. Options are default, legacy, nested, cisco_csr, sophos_utm, f5_bigip and q35 at the moment of writing. If it is not set, the backend will set it by default. Check [the official docs](https://gridscale.io/en/api-documentation/index.html#operation/createServer).
 
@@ -231,7 +231,7 @@ This resource exports the following attributes:
 * `location_uuid` - The location this server is placed. The location of a resource is determined by it's project.
 * `labels` - List of labels in the format [ "label1", "label2" ].
 * `hardware_profile` - The hardware profile of the server.
-* `user_data` - See Argument Reference above.
+* `user_data_base64` - See Argument Reference above.
 * `hardware_profile_config` - (See Argument Reference above.
     * `machinetype` - See Argument Reference above.
     * `storage_device` - See Argument Reference above.

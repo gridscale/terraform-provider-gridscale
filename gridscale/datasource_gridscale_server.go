@@ -291,7 +291,7 @@ func dataSourceGridscaleServer() *schema.Resource {
 				Computed:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
-			"user_data": {
+			"user_data_base64": {
 				Type:        schema.TypeString,
 				Description: "For system configuration on first boot. May contain cloud-config data or shell scripting, encoded as base64 string. Supported tools are cloud-init, Cloudbase-init, and Ignition.",
 				Computed:    true,
@@ -367,8 +367,8 @@ func dataSourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
 	}
 
-	if err = d.Set("user_data", server.Properties.UserData); err != nil {
-		return fmt.Errorf("%s error setting user_data: %v", errorPrefix, err)
+	if err = d.Set("user_data_base64", server.Properties.UserData); err != nil {
+		return fmt.Errorf("%s error setting user_data_base64: %v", errorPrefix, err)
 	}
 
 	//Get storages
