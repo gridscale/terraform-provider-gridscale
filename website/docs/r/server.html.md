@@ -91,9 +91,7 @@ The following arguments are supported:
 
 * `auto_recovery` - (Optional) If the server should be auto-started in case of a failure (default=true).
 
-* `user_data` - (Optional, Computed) For system configuration on first boot. May contain cloud-config data or shell scripting. Supported tools are cloud-init, Cloudbase-init, and Ignition. **NOTE**: if both `user_data` and `user_data_base64` are set, `user_data` will be ignored.
-
-* `user_data_base64` - (Optional, Computed) For system configuration on first boot. May contain cloud-config data or shell scripting, encoded as base64 string. Supported tools are cloud-init, Cloudbase-init, and Ignition. **NOTE**: if both `user_data` and `user_data_base64` are set, `user_data` will be ignored.
+* `user_data_base64` - (Optional, Computed) For system configuration on first boot. May contain cloud-config data or shell scripting, encoded as base64 string. Supported tools are cloud-init, Cloudbase-init, and Ignition.
 
 * `hardware_profile` - (Optional, Computed) The hardware profile of the Server. Options are default, legacy, nested, cisco_csr, sophos_utm, f5_bigip and q35 at the moment of writing. If it is not set, the backend will set it by default. Check [the official docs](https://gridscale.io/en/api-documentation/index.html#operation/createServer).
 

@@ -2,7 +2,6 @@ package gridscale
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 	"log"
 	"net/http"
@@ -398,12 +397,6 @@ func resourceGridscaleServer() *schema.Resource {
 				Optional:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
-			"user_data": {
-				Type:        schema.TypeString,
-				Description: "For system configuration on first boot. May contain cloud-config data or shell scripting. Supported tools are cloud-init, Cloudbase-init, and Ignition.",
-				Optional:    true,
-				Computed:    true,
-			},
 			"user_data_base64": {
 				Type:        schema.TypeString,
 				Description: "For system configuration on first boot. May contain cloud-config data or shell scripting, encoded as base64 string. Supported tools are cloud-init, Cloudbase-init, and Ignition.",
@@ -575,17 +568,6 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 
 	if err = d.Set("user_data_base64", server.Properties.UserData); err != nil {
 		return fmt.Errorf("%s error setting user_data_base64: %v", errorPrefix, err)
-	}
-
-	if server.Properties.UserData != "" {
-		// Decode base64 string
-		decoded, err := base64.StdEncoding.DecodeString(server.Properties.UserData)
-		if err != nil {
-			return fmt.Errorf("%s error decoding user_data_base64: %v", errorPrefix, err)
-		}
-		if err = d.Set("user_data", string(decoded)); err != nil {
-			return fmt.Errorf("%s error setting user_data: %v", errorPrefix, err)
-		}
 	}
 
 	//Get storages
@@ -784,16 +766,9 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		requestBody.AutoRecovery = autoRecovery
 	}
 
-	var userDataBase64 string
-	if val, ok := d.GetOk("user_data"); ok {
-		userData := val.(string)
-		userDataBase64 = base64.StdEncoding.EncodeToString([]byte(userData))
-		requestBody.UserData = &userDataBase64
-	}
-	// if user_data_base64 is set, it will override user_data
 	if val, ok := d.GetOk("user_data_base64"); ok {
-		userDataBase64 = val.(string)
-		requestBody.UserData = &userDataBase64
+		userData := val.(string)
+		requestBody.UserData = &userData
 	}
 
 	profile := d.Get("hardware_profile").(string)
@@ -1048,16 +1023,10 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 			autoRecovery := val.(bool)
 			requestBody.AutoRecovery = &autoRecovery
 		}
-		var userDataBase64 string
-		if val, ok := d.GetOk("user_data"); ok {
-			userData := val.(string)
-			userDataBase64 = base64.StdEncoding.EncodeToString([]byte(userData))
-			requestBody.UserData = &userDataBase64
-		}
-		// if user_data_base64 is set, it will override user_data
+
 		if val, ok := d.GetOk("user_data_base64"); ok {
-			userDataBase64 = val.(string)
-			requestBody.UserData = &userDataBase64
+			userData := val.(string)
+			requestBody.UserData = &userData
 		}
 
 		updateSequence := func(ctx context.Context) error {
