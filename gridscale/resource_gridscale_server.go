@@ -2,6 +2,7 @@ package gridscale
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"log"
 	"net/http"
@@ -768,6 +769,10 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 
 	if val, ok := d.GetOk("user_data_base64"); ok {
 		userData := val.(string)
+		// check if user_data is base64 encoded
+		if _, err := base64.StdEncoding.DecodeString(userData); err != nil {
+			return fmt.Errorf("user_data_base64 is not base64 encoded")
+		}
 		requestBody.UserData = &userData
 	}
 
@@ -1026,6 +1031,10 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 
 		if val, ok := d.GetOk("user_data_base64"); ok {
 			userData := val.(string)
+			// check if user_data is base64 encoded
+			if _, err := base64.StdEncoding.DecodeString(userData); err != nil {
+				return fmt.Errorf("user_data_base64 is not base64 encoded")
+			}
 			requestBody.UserData = &userData
 		}
 
