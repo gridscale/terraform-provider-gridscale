@@ -13,6 +13,8 @@ type ObjectStorageOperator interface {
 	GetObjectStorageAccessKeyList(ctx context.Context) ([]ObjectStorageAccessKey, error)
 	GetObjectStorageAccessKey(ctx context.Context, id string) (ObjectStorageAccessKey, error)
 	CreateObjectStorageAccessKey(ctx context.Context) (ObjectStorageAccessKeyCreateResponse, error)
+	AdvancedCreateObjectStorageAccessKey(ctx context.Context, body ObjectStorageAccessKeyCreateRequest) (ObjectStorageAccessKeyCreateResponse, error)
+	UpdateObjectStorageAccessKey(ctx context.Context, id string, body ObjectStorageAccessKeyUpdateRequest) error
 	DeleteObjectStorageAccessKey(ctx context.Context, id string) error
 	GetObjectStorageBucketList(ctx context.Context) ([]ObjectStorageBucket, error)
 }
@@ -39,6 +41,30 @@ type ObjectStorageAccessKeyProperties struct {
 
 	// Account this credentials belong to.
 	User string `json:"user"`
+
+	// Comment for the access_key.
+	Comment string `json:"comment"`
+
+	// User UUID.
+	UserUUID string `json:"user_uuid"`
+}
+
+// ObjectStorageAccessKeyCreateRequest represents a request for creating an object storage access key.
+type ObjectStorageAccessKeyCreateRequest struct {
+	// Comment for the access_key.
+	Comment string `json:"comment,omitempty"`
+
+	// If a user_uuid is sent along with the request, a user-specific key will get created.
+	// If no user_uuid is sent along a user with write-access to the contract will still
+	// only create a user-specific key for themselves while a user with admin-access to
+	// the contract will create a contract-level admin key.
+	UserUUID string `json:"user_uuid,omitempty"`
+}
+
+// ObjectStorageAccessKeyUpdateRequest represents a request for updating an object storage access key.
+type ObjectStorageAccessKeyUpdateRequest struct {
+	// Comment for the access_key.
+	Comment *string `json:"comment,omitempty"`
 }
 
 // ObjectStorageAccessKeyCreateResponse represents a response for creating an object storage access key.
@@ -128,6 +154,35 @@ func (c *Client) CreateObjectStorageAccessKey(ctx context.Context) (ObjectStorag
 	var response ObjectStorageAccessKeyCreateResponse
 	err := r.execute(ctx, *c, &response)
 	return response, err
+}
+
+// AdvancedCreateObjectStorageAccessKey creates an object storage access key with user_uuid and/or comment.
+//
+// See: https://gridscale.io/en//api-documentation/index.html#operation/createAccessKey
+func (c *Client) AdvancedCreateObjectStorageAccessKey(ctx context.Context, body ObjectStorageAccessKeyCreateRequest) (ObjectStorageAccessKeyCreateResponse, error) {
+	r := gsRequest{
+		uri:    path.Join(apiObjectStorageBase, "access_keys"),
+		method: http.MethodPost,
+		body:   body,
+	}
+	var response ObjectStorageAccessKeyCreateResponse
+	err := r.execute(ctx, *c, &response)
+	return response, err
+}
+
+// UpdateObjectStorageAccessKey updates a specific object storage access key based on given id.
+//
+// See: https://my.gridscale.io/APIDoc#tag/object-storage/operation/updateAccessKey
+func (c *Client) UpdateObjectStorageAccessKey(ctx context.Context, id string, body ObjectStorageAccessKeyUpdateRequest) error {
+	if strings.TrimSpace(id) == "" {
+		return errors.New("'id' is required")
+	}
+	r := gsRequest{
+		uri:    path.Join(apiObjectStorageBase, "access_keys", id),
+		method: http.MethodPatch,
+		body:   body,
+	}
+	return r.execute(ctx, *c, nil)
 }
 
 // DeleteObjectStorageAccessKey removed a specific object storage access key based on given id.

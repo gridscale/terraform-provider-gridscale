@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.12.1 (May 19, 2023)
+
+BUG FIXES:
+- (Hot fix) Add missing `comment` and `user_uuid` fields to object storage access key create/update operations [#226](https://github.com/gridscale/gsclient-go/pull/226).
+
 ## 3.12.0 (May 09, 2023)
 
 FEATURES:
