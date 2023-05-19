@@ -2,6 +2,7 @@ package gridscale
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"log"
 	"net/http"
@@ -397,6 +398,12 @@ func resourceGridscaleServer() *schema.Resource {
 				Optional:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
+			"user_data_base64": {
+				Type:        schema.TypeString,
+				Description: "For system configuration on first boot. May contain cloud-config data or shell scripting, encoded as base64 string. Supported tools are cloud-init, Cloudbase-init, and Ignition.",
+				Optional:    true,
+				Computed:    true,
+			},
 		},
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(5 * time.Minute),
@@ -558,6 +565,10 @@ func resourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) error
 
 	if err = d.Set("labels", server.Properties.Labels); err != nil {
 		return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
+	}
+
+	if err = d.Set("user_data_base64", server.Properties.UserData); err != nil {
+		return fmt.Errorf("%s error setting user_data_base64: %v", errorPrefix, err)
 	}
 
 	//Get storages
@@ -754,6 +765,15 @@ func resourceGridscaleServerCreate(d *schema.ResourceData, meta interface{}) err
 		autoRecovery := new(bool)
 		*autoRecovery = val.(bool)
 		requestBody.AutoRecovery = autoRecovery
+	}
+
+	if val, ok := d.GetOk("user_data_base64"); ok {
+		userData := val.(string)
+		// check if user_data is base64 encoded
+		if _, err := base64.StdEncoding.DecodeString(userData); err != nil {
+			return fmt.Errorf("user_data_base64 is not base64 encoded")
+		}
+		requestBody.UserData = &userData
 	}
 
 	profile := d.Get("hardware_profile").(string)
@@ -1007,6 +1027,15 @@ func resourceGridscaleServerUpdate(d *schema.ResourceData, meta interface{}) err
 		if val, ok := d.GetOk("auto_recovery"); ok {
 			autoRecovery := val.(bool)
 			requestBody.AutoRecovery = &autoRecovery
+		}
+
+		if val, ok := d.GetOk("user_data_base64"); ok {
+			userData := val.(string)
+			// check if user_data is base64 encoded
+			if _, err := base64.StdEncoding.DecodeString(userData); err != nil {
+				return fmt.Errorf("user_data_base64 is not base64 encoded")
+			}
+			requestBody.UserData = &userData
 		}
 
 		updateSequence := func(ctx context.Context) error {
