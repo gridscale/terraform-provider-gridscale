@@ -32,5 +32,7 @@ The following arguments are supported:
 The following attributes are exported:
 
 * `id` - The access key of the object storage.
+* `comment` - A comment for the object storage access key.
+* `user_uuid` - If a `user_uuid` is set, a user-specific key will get created. If no `user_uuid` is set along a user with write-access to the contract will still only create a user-specific key for themselves while a user with admin-access to the contract will create a contract-level admin key.
 * `access_key` - Access key of an object storage.
 * `secret_key` - Secret key of an object storage.
