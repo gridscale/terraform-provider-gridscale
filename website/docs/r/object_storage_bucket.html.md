@@ -1,7 +1,7 @@
 ---
 layout: "gridscale"
-page_title: "gridscale: bucket"
-sidebar_current: "docs-gridscale-resource-bucket"
+page_title: "gridscale: object storage bucket"
+sidebar_current: "docs-gridscale-resource-object-storage-bucket"
 description: |-
    Manages an object storage bucket in gridscale.
 ---
