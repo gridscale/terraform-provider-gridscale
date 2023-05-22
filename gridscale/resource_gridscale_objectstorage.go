@@ -26,6 +26,7 @@ func resourceGridscaleObjectStorage() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "Comment for the access_key.",
 				Optional:    true,
+				Computed:    true,
 			},
 			"user_uuid": {
 				Type: schema.TypeString,
