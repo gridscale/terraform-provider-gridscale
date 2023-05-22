@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.19.0 (May 22, 2023)
+
+BUG FIXES:
+- Fix server's `auto_recovery` cannot be updated [PR #230](https://github.com/gridscale/terraform-provider-gridscale/pull/230).
+- Correct name of `gridscale_object_storage_bucket` in document menu [PR #232](https://github.com/gridscale/terraform-provider-gridscale/pull/232).
+
+FEATURES:
+- Allow `user_data_base64` to be set in server resource [PR #231](https://github.com/gridscale/terraform-provider-gridscale/pull/231).
+- Allow `comment` and `user_uuid` to be set in object storage access key resource [PR #232](https://github.com/gridscale/terraform-provider-gridscale/pull/232).
+
+IMPROVEMENTS:
+- Renew `kubeconfig` in k8s resource when it expires [PR #229](https://github.com/gridscale/terraform-provider-gridscale/pull/229).
+
 ## 1.18.1 (Mar 22, 2023)
 
 BUG FIXES:
