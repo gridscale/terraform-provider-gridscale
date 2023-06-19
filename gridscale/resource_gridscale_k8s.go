@@ -190,6 +190,11 @@ func resourceGridscaleK8s() *schema.Resource {
 							Description: "Storage type.",
 							Required:    true,
 						},
+						"rocket_storage": {
+							Type:        schema.TypeInt,
+							Description: "Rocket storage per worker node (in GiB).",
+							Optional:    true,
+						},
 						"surge_node": {
 							Type:        schema.TypeBool,
 							Description: "Enable surge node to avoid resources shortage during the cluster upgrade.",
@@ -315,12 +320,13 @@ func resourceGridscaleK8sRead(d *schema.ResourceData, meta interface{}) error {
 	nodePoolList := make([]interface{}, 0)
 	// TODO: The API scheme will be CHANGED in the future. There will be multiple node pools.
 	nodePool := map[string]interface{}{
-		"name":         d.Get("node_pool.0.name"),
-		"node_count":   props.Parameters["k8s_worker_node_count"],
-		"cores":        props.Parameters["k8s_worker_node_cores"],
-		"memory":       props.Parameters["k8s_worker_node_ram"],
-		"storage":      props.Parameters["k8s_worker_node_storage"],
-		"storage_type": props.Parameters["k8s_worker_node_storage_type"],
+		"name":           d.Get("node_pool.0.name"),
+		"node_count":     props.Parameters["k8s_worker_node_count"],
+		"cores":          props.Parameters["k8s_worker_node_cores"],
+		"memory":         props.Parameters["k8s_worker_node_ram"],
+		"storage":        props.Parameters["k8s_worker_node_storage"],
+		"storage_type":   props.Parameters["k8s_worker_node_storage_type"],
+		"rocket_storage": props.Parameters["k8s_worker_node_rocket_storage"],
 	}
 	// Set cluster CIDR if it is set
 	if _, isClusterCIDRSet := props.Parameters["k8s_cluster_cidr"]; isClusterCIDRSet {
@@ -413,6 +419,7 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 	params["k8s_worker_node_count"] = d.Get("node_pool.0.node_count")
 	params["k8s_worker_node_storage"] = d.Get("node_pool.0.storage")
 	params["k8s_worker_node_storage_type"] = d.Get("node_pool.0.storage_type")
+	params["k8s_worker_node_rocket_storage"] = d.Get("node_pool.0.rocket_storage")
 	// Set cluster CIDR if it is set
 	if clusterCIDR, isClusterCIDRSet := d.GetOk("node_pool.0.cluster_cidr"); isClusterCIDRSet {
 		params["k8s_cluster_cidr"] = clusterCIDR
@@ -478,6 +485,7 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 	params["k8s_worker_node_count"] = d.Get("node_pool.0.node_count")
 	params["k8s_worker_node_storage"] = d.Get("node_pool.0.storage")
 	params["k8s_worker_node_storage_type"] = d.Get("node_pool.0.storage_type")
+	params["k8s_worker_node_rocket_storage"] = d.Get("node_pool.0.rocket_storage")
 	isSurgeNodeEnabled := d.Get("node_pool.0.surge_node").(bool)
 	if isSurgeNodeEnabled {
 		params["k8s_surge_node_count"] = 1
@@ -594,6 +602,14 @@ func validateK8sParameters(d *schema.ResourceDiff, template gsclient.PaaSTemplat
 	if storage, ok := d.GetOk("node_pool.0.storage"); ok && storage_ok {
 		if storage.(int) < worker_storage_scheme.Min || storage.(int) > worker_storage_scheme.Max {
 			errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'node_pool.0.storage' value. Value must stays between %d and %d\n", worker_storage_scheme.Min, worker_storage_scheme.Max))
+		}
+	}
+
+	worker_rocket_storage_scheme, rocket_storage_ok := template.Properties.ParametersSchema["k8s_worker_node_rocket_storage"]
+	// TODO: The API scheme will be CHANGED in the future. There will be multiple node pools.
+	if rocket_storage, ok := d.GetOk("node_pool.0.rocket_storage"); ok && rocket_storage_ok {
+		if rocket_storage.(int) < worker_rocket_storage_scheme.Min || rocket_storage.(int) > worker_rocket_storage_scheme.Max {
+			errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'node_pool.0.rocket_storage' value. Value must stay between %d and %d\n", worker_rocket_storage_scheme.Min, worker_rocket_storage_scheme.Max))
 		}
 	}
 
