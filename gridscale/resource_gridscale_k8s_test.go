@@ -51,6 +51,7 @@ resource "gridscale_k8s" "foopaas" {
 		memory = 2
 		storage = 30
 		storage_type = "storage_insane"
+		rocket_storage = 90
 	}
 }
 `, name)
@@ -68,6 +69,7 @@ resource "gridscale_k8s" "foopaas" {
 		memory = 2
 		storage = 30
 		storage_type = "storage_insane"
+		rocket_storage = 90
 	}
 }
 `)
