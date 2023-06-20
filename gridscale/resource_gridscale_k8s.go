@@ -580,7 +580,7 @@ func validateK8sParameters(d *schema.ResourceDiff, template gsclient.PaaSTemplat
 	// TODO: The API scheme will be CHANGED in the future. There will be multiple node pools.
 	if memory, ok := d.GetOk("node_pool.0.memory"); ok && mem_ok {
 		if memory.(int) < worker_memory_scheme.Min || memory.(int) > worker_memory_scheme.Max {
-			errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'node_pool.0.memory' value. Value must stays between %d and %d\n", worker_memory_scheme.Min, worker_memory_scheme.Max))
+			errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'node_pool.0.memory' value. Value must stay between %d and %d\n", worker_memory_scheme.Min, worker_memory_scheme.Max))
 		}
 	}
 
@@ -588,7 +588,7 @@ func validateK8sParameters(d *schema.ResourceDiff, template gsclient.PaaSTemplat
 	// TODO: The API scheme will be CHANGED in the future. There will be multiple node pools.
 	if core, ok := d.GetOk("node_pool.0.cores"); ok && core_ok {
 		if core.(int) < worker_core_scheme.Min || core.(int) > worker_core_scheme.Max {
-			errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'node_pool.0.cores' value. Value must stays between %d and %d\n", worker_core_scheme.Min, worker_core_scheme.Max))
+			errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'node_pool.0.cores' value. Value must stay between %d and %d\n", worker_core_scheme.Min, worker_core_scheme.Max))
 		}
 	}
 
@@ -596,7 +596,7 @@ func validateK8sParameters(d *schema.ResourceDiff, template gsclient.PaaSTemplat
 	// TODO: The API scheme will be CHANGED in the future. There will be multiple node pools.
 	if node_count, ok := d.GetOk("node_pool.0.node_count"); ok && worker_count_ok {
 		if node_count.(int) < worker_count_scheme.Min || node_count.(int) > worker_count_scheme.Max {
-			errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'node_pool.0.node_count' value. Value must stays between %d and %d\n", worker_count_scheme.Min, worker_count_scheme.Max))
+			errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'node_pool.0.node_count' value. Value must stay between %d and %d\n", worker_count_scheme.Min, worker_count_scheme.Max))
 		}
 	}
 
@@ -604,7 +604,7 @@ func validateK8sParameters(d *schema.ResourceDiff, template gsclient.PaaSTemplat
 	// TODO: The API scheme will be CHANGED in the future. There will be multiple node pools.
 	if storage, ok := d.GetOk("node_pool.0.storage"); ok && storage_ok {
 		if storage.(int) < worker_storage_scheme.Min || storage.(int) > worker_storage_scheme.Max {
-			errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'node_pool.0.storage' value. Value must stays between %d and %d\n", worker_storage_scheme.Min, worker_storage_scheme.Max))
+			errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'node_pool.0.storage' value. Value must stay between %d and %d\n", worker_storage_scheme.Min, worker_storage_scheme.Max))
 		}
 	}
 
