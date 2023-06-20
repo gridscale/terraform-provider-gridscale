@@ -18,12 +18,8 @@ import (
 )
 
 const (
-	k8sTemplateFlavourName = "kubernetes"
-	k8sLabelPrefix         = "#gsk#"
-)
-
-const (
-	k8sReleaseValidationOpt        = iota
+	k8sTemplateFlavourName         = "kubernetes"
+	k8sLabelPrefix                 = "#gsk#"
 	k8sRocketStorageSupportRelease = "1.26"
 )
 
