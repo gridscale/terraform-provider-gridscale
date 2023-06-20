@@ -47,15 +47,15 @@ The following arguments are supported:
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
 
 * `node_pool` - (Required) Node pool's specification. **NOTE**: The node pool's specification is not yet mutable (except `node_count`).
-    * `name` - (Immutable) Name of the node pool.
+    * `name` - Name of the node pool.
     * `node_count` - Number of worker nodes.
-    * `cores` - (Immutable) Cores per worker node.
-    * `memory` - (Immutable) Memory per worker node (in GiB).
-    * `storage` - (Immutable) Storage per worker node (in GiB).
-    * `storage_type` - (Immutable) Storage type (one of storage, storage_high, storage_insane).
+    * `cores` - Cores per worker node.
+    * `memory` - Memory per worker node (in GiB).
+    * `storage` - Storage per worker node (in GiB).
+    * `storage_type` - Storage type (one of storage, storage_high, storage_insane).
     * `rocket_storage` - Rocket storage per worker node (in GiB).
     * `surge_node` - Enable surge node to avoid resources shortage during the cluster upgrade (Default: true).
-    * `cluster_cidr` - The cluster CIDR that will be used to generate the CIDR of nodes, services, and pods. The allowed CIDR prefix length is /16. If the cluster CIDR is not set, the cluster will use "10.244.0.0/16" as it default (even though the `cluster_cidr` in the k8s resource is empty).
+    * `cluster_cidr` - (Immutable) The cluster CIDR that will be used to generate the CIDR of nodes, services, and pods. The allowed CIDR prefix length is /16. If the cluster CIDR is not set, the cluster will use "10.244.0.0/16" as it default (even though the `cluster_cidr` in the k8s resource is empty).
 
 ## Timeouts
 
