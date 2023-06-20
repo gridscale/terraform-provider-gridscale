@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/gridscale/gsclient-go/v3"
-	goVersion "github.com/hashicorp/go-version"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	errHandler "github.com/terraform-providers/terraform-provider-gridscale/gridscale/error-handler"
@@ -613,18 +612,21 @@ func validateK8sParameters(d *schema.ResourceDiff, template gsclient.PaaSTemplat
 	if rocket_storage, ok := d.GetOk("node_pool.0.rocket_storage"); ok && rocket_storage_ok {
 		rocketStorageValidation := true
 		featureReleaseCompabilityValidation := true
-		supportedRelease, err := goVersion.NewVersion(k8sRocketStorageSupportRelease)
+		supportedRelease, err := NewRelease(k8sRocketStorageSupportRelease)
 		if err != nil {
 			panic("Something went wrong at backend side parsing of version string expected for support of rocket storage at k8s.")
 		}
-		requestedRelease, err := goVersion.NewVersion(template.Properties.Release)
+		requestedRelease, err := NewRelease(template.Properties.Release)
 		if err != nil {
 			errorMessages = append(errorMessages, "The release doesn't match a valid version string.")
 			featureReleaseCompabilityValidation = false
 		}
-		if featureReleaseCompabilityValidation && requestedRelease.LessThan(supportedRelease) {
-			errorMessages = append(errorMessages, fmt.Sprintf("Rocket storage isn't supported at release < %s.", supportedRelease))
-			rocketStorageValidation = false
+		if featureReleaseCompabilityValidation {
+			err := requestedRelease.CheckIfFeatureIsKnown(&Feature{Description: "rocket storage", Release: *supportedRelease})
+			if err != nil {
+				errorMessages = append(errorMessages, err.Error())
+				rocketStorageValidation = false
+			}
 		}
 		if rocketStorageValidation && (rocket_storage.(int) < worker_rocket_storage_scheme.Min || rocket_storage.(int) > worker_rocket_storage_scheme.Max) {
 			errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'node_pool.0.rocket_storage' value. Value must stay between %d and %d\n", worker_rocket_storage_scheme.Min, worker_rocket_storage_scheme.Max))
