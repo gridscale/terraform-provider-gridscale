@@ -18,12 +18,9 @@ import (
 )
 
 const (
-	k8sTemplateFlavourName = "kubernetes"
-	k8sLabelPrefix         = "#gsk#"
-)
-
-const (
-	k8sReleaseValidationOpt = iota
+	k8sTemplateFlavourName         = "kubernetes"
+	k8sLabelPrefix                 = "#gsk#"
+	k8sRocketStorageSupportRelease = "1.26"
 )
 
 func resourceGridscaleK8s() *schema.Resource {
@@ -190,6 +187,11 @@ func resourceGridscaleK8s() *schema.Resource {
 							Description: "Storage type.",
 							Required:    true,
 						},
+						"rocket_storage": {
+							Type:        schema.TypeInt,
+							Description: "Rocket storage per worker node (in GiB).",
+							Optional:    true,
+						},
 						"surge_node": {
 							Type:        schema.TypeBool,
 							Description: "Enable surge node to avoid resources shortage during the cluster upgrade.",
@@ -315,12 +317,13 @@ func resourceGridscaleK8sRead(d *schema.ResourceData, meta interface{}) error {
 	nodePoolList := make([]interface{}, 0)
 	// TODO: The API scheme will be CHANGED in the future. There will be multiple node pools.
 	nodePool := map[string]interface{}{
-		"name":         d.Get("node_pool.0.name"),
-		"node_count":   props.Parameters["k8s_worker_node_count"],
-		"cores":        props.Parameters["k8s_worker_node_cores"],
-		"memory":       props.Parameters["k8s_worker_node_ram"],
-		"storage":      props.Parameters["k8s_worker_node_storage"],
-		"storage_type": props.Parameters["k8s_worker_node_storage_type"],
+		"name":           d.Get("node_pool.0.name"),
+		"node_count":     props.Parameters["k8s_worker_node_count"],
+		"cores":          props.Parameters["k8s_worker_node_cores"],
+		"memory":         props.Parameters["k8s_worker_node_ram"],
+		"storage":        props.Parameters["k8s_worker_node_storage"],
+		"storage_type":   props.Parameters["k8s_worker_node_storage_type"],
+		"rocket_storage": props.Parameters["k8s_worker_node_rocket_storage"],
 	}
 	// Set cluster CIDR if it is set
 	if _, isClusterCIDRSet := props.Parameters["k8s_cluster_cidr"]; isClusterCIDRSet {
@@ -413,6 +416,7 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 	params["k8s_worker_node_count"] = d.Get("node_pool.0.node_count")
 	params["k8s_worker_node_storage"] = d.Get("node_pool.0.storage")
 	params["k8s_worker_node_storage_type"] = d.Get("node_pool.0.storage_type")
+	params["k8s_worker_node_rocket_storage"] = d.Get("node_pool.0.rocket_storage")
 	// Set cluster CIDR if it is set
 	if clusterCIDR, isClusterCIDRSet := d.GetOk("node_pool.0.cluster_cidr"); isClusterCIDRSet {
 		params["k8s_cluster_cidr"] = clusterCIDR
@@ -478,6 +482,7 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 	params["k8s_worker_node_count"] = d.Get("node_pool.0.node_count")
 	params["k8s_worker_node_storage"] = d.Get("node_pool.0.storage")
 	params["k8s_worker_node_storage_type"] = d.Get("node_pool.0.storage_type")
+	params["k8s_worker_node_rocket_storage"] = d.Get("node_pool.0.rocket_storage")
 	isSurgeNodeEnabled := d.Get("node_pool.0.surge_node").(bool)
 	if isSurgeNodeEnabled {
 		params["k8s_surge_node_count"] = 1
@@ -565,11 +570,12 @@ func getK8sTemplateUUIDFromGSKVersion(client *gsclient.Client, version string) (
 
 func validateK8sParameters(d *schema.ResourceDiff, template gsclient.PaaSTemplate) error {
 	var errorMessages []string
+
 	worker_memory_scheme, mem_ok := template.Properties.ParametersSchema["k8s_worker_node_ram"]
 	// TODO: The API scheme will be CHANGED in the future. There will be multiple node pools.
 	if memory, ok := d.GetOk("node_pool.0.memory"); ok && mem_ok {
 		if memory.(int) < worker_memory_scheme.Min || memory.(int) > worker_memory_scheme.Max {
-			errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'node_pool.0.memory' value. Value must stays between %d and %d\n", worker_memory_scheme.Min, worker_memory_scheme.Max))
+			errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'node_pool.0.memory' value. Value must stay between %d and %d\n", worker_memory_scheme.Min, worker_memory_scheme.Max))
 		}
 	}
 
@@ -577,7 +583,7 @@ func validateK8sParameters(d *schema.ResourceDiff, template gsclient.PaaSTemplat
 	// TODO: The API scheme will be CHANGED in the future. There will be multiple node pools.
 	if core, ok := d.GetOk("node_pool.0.cores"); ok && core_ok {
 		if core.(int) < worker_core_scheme.Min || core.(int) > worker_core_scheme.Max {
-			errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'node_pool.0.cores' value. Value must stays between %d and %d\n", worker_core_scheme.Min, worker_core_scheme.Max))
+			errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'node_pool.0.cores' value. Value must stay between %d and %d\n", worker_core_scheme.Min, worker_core_scheme.Max))
 		}
 	}
 
@@ -585,7 +591,7 @@ func validateK8sParameters(d *schema.ResourceDiff, template gsclient.PaaSTemplat
 	// TODO: The API scheme will be CHANGED in the future. There will be multiple node pools.
 	if node_count, ok := d.GetOk("node_pool.0.node_count"); ok && worker_count_ok {
 		if node_count.(int) < worker_count_scheme.Min || node_count.(int) > worker_count_scheme.Max {
-			errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'node_pool.0.node_count' value. Value must stays between %d and %d\n", worker_count_scheme.Min, worker_count_scheme.Max))
+			errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'node_pool.0.node_count' value. Value must stay between %d and %d\n", worker_count_scheme.Min, worker_count_scheme.Max))
 		}
 	}
 
@@ -593,7 +599,33 @@ func validateK8sParameters(d *schema.ResourceDiff, template gsclient.PaaSTemplat
 	// TODO: The API scheme will be CHANGED in the future. There will be multiple node pools.
 	if storage, ok := d.GetOk("node_pool.0.storage"); ok && storage_ok {
 		if storage.(int) < worker_storage_scheme.Min || storage.(int) > worker_storage_scheme.Max {
-			errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'node_pool.0.storage' value. Value must stays between %d and %d\n", worker_storage_scheme.Min, worker_storage_scheme.Max))
+			errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'node_pool.0.storage' value. Value must stay between %d and %d\n", worker_storage_scheme.Min, worker_storage_scheme.Max))
+		}
+	}
+
+	worker_rocket_storage_scheme, rocket_storage_ok := template.Properties.ParametersSchema["k8s_worker_node_rocket_storage"]
+	// TODO: The API scheme will be CHANGED in the future. There will be multiple node pools.
+	if rocket_storage, ok := d.GetOk("node_pool.0.rocket_storage"); ok && rocket_storage_ok {
+		rocketStorageValidation := true
+		featureReleaseCompabilityValidation := true
+		supportedRelease, err := NewRelease(k8sRocketStorageSupportRelease)
+		if err != nil {
+			panic("Something went wrong at backend side parsing of version string expected for support of rocket storage at k8s.")
+		}
+		requestedRelease, err := NewRelease(template.Properties.Release)
+		if err != nil {
+			errorMessages = append(errorMessages, "The release doesn't match a valid version string.")
+			featureReleaseCompabilityValidation = false
+		}
+		if featureReleaseCompabilityValidation {
+			err := requestedRelease.CheckIfFeatureIsKnown(&Feature{Description: "rocket storage", Release: *supportedRelease})
+			if err != nil {
+				errorMessages = append(errorMessages, err.Error())
+				rocketStorageValidation = false
+			}
+		}
+		if rocketStorageValidation && (rocket_storage.(int) < worker_rocket_storage_scheme.Min || rocket_storage.(int) > worker_rocket_storage_scheme.Max) {
+			errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'node_pool.0.rocket_storage' value. Value must stay between %d and %d\n", worker_rocket_storage_scheme.Min, worker_rocket_storage_scheme.Max))
 		}
 	}
 
@@ -624,7 +656,7 @@ func validateK8sParameters(d *schema.ResourceDiff, template gsclient.PaaSTemplat
 			if cluster_cidr.(string) != "" {
 				_, _, err := net.ParseCIDR(cluster_cidr.(string))
 				if err != nil {
-					errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'node_pool.0.cluster_cidr' value. Value must be a valid CIDR.\n"))
+					errorMessages = append(errorMessages, fmt.Sprintf("Invalid value for PaaS template release. Value must be a valid CIDR.\n"))
 				}
 			}
 			// if cluster_cidr_template is immutable, return error if it is set during k8s creation
