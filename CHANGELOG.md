@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.20.0 (Jun 21, 2023)
+
+FEATURES:
+- Add rocket storage support to k8s resource [PR #234](https://github.com/gridscale/terraform-provider-gridscale/pull/234)
+
+IMPROVEMENTS:
+- Update k8s resource docs.
+
 ## 1.19.0 (May 22, 2023)
 
 BUG FIXES:
