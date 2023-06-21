@@ -15,6 +15,9 @@ const (
 
 var supportedPrimTypes = []string{boolInterfaceType, intInterfaceType, floatInterfaceType, stringInterfaceType}
 
+// Truth type
+type Truth bool
+
 // convSOStrings converts slice of interfaces to slice of strings
 func convSOStrings(interfaceList []interface{}) []string {
 	strList := make([]string, 0)

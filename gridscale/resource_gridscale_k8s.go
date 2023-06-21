@@ -608,7 +608,7 @@ func validateK8sParameters(d *schema.ResourceDiff, template gsclient.PaaSTemplat
 	if rocket_storage, ok := d.GetOk("node_pool.0.rocket_storage"); ok && rocket_storage_ok {
 		rocketStorageValidation := true
 		featureReleaseCompabilityValidation := true
-		supportedRelease, err := NewRelease(k8sRocketStorageSupportRelease)
+		supportedReleaseSpan, err := NewReleaseSpan(k8sRocketStorageSupportRelease, nil)
 		if err != nil {
 			panic("Something went wrong at backend side parsing of version string expected for support of rocket storage at k8s.")
 		}
@@ -618,7 +618,7 @@ func validateK8sParameters(d *schema.ResourceDiff, template gsclient.PaaSTemplat
 			featureReleaseCompabilityValidation = false
 		}
 		if featureReleaseCompabilityValidation {
-			err := requestedRelease.CheckIfFeatureIsKnown(&Feature{Description: "rocket storage", Release: *supportedRelease})
+			err := requestedRelease.CheckIfFeatureRequestIsApplicable(&Feature{Description: "rocket storage", ReleaseSpans: []ReleaseSpan{*supportedReleaseSpan}})
 			if err != nil {
 				errorMessages = append(errorMessages, err.Error())
 				rocketStorageValidation = false
