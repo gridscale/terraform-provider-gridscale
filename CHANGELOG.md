@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.21.0 (Jul 11, 2023)
+
+FEATURES:
+- Add proxy protocol support to loadbalancer resource [PR #237](https://github.com/gridscale/terraform-provider-gridscale/pull/237)
+
+BUG FIXES:
+- Fix `cluster_cidr`'s immutability issue in k8s resource [PR #238](https://github.com/gridscale/terraform-provider-gridscale/pull/238).
+
+IMPROVEMENTS:
+- Update k8s resource docs.
+
 ## 1.20.0 (Jun 21, 2023)
 
 FEATURES:
