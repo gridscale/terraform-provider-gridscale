@@ -2,7 +2,8 @@ module github.com/terraform-providers/terraform-provider-gridscale
 
 require (
 	github.com/aws/aws-sdk-go v1.44.114
-	github.com/gridscale/gsclient-go/v3 v3.12.1
+	github.com/gridscale/gsclient-go/v3 v3.13.0
+	github.com/hashicorp/go-version v1.4.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.16.0
 )
 
@@ -23,7 +24,6 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-plugin v1.4.3 // indirect
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
-	github.com/hashicorp/go-version v1.4.0 // indirect
 	github.com/hashicorp/hc-install v0.3.2 // indirect
 	github.com/hashicorp/hcl/v2 v2.12.0 // indirect
 	github.com/hashicorp/logutils v1.0.0 // indirect

@@ -95,8 +95,8 @@ github.com/google/uuid v1.1.2/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+
 github.com/google/uuid v1.2.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/google/uuid v1.3.0 h1:t6JiXgmwXMjEs8VusXIJk2BXHsn+wx8BZdTaoZ5fu7I=
 github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
-github.com/gridscale/gsclient-go/v3 v3.12.1 h1:SlB4V1sOK+7piFfS6A4KJZi915eB5Mrj7zIsXc5i6yo=
-github.com/gridscale/gsclient-go/v3 v3.12.1/go.mod h1:A9+Af0aJL+uei0DwAEnZ3G6gZgdC5oOyw2ZUPxUfvTs=
+github.com/gridscale/gsclient-go/v3 v3.13.0 h1:Oos0V8H1w0HEhZLSU0bNdBoY0Y3evkcNIR6P+Cp8pyY=
+github.com/gridscale/gsclient-go/v3 v3.13.0/go.mod h1:A9+Af0aJL+uei0DwAEnZ3G6gZgdC5oOyw2ZUPxUfvTs=
 github.com/grpc-ecosystem/grpc-gateway v1.16.0/go.mod h1:BDjrQk3hbvj6Nolgz8mAMFbcEtjT1g+wF4CSlocrBnw=
 github.com/hashicorp/errwrap v1.0.0 h1:hLrqtEDnRye3+sgx6z4qVLNuviH3MR5aQ0ykNJa/UYA=
 github.com/hashicorp/errwrap v1.0.0/go.mod h1:YH+1FKiLXxHSkmPseP+kNlulaMuP3n2brvKWEqk/Jc4=
