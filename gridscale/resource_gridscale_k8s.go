@@ -483,6 +483,10 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 	params["k8s_worker_node_storage"] = d.Get("node_pool.0.storage")
 	params["k8s_worker_node_storage_type"] = d.Get("node_pool.0.storage_type")
 	params["k8s_worker_node_rocket_storage"] = d.Get("node_pool.0.rocket_storage")
+	// Set cluster CIDR if it is set
+	if clusterCIDR, isClusterCIDRSet := d.GetOk("node_pool.0.cluster_cidr"); isClusterCIDRSet {
+		params["k8s_cluster_cidr"] = clusterCIDR
+	}
 	isSurgeNodeEnabled := d.Get("node_pool.0.surge_node").(bool)
 	if isSurgeNodeEnabled {
 		params["k8s_surge_node_count"] = 1
