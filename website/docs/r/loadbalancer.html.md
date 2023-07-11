@@ -54,6 +54,9 @@ The following arguments are supported:
   * `host` - (Required) A valid domain or an IP address of a server.
 
   * `weight` - (Optional) The backend host weight. Default: 100.
+  
+  * `proxy_protocol` - (Optional) The proxy protocol version. The proxy protocol is disabled by default and the valid version is either v1 or v2.
+
 
 * `forwarding_rule` - (Required) The forwarding rules of the load balancer.
 
@@ -93,6 +96,7 @@ This resource exports the following attributes:
 * `backend_server` - See Argument Reference above.
   * `host` - See Argument Reference above.
   * `weight` - See Argument Reference above.
+  * `proxy_protocol` - See Argument Reference above.
 * `forwarding_rule` - See Argument Reference above.
   * `letsencrypt_ssl` - See Argument Reference above.
   * `certificate_uuid` - See Argument Reference above.

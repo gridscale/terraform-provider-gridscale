@@ -44,4 +44,5 @@ The following attributes are exported:
 * `backend_server` - The servers that the load balancer can communicate with.
   * `host` - A valid domain or an IP address of the server.
   * `weight` - The backend host weight.
+  * `proxy_protocol` - The proxy protocol version.
 * `labels` - The list of labels.
