@@ -102,6 +102,10 @@ func resourceGridscaleLoadBalancer() *schema.Resource {
 							Type:     schema.TypeString,
 							Required: true,
 						},
+						"proxy_protocol": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
 					},
 				},
 			},
@@ -286,6 +290,10 @@ func expandLoadbalancerBackendServers(backendServers interface{}) []gsclient.Bac
 			Weight: server["weight"].(int),
 			Host:   server["host"].(string),
 		}
+		proxyProtocol := server["proxy_protocol"].(string)
+		if proxyProtocol != "" {
+			backendServer.ProxyProtocol = &proxyProtocol
+		}
 		tempBackendServers = append(tempBackendServers, backendServer)
 	}
 	return tempBackendServers
@@ -333,8 +341,9 @@ func flattenLoadbalancerBackendServers(backendServers []gsclient.BackendServer) 
 	if backendServers != nil {
 		for _, value := range backendServers {
 			backendServer := map[string]interface{}{
-				"weight": value.Weight,
-				"host":   value.Host,
+				"weight":         value.Weight,
+				"host":           value.Host,
+				"proxy_protocol": value.ProxyProtocol,
 			}
 			tempBackendServers = append(tempBackendServers, backendServer)
 		}

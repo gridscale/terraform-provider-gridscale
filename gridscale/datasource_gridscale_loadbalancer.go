@@ -83,6 +83,10 @@ func dataSourceGridscaleLoadBalancer() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
+						"proxy_protocol": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
 					},
 				},
 			},

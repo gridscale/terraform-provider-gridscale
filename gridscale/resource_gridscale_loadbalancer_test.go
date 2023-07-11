@@ -29,6 +29,8 @@ func TestAccResourceGridscaleLoadBalancerBasic(t *testing.T) {
 						"gridscale_loadbalancer.foo", "name", name),
 					resource.TestCheckResourceAttr(
 						"gridscale_loadbalancer.foo", "algorithm", "leastconn"),
+					resource.TestCheckResourceAttr(
+						"gridscale_loadbalancer.foo", "backend_server.0.proxy_protocol", "v2"),
 				),
 			},
 			{
@@ -38,7 +40,7 @@ func TestAccResourceGridscaleLoadBalancerBasic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"gridscale_loadbalancer.foo", "name", "newname"),
 					resource.TestCheckResourceAttr(
-						"gridscale_loadbalancer.foo", "algorithm", "roundrobin"),
+						"gridscale_loadbalancer.foo", "backend_server.0.proxy_protocol", "v1"),
 				),
 			},
 		},
@@ -98,6 +100,8 @@ resource "gridscale_loadbalancer" "foo" {
 	backend_server {
 		weight = 100
 		host   = gridscale_ipv4.server.ip
+		proxy_protocol = "v2"
+
 	}
 	forwarding_rule {
 		listen_port =  80
@@ -128,6 +132,7 @@ resource "gridscale_loadbalancer" "foo" {
 	backend_server {
 		weight = 100
 		host   = gridscale_ipv4.server.ip
+		proxy_protocol = "v1"
 	}
 	forwarding_rule {
 		listen_port =  80

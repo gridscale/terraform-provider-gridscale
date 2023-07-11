@@ -27,6 +27,7 @@ func TestAccdataSourceGridscaleLoadBalancer_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("data.gridscale_loadbalancer.foo", "forwarding_rule.0.listen_port", "80"),
 					resource.TestCheckResourceAttr("data.gridscale_loadbalancer.foo", "backend_server.#", "1"),
 					resource.TestCheckResourceAttr("data.gridscale_loadbalancer.foo", "backend_server.0.weight", "100"),
+					resource.TestCheckResourceAttr("data.gridscale_loadbalancer.foo", "backend_server.0.proxy_protocol", "v2"),
 				),
 			},
 		},
@@ -56,6 +57,7 @@ resource "gridscale_loadbalancer" "foo" {
 	backend_server {
 		weight = 100
 		host   = gridscale_ipv4.server.ip
+		proxy_protocol = "v2"
 	}
 	forwarding_rule {
 		listen_port =  80

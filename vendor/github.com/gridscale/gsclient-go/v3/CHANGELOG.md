@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.13.0 (Jul 4, 2023)
+
+FEATURES:
+- Support proxy protocol for loadbalancer backends [#227](https://github.com/gridscale/gsclient-go/pull/227)
+
 ## 3.12.1 (May 19, 2023)
 
 BUG FIXES:
