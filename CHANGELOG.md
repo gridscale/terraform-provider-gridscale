@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.21.1 (Jul 17, 2023)
+
+BUG FIXES:
+- Fix cannot create a k8s cluster with a version not supporting `rocket_storage` [PR #239](https://github.com/gridscale/terraform-provider-gridscale/pull/239).
+
 ## 1.21.0 (Jul 11, 2023)
 
 FEATURES:
