@@ -317,14 +317,19 @@ func resourceGridscaleK8sRead(d *schema.ResourceData, meta interface{}) error {
 	nodePoolList := make([]interface{}, 0)
 	// TODO: The API scheme will be CHANGED in the future. There will be multiple node pools.
 	nodePool := map[string]interface{}{
-		"name":           d.Get("node_pool.0.name"),
-		"node_count":     props.Parameters["k8s_worker_node_count"],
-		"cores":          props.Parameters["k8s_worker_node_cores"],
-		"memory":         props.Parameters["k8s_worker_node_ram"],
-		"storage":        props.Parameters["k8s_worker_node_storage"],
-		"storage_type":   props.Parameters["k8s_worker_node_storage_type"],
-		"rocket_storage": props.Parameters["k8s_worker_node_rocket_storage"],
+		"name":         d.Get("node_pool.0.name"),
+		"node_count":   props.Parameters["k8s_worker_node_count"],
+		"cores":        props.Parameters["k8s_worker_node_cores"],
+		"memory":       props.Parameters["k8s_worker_node_ram"],
+		"storage":      props.Parameters["k8s_worker_node_storage"],
+		"storage_type": props.Parameters["k8s_worker_node_storage_type"],
 	}
+
+	// Set rocket storage if it is set
+	if _, isRocketStorageSet := props.Parameters["k8s_worker_node_rocket_storage"]; isRocketStorageSet {
+		nodePool["rocket_storage"] = props.Parameters["k8s_worker_node_rocket_storage"]
+	}
+
 	// Set cluster CIDR if it is set
 	if _, isClusterCIDRSet := props.Parameters["k8s_cluster_cidr"]; isClusterCIDRSet {
 		nodePool["cluster_cidr"] = props.Parameters["k8s_cluster_cidr"]
@@ -416,7 +421,10 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 	params["k8s_worker_node_count"] = d.Get("node_pool.0.node_count")
 	params["k8s_worker_node_storage"] = d.Get("node_pool.0.storage")
 	params["k8s_worker_node_storage_type"] = d.Get("node_pool.0.storage_type")
-	params["k8s_worker_node_rocket_storage"] = d.Get("node_pool.0.rocket_storage")
+	// Set rocket storage if it is set
+	if rocketStorage, isRocketStorageSet := d.GetOk("node_pool.0.rocket_storage"); isRocketStorageSet {
+		params["k8s_worker_node_rocket_storage"] = rocketStorage
+	}
 	// Set cluster CIDR if it is set
 	if clusterCIDR, isClusterCIDRSet := d.GetOk("node_pool.0.cluster_cidr"); isClusterCIDRSet {
 		params["k8s_cluster_cidr"] = clusterCIDR
@@ -482,7 +490,10 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 	params["k8s_worker_node_count"] = d.Get("node_pool.0.node_count")
 	params["k8s_worker_node_storage"] = d.Get("node_pool.0.storage")
 	params["k8s_worker_node_storage_type"] = d.Get("node_pool.0.storage_type")
-	params["k8s_worker_node_rocket_storage"] = d.Get("node_pool.0.rocket_storage")
+	// Set rocket storage if it is set
+	if rocketStorage, isRocketStorageSet := d.GetOk("node_pool.0.rocket_storage"); isRocketStorageSet {
+		params["k8s_worker_node_rocket_storage"] = rocketStorage
+	}
 	// Set cluster CIDR if it is set
 	if clusterCIDR, isClusterCIDRSet := d.GetOk("node_pool.0.cluster_cidr"); isClusterCIDRSet {
 		params["k8s_cluster_cidr"] = clusterCIDR
