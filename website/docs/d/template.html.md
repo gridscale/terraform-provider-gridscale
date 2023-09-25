@@ -18,7 +18,7 @@ Get the template:
 
 ```terraform
    data "gridscale_template" "ubuntu" {
-     name = "Ubuntu 18.04 LTS"
+     name = "Ubuntu 22.04 LTS (Jammy Jellyfish) "
    }
 ```
 

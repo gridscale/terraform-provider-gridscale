@@ -8,7 +8,7 @@ import (
 )
 
 func TestAccDataSourceTemplate_basic(t *testing.T) {
-	name := "Ubuntu 18.04 LTS"
+	name := "Ubuntu 22.04 LTS (Jammy Jellyfish) "
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
