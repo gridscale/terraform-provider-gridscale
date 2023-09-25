@@ -257,35 +257,38 @@ func resourceGridscaleNetworkUpdate(d *schema.ResourceData, meta interface{}) er
 	errorPrefix := fmt.Sprintf("update network (%s) resource -", d.Id())
 
 	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
-	requestBody := gsclient.NetworkUpdateRequest{
+	requestBody := gsclient.NetworkUpdatePutRequest{
 		Name:       d.Get("name").(string),
 		L2Security: d.Get("l2security").(bool),
 		Labels:     &labels,
 	}
-	if d.HasChange("dhcp_active") {
-		dhcpActive := d.Get("dhcp_active").(bool)
-		requestBody.DHCPActive = &dhcpActive
-	}
-	if d.HasChange("dhcp_range") {
-		dhcpRange := d.Get("dhcp_range").(string)
+
+	dhcpActive := d.Get("dhcp_active").(bool)
+	requestBody.DHCPActive = &dhcpActive
+
+	dhcpRange, isSet := d.Get("dhcp_range").(string)
+	if isSet && dhcpRange != "" {
 		requestBody.DHCPRange = &dhcpRange
 	}
-	if d.HasChange("dhcp_gateway") {
-		dhcpGateway := d.Get("dhcp_gateway").(string)
+
+	dhcpGateway, isSet := d.Get("dhcp_gateway").(string)
+	if isSet && dhcpGateway != "" {
 		requestBody.DHCPGateway = &dhcpGateway
 	}
-	if d.HasChange("dhcp_dns") {
-		dhcpDNS := d.Get("dhcp_dns").(string)
+
+	dhcpDNS, isSet := d.Get("dhcp_dns").(string)
+	if isSet && dhcpDNS != "" {
 		requestBody.DHCPDNS = &dhcpDNS
 	}
-	if d.HasChange("dhcp_reserved_subnet") {
-		dhcpReservedSubnet := convSOStrings(d.Get("dhcp_reserved_subnet").(*schema.Set).List())
+
+	dhcpReservedSubnet := convSOStrings(d.Get("dhcp_reserved_subnet").(*schema.Set).List())
+	if len(dhcpReservedSubnet) > 0 {
 		requestBody.DHCPReservedSubnet = &dhcpReservedSubnet
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
 	defer cancel()
-	err := client.UpdateNetwork(ctx, d.Id(), requestBody)
+	err := client.PutUpdateNetwork(ctx, d.Id(), requestBody)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
