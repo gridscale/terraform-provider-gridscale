@@ -43,7 +43,7 @@ func testAccCheckResourceGridscaleRedisCacheConfig_basic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_redis_cache" "test" {
 	name = "%s"
-	release = "5.0"
+	release = "7.0"
 	performance_class = "standard"
 }
 `, name)
@@ -53,7 +53,7 @@ func testAccCheckResourceGridscaleRedisCacheConfig_basic_update() string {
 	return fmt.Sprintf(`
 resource "gridscale_redis_cache" "test" {
 	name = "newname"
-	release = "5.0"
+	release = "7.0"
 	performance_class = "standard"
 	labels = ["test"]
 }
