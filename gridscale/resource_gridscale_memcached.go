@@ -20,10 +20,11 @@ const memcachedTemplateFlavourName = "memcached"
 
 func resourceGridscaleMemcached() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceGridscaleMemcachedCreate,
-		Read:   resourceGridscaleMemcachedRead,
-		Delete: resourceGridscaleMemcachedDelete,
-		Update: resourceGridscaleMemcachedUpdate,
+		DeprecationMessage: "This resource is deprecated.",
+		Create:             resourceGridscaleMemcachedCreate,
+		Read:               resourceGridscaleMemcachedRead,
+		Delete:             resourceGridscaleMemcachedDelete,
+		Update:             resourceGridscaleMemcachedUpdate,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
