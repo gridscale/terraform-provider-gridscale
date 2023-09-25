@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.14.0 (Sept 25, 2023)
+
+FEATURES:
+- Add network PUT update operation [#228](https://github.com/gridscale/gsclient-go/pull/228).
+
 ## 3.13.0 (Jul 4, 2023)
 
 FEATURES:
