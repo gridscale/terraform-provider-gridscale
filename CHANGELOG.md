@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.22.0 (Sept 26, 2023)
+
+FEATURES:
+- Deprecate `gridscale_memcached` resource.
+
+BUG FIXES:
+- Fix issue causing "cannot set some dhcp options to null in network resource" [PR #241](https://github.com/gridscale/terraform-provider-gridscale/pull/241). 
+- Upgrade some go libraries to fix security issues.
+
 ## 1.21.1 (Jul 17, 2023)
 
 BUG FIXES:
