@@ -3,12 +3,12 @@ layout: "gridscale"
 page_title: "gridscale: gridscale_memcached"
 sidebar_current: "docs-gridscale-resource-memcached"
 description: |-
-  Manage a Memcached service in gridscale.
+  Manage a Memcached service in gridscale **Deprecated**.
 ---
 
 # gridscale_memcached
 
-Provides a Memcached resource. This can be used to create, modify, and delete Memcached instances.
+Provides a Memcached resource **Deprecated**. This can be used to create, modify, and delete Memcached instances.
 
 ## Example
 
