@@ -19,7 +19,7 @@ import (
 
 const mysql8TemplateFlavourName = "mysql"
 
-func resourceGridscaleMySQL() *schema.Resource {
+func resourceGridscaleMySQL8_0() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceGridscaleMySQLCreate,
 		Read:   resourceGridscaleMySQLRead,
@@ -202,7 +202,7 @@ func resourceGridscaleMySQL() *schema.Resource {
 	}
 }
 
-func resourceGridscaleMySQLRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGridscaleMySQL8_0Read(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("read mysql (%s) resource -", d.Id())
 	paas, err := client.GetPaaSService(context.Background(), d.Id())
@@ -320,7 +320,7 @@ func resourceGridscaleMySQLRead(d *schema.ResourceData, meta interface{}) error 
 	return nil
 }
 
-func resourceGridscaleMySQLCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGridscaleMySQL8_0Create(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("create mysql (%s) resource -", d.Id())
 
@@ -373,7 +373,7 @@ func resourceGridscaleMySQLCreate(d *schema.ResourceData, meta interface{}) erro
 	return resourceGridscaleMySQLRead(d, meta)
 }
 
-func resourceGridscaleMySQLUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceGridscaleMySQL8_0Update(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("update mysql (%s) resource -", d.Id())
 
@@ -423,7 +423,7 @@ func resourceGridscaleMySQLUpdate(d *schema.ResourceData, meta interface{}) erro
 	return resourceGridscaleMySQLRead(d, meta)
 }
 
-func resourceGridscaleMySQLDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGridscaleMySQL8_0Delete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("delete mysql (%s) resource -", d.Id())
 
@@ -440,7 +440,7 @@ func resourceGridscaleMySQLDelete(d *schema.ResourceData, meta interface{}) erro
 }
 
 // getMySQLTemplateUUID returns the UUID of the mysql service template.
-func getMySQLTemplateUUID(client *gsclient.Client, release, performanceClass string) (string, error) {
+func getMySQL8_0TemplateUUID(client *gsclient.Client, release, performanceClass string) (string, error) {
 	paasTemplates, err := client.GetPaaSTemplateList(context.Background())
 	if err != nil {
 		return "", err
@@ -464,7 +464,7 @@ func getMySQLTemplateUUID(client *gsclient.Client, release, performanceClass str
 	return uTemplate.Properties.ObjectUUID, nil
 }
 
-func validateMySQLParameters(d *schema.ResourceDiff, template gsclient.PaaSTemplate) error {
+func validateMySQL8_0Parameters(d *schema.ResourceDiff, template gsclient.PaaSTemplate) error {
 	var errorMessages []string
 	if sqlMode, ok := d.GetOk("mysql_sql_mode"); ok {
 		if scheme, ok := template.Properties.ParametersSchema["mysql_sql_mode"]; ok {
