@@ -1,31 +1,27 @@
 ---
 layout: "gridscale"
-page_title: "gridscale: gridscale_mysql"
-sidebar_current: "docs-gridscale-resource-mysql"
+page_title: "gridscale: gridscale_mysql8_0"
+sidebar_current: "docs-gridscale-resource-mysql8_0"
 description: |-
-  Manage a MySQL service in gridscale.
+  Manage a MySQL 8.0 service in gridscale.
 ---
 
-# gridscale_mysql
+# gridscale_mysql8_0
 
-*DEPRECATED* - We keep this for existing customers who still use MySQL 5.7. Please migrate to MySQL 8.0.
 
-Provides a MySQL resource. This can be used to create, modify, and delete MySQL instances.
+Provides a MySQL 8.0 resource. This can be used to create, modify, and delete MySQL 8.0 instances.
 
 ## Example
 
-The following example shows how one might use this resource to add a MySQL service to gridscale:
+The following example shows how one might use this resource to add a MySQL 8.0 service to gridscale:
 
 ```terraform
-resource "gridscale_mysql" "terra-mysql-test" {
+resource "gridscale_mysql8_0" "terra-mysql-test" {
   name = "my mysql"
-	release = "5.7"
+	release = "8.0"
 	performance_class = "insane"
   max_core_count = 20
-  mysql_query_cache_limit = "2M"
 	mysql_default_time_zone = "Europe/Berlin"
-	mysql_server_id = 2
-	mysql_binlog_format = "STATEMENT"
 }
 ```
 
@@ -39,23 +35,11 @@ The following arguments are supported:
 
 * `performance_class` - (Required) Performance class of mysql service. Available performance classes at the time of writing: `standard`, `high`, `insane`, `ultra`.
 
-* `mysql_log_bin` - (Optional) mysql parameter: Binary Logging. Default: false.
-
-* `mysql_sql_mode` - (Optional) mysql parameter: SQL Mode. Default: "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION".
-
-* `mysql_server_id` - (Optional) mysql parameter: Server Id. Default: 1.
-
-* `mysql_query_cache` - (Optional) mysql parameter: Enable query cache. Default: true.
-
-* `mysql_binlog_format` - (Optional) mysql parameter: Binary Logging Format. Default: "ROW".
+* `mysql_sql_mode` - (Optional) mysql parameter: SQL Mode. Default: "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION".
 
 * `mysql_max_connections` - (Optional) mysql parameter: Max Connections. Default: 4000.
 
-* `mysql_query_cache_size` - (Optional) mysql parameter: Query Cache Size. Format: xM (where x is an integer, M stands for unit: k(kB), M(MB), G(GB)). Default: 128M.
-
 * `mysql_default_time_zone` - (Optional) mysql parameter: Server Timezone. Default: UTC.
-
-* `mysql_query_cache_limit` - (Optional) mysql parameter: Query Cache Limit. Format: xM (where x is an integer, M stands for unit: k(kB), M(MB), G(GB)). Default: 1M.
 
 * `mysql_max_allowed_packet` - (Optional) mysql parameter: Max Allowed Packet Size. Format: xM (where x is an integer, M stands for unit: k(kB), M(MB), G(GB)). Default: 64M.
 
@@ -83,15 +67,9 @@ This resource exports the following attributes:
 * `name` - See Argument Reference above.
 * `release` - See Argument Reference above.
 * `performance_class` - See Argument Reference above.
-* `mysql_log_bin` - See Argument Reference above.
 * `mysql_sql_mode` - See Argument Reference above.
-* `mysql_server_id` - See Argument Reference above.
-* `mysql_query_cache` - See Argument Reference above.
-* `mysql_binlog_format` - See Argument Reference above.
 * `mysql_max_connections` - See Argument Reference above.
-* `mysql_query_cache_size` - See Argument Reference above.
 * `mysql_default_time_zone` - See Argument Reference above.
-* `mysql_query_cache_limit` - See Argument Reference above.
 * `mysql_max_allowed_packet` - See Argument Reference above.
 * `username` - Username for PaaS service. It is used to connect to the mysql instance.
 * `password` - Password for PaaS service. It is used to connect to the mysql instance.
