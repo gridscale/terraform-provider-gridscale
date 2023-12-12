@@ -88,6 +88,45 @@ To run a specific acceptance test, use `TESTARGS`.
         TEST=./gridscale \
         TESTARGS='-run=TestAccResourceGridscaleLoadBalancerBasic'
 
+# Override local terraform provider for development
+
+Create `local-dev.tfrc` with this content and change YOUR_USERNAME:
+
+```
+provider_installation {
+  # Use /Users/YOUR_USERNAME/github/terraform-provider-gridscale as an overridden package directory
+  # for the hashicorp/null provider. This disables the version and checksum
+  # verifications for this provider and forces Terraform to look for the
+  # null provider plugin in the given directory.
+  dev_overrides {
+    "gridscale/gridscale" = "/Users/YOUR_USERNAME/github/terraform-provider-gridscale/"
+  }
+  # For all other providers, install them directly from their origin provider
+  # registries as normal. If you omit this, Terraform will _only_ use
+  # the dev_overrides block, and so no other providers will be available.
+  direct {}
+}
+```
+
+`export TF_CLI_CONFIG_FILE=./local-dev.tfrc`
+
+Build the binary: `go build -o terraform-provider-gridscale`
+
+Now you can run `terraform plan/apply` and terraform will tell you that you are using a local version of that provider:
+
+```
+> terraform apply
+╷
+│ Warning: Provider development overrides are in effect
+│
+│ The following provider development overrides are set in the CLI configuration:
+│  - gridscale/gridscale in /Users/YOUR_USERNAME/github/terraform-provider-gridscale
+│
+│ The behavior may therefore not match any released version of the provider and applying changes may cause the state to become incompatible with published
+│ releases.
+╵
+```
+
 ## Releasing the Provider
 
 A [GoReleaser](https://goreleaser.com/) configuration is provided that produces build artifacts matching the [layout required](https://www.terraform.io/docs/registry/providers/publishing.html#manually-preparing-a-release) to publish the provider in the Terraform Registry.
