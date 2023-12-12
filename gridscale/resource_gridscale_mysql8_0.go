@@ -17,7 +17,7 @@ import (
 	"log"
 )
 
-const mysqlTemplateFlavourName = "mysql"
+const mysql8TemplateFlavourName = "mysql"
 
 func resourceGridscaleMySQL() *schema.Resource {
 	return &schema.Resource{
@@ -41,7 +41,7 @@ func resourceGridscaleMySQL() *schema.Resource {
 			var isReleasePerfClassValid bool
 			releaseWPerfClasess := make(map[string][]string)
 			for _, template := range paasTemplates {
-				if template.Properties.Flavour == mysqlTemplateFlavourName {
+				if template.Properties.Flavour == mysql8TemplateFlavourName {
 					perfClasses := releaseWPerfClasess[template.Properties.Release]
 					releaseWPerfClasess[template.Properties.Release] = append(perfClasses, template.Properties.PerformanceClass)
 					if template.Properties.Release == releaseVal && template.Properties.PerformanceClass == perfClassVal {
@@ -449,7 +449,7 @@ func getMySQLTemplateUUID(client *gsclient.Client, release, performanceClass str
 	var releases []string
 	var uTemplate gsclient.PaaSTemplate
 	for _, template := range paasTemplates {
-		if template.Properties.Flavour == mysqlTemplateFlavourName {
+		if template.Properties.Flavour == mysql8TemplateFlavourName {
 			releases = append(releases, template.Properties.Release)
 			if template.Properties.Release == release && template.Properties.PerformanceClass == performanceClass {
 				isReleaseValid = true
