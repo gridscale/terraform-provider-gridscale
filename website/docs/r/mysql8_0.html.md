@@ -1,19 +1,19 @@
 ---
 layout: "gridscale"
-page_title: "gridscale: gridscale_mysql"
-sidebar_current: "docs-gridscale-resource-mysql"
+page_title: "gridscale: gridscale_mysql8_0"
+sidebar_current: "docs-gridscale-resource-mysql8_0"
 description: |-
-  Manage a MySQL service in gridscale.
+  Manage a MySQL 8.0 service in gridscale.
 ---
 
-# gridscale_mysql
+# gridscale_mysql8_0
 
 
-Provides a MySQL resource. This can be used to create, modify, and delete MySQL instances.
+Provides a MySQL 8.0 resource. This can be used to create, modify, and delete MySQL 8.0 instances.
 
 ## Example
 
-The following example shows how one might use this resource to add a MySQL service to gridscale:
+The following example shows how one might use this resource to add a MySQL 8.0 service to gridscale:
 
 ```terraform
 resource "gridscale_mysql8_0" "terra-mysql-test" {
