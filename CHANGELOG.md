@@ -1,5 +1,14 @@
 # Changelog
 
+
+## 1.23.0 (Dec 12, 2023)
+
+FEATURES:
+- Add `griscale_mysql8_0` resource [PR #246](https://github.com/gridscale/terraform-provider-gridscale/issues/246)
+
+IMPROVEMENTS:
+- Add deprecation notice for `griscale_mysql` (MySQL 5.7)
+
 ## 1.22.0 (Sept 26, 2023)
 
 FEATURES:
