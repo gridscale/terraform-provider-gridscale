@@ -260,7 +260,7 @@ func resourceGridscaleMySQL8_0Read(d *schema.ResourceData, meta interface{}) err
 	if err = d.Set("mysql_max_connections", props.Parameters["mysql_max_connections"]); err != nil {
 		return fmt.Errorf("%s error setting mysql_max_connections: %v", errorPrefix, err)
 	}
-    if err = d.Set("mysql_default_time_zone", props.Parameters["mysql_default_time_zone"]); err != nil {
+	if err = d.Set("mysql_default_time_zone", props.Parameters["mysql_default_time_zone"]); err != nil {
 		return fmt.Errorf("%s error setting mysql_default_time_zone: %v", errorPrefix, err)
 	}
 	if err = d.Set("mysql_max_allowed_packet", props.Parameters["mysql_max_allowed_packet"]); err != nil {
