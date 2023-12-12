@@ -21,10 +21,10 @@ const mysql8TemplateFlavourName = "mysql"
 
 func resourceGridscaleMySQL8_0() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceGridscaleMySQLCreate,
-		Read:   resourceGridscaleMySQLRead,
-		Delete: resourceGridscaleMySQLDelete,
-		Update: resourceGridscaleMySQLUpdate,
+		Create: resourceGridscaleMySQL8_0Create,
+		Read:   resourceGridscaleMySQL8_0Read,
+		Delete: resourceGridscaleMySQL8_0Delete,
+		Update: resourceGridscaleMySQL8_0Update,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -57,7 +57,7 @@ func resourceGridscaleMySQL8_0() *schema.Resource {
 				}
 				return errors.New(errMess)
 			}
-			return validateMySQLParameters(d, chosenTemplate)
+			return validateMySQL8_0Parameters(d, chosenTemplate)
 		},
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -327,7 +327,7 @@ func resourceGridscaleMySQL8_0Create(d *schema.ResourceData, meta interface{}) e
 	// Get mysql template UUID
 	release := d.Get("release").(string)
 	performanceClass := d.Get("performance_class").(string)
-	templateUUID, err := getMySQLTemplateUUID(client, release, performanceClass)
+	templateUUID, err := getMySQL8_0TemplateUUID(client, release, performanceClass)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
@@ -370,7 +370,7 @@ func resourceGridscaleMySQL8_0Create(d *schema.ResourceData, meta interface{}) e
 	}
 	d.SetId(response.ObjectUUID)
 	log.Printf("The id for MySQL service %s has been set to %v", requestBody.Name, response.ObjectUUID)
-	return resourceGridscaleMySQLRead(d, meta)
+	return resourceGridscaleMySQL8_0Read(d, meta)
 }
 
 func resourceGridscaleMySQL8_0Update(d *schema.ResourceData, meta interface{}) error {
@@ -390,7 +390,7 @@ func resourceGridscaleMySQL8_0Update(d *schema.ResourceData, meta interface{}) e
 		// Get mysql template UUID
 		release := d.Get("release").(string)
 		performanceClass := d.Get("performance_class").(string)
-		templateUUID, err := getMySQLTemplateUUID(client, release, performanceClass)
+		templateUUID, err := getMySQL8_0TemplateUUID(client, release, performanceClass)
 		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
@@ -420,7 +420,7 @@ func resourceGridscaleMySQL8_0Update(d *schema.ResourceData, meta interface{}) e
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
-	return resourceGridscaleMySQLRead(d, meta)
+	return resourceGridscaleMySQL8_0Read(d, meta)
 }
 
 func resourceGridscaleMySQL8_0Delete(d *schema.ResourceData, meta interface{}) error {
@@ -439,7 +439,7 @@ func resourceGridscaleMySQL8_0Delete(d *schema.ResourceData, meta interface{}) e
 	return nil
 }
 
-// getMySQLTemplateUUID returns the UUID of the mysql service template.
+// getMySQL8_0TemplateUUID returns the UUID of the mysql service template.
 func getMySQL8_0TemplateUUID(client *gsclient.Client, release, performanceClass string) (string, error) {
 	paasTemplates, err := client.GetPaaSTemplateList(context.Background())
 	if err != nil {
