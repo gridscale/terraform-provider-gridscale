@@ -8,6 +8,8 @@ description: |-
 
 # gridscale_mysql
 
+*DEPRECATED* - We keep this for existing customers who still use MySQL 5.7. Please migrate to MySQL 8.0.
+
 Provides a MySQL resource. This can be used to create, modify, and delete MySQL instances.
 
 ## Example
