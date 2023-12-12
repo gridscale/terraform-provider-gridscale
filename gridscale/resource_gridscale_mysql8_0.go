@@ -79,35 +79,11 @@ func resourceGridscaleMySQL() *schema.Resource {
 				Required:     true,
 				ValidateFunc: validation.NoZeroValues,
 			},
-			"mysql_log_bin": {
-				Type:        schema.TypeBool,
-				Description: "Binary Logging.",
-				Optional:    true,
-				Default:     false,
-			},
 			"mysql_sql_mode": {
 				Type:        schema.TypeString,
 				Description: "SQL Mode.",
 				Optional:    true,
-				Default:     "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION",
-			},
-			"mysql_server_id": {
-				Type:        schema.TypeInt,
-				Description: "Server Id.",
-				Optional:    true,
-				Default:     1,
-			},
-			"mysql_query_cache": {
-				Type:        schema.TypeBool,
-				Description: "Enable query cache.",
-				Optional:    true,
-				Default:     true,
-			},
-			"mysql_binlog_format": {
-				Type:        schema.TypeString,
-				Description: "Binary Logging Format.",
-				Optional:    true,
-				Default:     "ROW",
+				Default:     "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION",
 			},
 			"mysql_max_connections": {
 				Type:        schema.TypeInt,
@@ -115,23 +91,11 @@ func resourceGridscaleMySQL() *schema.Resource {
 				Optional:    true,
 				Default:     4000,
 			},
-			"mysql_query_cache_size": {
-				Type:        schema.TypeString,
-				Description: "Query Cache Size. Format: xM (where x is an integer, M stands for unit: k(kB), M(MB), G(GB)).",
-				Optional:    true,
-				Default:     "128M",
-			},
 			"mysql_default_time_zone": {
 				Type:        schema.TypeString,
 				Description: "Server Timezone.",
 				Optional:    true,
 				Default:     "UTC",
-			},
-			"mysql_query_cache_limit": {
-				Type:        schema.TypeString,
-				Description: "Query Cache Limit. Format: xM (where x is an integer, M stands for unit: k(kB), M(MB), G(GB)).",
-				Optional:    true,
-				Default:     "1M",
 			},
 			"mysql_max_allowed_packet": {
 				Type:        schema.TypeString,
@@ -290,32 +254,14 @@ func resourceGridscaleMySQLRead(d *schema.ResourceData, meta interface{}) error 
 	}
 
 	// Set MySQL parameters
-	if err = d.Set("mysql_log_bin", props.Parameters["mysql_log_bin"]); err != nil {
-		return fmt.Errorf("%s error setting mysql_log_bin: %v", errorPrefix, err)
-	}
 	if err = d.Set("mysql_sql_mode", props.Parameters["mysql_sql_mode"]); err != nil {
 		return fmt.Errorf("%s error setting mysql_sql_mode: %v", errorPrefix, err)
-	}
-	if err = d.Set("mysql_server_id", props.Parameters["mysql_server_id"]); err != nil {
-		return fmt.Errorf("%s error setting mysql_server_id: %v", errorPrefix, err)
-	}
-	if err = d.Set("mysql_query_cache", props.Parameters["mysql_query_cache"]); err != nil {
-		return fmt.Errorf("%s error setting mysql_query_cache: %v", errorPrefix, err)
-	}
-	if err = d.Set("mysql_binlog_format", props.Parameters["mysql_binlog_format"]); err != nil {
-		return fmt.Errorf("%s error setting mysql_binlog_format: %v", errorPrefix, err)
 	}
 	if err = d.Set("mysql_max_connections", props.Parameters["mysql_max_connections"]); err != nil {
 		return fmt.Errorf("%s error setting mysql_max_connections: %v", errorPrefix, err)
 	}
-	if err = d.Set("mysql_query_cache_size", props.Parameters["mysql_query_cache_size"]); err != nil {
-		return fmt.Errorf("%s error setting mysql_query_cache_size: %v", errorPrefix, err)
-	}
-	if err = d.Set("mysql_default_time_zone", props.Parameters["mysql_default_time_zone"]); err != nil {
+    if err = d.Set("mysql_default_time_zone", props.Parameters["mysql_default_time_zone"]); err != nil {
 		return fmt.Errorf("%s error setting mysql_default_time_zone: %v", errorPrefix, err)
-	}
-	if err = d.Set("mysql_query_cache_limit", props.Parameters["mysql_query_cache_limit"]); err != nil {
-		return fmt.Errorf("%s error setting mysql_query_cache_limit: %v", errorPrefix, err)
 	}
 	if err = d.Set("mysql_max_allowed_packet", props.Parameters["mysql_max_allowed_packet"]); err != nil {
 		return fmt.Errorf("%s error setting mysql_max_allowed_packet: %v", errorPrefix, err)
@@ -410,15 +356,9 @@ func resourceGridscaleMySQLCreate(d *schema.ResourceData, meta interface{}) erro
 	}
 
 	params := make(map[string]interface{})
-	params["mysql_log_bin"] = d.Get("mysql_log_bin")
 	params["mysql_sql_mode"] = d.Get("mysql_sql_mode")
-	params["mysql_server_id"] = d.Get("mysql_server_id")
-	params["mysql_query_cache"] = d.Get("mysql_query_cache")
-	params["mysql_binlog_format"] = d.Get("mysql_binlog_format")
 	params["mysql_max_connections"] = d.Get("mysql_max_connections")
-	params["mysql_query_cache_size"] = d.Get("mysql_query_cache_size")
 	params["mysql_default_time_zone"] = d.Get("mysql_default_time_zone")
-	params["mysql_query_cache_limit"] = d.Get("mysql_query_cache_limit")
 	params["mysql_max_allowed_packet"] = d.Get("mysql_max_allowed_packet")
 	requestBody.Parameters = params
 
@@ -468,15 +408,9 @@ func resourceGridscaleMySQLUpdate(d *schema.ResourceData, meta interface{}) erro
 	}
 
 	params := make(map[string]interface{})
-	params["mysql_log_bin"] = d.Get("mysql_log_bin")
 	params["mysql_sql_mode"] = d.Get("mysql_sql_mode")
-	params["mysql_server_id"] = d.Get("mysql_server_id")
-	params["mysql_query_cache"] = d.Get("mysql_query_cache")
-	params["mysql_binlog_format"] = d.Get("mysql_binlog_format")
 	params["mysql_max_connections"] = d.Get("mysql_max_connections")
-	params["mysql_query_cache_size"] = d.Get("mysql_query_cache_size")
 	params["mysql_default_time_zone"] = d.Get("mysql_default_time_zone")
-	params["mysql_query_cache_limit"] = d.Get("mysql_query_cache_limit")
 	params["mysql_max_allowed_packet"] = d.Get("mysql_max_allowed_packet")
 	requestBody.Parameters = params
 
@@ -540,42 +474,10 @@ func validateMySQLParameters(d *schema.ResourceDiff, template gsclient.PaaSTempl
 			}
 		}
 	}
-	if serverID, ok := d.GetOk("mysql_server_id"); ok {
-		if scheme, ok := template.Properties.ParametersSchema["mysql_server_id"]; ok {
-			if scheme.Min > serverID.(int) || serverID.(int) > scheme.Max {
-				errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'mysql_server_id' value. Value must stays between %d and %d\n", scheme.Min, scheme.Max))
-			}
-		}
-	}
-	if binLogFormat, ok := d.GetOk("mysql_binlog_format"); ok {
-		if scheme, ok := template.Properties.ParametersSchema["mysql_binlog_format"]; ok {
-			var isValidFormat bool
-			for _, allowedValue := range scheme.Allowed {
-				if binLogFormat.(string) == allowedValue {
-					isValidFormat = true
-				}
-			}
-			if !isValidFormat {
-				errorMessages = append(errorMessages,
-					fmt.Sprintf("Invalid 'mysql_binlog_format' value. Value must be one of these:\n\t%s\n",
-						strings.Join(scheme.Allowed, "\n\t"),
-					),
-				)
-			}
-		}
-	}
 	if maxNConn, ok := d.GetOk("mysql_max_connections"); ok {
 		if scheme, ok := template.Properties.ParametersSchema["mysql_max_connections"]; ok {
 			if scheme.Min > maxNConn.(int) || maxNConn.(int) > scheme.Max {
 				errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'mysql_max_connections' value. Value must stays between %d and %d\n", scheme.Min, scheme.Max))
-			}
-		}
-	}
-	if cacheSize, ok := d.GetOk("mysql_query_cache_size"); ok {
-		if scheme, ok := template.Properties.ParametersSchema["mysql_query_cache_size"]; ok {
-			validMode := regexp.MustCompile(scheme.Regex)
-			if !validMode.MatchString(cacheSize.(string)) {
-				errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'mysql_query_cache_size' value. Example value: '%s'\n", scheme.Default))
 			}
 		}
 	}
@@ -593,14 +495,6 @@ func validateMySQLParameters(d *schema.ResourceDiff, template gsclient.PaaSTempl
 						strings.Join(scheme.Allowed, "\n\t"),
 					),
 				)
-			}
-		}
-	}
-	if cacheLimit, ok := d.GetOk("mysql_query_cache_limit"); ok {
-		if scheme, ok := template.Properties.ParametersSchema["mysql_query_cache_limit"]; ok {
-			validMode := regexp.MustCompile(scheme.Regex)
-			if !validMode.MatchString(cacheLimit.(string)) {
-				errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'mysql_query_cache_limit' value. Example value: '%s'\n", scheme.Default))
 			}
 		}
 	}
