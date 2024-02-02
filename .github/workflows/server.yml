@@ -32,6 +32,8 @@ jobs:
       GRIDSCALE_UUID: ${{ secrets.CI_USER_UUID }}
       GRIDSCALE_TOKEN: ${{ secrets.CI_API_TOKEN }}
       GRIDSCALE_URL: ${{ secrets.CI_API_URL }}
+      GRIDSCALE_TF_REQUEST_DELAY_INTERVAL: 2000
+      GRIDSCALE_TF_MAX_N_RETRIES: 5
     steps:
       - name: Set up Go 1.17
         uses: actions/setup-go@v5
