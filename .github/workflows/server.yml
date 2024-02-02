@@ -34,7 +34,7 @@ jobs:
       GRIDSCALE_URL: ${{ secrets.CI_API_URL }}
     steps:
       - name: Set up Go 1.17
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v5
         with:
           go-version: ^1.17
         id: go
