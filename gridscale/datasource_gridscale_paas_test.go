@@ -19,7 +19,7 @@ func TestAccdataSourceGridscalePaaS_basic(t *testing.T) {
 				Config: testAccCheckDataSourcePaaSConfig_basic(name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.gridscale_paas.foo", "name", name),
-					resource.TestCheckResourceAttr("data.gridscale_paas.foo", "service_template_uuid", "8bcb216c-65ec-4c93-925d-1b8feaa5c2c5"),
+					resource.TestCheckResourceAttr("data.gridscale_paas.foo", "service_template_uuid", "d7a5e8ec-fa78-4d1b-86f9-febe3e16e398"),
 				),
 			},
 		},
@@ -31,7 +31,7 @@ func testAccCheckDataSourcePaaSConfig_basic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_paas" "foo" {
   name = "%s"
-  service_template_uuid = "8bcb216c-65ec-4c93-925d-1b8feaa5c2c5"
+  service_template_uuid = "d7a5e8ec-fa78-4d1b-86f9-febe3e16e398"
   parameter {
     param = "mysql_max_connections"
     value = "2000"

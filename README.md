@@ -40,7 +40,7 @@ Alternatively, this documentation can also be found within this repository. Chec
 | Load balancer (CRUD) | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/loadbalancer.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/loadbalancer.yml) |
 | PaaS (CRUD) | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/paas.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/paas.yml) |
 | K8S (CRUD) | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/k8s.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/k8s.yml) |
-| MySQL (CRUD) | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/mysql.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/mysql.yml) |
+| MySQL (CRUD) | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/mysql8_0.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/mysql8_0.yml) |
 | MSSQL (CRUD) | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/mssql.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/mssql.yml) |
 | MariaDB (CRUD) | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/mariadb.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/mariadb.yml) |
 | Postgres (CRUD) | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/postgres.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/postgres.yml) |
@@ -52,7 +52,6 @@ Alternatively, this documentation can also be found within this repository. Chec
 | Object storage (CRUD) | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/object_storage.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/object_storage.yml) |
 | IP address (CRUD) | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/ipv4_ipv6.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/ipv4_ipv6.yml) |
 | Network (CRUD) | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/network.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/network.yml) |
-| Security zone (PaaS) (CRUD) | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/security_zone.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/security_zone.yml) |
 | Firewall (CRUD) | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/firewall.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/firewall.yml) |
 | SSH key (CRUD) | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/sshkey.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/sshkey.yml) |
 | ISO Image (CRUD) | :heavy_check_mark: | [![Build status](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/isoimage.yml/badge.svg?branch=master)](https://github.com/gridscale/terraform-provider-gridscale/actions/workflows/isoimage.yml) |
@@ -76,7 +75,7 @@ To test the provider, simply run
 
     $ make test
 
-To run the full suite of acceptance tests execute `make testacc`. You will need to set `GRIDSCALE_UUID`, `GRIDSCALE_TOKEN`, and `GRIDSCALE_URL` environment variables to point to an existing project when running acceptance tests.
+To run the full suite of acceptance tests execute `make testacc` you will need to set `GRIDSCALE_UUID`, `GRIDSCALE_TOKEN`, and `GRIDSCALE_URL` environment variables to point to an existing project when running acceptance tests.
 
 *Note:* acceptance tests create real resources and often cost money to run.
 
