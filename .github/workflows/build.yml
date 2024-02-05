@@ -33,6 +33,6 @@ jobs:
           GPG_FINGERPRINT: oss@gridscale.io
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          go install github.com/goreleaser/goreleaser@v1.16.2
+          go install github.com/goreleaser/goreleaser@v1.23.0
           export PATH="./bin:$PATH"
           goreleaser release --clean
