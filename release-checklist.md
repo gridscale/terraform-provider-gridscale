@@ -1,8 +1,22 @@
 # Release Checklist
 
-## Add and push a new tag
+## Update Changelog
 
-That is really all you need to do now. Release assets will be build automatically by GoReleaser and the checksums file will be signed with the release signing key. A draft release will be created for the tag.
+Add a new section to [CHANGELOG.md](https://github.com/gridscale/terraform-provider-gridscale/blob/master/CHANGELOG.md), use the following format for the changelog entry:
+```
+FEATURES:
+- ...
+
+IMPROVEMENTS:
+- ...
+
+BUG FIXES:
+- ...
+```
+
+## Add and push a new Tag
+
+That is really all you need to do - release assets will be build automatically by GoReleaser and the checksums file will be signed with the release signing key. A draft release will be created for the tag.
 
     $ git tag v1.7.0
     $ git push --tags

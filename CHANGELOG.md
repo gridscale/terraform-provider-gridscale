@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.23.1 (Feb 5, 2024)
+
+IMPROVEMENTS:
+
+- Bump `go` from 1.17 to 1.21
+- Bump `hashicorp/go-version` from 1.4.0 to 1.6.0
+- Bump `hashicorp/terraform-plugin-sdk/v2` from 2.16.0 to 2.32.0
+- Bump `aws/aws-sdk-go` from 1.44.114 to 1.50.10
 
 ## 1.23.0 (Dec 12, 2023)
 
