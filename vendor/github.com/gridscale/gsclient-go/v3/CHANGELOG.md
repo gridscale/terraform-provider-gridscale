@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.14.1 (Feb 15, 2024)
+
+IMPROVEMENTS:
+- Upgrade dependencies to fix some security vulnerabilities.
+
 ## 3.14.0 (Sept 25, 2023)
 
 FEATURES:
