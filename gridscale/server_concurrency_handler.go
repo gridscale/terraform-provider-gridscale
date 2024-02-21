@@ -12,6 +12,8 @@ import (
 	errHandler "github.com/terraform-providers/terraform-provider-gridscale/gridscale/error-handler"
 )
 
+const serverAlreadyInRequestedPowerStateErrSubStr = "already in the requested power state"
+
 type serverStatus struct {
 	//is the server is deleted
 	deleted bool
@@ -74,7 +76,11 @@ func (l *serverStatusList) removeServerSynchronously(ctx context.Context, c *gsc
 			//set the shutdown timeout specifically
 			shutdownCtx, cancel := context.WithTimeout(context.Background(), serverShutdownTimeoutSecs*time.Second)
 			defer cancel()
-			err := c.ShutdownServer(shutdownCtx, id)
+			err := errHandler.SuppressHTTPErrorCodesWithSubErrString(
+				c.ShutdownServer(shutdownCtx, id),
+				serverAlreadyInRequestedPowerStateErrSubStr,
+				http.StatusBadRequest,
+			)
 			//if error is returned and it is not caused by an expired context, returns error
 			if err != nil && err != shutdownCtx.Err() {
 				return err
@@ -89,7 +95,11 @@ func (l *serverStatusList) removeServerSynchronously(ctx context.Context, c *gsc
 				default:
 				}
 				//force the sever to stop
-				err = c.StopServer(ctx, id)
+				err = errHandler.SuppressHTTPErrorCodesWithSubErrString(
+					c.StopServer(ctx, id),
+					serverAlreadyInRequestedPowerStateErrSubStr,
+					http.StatusBadRequest,
+				)
 				if err != nil {
 					return err
 				}
