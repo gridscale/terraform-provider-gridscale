@@ -204,6 +204,12 @@ func resourceGridscaleK8s() *schema.Resource {
 							Optional:    true,
 							Computed:    true,
 						},
+						"cluster_traffic_encryption": {
+							Type:        schema.TypeBool,
+							Description: "Enables cluster encryption via wireguard if true. Only available for GSK version 1.29 and above. Default is false.",
+							Optional:    true,
+							Default:     false,
+						},
 					},
 				},
 			},
@@ -340,6 +346,11 @@ func resourceGridscaleK8sRead(d *schema.ResourceData, meta interface{}) error {
 		nodePool["surge_node"] = surgeNodeCount > 0
 	}
 
+	// Cluster traffic encryption feature is enabled if k8s_cluster_traffic_encryption is true
+	if clusterTrafficEncryption, ok := props.Parameters["k8s_cluster_traffic_encryption"].(bool); ok {
+		nodePool["cluster_traffic_encryption"] = clusterTrafficEncryption
+	}
+
 	nodePoolList = append(nodePoolList, nodePool)
 	if err = d.Set("node_pool", nodePoolList); err != nil {
 		return fmt.Errorf("%s error setting node_pool: %v", errorPrefix, err)
@@ -435,6 +446,10 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 	} else {
 		params["k8s_surge_node_count"] = 0
 	}
+	// Set cluster traffic encryption if it is set
+	if clusterTrafficEncryption, isSet := d.GetOk("node_pool.0.cluster_traffic_encryption"); isSet {
+		params["k8s_cluster_traffic_encryption"] = clusterTrafficEncryption
+	}
 	requestBody.Parameters = params
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
@@ -503,6 +518,10 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 		params["k8s_surge_node_count"] = 1
 	} else {
 		params["k8s_surge_node_count"] = 0
+	}
+	// Set cluster traffic encryption if it is set
+	if clusterTrafficEncryption, isSet := d.GetOk("node_pool.0.cluster_traffic_encryption"); isSet {
+		params["k8s_cluster_traffic_encryption"] = clusterTrafficEncryption
 	}
 	requestBody.Parameters = params
 
