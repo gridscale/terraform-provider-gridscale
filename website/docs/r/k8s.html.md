@@ -56,6 +56,7 @@ The following arguments are supported:
     * `rocket_storage` - Rocket storage per worker node (in GiB).
     * `surge_node` - Enable surge node to avoid resources shortage during the cluster upgrade (Default: true).
     * `cluster_cidr` - (Immutable) The cluster CIDR that will be used to generate the CIDR of nodes, services, and pods. The allowed CIDR prefix length is /16. If the cluster CIDR is not set, the cluster will use "10.244.0.0/16" as it default (even though the `cluster_cidr` in the k8s resource is empty).
+    * `cluster_traffic_encryption` - Enables cluster encryption via wireguard if true. Only available for GSK version 1.29 and above. Default is false.
 
 ## Timeouts
 
@@ -90,6 +91,7 @@ This resource exports the following attributes:
     * `rocket_storage` - See Argument Reference above.
     * `surge_node` - See Argument Reference above.
     * `cluster_cidr` - See Argument Reference above.
+    * `cluster_traffic_encryption` - See Argument Reference above.
 * `usage_in_minutes` - The amount of minutes the IP address has been in use.
 * `create_time` - The time the object was created.
 * `change_time` - Defines the date and time of the last object change.
