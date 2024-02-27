@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.23.2 (Feb 27, 2024)
+
+BUG FIXES:
+- Fix failed server deletion due to shutting down/turning off a server which is already off. [PR #275](https://github.com/gridscale/terraform-provider-gridscale/pull/275).
+
 ## 1.23.1 (Feb 5, 2024)
 
 IMPROVEMENTS:
