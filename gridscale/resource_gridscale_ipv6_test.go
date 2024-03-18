@@ -110,11 +110,11 @@ resource "gridscale_ipv6" "foo" {
 }
 
 func testAccCheckResourceGridscaleIpv6Config_basic_update() string {
-	return fmt.Sprintf(`
+	return `
 resource "gridscale_ipv6" "foo" {
   name   = "newname"
   failover = true
   reverse_dns = "test.test"
 }
-`)
+`
 }

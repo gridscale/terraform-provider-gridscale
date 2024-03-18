@@ -372,7 +372,7 @@ func dataSourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) err
 	}
 
 	//Get storages
-	storages := make([]interface{}, 0)
+	/*storages := make([]interface{}, 0)
 	for _, value := range server.Properties.Relations.Storages {
 		storage := map[string]interface{}{
 			"object_uuid":        value.ObjectUUID,
@@ -389,7 +389,7 @@ func dataSourceGridscaleServerRead(d *schema.ResourceData, meta interface{}) err
 			"capacity":           value.Capacity,
 		}
 		storages = append(storages, storage)
-	}
+	}*/
 
 	// Get hardware_profile_config
 	hardwareProfileConfigList := make([]interface{}, 0)

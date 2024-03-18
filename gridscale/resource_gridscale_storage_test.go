@@ -138,12 +138,12 @@ resource "gridscale_storage" "foo" {
 }
 
 func testAccCheckResourceGridscaleStorageConfig_basic_update() string {
-	return fmt.Sprintf(`
+	return `
 resource "gridscale_storage" "foo" {
   name   = "newname"
   capacity = 1
 }
-`)
+`
 }
 
 func testAccCheckResourceGridscaleStorageConfig_advanced(name string) string {

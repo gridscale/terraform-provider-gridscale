@@ -114,10 +114,10 @@ resource "gridscale_server" "foo" {
 }
 
 func testAccCheckResourceGridscaleISOImageConfig_basic_update() string {
-	return fmt.Sprintf(`
+	return `
 resource "gridscale_isoimage" "foo" {
   name   = "newname"
   source_url = "http://tinycorelinux.net/10.x/x86/release/TinyCore-current.iso"
 }
-`)
+`
 }

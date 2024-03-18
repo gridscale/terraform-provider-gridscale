@@ -117,7 +117,7 @@ resource "gridscale_template" "foo" {
 }
 
 func testAccCheckResourceGridscaleTemplateConfig_basic_update() string {
-	return fmt.Sprintf(`
+	return `
 resource "gridscale_storage" "foo" {
   name   = "newname"
   capacity = 1
@@ -133,5 +133,5 @@ resource "gridscale_template" "foo" {
   labels = ["test"]
   snapshot_uuid = gridscale_snapshot.foo.id
 }
-`)
+`
 }

@@ -59,7 +59,7 @@ resource "gridscale_filesystem" "test" {
 }
 
 func testAccCheckResourceGridscaleFilesystemConfig_basic_update() string {
-	return fmt.Sprintf(`
+	return `
 resource "gridscale_filesystem" "test" {
 	name = "newname"
 	root_squash = false
@@ -68,5 +68,5 @@ resource "gridscale_filesystem" "test" {
 	allowed_ip_ranges = ["192.14.15.15"]
 	labels = ["test"]
 }
-`)
+`
 }

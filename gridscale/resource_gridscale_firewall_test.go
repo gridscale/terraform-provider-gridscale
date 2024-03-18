@@ -121,7 +121,7 @@ resource "gridscale_firewall" "foo" {
 }
 
 func testAccCheckResourceGridscaleFirewallConfig_basic_update() string {
-	return fmt.Sprintf(`
+	return `
 resource "gridscale_firewall" "foo" {
   name   = "newname"
   rules_v4_out {
@@ -139,5 +139,5 @@ resource "gridscale_firewall" "foo" {
 	comment = "testv6"
   }
 }
-`)
+`
 }

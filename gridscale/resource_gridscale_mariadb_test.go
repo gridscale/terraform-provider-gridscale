@@ -50,7 +50,7 @@ resource "gridscale_mariadb" "test" {
 }
 
 func testAccCheckResourceGridscaleMariaDBConfig_basic_update() string {
-	return fmt.Sprintf(`
+	return `
 resource "gridscale_mariadb" "test" {
 	name = "newname"
 	release = "10.5"
@@ -63,5 +63,5 @@ resource "gridscale_mariadb" "test" {
 	mariadb_server_id = 2
 	mariadb_binlog_format = "STATEMENT"
 }
-`)
+`
 }

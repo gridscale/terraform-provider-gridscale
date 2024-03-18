@@ -112,7 +112,7 @@ resource "gridscale_marketplace_application" "foo" {
 }
 
 func testAccCheckResourceGridscaleMarketplaceApplicationConfig_basic_update() string {
-	return fmt.Sprintf(`
+	return `
 resource "gridscale_marketplace_application" "foo" {
   	name   = "newname"
 	object_storage_path = "s3://testsnapshot/test.gz"
@@ -122,5 +122,5 @@ resource "gridscale_marketplace_application" "foo" {
 	setup_storage_capacity = 5
 	meta_components = ["test_component", "test_component1"]
 }
-`)
+`
 }

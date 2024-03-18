@@ -314,8 +314,7 @@ func resourceGridscaleMarketplaceApplicationRead(d *schema.ResourceData, meta in
 
 func resourceGridscaleMarketplaceApplicationCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	var publish bool
-	publish = d.Get("publish").(bool)
+	publish := d.Get("publish").(bool)
 	requestBody := gsclient.MarketplaceApplicationCreateRequest{
 		Name:              d.Get("name").(string),
 		ObjectStoragePath: d.Get("object_storage_path").(string),
@@ -370,9 +369,7 @@ func resourceGridscaleMarketplaceApplicationCreate(d *schema.ResourceData, meta 
 func resourceGridscaleMarketplaceApplicationUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("update marketplace application (%s) resource -", d.Id())
-
-	var publish bool
-	publish = d.Get("publish").(bool)
+	publish := d.Get("publish").(bool)
 	requestBody := gsclient.MarketplaceApplicationUpdateRequest{
 		Name:              d.Get("name").(string),
 		ObjectStoragePath: d.Get("object_storage_path").(string),

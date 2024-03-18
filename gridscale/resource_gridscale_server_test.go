@@ -159,7 +159,7 @@ resource "gridscale_server" "foo" {
 }
 
 func testAccCheckResourceGridscaleServerConfig_basic_update() string {
-	return fmt.Sprintf(`
+	return `
 resource "gridscale_ipv4" "foo1" {
   name   = "newname"
 }
@@ -197,5 +197,5 @@ resource "gridscale_server" "foo" {
   	object_uuid = gridscale_storage.foo1.id
   }
 }
-`)
+`
 }

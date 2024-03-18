@@ -1,7 +1,6 @@
 package gridscale
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -29,12 +28,12 @@ func TestAccdataSourceGridscaleObjectStorage_basic(t *testing.T) {
 }
 
 func testAccCheckDataSourceObjectStorageConfig_basic() string {
-	return fmt.Sprint(`
+	return `
 resource "gridscale_object_storage_accesskey" "foo" {
 }
 
 data "gridscale_object_storage_accesskey" "foo" {
 	resource_id   = "${gridscale_object_storage_accesskey.foo.id}"
 }
-`)
+`
 }

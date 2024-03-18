@@ -163,7 +163,7 @@ func resourceGridscaleMSSQLServer() *schema.Resource {
 							Default:  defaultBackupServerURL,
 							ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
 								if v.(string) != defaultBackupServerURL {
-									errors = append(errors, fmt.Errorf("Currently, only %s is supported", defaultBackupServerURL))
+									errors = append(errors, fmt.Errorf("currently, only %s is supported", defaultBackupServerURL))
 								}
 								return
 							},
@@ -466,7 +466,7 @@ func getMSSQLTemplateUUID(client *gsclient.Client, release, performanceClass str
 		}
 	}
 	if !isReleaseValid {
-		return "", fmt.Errorf("%v is not a valid MS SQL Server release. Valid releases are: %v\n", release, strings.Join(releases, ", "))
+		return "", fmt.Errorf("%v is not a valid MS SQL Server release. Valid releases are: %v", release, strings.Join(releases, ", "))
 	}
 
 	return uTemplate.Properties.ObjectUUID, nil

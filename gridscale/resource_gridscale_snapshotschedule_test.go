@@ -113,7 +113,7 @@ resource "gridscale_snapshotschedule" "foo" {
 }
 
 func testAccCheckDataSourceGridscaleSnapshotScheduleConfig_basic_update() string {
-	return fmt.Sprintf(`
+	return `
 resource "gridscale_storage" "foo" {
   name   = "storage"
   capacity = 1
@@ -125,11 +125,11 @@ resource "gridscale_snapshotschedule" "foo" {
   keep_snapshots = 1
   run_interval = 60
 }
-`)
+`
 }
 
 func testAccCheckDataSourceGridscaleSnapshotScheduleConfig_forcenew_update() string {
-	return fmt.Sprintf(`
+	return `
 resource "gridscale_storage" "new" {
   name   = "storage"
   capacity = 1
@@ -140,5 +140,5 @@ resource "gridscale_snapshotschedule" "foo" {
   keep_snapshots = 1
   run_interval = 60
 }
-`)
+`
 }

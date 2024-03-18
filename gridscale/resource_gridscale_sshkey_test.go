@@ -111,10 +111,10 @@ resource "gridscale_sshkey" "foo" {
 }
 
 func testAccCheckResourceGridscaleSshkeyConfig_basic_update() string {
-	return fmt.Sprintf(`
+	return `
 resource "gridscale_sshkey" "foo" {
   name   = "newname"
   sshkey = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCvOYJ3xXtPXaPOacFQ97+nGq5QDkl17/JeTaY36RLPKgYBt2Z5YSPSROdzh/5GgZ0p6E3W84gKNaedUo3v+zvgmdGZeDFk+cxlC0HtXwQN87GQRtYTMsucbI6OJT7p4qntl70MIBzvIrmheGZqXnpeRxA7PjVcjkA3nxps3XJsuMDd0Ft0Ue3j0lmOno779mfgg34VeTgE2GZlH31gFqxWz3fXUgaZoLdO7HbLKu4ybfFWdCzqBt4B8RG9xMq0220gJR6ZwAaiMc1CGIknK7C6EKeCx9LOWDjCaHg6pA2iPAb/PoxDuiqbUIzfRmkgMf0lYmrf0kqx529ALm92ulSx root@33c294c5235e"
 }
-`)
+`
 }

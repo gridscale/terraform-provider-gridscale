@@ -113,7 +113,7 @@ resource "gridscale_snapshot" "foo" {
 }
 
 func testAccCheckDataSourceGridscaleSnapshotConfig_basic_update() string {
-	return fmt.Sprintf(`
+	return `
 resource "gridscale_storage" "foo" {
   name   = "storage"
   capacity = 1
@@ -129,11 +129,11 @@ resource "gridscale_snapshot" "foo" {
 	id = "second"
   }
 }
-`)
+`
 }
 
 func testAccCheckDataSourceGridscaleSnapshotConfig_forcenew_update() string {
-	return fmt.Sprintf(`
+	return `
 resource "gridscale_storage" "new" {
   name   = "storage"
   capacity = 1
@@ -142,5 +142,5 @@ resource "gridscale_snapshot" "foo" {
   name = "newname"
   storage_uuid = gridscale_storage.new.id
 }
-`)
+`
 }

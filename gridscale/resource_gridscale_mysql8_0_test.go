@@ -50,7 +50,7 @@ resource "gridscale_mysql8_0" "test" {
 }
 
 func testAccCheckResourceGridscaleMySQL8_0Config_basic_update() string {
-	return fmt.Sprintf(`
+	return `
 resource "gridscale_mysql8_0" "test" {
 	name = "newname"
 	release = "8.0"
@@ -59,5 +59,5 @@ resource "gridscale_mysql8_0" "test" {
 	mysql_max_connections = 2000
 	labels = ["test"]
 }
-`)
+`
 }

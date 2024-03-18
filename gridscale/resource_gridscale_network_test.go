@@ -129,7 +129,7 @@ resource "gridscale_network" "foo" {
 }
 
 func testAccCheckResourceGridscaleNetworkConfig_basic_update() string {
-	return fmt.Sprint(`
+	return `
 resource "gridscale_network" "foo" {
   name   = "newname"
   l2security = true
@@ -139,5 +139,5 @@ resource "gridscale_network" "foo" {
   dhcp_range = "192.168.122.0/27"
   dhcp_reserved_subnet = ["192.168.122.0/31"]
 }
-`)
+`
 }

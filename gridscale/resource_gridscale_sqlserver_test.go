@@ -50,12 +50,12 @@ resource "gridscale_sqlserver" "test" {
 }
 
 func testAccCheckResourceGridscaleMSSQLServerConfig_basic_update() string {
-	return fmt.Sprintf(`
+	return `
 resource "gridscale_sqlserver" "test" {
 	name = "newname"
 	release = "2019"
 	performance_class = "standard"
 	labels = ["test"]
 }
-`)
+`
 }

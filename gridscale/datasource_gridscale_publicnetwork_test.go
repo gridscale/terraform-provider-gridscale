@@ -1,7 +1,6 @@
 package gridscale
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -26,7 +25,7 @@ func TestAccdataSourceGridscalePublicNetwork_basic(t *testing.T) {
 }
 
 func testAccCheckDataSourcePublicNetworkConfig_basic() string {
-	return fmt.Sprint(`
+	return `
 data "gridscale_public_network" "foo" {
-}`)
+}`
 }

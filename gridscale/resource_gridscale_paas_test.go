@@ -105,7 +105,7 @@ resource "gridscale_paas" "foopaas" {
 }
 
 func testAccCheckResourceGridscalePaaSConfig_basic_update() string {
-	return fmt.Sprintf(`
+	return `
 resource "gridscale_paas" "foopaas" {
   name = "newname"
   service_template_uuid = "d7a5e8ec-fa78-4d1b-86f9-febe3e16e398"
@@ -124,13 +124,13 @@ resource "gridscale_paas" "foopaas" {
     type = "string"
   }
 }
-`)
+`
 }
 
 // TO DO: update `service_template_uuid` when the backend enables the option to
 // update `service_template_uuid`.
 func testAccCheckResourceGridscalePaaSConfig_tmp_update() string {
-	return fmt.Sprintf(`
+	return `
 resource "gridscale_paas" "foopaas" {
   name = "newname"
   service_template_uuid = "d7a5e8ec-fa78-4d1b-86f9-febe3e16e398"
@@ -149,5 +149,5 @@ resource "gridscale_paas" "foopaas" {
     type = "string"
   }
 }
-`)
+`
 }

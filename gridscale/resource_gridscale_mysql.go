@@ -524,7 +524,7 @@ func getMySQLTemplateUUID(client *gsclient.Client, release, performanceClass str
 		}
 	}
 	if !isReleaseValid {
-		return "", fmt.Errorf("%v is not a valid MySQL release. Valid releases are: %v\n", release, strings.Join(releases, ", "))
+		return "", fmt.Errorf("%v is not a valid MySQL release. Valid releases are: %v", release, strings.Join(releases, ", "))
 	}
 
 	return uTemplate.Properties.ObjectUUID, nil

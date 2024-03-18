@@ -58,7 +58,7 @@ resource "gridscale_k8s" "foopaas" {
 }
 
 func testAccCheckResourceGridscaleK8sConfig_basic_update() string {
-	return fmt.Sprintf(`
+	return `
 resource "gridscale_k8s" "foopaas" {
 	name   = "newname"
 	release = "1.26"
@@ -72,5 +72,5 @@ resource "gridscale_k8s" "foopaas" {
 		rocket_storage = 90
 	}
 }
-`)
+`
 }

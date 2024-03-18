@@ -115,7 +115,7 @@ resource "gridscale_marketplace_application_import" "foo" {
 }
 
 func testAccCheckResourceGridscaleMarketplaceApplicationImportConfig_basic_update() string {
-	return fmt.Sprintf(`
+	return `
 resource "gridscale_marketplace_application" "foonew" {
   	name   = "newname"
 	object_storage_path = "s3://testsnapshot/test.gz"
@@ -127,5 +127,5 @@ resource "gridscale_marketplace_application" "foonew" {
 resource "gridscale_marketplace_application_import" "foo" {
 	import_unique_hash = gridscale_marketplace_application.foonew.unique_hash
 }
-`)
+`
 }

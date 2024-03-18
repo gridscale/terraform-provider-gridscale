@@ -114,7 +114,7 @@ resource "gridscale_backupschedule" "foo" {
 }
 
 func testAccCheckDataSourceGridscaleBackupScheduleConfig_basic_update() string {
-	return fmt.Sprintf(`
+	return `
 resource "gridscale_storage" "foo" {
   name   = "storage"
   capacity = 1
@@ -127,11 +127,11 @@ resource "gridscale_backupschedule" "foo" {
   next_runtime = "2030-12-30 15:04:05"
   active = true
 }
-`)
+`
 }
 
 func testAccCheckDataSourceGridscaleBackupScheduleConfig_forcenew_update() string {
-	return fmt.Sprintf(`
+	return `
 resource "gridscale_storage" "new" {
   name   = "storage"
   capacity = 1
@@ -144,5 +144,5 @@ resource "gridscale_backupschedule" "foo" {
   next_runtime = "2030-12-30 15:04:05"
   active = true
 }
-`)
+`
 }

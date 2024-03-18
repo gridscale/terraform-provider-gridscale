@@ -1,13 +1,9 @@
 package gridscale
 
 import (
-	"context"
-	"fmt"
 	"testing"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 
 	"github.com/gridscale/gsclient-go/v3"
 )
@@ -43,7 +39,7 @@ func TestAccResourceGridscaleStorageClone_Basic(t *testing.T) {
 	})
 }
 
-func testAccCheckGridscaleStorageCloneDestroyCheck(s *terraform.State) error {
+/*func testAccCheckGridscaleStorageCloneDestroyCheck(s *terraform.State) error {
 	client := testAccProvider.Meta().(*gsclient.Client)
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gridscale_storage_clone" {
@@ -68,10 +64,10 @@ func testAccCheckGridscaleStorageCloneDestroyCheck(s *terraform.State) error {
 	}
 
 	return nil
-}
+}*/
 
 func testAccCheckResourceGridscaleStorageCloneConfig_basic() string {
-	return fmt.Sprint(`
+	return `
 resource "gridscale_storage" "foo" {
   name   = "test"
   capacity = 1
@@ -82,11 +78,11 @@ resource "gridscale_storage_clone" "foo" {
   name = "desired_name"
   storage_type = "storage_high"
 }
-`)
+`
 }
 
 func testAccCheckResourceGridscaleStorageCloneConfig_basic_update() string {
-	return fmt.Sprint(`
+	return `
 resource "gridscale_storage" "foo" {
 	name   = "test"
 	capacity = 1
@@ -98,5 +94,5 @@ resource "gridscale_storage_clone" "foo" {
   capacity = 2
   storage_type = "storage_insane"
 }
-`)
+`
 }

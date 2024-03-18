@@ -55,7 +55,7 @@ resource "gridscale_postgresql" "test" {
 }
 
 func testAccCheckResourceGridscalePostgresConfig_basic_update() string {
-	return fmt.Sprintf(`
+	return `
 resource "gridscale_postgresql" "test" {
 	name = "newname"
 	release = "13"
@@ -68,5 +68,5 @@ resource "gridscale_postgresql" "test" {
 	pgaudit_log_secret_key = "testing"
 	pgaudit_log_rotation_frequency = 25
 }
-`)
+`
 }

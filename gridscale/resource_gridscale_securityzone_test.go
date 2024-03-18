@@ -96,9 +96,9 @@ resource "gridscale_paas_securityzone" "foo" {
 }
 
 func testAccCheckDataSourceGridscaleSecurityZoneConfig_basic_update() string {
-	return fmt.Sprintf(`
+	return `
 resource "gridscale_paas_securityzone" "foo" {
   name = "newname"
 }
-`)
+`
 }

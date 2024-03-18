@@ -89,8 +89,8 @@ func testAccCheckGridscaleObjectStorageDestroyCheck(s *terraform.State) error {
 }
 
 func testAccCheckResourceGridscaleObjectStorageConfig_basic() string {
-	return fmt.Sprint(`
+	return `
 resource "gridscale_object_storage_accesskey" "foo" {
 }
-`)
+`
 }

@@ -20,11 +20,6 @@ import (
 
 const postgresTemplateFlavourName = "postgres"
 
-const (
-	postgresReleaseValidationOpt = iota
-	postgresMaxCoreCountValidationOpt
-)
-
 func resourceGridscalePostgreSQL() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceGridscalePostgreSQLCreate,
@@ -191,7 +186,7 @@ func resourceGridscalePostgreSQL() *schema.Resource {
 				Computed:    true,
 				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
 					if 1 > v.(int) || v.(int) > 32 {
-						errors = append(errors, fmt.Errorf("%v is not a valid value for number of \"max_core_count\". Valid value should be between 1 and 32\n", v.(int)))
+						errors = append(errors, fmt.Errorf("%v is not a valid value for number of \"max_core_count\". Valid value should be between 1 and 32", v.(int)))
 					}
 					return
 				},
@@ -495,7 +490,7 @@ func getPostgresTemplateUUID(client *gsclient.Client, release, performanceClass 
 		}
 	}
 	if !isReleaseValid {
-		return "", fmt.Errorf("%v is not a valid PostgreSQL release. Valid releases are: %v\n", release, strings.Join(releases, ", "))
+		return "", fmt.Errorf("%v is not a valid PostgreSQL release. Valid releases are: %v", release, strings.Join(releases, ", "))
 	}
 
 	return uTemplate.Properties.ObjectUUID, nil

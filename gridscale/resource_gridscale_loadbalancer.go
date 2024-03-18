@@ -321,32 +321,34 @@ func expandLoadbalancerForwardingRules(forwardingRules interface{}) []gsclient.F
 func flattenLoadbalancerForwardingRules(forwardingRules []gsclient.ForwardingRule) []interface{} {
 	tempForwardingRules := make([]interface{}, 0)
 
-	if forwardingRules != nil {
-		for _, value := range forwardingRules {
-			forwardingRule := map[string]interface{}{
-				"letsencrypt_ssl":  value.LetsencryptSSL,
-				"certificate_uuid": value.CertificateUUID,
-				"listen_port":      value.ListenPort,
-				"mode":             value.Mode,
-				"target_port":      value.TargetPort,
-			}
-			tempForwardingRules = append(tempForwardingRules, forwardingRule)
+	if forwardingRules == nil {
+		return tempForwardingRules
+	}
+	for _, value := range forwardingRules {
+		forwardingRule := map[string]interface{}{
+			"letsencrypt_ssl":  value.LetsencryptSSL,
+			"certificate_uuid": value.CertificateUUID,
+			"listen_port":      value.ListenPort,
+			"mode":             value.Mode,
+			"target_port":      value.TargetPort,
 		}
+		tempForwardingRules = append(tempForwardingRules, forwardingRule)
 	}
 	return tempForwardingRules
 }
 
 func flattenLoadbalancerBackendServers(backendServers []gsclient.BackendServer) []interface{} {
 	tempBackendServers := make([]interface{}, 0)
-	if backendServers != nil {
-		for _, value := range backendServers {
-			backendServer := map[string]interface{}{
-				"weight":         value.Weight,
-				"host":           value.Host,
-				"proxy_protocol": value.ProxyProtocol,
-			}
-			tempBackendServers = append(tempBackendServers, backendServer)
+	if backendServers == nil {
+		return tempBackendServers
+	}
+	for _, value := range backendServers {
+		backendServer := map[string]interface{}{
+			"weight":         value.Weight,
+			"host":           value.Host,
+			"proxy_protocol": value.ProxyProtocol,
 		}
+		tempBackendServers = append(tempBackendServers, backendServer)
 	}
 	return tempBackendServers
 }
