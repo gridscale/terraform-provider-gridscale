@@ -36,12 +36,17 @@ func resourceGridscalePostgreSQL() *schema.Resource {
 		},
 		CustomizeDiff: func(ctx context.Context, d *schema.ResourceDiff, meta interface{}) error {
 			requestedReleaseInterface, isReleaseSet := d.GetOk("release")
+			requestedPerformanceClassInterface, isPerformanceClassSet := d.GetOk("performance_class")
 
 			if !isReleaseSet {
 				return errors.New("\"release\" has to be defined")
 			}
+			if !isPerformanceClassSet {
+				return errors.New("\"performance_class\" has to be defined")
+			}
 
 			requestedRelease := requestedReleaseInterface.(string)
+			requestedPerformanceClass := requestedPerformanceClassInterface.(string)
 			client := meta.(*gsclient.Client)
 			paasTemplates, err := client.GetPaaSTemplateList(ctx)
 
@@ -49,25 +54,24 @@ func resourceGridscalePostgreSQL() *schema.Resource {
 				return err
 			}
 			var chosenTemplate gsclient.PaaSTemplate
-			var isReleaseValid bool
-			var releaseList []string
-		TEMPLATELOOP:
+			var isReleasePerformanceClassValid bool
+			releaseSupportedPerformanceClasses := make(map[string][]string)
 			for _, template := range paasTemplates {
 				if template.Properties.Flavour == postgresTemplateFlavourName {
-					for _, release := range releaseList {
-						if release == template.Properties.Release {
-							continue TEMPLATELOOP
-						}
-					}
-					releaseList = append(releaseList, template.Properties.Release)
-					if template.Properties.Release == requestedRelease {
-						isReleaseValid = true
+					performanceClasses := releaseSupportedPerformanceClasses[template.Properties.Release]
+					releaseSupportedPerformanceClasses[template.Properties.Release] = append(performanceClasses, template.Properties.PerformanceClass)
+					if template.Properties.Release == requestedRelease && template.Properties.PerformanceClass == requestedPerformanceClass {
+						isReleasePerformanceClassValid = true
 						chosenTemplate = template
 					}
 				}
 			}
-			if !isReleaseValid {
-				return fmt.Errorf("%v is not a valid PostgreSQL release. Valid releases are: %v", requestedRelease, strings.Join(releaseList, ", "))
+			if !isReleasePerformanceClassValid {
+				errMessage := fmt.Sprintf("release %v with performance class %s is not a valid PostgreSQL release/performance class. Valid releases with corresponding performance classes are:\n\t", requestedRelease, requestedPerformanceClass)
+				for release, performanceClasses := range releaseSupportedPerformanceClasses {
+					errMessage += fmt.Sprintf("release %s is compatible with following performance classes: %s\n\t", release, strings.Join(performanceClasses, ", "))
+				}
+				return errors.New(errMessage)
 			}
 			return validatePostgreSQLParameters(d, chosenTemplate)
 		},
