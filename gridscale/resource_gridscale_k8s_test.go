@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func TestAccResourceGridscaleK8s_Basic(t *testing.T) {
+func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 	var object gsclient.PaaSService
 	name := fmt.Sprintf("k8s-%s", acctest.RandString(10))
 
@@ -20,7 +20,7 @@ func TestAccResourceGridscaleK8s_Basic(t *testing.T) {
 		CheckDestroy: testAccCheckResourceGridscalePaaSDestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckResourceGridscaleK8sConfig_basic(name),
+				Config: testAccCheckResourceGridscaleK8sConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscalePaaSExists("gridscale_k8s.foopaas", &object),
 					resource.TestCheckResourceAttr(
@@ -28,7 +28,7 @@ func TestAccResourceGridscaleK8s_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckResourceGridscaleK8sConfig_basic_update(),
+				Config: testAccCheckResourceGridscaleK8sConfigBasicUpdate(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscalePaaSExists("gridscale_k8s.foopaas", &object),
 					resource.TestCheckResourceAttr(
@@ -39,7 +39,7 @@ func TestAccResourceGridscaleK8s_Basic(t *testing.T) {
 	})
 }
 
-func testAccCheckResourceGridscaleK8sConfig_basic(name string) string {
+func testAccCheckResourceGridscaleK8sConfigBasic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_k8s" "foopaas" {
 	name   = "%s"
@@ -57,7 +57,7 @@ resource "gridscale_k8s" "foopaas" {
 `, name)
 }
 
-func testAccCheckResourceGridscaleK8sConfig_basic_update() string {
+func testAccCheckResourceGridscaleK8sConfigBasicUpdate() string {
 	return `
 resource "gridscale_k8s" "foopaas" {
 	name   = "newname"

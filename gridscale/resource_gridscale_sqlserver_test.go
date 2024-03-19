@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func TestAccResourceGridscaleMSSQLServer_Basic(t *testing.T) {
+func TestAccResourceGridscaleMSSQLServerBasic(t *testing.T) {
 	var object gsclient.PaaSService
 	name := fmt.Sprintf("MSSQLServer-%s", acctest.RandString(10))
 
@@ -20,7 +20,7 @@ func TestAccResourceGridscaleMSSQLServer_Basic(t *testing.T) {
 		CheckDestroy: testAccCheckResourceGridscalePaaSDestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckResourceGridscaleMSSQLServerConfig_basic(name),
+				Config: testAccCheckResourceGridscaleMSSQLServerConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscalePaaSExists("gridscale_sqlserver.test", &object),
 					resource.TestCheckResourceAttr(
@@ -28,7 +28,7 @@ func TestAccResourceGridscaleMSSQLServer_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckResourceGridscaleMSSQLServerConfig_basic_update(),
+				Config: testAccCheckResourceGridscaleMSSQLServerConfigBasicUpdate(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscalePaaSExists("gridscale_sqlserver.test", &object),
 					resource.TestCheckResourceAttr(
@@ -39,7 +39,7 @@ func TestAccResourceGridscaleMSSQLServer_Basic(t *testing.T) {
 	})
 }
 
-func testAccCheckResourceGridscaleMSSQLServerConfig_basic(name string) string {
+func testAccCheckResourceGridscaleMSSQLServerConfigBasic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_sqlserver" "test" {
 	name = "%s"
@@ -49,7 +49,7 @@ resource "gridscale_sqlserver" "test" {
 `, name)
 }
 
-func testAccCheckResourceGridscaleMSSQLServerConfig_basic_update() string {
+func testAccCheckResourceGridscaleMSSQLServerConfigBasicUpdate() string {
 	return `
 resource "gridscale_sqlserver" "test" {
 	name = "newname"

@@ -13,7 +13,7 @@ import (
 	"github.com/gridscale/gsclient-go/v3"
 )
 
-func TestAccResourceGridscaleStorage_Basic(t *testing.T) {
+func TestAccResourceGridscaleStorageBasic(t *testing.T) {
 	var object gsclient.Storage
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
@@ -23,7 +23,7 @@ func TestAccResourceGridscaleStorage_Basic(t *testing.T) {
 		CheckDestroy: testAccCheckGridscaleStorageDestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckResourceGridscaleStorageConfig_basic(name),
+				Config: testAccCheckResourceGridscaleStorageConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscaleStorageExists("gridscale_storage.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -33,7 +33,7 @@ func TestAccResourceGridscaleStorage_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckResourceGridscaleStorageConfig_basic_update(),
+				Config: testAccCheckResourceGridscaleStorageConfigBasicUpdate(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscaleStorageExists("gridscale_storage.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -44,7 +44,7 @@ func TestAccResourceGridscaleStorage_Basic(t *testing.T) {
 	})
 }
 
-func TestAccResourceGridscaleStorage_Advanced(t *testing.T) {
+func TestAccResourceGridscaleStorageAdvanced(t *testing.T) {
 	var object gsclient.Storage
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
@@ -54,7 +54,7 @@ func TestAccResourceGridscaleStorage_Advanced(t *testing.T) {
 		CheckDestroy: testAccCheckGridscaleStorageDestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckResourceGridscaleStorageConfig_advanced(name),
+				Config: testAccCheckResourceGridscaleStorageConfigAdvanced(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscaleStorageExists("gridscale_storage.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -128,7 +128,7 @@ func testAccCheckGridscaleStorageDestroyCheck(s *terraform.State) error {
 	return nil
 }
 
-func testAccCheckResourceGridscaleStorageConfig_basic(name string) string {
+func testAccCheckResourceGridscaleStorageConfigBasic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_storage" "foo" {
   name   = "%s"
@@ -137,7 +137,7 @@ resource "gridscale_storage" "foo" {
 `, name)
 }
 
-func testAccCheckResourceGridscaleStorageConfig_basic_update() string {
+func testAccCheckResourceGridscaleStorageConfigBasicUpdate() string {
 	return `
 resource "gridscale_storage" "foo" {
   name   = "newname"
@@ -146,7 +146,7 @@ resource "gridscale_storage" "foo" {
 `
 }
 
-func testAccCheckResourceGridscaleStorageConfig_advanced(name string) string {
+func testAccCheckResourceGridscaleStorageConfigAdvanced(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_sshkey" "sshkey" {
   name = "%s"

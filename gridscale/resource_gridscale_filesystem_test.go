@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func TestAccResourceGridscaleFilesystem_Basic(t *testing.T) {
+func TestAccResourceGridscaleFilesystemBasic(t *testing.T) {
 	var object gsclient.PaaSService
 	name := fmt.Sprintf("TEST-Filesystem-%s", acctest.RandString(10))
 	resource.Test(t, resource.TestCase{
@@ -19,7 +19,7 @@ func TestAccResourceGridscaleFilesystem_Basic(t *testing.T) {
 		CheckDestroy: testAccCheckResourceGridscalePaaSDestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckResourceGridscaleFilesystemConfig_basic(name),
+				Config: testAccCheckResourceGridscaleFilesystemConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscalePaaSExists("gridscale_filesystem.test", &object),
 					resource.TestCheckResourceAttr(
@@ -33,7 +33,7 @@ func TestAccResourceGridscaleFilesystem_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckResourceGridscaleFilesystemConfig_basic_update(),
+				Config: testAccCheckResourceGridscaleFilesystemConfigBasicUpdate(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscalePaaSExists("gridscale_filesystem.test", &object),
 					resource.TestCheckResourceAttr(
@@ -46,7 +46,7 @@ func TestAccResourceGridscaleFilesystem_Basic(t *testing.T) {
 	})
 }
 
-func testAccCheckResourceGridscaleFilesystemConfig_basic(name string) string {
+func testAccCheckResourceGridscaleFilesystemConfigBasic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_filesystem" "test" {
 	name = "%s"
@@ -58,7 +58,7 @@ resource "gridscale_filesystem" "test" {
 `, name)
 }
 
-func testAccCheckResourceGridscaleFilesystemConfig_basic_update() string {
+func testAccCheckResourceGridscaleFilesystemConfigBasicUpdate() string {
 	return `
 resource "gridscale_filesystem" "test" {
 	name = "newname"

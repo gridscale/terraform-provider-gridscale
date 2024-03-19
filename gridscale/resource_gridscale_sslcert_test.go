@@ -17,7 +17,7 @@ const (
 	leafCertExample   = "-----BEGIN CERTIFICATE-----\nMIIC1TCCAb2gAwIBAgIJAP4/xUQz5NypMA0GCSqGSIb3DQEBBQUAMBoxGDAWBgNV\nBAMTD3d3dy5leGFtcGxlLmNvbTAeFw0yMTAzMjkxNDQxNTdaFw0zMTAzMjcxNDQx\nNTdaMBoxGDAWBgNVBAMTD3d3dy5leGFtcGxlLmNvbTCCASIwDQYJKoZIhvcNAQEB\nBQADggEPADCCAQoCggEBANIM0Lom/iIwroEsBrSzmibfVRhpI9BQM1x9AigEhjo3\nttb90/TNpbhEZ+EsElVVQJgbyy6e0jIVikxsRmd+8KHcsGEIiSVYk2w0VkhxJqpX\ndPTMVANL8G8fSlCeUsGVCp6PViKhSBt9EyptqUSe17qVgigXac46uxackWdSjNuE\ntnw3muCM7h0cCb3s9geRFaPbOvTYNVm/wFi5I0joQeJYXV4LKjT33g2fiKhb6c4b\n4fPui5FYUhSJgB4o35uFR/qBsota38OZwl4dUIBPirb8mFT6buYwD/dw2DVTxjHx\naD8aWtQWg896U1sc/A3CPvWb+EyD/4Jn3YzKvOdX7PUCAwEAAaMeMBwwGgYDVR0R\nBBMwEYIPd3d3LmV4YW1wbGUuY29tMA0GCSqGSIb3DQEBBQUAA4IBAQDKWvBcVS1R\n8K+HYBpEaVnElMk7vBOvdq7h/SZSXVAGNgNM1RPK7w6zWyDwI2Zs5COQiAbK0MwL\nBkI6RwTfDd8RL/nZe35iL6agI0CQbX3/l7Zo09n2RpShpzHbzWIkuzPNlzR+b0pb\nIGyChAsL1O+d3Ft/8LFkFiXIcEb+0kB75X/R+Tx2+LmCMxCHM4JYudzE8mzuKHuR\neXktzUNvVHzkcAN1rpTCK0tGJivmh+QMrwXZh2cWsL6xdI8m24J+e2zJef/mosYQ\n+xX/qCCQKbsRfckG3SDHi6RZlCnzrwSaW+djekAIuju+3HIbeDjjAI4DUSfqd1SH\n87fnnaj9tE69\n-----END CERTIFICATE-----"
 )
 
-func TestAccResourceGridscaleSSLCert_Basic(t *testing.T) {
+func TestAccResourceGridscaleSSLCertBasic(t *testing.T) {
 	var object gsclient.SSLCertificate
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
@@ -27,7 +27,7 @@ func TestAccResourceGridscaleSSLCert_Basic(t *testing.T) {
 		CheckDestroy: testAccCheckGridscaleSSLCertDestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckResourceGridscaleSSLCertConfig_basic(name),
+				Config: testAccCheckResourceGridscaleSSLCertConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscaleSSLCertExists("gridscale_ssl_certificate.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -108,7 +108,7 @@ func testAccCheckGridscaleSSLCertDestroyCheck(s *terraform.State) error {
 	return nil
 }
 
-func testAccCheckResourceGridscaleSSLCertConfig_basic(name string) string {
+func testAccCheckResourceGridscaleSSLCertConfigBasic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_ssl_certificate" "foo" {
   name   = "%s"

@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccdataSourceGridscaleMarketplaceApplication_basic(t *testing.T) {
+func TestAccdataSourceGridscaleMarketplaceApplicationBasic(t *testing.T) {
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
 	resource.Test(t, resource.TestCase{
@@ -18,7 +18,7 @@ func TestAccdataSourceGridscaleMarketplaceApplication_basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 
-				Config: testAccCheckDataSourceMarketplaceApplicationConfig_basic(name),
+				Config: testAccCheckDataSourceMarketplaceApplicationConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.gridscale_marketplace_application.foo", "id"),
 					resource.TestCheckResourceAttrSet("data.gridscale_marketplace_application.foo", "category"),
@@ -33,7 +33,7 @@ func TestAccdataSourceGridscaleMarketplaceApplication_basic(t *testing.T) {
 
 }
 
-func testAccCheckDataSourceMarketplaceApplicationConfig_basic(name string) string {
+func testAccCheckDataSourceMarketplaceApplicationConfigBasic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_marketplace_application" "foo" {
 	name = "%s"

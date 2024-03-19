@@ -12,7 +12,7 @@ import (
 	"github.com/gridscale/gsclient-go/v3"
 )
 
-func TestAccResourceGridscaleIpv6_Basic(t *testing.T) {
+func TestAccResourceGridscaleIpv6Basic(t *testing.T) {
 	var object gsclient.IP
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
@@ -22,7 +22,7 @@ func TestAccResourceGridscaleIpv6_Basic(t *testing.T) {
 		CheckDestroy: testAccCheckGridscaleIpv6DestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckResourceGridscaleIpv6Config_basic(name),
+				Config: testAccCheckResourceGridscaleIpv6ConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscaleIpv6Exists("gridscale_ipv6.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -30,7 +30,7 @@ func TestAccResourceGridscaleIpv6_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckResourceGridscaleIpv6Config_basic_update(),
+				Config: testAccCheckResourceGridscaleIpv6ConfigBasicUpdate(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscaleIpv6Exists("gridscale_ipv6.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -101,7 +101,7 @@ func testAccCheckGridscaleIpv6DestroyCheck(s *terraform.State) error {
 	return nil
 }
 
-func testAccCheckResourceGridscaleIpv6Config_basic(name string) string {
+func testAccCheckResourceGridscaleIpv6ConfigBasic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_ipv6" "foo" {
   name   = "%s"
@@ -109,7 +109,7 @@ resource "gridscale_ipv6" "foo" {
 `, name)
 }
 
-func testAccCheckResourceGridscaleIpv6Config_basic_update() string {
+func testAccCheckResourceGridscaleIpv6ConfigBasicUpdate() string {
 	return `
 resource "gridscale_ipv6" "foo" {
   name   = "newname"

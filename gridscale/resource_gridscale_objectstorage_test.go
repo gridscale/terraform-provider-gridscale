@@ -11,7 +11,7 @@ import (
 	"github.com/gridscale/gsclient-go/v3"
 )
 
-func TestAccResourceGridscaleObjectStorage_Basic(t *testing.T) {
+func TestAccResourceGridscaleObjectStorageBasic(t *testing.T) {
 	var object gsclient.ObjectStorageAccessKey
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -19,7 +19,7 @@ func TestAccResourceGridscaleObjectStorage_Basic(t *testing.T) {
 		CheckDestroy: testAccCheckGridscaleObjectStorageDestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckResourceGridscaleObjectStorageConfig_basic(),
+				Config: testAccCheckResourceGridscaleObjectStorageConfigBasic(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscaleObjectStorageExists("gridscale_object_storage_accesskey.foo", &object),
 					resource.TestCheckResourceAttrSet(
@@ -88,7 +88,7 @@ func testAccCheckGridscaleObjectStorageDestroyCheck(s *terraform.State) error {
 	return nil
 }
 
-func testAccCheckResourceGridscaleObjectStorageConfig_basic() string {
+func testAccCheckResourceGridscaleObjectStorageConfigBasic() string {
 	return `
 resource "gridscale_object_storage_accesskey" "foo" {
 }

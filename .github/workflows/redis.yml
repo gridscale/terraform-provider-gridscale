@@ -41,8 +41,8 @@ jobs:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v4
 
-      - name: Run TestAccResourceGridscaleRedisStore_Basic
-        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccResourceGridscaleRedisStore_Basic'
+      - name: Run TestAccResourceGridscaleRedisStoreBasic
+        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccResourceGridscaleRedisStoreBasic'
 
-      - name: Run TestAccResourceGridscaleRedisCache_Basic
-        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccResourceGridscaleRedisCache_Basic'
+      - name: Run TestAccResourceGridscaleRedisCacheBasic
+        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccResourceGridscaleRedisCacheBasic'

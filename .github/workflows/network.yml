@@ -42,11 +42,11 @@ jobs:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v4
 
-      - name: Run TestAccdataSourceGridscaleNetwork_basic
-        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccdataSourceGridscaleNetwork_basic'
+      - name: Run TestAccdataSourceGridscaleNetworkBasic
+        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccdataSourceGridscaleNetworkBasic'
 
-      - name: Run TestAccdataSourceGridscalePublicNetwork_basic
-        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccdataSourceGridscalePublicNetwork_basic'
+      - name: Run TestAccdataSourceGridscalePublicNetworkBasic
+        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccdataSourceGridscalePublicNetworkBasic'
 
-      - name: Run TestAccResourceGridscaleNetwork_Basic
-        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccResourceGridscaleNetwork_Basic'
+      - name: Run TestAccResourceGridscaleNetworkBasic
+        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccResourceGridscaleNetworkBasic'

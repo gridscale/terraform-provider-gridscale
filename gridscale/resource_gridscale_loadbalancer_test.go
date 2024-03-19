@@ -22,7 +22,7 @@ func TestAccResourceGridscaleLoadBalancerBasic(t *testing.T) {
 		CheckDestroy: testAccCheckGridscaleLoadBalancerDestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckResourceGridscaleLoadBalancerConfig_basic(name, "leastconn"),
+				Config: testAccCheckResourceGridscaleLoadBalancerConfigBasic(name, "leastconn"),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscaleLoadBalancerExists("gridscale_loadbalancer.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -34,7 +34,7 @@ func TestAccResourceGridscaleLoadBalancerBasic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckResourceGridscaleLoadBalancerConfig_update("newname", "roundrobin"),
+				Config: testAccCheckResourceGridscaleLoadBalancerConfigUpdate("newname", "roundrobin"),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscaleLoadBalancerExists("gridscale_loadbalancer.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -79,7 +79,7 @@ func testAccCheckResourceGridscaleLoadBalancerExists(n string, object *gsclient.
 	}
 }
 
-func testAccCheckResourceGridscaleLoadBalancerConfig_basic(name string, algorithm string) string {
+func testAccCheckResourceGridscaleLoadBalancerConfigBasic(name string, algorithm string) string {
 	return fmt.Sprintf(`
 resource "gridscale_ipv4" "lb" {
 	name   = "ipv4-%s"
@@ -111,7 +111,7 @@ resource "gridscale_loadbalancer" "foo" {
 }`, name, name, name, name, algorithm)
 }
 
-func testAccCheckResourceGridscaleLoadBalancerConfig_update(name string, algorithm string) string {
+func testAccCheckResourceGridscaleLoadBalancerConfigUpdate(name string, algorithm string) string {
 	return fmt.Sprintf(`
 resource "gridscale_ipv4" "lb" {
 	name   = "ipv4-%s"

@@ -12,7 +12,7 @@ import (
 	"testing"
 )
 
-func TestAccResourceGridscalePaaS_Basic(t *testing.T) {
+func TestAccResourceGridscalePaaSBasic(t *testing.T) {
 	var object gsclient.PaaSService
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
@@ -22,7 +22,7 @@ func TestAccResourceGridscalePaaS_Basic(t *testing.T) {
 		CheckDestroy: testAccCheckResourceGridscalePaaSDestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckResourceGridscalePaaSConfig_basic(name),
+				Config: testAccCheckResourceGridscalePaaSConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscalePaaSExists("gridscale_paas.foopaas", &object),
 					resource.TestCheckResourceAttr(
@@ -30,7 +30,7 @@ func TestAccResourceGridscalePaaS_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckResourceGridscalePaaSConfig_basic_update(),
+				Config: testAccCheckResourceGridscalePaaSConfigBasicUpdate(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscalePaaSExists("gridscale_paas.foopaas", &object),
 					resource.TestCheckResourceAttr(
@@ -38,7 +38,7 @@ func TestAccResourceGridscalePaaS_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckResourceGridscalePaaSConfig_tmp_update(),
+				Config: testAccCheckResourceGridscalePaaSConfigTMPUpdate(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscalePaaSExists("gridscale_paas.foopaas", &object),
 					resource.TestCheckResourceAttr(
@@ -95,7 +95,7 @@ func testAccCheckResourceGridscalePaaSDestroyCheck(s *terraform.State) error {
 	return nil
 }
 
-func testAccCheckResourceGridscalePaaSConfig_basic(name string) string {
+func testAccCheckResourceGridscalePaaSConfigBasic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_paas" "foopaas" {
   name = "%s"
@@ -104,7 +104,7 @@ resource "gridscale_paas" "foopaas" {
 `, name)
 }
 
-func testAccCheckResourceGridscalePaaSConfig_basic_update() string {
+func testAccCheckResourceGridscalePaaSConfigBasicUpdate() string {
 	return `
 resource "gridscale_paas" "foopaas" {
   name = "newname"
@@ -129,7 +129,7 @@ resource "gridscale_paas" "foopaas" {
 
 // TO DO: update `service_template_uuid` when the backend enables the option to
 // update `service_template_uuid`.
-func testAccCheckResourceGridscalePaaSConfig_tmp_update() string {
+func testAccCheckResourceGridscalePaaSConfigTMPUpdate() string {
 	return `
 resource "gridscale_paas" "foopaas" {
   name = "newname"

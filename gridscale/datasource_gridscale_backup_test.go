@@ -6,13 +6,13 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccdataSourceGridscaleBackup_basic(t *testing.T) {
+func TestAccdataSourceGridscaleBackupBasic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckDataSourceBackupConfig_basic(),
+				Config: testAccCheckDataSourceBackupConfigBasic(),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.gridscale_backup_list.foo", "id"),
 				),
@@ -22,7 +22,7 @@ func TestAccdataSourceGridscaleBackup_basic(t *testing.T) {
 
 }
 
-func testAccCheckDataSourceBackupConfig_basic() string {
+func testAccCheckDataSourceBackupConfigBasic() string {
 	return `
 resource "gridscale_storage" "foo" {
 	name   = "storage"

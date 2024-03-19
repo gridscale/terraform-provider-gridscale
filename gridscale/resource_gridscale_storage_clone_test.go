@@ -8,7 +8,7 @@ import (
 	"github.com/gridscale/gsclient-go/v3"
 )
 
-func TestAccResourceGridscaleStorageClone_Basic(t *testing.T) {
+func TestAccResourceGridscaleStorageCloneBasic(t *testing.T) {
 	var object gsclient.Storage
 
 	resource.Test(t, resource.TestCase{
@@ -17,7 +17,7 @@ func TestAccResourceGridscaleStorageClone_Basic(t *testing.T) {
 		CheckDestroy: testAccCheckGridscaleStorageDestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckResourceGridscaleStorageCloneConfig_basic(),
+				Config: testAccCheckResourceGridscaleStorageCloneConfigBasic(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscaleStorageExists("gridscale_storage_clone.foo", &object),
 					resource.TestCheckResourceAttrSet("gridscale_storage_clone.foo", "name"),
@@ -26,7 +26,7 @@ func TestAccResourceGridscaleStorageClone_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckResourceGridscaleStorageCloneConfig_basic_update(),
+				Config: testAccCheckResourceGridscaleStorageCloneConfigBasicUpdate(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscaleStorageExists("gridscale_storage_clone.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -66,7 +66,7 @@ func TestAccResourceGridscaleStorageClone_Basic(t *testing.T) {
 	return nil
 }*/
 
-func testAccCheckResourceGridscaleStorageCloneConfig_basic() string {
+func testAccCheckResourceGridscaleStorageCloneConfigBasic() string {
 	return `
 resource "gridscale_storage" "foo" {
   name   = "test"
@@ -81,7 +81,7 @@ resource "gridscale_storage_clone" "foo" {
 `
 }
 
-func testAccCheckResourceGridscaleStorageCloneConfig_basic_update() string {
+func testAccCheckResourceGridscaleStorageCloneConfigBasicUpdate() string {
 	return `
 resource "gridscale_storage" "foo" {
 	name   = "test"

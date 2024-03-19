@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccdataSourceGridscaleSSLCert_basic(t *testing.T) {
+func TestAccdataSourceGridscaleSSLCertBasic(t *testing.T) {
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -17,7 +17,7 @@ func TestAccdataSourceGridscaleSSLCert_basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 
-				Config: testAccCheckDataSourceSSLCertConfig_basic(name),
+				Config: testAccCheckDataSourceSSLCertConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.gridscale_ssl_certificate.foo", "id"),
 					resource.TestCheckResourceAttrSet("data.gridscale_ssl_certificate.foo", "common_name"),
@@ -36,7 +36,7 @@ func TestAccdataSourceGridscaleSSLCert_basic(t *testing.T) {
 
 }
 
-func testAccCheckDataSourceSSLCertConfig_basic(name string) string {
+func testAccCheckDataSourceSSLCertConfigBasic(name string) string {
 	return fmt.Sprintf(`
 
 resource "gridscale_ssl_certificate" "foo" {

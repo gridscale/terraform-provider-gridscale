@@ -6,13 +6,13 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccResourceGridscaleBucket_Basic(t *testing.T) {
+func TestAccResourceGridscaleBucketBasic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckResourceGridscaleBucketConfig_basic(),
+				Config: testAccCheckResourceGridscaleBucketConfigBasic(),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet(
 						"gridscale_object_storage_bucket.foo", "access_key"),
@@ -30,7 +30,7 @@ func TestAccResourceGridscaleBucket_Basic(t *testing.T) {
 	})
 }
 
-func testAccCheckResourceGridscaleBucketConfig_basic() string {
+func testAccCheckResourceGridscaleBucketConfigBasic() string {
 	return `
 resource "gridscale_object_storage_accesskey" "test" {
    timeouts {

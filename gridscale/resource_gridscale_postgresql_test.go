@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func TestAccResourceGridscalePostgres_Basic(t *testing.T) {
+func TestAccResourceGridscalePostgresBasic(t *testing.T) {
 	var object gsclient.PaaSService
 	name := fmt.Sprintf("postgres-%s", acctest.RandString(10))
 
@@ -20,7 +20,7 @@ func TestAccResourceGridscalePostgres_Basic(t *testing.T) {
 		CheckDestroy: testAccCheckResourceGridscalePaaSDestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckResourceGridscalePostgresConfig_basic(name),
+				Config: testAccCheckResourceGridscalePostgresConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscalePaaSExists("gridscale_postgresql.test", &object),
 					resource.TestCheckResourceAttr(
@@ -28,7 +28,7 @@ func TestAccResourceGridscalePostgres_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckResourceGridscalePostgresConfig_basic_update(),
+				Config: testAccCheckResourceGridscalePostgresConfigBasicUpdate(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscalePaaSExists("gridscale_postgresql.test", &object),
 					resource.TestCheckResourceAttr(
@@ -39,7 +39,7 @@ func TestAccResourceGridscalePostgres_Basic(t *testing.T) {
 	})
 }
 
-func testAccCheckResourceGridscalePostgresConfig_basic(name string) string {
+func testAccCheckResourceGridscalePostgresConfigBasic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_postgresql" "test" {
 	name = "%s"
@@ -54,7 +54,7 @@ resource "gridscale_postgresql" "test" {
 `, name)
 }
 
-func testAccCheckResourceGridscalePostgresConfig_basic_update() string {
+func testAccCheckResourceGridscalePostgresConfigBasicUpdate() string {
 	return `
 resource "gridscale_postgresql" "test" {
 	name = "newname"

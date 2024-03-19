@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccdataSourceGridscaleFirewall_basic(t *testing.T) {
+func TestAccdataSourceGridscaleFirewallBasic(t *testing.T) {
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
 	resource.Test(t, resource.TestCase{
@@ -18,7 +18,7 @@ func TestAccdataSourceGridscaleFirewall_basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 
-				Config: testAccCheckDataSourceFirewallConfig_basic(name),
+				Config: testAccCheckDataSourceFirewallConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.gridscale_firewall.foo", "id"),
 					resource.TestCheckResourceAttr("data.gridscale_firewall.foo", "name", name),
@@ -29,7 +29,7 @@ func TestAccdataSourceGridscaleFirewall_basic(t *testing.T) {
 
 }
 
-func testAccCheckDataSourceFirewallConfig_basic(name string) string {
+func testAccCheckDataSourceFirewallConfigBasic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_firewall" "foo" {
   name   = "%s"

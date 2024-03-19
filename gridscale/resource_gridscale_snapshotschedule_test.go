@@ -12,7 +12,7 @@ import (
 	"github.com/gridscale/gsclient-go/v3"
 )
 
-func TestAccResourceGridscaleSnapshotSchedule_Basic(t *testing.T) {
+func TestAccResourceGridscaleSnapshotScheduleBasic(t *testing.T) {
 	var object gsclient.StorageSnapshotSchedule
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
@@ -22,7 +22,7 @@ func TestAccResourceGridscaleSnapshotSchedule_Basic(t *testing.T) {
 		CheckDestroy: testAccCheckDataSourceGridscaleSnapshotScheduleDestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckDataSourceGridscaleSnapshotScheduleConfig_basic(name),
+				Config: testAccCheckDataSourceGridscaleSnapshotScheduleConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckDataSourceGridscaleSnapshotScheduleExists("gridscale_snapshotschedule.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -30,7 +30,7 @@ func TestAccResourceGridscaleSnapshotSchedule_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckDataSourceGridscaleSnapshotScheduleConfig_basic_update(),
+				Config: testAccCheckDataSourceGridscaleSnapshotScheduleConfigBasicUpdate(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckDataSourceGridscaleSnapshotScheduleExists("gridscale_snapshotschedule.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -38,7 +38,7 @@ func TestAccResourceGridscaleSnapshotSchedule_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckDataSourceGridscaleSnapshotScheduleConfig_forcenew_update(),
+				Config: testAccCheckDataSourceGridscaleSnapshotScheduleConfigForceNewUpdate(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckDataSourceGridscaleSnapshotScheduleExists("gridscale_snapshotschedule.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -96,7 +96,7 @@ func testAccCheckDataSourceGridscaleSnapshotScheduleDestroyCheck(s *terraform.St
 	return nil
 }
 
-func testAccCheckDataSourceGridscaleSnapshotScheduleConfig_basic(name string) string {
+func testAccCheckDataSourceGridscaleSnapshotScheduleConfigBasic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_storage" "foo" {
   name   = "storage"
@@ -112,7 +112,7 @@ resource "gridscale_snapshotschedule" "foo" {
 `, name)
 }
 
-func testAccCheckDataSourceGridscaleSnapshotScheduleConfig_basic_update() string {
+func testAccCheckDataSourceGridscaleSnapshotScheduleConfigBasicUpdate() string {
 	return `
 resource "gridscale_storage" "foo" {
   name   = "storage"
@@ -128,7 +128,7 @@ resource "gridscale_snapshotschedule" "foo" {
 `
 }
 
-func testAccCheckDataSourceGridscaleSnapshotScheduleConfig_forcenew_update() string {
+func testAccCheckDataSourceGridscaleSnapshotScheduleConfigForceNewUpdate() string {
 	return `
 resource "gridscale_storage" "new" {
   name   = "storage"

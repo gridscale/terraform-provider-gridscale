@@ -12,7 +12,7 @@ import (
 	"github.com/gridscale/gsclient-go/v3"
 )
 
-func TestAccResourceGridscaleTemplate_Basic(t *testing.T) {
+func TestAccResourceGridscaleTemplateBasic(t *testing.T) {
 	var object gsclient.Template
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
@@ -22,7 +22,7 @@ func TestAccResourceGridscaleTemplate_Basic(t *testing.T) {
 		CheckDestroy: testAccCheckGridscaleTemplateDestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckResourceGridscaleTemplateConfig_basic(name),
+				Config: testAccCheckResourceGridscaleTemplateConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscaleTemplateExists("gridscale_template.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -30,7 +30,7 @@ func TestAccResourceGridscaleTemplate_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckResourceGridscaleTemplateConfig_basic_update(),
+				Config: testAccCheckResourceGridscaleTemplateConfigBasicUpdate(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscaleTemplateExists("gridscale_template.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -97,7 +97,7 @@ func testAccCheckGridscaleTemplateDestroyCheck(s *terraform.State) error {
 	return nil
 }
 
-func testAccCheckResourceGridscaleTemplateConfig_basic(name string) string {
+func testAccCheckResourceGridscaleTemplateConfigBasic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_storage" "foo" {
   name   = "%s"
@@ -116,7 +116,7 @@ resource "gridscale_template" "foo" {
 `, name, name, name)
 }
 
-func testAccCheckResourceGridscaleTemplateConfig_basic_update() string {
+func testAccCheckResourceGridscaleTemplateConfigBasicUpdate() string {
 	return `
 resource "gridscale_storage" "foo" {
   name   = "newname"

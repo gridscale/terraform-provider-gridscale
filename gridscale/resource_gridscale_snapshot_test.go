@@ -12,7 +12,7 @@ import (
 	"github.com/gridscale/gsclient-go/v3"
 )
 
-func TestAccResourceGridscaleSnapshot_Basic(t *testing.T) {
+func TestAccResourceGridscaleSnapshotBasic(t *testing.T) {
 	var object gsclient.StorageSnapshot
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
@@ -22,7 +22,7 @@ func TestAccResourceGridscaleSnapshot_Basic(t *testing.T) {
 		CheckDestroy: testAccCheckDataSourceGridscaleSnapshotDestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckDataSourceGridscaleSnapshotConfig_basic(name),
+				Config: testAccCheckDataSourceGridscaleSnapshotConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckDataSourceGridscaleSnapshotExists("gridscale_snapshot.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -30,7 +30,7 @@ func TestAccResourceGridscaleSnapshot_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckDataSourceGridscaleSnapshotConfig_basic_update(),
+				Config: testAccCheckDataSourceGridscaleSnapshotConfigBasicUpdate(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckDataSourceGridscaleSnapshotExists("gridscale_snapshot.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -38,7 +38,7 @@ func TestAccResourceGridscaleSnapshot_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckDataSourceGridscaleSnapshotConfig_forcenew_update(),
+				Config: testAccCheckDataSourceGridscaleSnapshotConfigForceNewUpdate(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckDataSourceGridscaleSnapshotExists("gridscale_snapshot.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -96,7 +96,7 @@ func testAccCheckDataSourceGridscaleSnapshotDestroyCheck(s *terraform.State) err
 	return nil
 }
 
-func testAccCheckDataSourceGridscaleSnapshotConfig_basic(name string) string {
+func testAccCheckDataSourceGridscaleSnapshotConfigBasic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_storage" "foo" {
   name   = "storage"
@@ -112,7 +112,7 @@ resource "gridscale_snapshot" "foo" {
 `, name)
 }
 
-func testAccCheckDataSourceGridscaleSnapshotConfig_basic_update() string {
+func testAccCheckDataSourceGridscaleSnapshotConfigBasicUpdate() string {
 	return `
 resource "gridscale_storage" "foo" {
   name   = "storage"
@@ -132,7 +132,7 @@ resource "gridscale_snapshot" "foo" {
 `
 }
 
-func testAccCheckDataSourceGridscaleSnapshotConfig_forcenew_update() string {
+func testAccCheckDataSourceGridscaleSnapshotConfigForceNewUpdate() string {
 	return `
 resource "gridscale_storage" "new" {
   name   = "storage"

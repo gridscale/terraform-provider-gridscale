@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccdataSourceGridscaleIPv6_basic(t *testing.T) {
+func TestAccdataSourceGridscaleIPv6Basic(t *testing.T) {
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -17,7 +17,7 @@ func TestAccdataSourceGridscaleIPv6_basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 
-				Config: testAccCheckDataSourceIPv6Config_basic(name),
+				Config: testAccCheckDataSourceIPv6ConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.gridscale_ipv6.foo", "id"),
 					resource.TestCheckResourceAttr("data.gridscale_ipv6.foo", "name", name),
@@ -28,7 +28,7 @@ func TestAccdataSourceGridscaleIPv6_basic(t *testing.T) {
 
 }
 
-func testAccCheckDataSourceIPv6Config_basic(name string) string {
+func testAccCheckDataSourceIPv6ConfigBasic(name string) string {
 	return fmt.Sprintf(`
 
 resource "gridscale_ipv6" "foo" {

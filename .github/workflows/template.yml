@@ -41,8 +41,8 @@ jobs:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v4
 
-      - name: Run TestAccDataSourceTemplate_basic
-        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccDataSourceTemplate_basic'
+      - name: Run TestAccDataSourceTemplateBasic
+        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccDataSourceTemplateBasic'
 
-      - name: Run TestAccResourceGridscaleTemplate_Basic
-        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccResourceGridscaleTemplate_Basic'
+      - name: Run TestAccResourceGridscaleTemplateBasic
+        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccResourceGridscaleTemplateBasic'
