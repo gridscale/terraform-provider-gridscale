@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccdataSourceGridscaleLoadBalancer_basic(t *testing.T) {
+func TestAccdataSourceGridscaleLoadBalancerBasic(t *testing.T) {
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -17,7 +17,7 @@ func TestAccdataSourceGridscaleLoadBalancer_basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 
-				Config: testAccCheckDataSourceLoadBalancerConfig_basic(name),
+				Config: testAccCheckDataSourceLoadBalancerConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.gridscale_loadbalancer.foo", "id"),
 					resource.TestCheckResourceAttr("data.gridscale_loadbalancer.foo", "name", name),
@@ -35,7 +35,7 @@ func TestAccdataSourceGridscaleLoadBalancer_basic(t *testing.T) {
 
 }
 
-func testAccCheckDataSourceLoadBalancerConfig_basic(name string) string {
+func testAccCheckDataSourceLoadBalancerConfigBasic(name string) string {
 	return fmt.Sprintf(`
 
 resource "gridscale_ipv4" "lb" {

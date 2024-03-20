@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccdataSourceGridscaleSecurityZone_basic(t *testing.T) {
+func TestAccdataSourceGridscaleSecurityZoneBasic(t *testing.T) {
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -17,7 +17,7 @@ func TestAccdataSourceGridscaleSecurityZone_basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 
-				Config: testAccCheckDataSourceSecurityZoneConfig_basic(name),
+				Config: testAccCheckDataSourceSecurityZoneConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.gridscale_paas_securityzone.foo", "location_uuid"),
 					resource.TestCheckResourceAttr("data.gridscale_paas_securityzone.foo", "name", name),
@@ -28,7 +28,7 @@ func TestAccdataSourceGridscaleSecurityZone_basic(t *testing.T) {
 
 }
 
-func testAccCheckDataSourceSecurityZoneConfig_basic(name string) string {
+func testAccCheckDataSourceSecurityZoneConfigBasic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_paas_securityzone" "foo" {
   name = "%s"

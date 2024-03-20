@@ -12,7 +12,7 @@ import (
 	"github.com/gridscale/gsclient-go/v3"
 )
 
-func TestAccResourceGridscaleISOImage_Basic(t *testing.T) {
+func TestAccResourceGridscaleISOImageBasic(t *testing.T) {
 	var object gsclient.ISOImage
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
@@ -22,7 +22,7 @@ func TestAccResourceGridscaleISOImage_Basic(t *testing.T) {
 		CheckDestroy: testAccCheckGridscaleISOImageDestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckResourceGridscaleISOImageConfig_basic(name),
+				Config: testAccCheckResourceGridscaleISOImageConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscaleISOImageExists("gridscale_isoimage.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -30,7 +30,7 @@ func TestAccResourceGridscaleISOImage_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckResourceGridscaleISOImageConfig_basic_update(),
+				Config: testAccCheckResourceGridscaleISOImageConfigBasicUpdate(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscaleISOImageExists("gridscale_isoimage.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -97,7 +97,7 @@ func testAccCheckGridscaleISOImageDestroyCheck(s *terraform.State) error {
 	return nil
 }
 
-func testAccCheckResourceGridscaleISOImageConfig_basic(name string) string {
+func testAccCheckResourceGridscaleISOImageConfigBasic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_isoimage" "foo" {
   name   = "%s"
@@ -113,11 +113,11 @@ resource "gridscale_server" "foo" {
 `, name, name)
 }
 
-func testAccCheckResourceGridscaleISOImageConfig_basic_update() string {
-	return fmt.Sprintf(`
+func testAccCheckResourceGridscaleISOImageConfigBasicUpdate() string {
+	return `
 resource "gridscale_isoimage" "foo" {
   name   = "newname"
   source_url = "http://tinycorelinux.net/10.x/x86/release/TinyCore-current.iso"
 }
-`)
+`
 }

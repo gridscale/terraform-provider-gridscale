@@ -12,7 +12,7 @@ import (
 	"github.com/gridscale/gsclient-go/v3"
 )
 
-func TestAccResourceGridscaleServer_Basic(t *testing.T) {
+func TestAccResourceGridscaleServerBasic(t *testing.T) {
 	var object gsclient.Server
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
@@ -22,7 +22,7 @@ func TestAccResourceGridscaleServer_Basic(t *testing.T) {
 		CheckDestroy: testAccCheckResourceGridscaleServerDestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckResourceGridscaleServerConfig_basic(name),
+				Config: testAccCheckResourceGridscaleServerConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscaleServerExists("gridscale_server.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -36,7 +36,7 @@ func TestAccResourceGridscaleServer_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckResourceGridscaleServerConfig_basic_update(),
+				Config: testAccCheckResourceGridscaleServerConfigBasicUpdate(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscaleServerExists("gridscale_server.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -109,7 +109,7 @@ func testAccCheckResourceGridscaleServerDestroyCheck(s *terraform.State) error {
 	return nil
 }
 
-func testAccCheckResourceGridscaleServerConfig_basic(name string) string {
+func testAccCheckResourceGridscaleServerConfigBasic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_ipv4" "foo" {
   name   = "ip-%s"
@@ -158,8 +158,8 @@ resource "gridscale_server" "foo" {
 `, name, name, name, name)
 }
 
-func testAccCheckResourceGridscaleServerConfig_basic_update() string {
-	return fmt.Sprintf(`
+func testAccCheckResourceGridscaleServerConfigBasicUpdate() string {
+	return `
 resource "gridscale_ipv4" "foo1" {
   name   = "newname"
 }
@@ -197,5 +197,5 @@ resource "gridscale_server" "foo" {
   	object_uuid = gridscale_storage.foo1.id
   }
 }
-`)
+`
 }

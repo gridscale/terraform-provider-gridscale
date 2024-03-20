@@ -163,7 +163,7 @@ func dataSourceGridscalePaaSRead(d *schema.ResourceData, meta interface{}) error
 	if err = d.Set("name", props.Name); err != nil {
 		return fmt.Errorf("%s error setting name: %v", errorPrefix, err)
 	}
-	if creds != nil && len(creds) > 0 {
+	if len(creds) > 0 {
 		if err = d.Set("username", creds[0].Username); err != nil {
 			return fmt.Errorf("%s error setting username: %v", errorPrefix, err)
 		}
@@ -222,6 +222,10 @@ func dataSourceGridscalePaaSRead(d *schema.ResourceData, meta interface{}) error
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
 		valueInString, err := convInterfaceToString(paramValType, value)
+
+		if err != nil {
+			return err
+		}
 		param := map[string]interface{}{
 			"param": k,
 			"value": valueInString,

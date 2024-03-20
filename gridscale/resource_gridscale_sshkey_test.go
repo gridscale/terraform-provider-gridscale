@@ -12,7 +12,7 @@ import (
 	"github.com/gridscale/gsclient-go/v3"
 )
 
-func TestAccResourceGridscaleSshkey_Basic(t *testing.T) {
+func TestAccResourceGridscaleSshkeyBasic(t *testing.T) {
 	var object gsclient.Sshkey
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
@@ -22,7 +22,7 @@ func TestAccResourceGridscaleSshkey_Basic(t *testing.T) {
 		CheckDestroy: testAccCheckGridscaleSshkeyDestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckResourceGridscaleSshkeyConfig_basic(name),
+				Config: testAccCheckResourceGridscaleSshkeyConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscaleSshkeyExists("gridscale_sshkey.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -32,7 +32,7 @@ func TestAccResourceGridscaleSshkey_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckResourceGridscaleSshkeyConfig_basic_update(),
+				Config: testAccCheckResourceGridscaleSshkeyConfigBasicUpdate(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscaleSshkeyExists("gridscale_sshkey.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -101,7 +101,7 @@ func testAccCheckGridscaleSshkeyDestroyCheck(s *terraform.State) error {
 	return nil
 }
 
-func testAccCheckResourceGridscaleSshkeyConfig_basic(name string) string {
+func testAccCheckResourceGridscaleSshkeyConfigBasic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_sshkey" "foo" {
   name   = "%s"
@@ -110,11 +110,11 @@ resource "gridscale_sshkey" "foo" {
 `, name)
 }
 
-func testAccCheckResourceGridscaleSshkeyConfig_basic_update() string {
-	return fmt.Sprintf(`
+func testAccCheckResourceGridscaleSshkeyConfigBasicUpdate() string {
+	return `
 resource "gridscale_sshkey" "foo" {
   name   = "newname"
   sshkey = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCvOYJ3xXtPXaPOacFQ97+nGq5QDkl17/JeTaY36RLPKgYBt2Z5YSPSROdzh/5GgZ0p6E3W84gKNaedUo3v+zvgmdGZeDFk+cxlC0HtXwQN87GQRtYTMsucbI6OJT7p4qntl70MIBzvIrmheGZqXnpeRxA7PjVcjkA3nxps3XJsuMDd0Ft0Ue3j0lmOno779mfgg34VeTgE2GZlH31gFqxWz3fXUgaZoLdO7HbLKu4ybfFWdCzqBt4B8RG9xMq0220gJR6ZwAaiMc1CGIknK7C6EKeCx9LOWDjCaHg6pA2iPAb/PoxDuiqbUIzfRmkgMf0lYmrf0kqx529ALm92ulSx root@33c294c5235e"
 }
-`)
+`
 }

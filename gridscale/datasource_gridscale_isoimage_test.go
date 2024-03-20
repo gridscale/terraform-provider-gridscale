@@ -2,13 +2,14 @@ package gridscale
 
 import (
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccDataSourceISOImage_basic(t *testing.T) {
+func TestAccDataSourceISOImageBasic(t *testing.T) {
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -18,7 +19,7 @@ func TestAccDataSourceISOImage_basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 
-				Config: testAccCheckDataSourceGridscaleISOImageConfig_basic(name),
+				Config: testAccCheckDataSourceGridscaleISOImageConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.gridscale_isoimage.foo", "id"),
 				),
@@ -28,7 +29,7 @@ func TestAccDataSourceISOImage_basic(t *testing.T) {
 
 }
 
-func testAccCheckDataSourceGridscaleISOImageConfig_basic(name string) string {
+func testAccCheckDataSourceGridscaleISOImageConfigBasic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_isoimage" "foo" {
   name   = "%s"

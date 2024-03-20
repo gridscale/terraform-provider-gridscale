@@ -12,7 +12,7 @@ import (
 	"github.com/gridscale/gsclient-go/v3"
 )
 
-func TestAccResourceGridscaleFirewall_Basic(t *testing.T) {
+func TestAccResourceGridscaleFirewallBasic(t *testing.T) {
 	var object gsclient.Firewall
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
@@ -22,7 +22,7 @@ func TestAccResourceGridscaleFirewall_Basic(t *testing.T) {
 		CheckDestroy: testAccCheckGridscaleFirewallDestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckResourceGridscaleFirewallConfig_basic(name),
+				Config: testAccCheckResourceGridscaleFirewallConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscaleFirewallExists("gridscale_firewall.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -30,7 +30,7 @@ func TestAccResourceGridscaleFirewall_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckResourceGridscaleFirewallConfig_basic_update(),
+				Config: testAccCheckResourceGridscaleFirewallConfigBasicUpdate(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscaleFirewallExists("gridscale_firewall.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -97,7 +97,7 @@ func testAccCheckGridscaleFirewallDestroyCheck(s *terraform.State) error {
 	return nil
 }
 
-func testAccCheckResourceGridscaleFirewallConfig_basic(name string) string {
+func testAccCheckResourceGridscaleFirewallConfigBasic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_firewall" "foo" {
   name   = "%s"
@@ -120,8 +120,8 @@ resource "gridscale_firewall" "foo" {
 `, name)
 }
 
-func testAccCheckResourceGridscaleFirewallConfig_basic_update() string {
-	return fmt.Sprintf(`
+func testAccCheckResourceGridscaleFirewallConfigBasicUpdate() string {
+	return `
 resource "gridscale_firewall" "foo" {
   name   = "newname"
   rules_v4_out {
@@ -139,5 +139,5 @@ resource "gridscale_firewall" "foo" {
 	comment = "testv6"
   }
 }
-`)
+`
 }

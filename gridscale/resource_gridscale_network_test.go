@@ -12,7 +12,7 @@ import (
 	"github.com/gridscale/gsclient-go/v3"
 )
 
-func TestAccResourceGridscaleNetwork_Basic(t *testing.T) {
+func TestAccResourceGridscaleNetworkBasic(t *testing.T) {
 	var object gsclient.Network
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
@@ -22,7 +22,7 @@ func TestAccResourceGridscaleNetwork_Basic(t *testing.T) {
 		CheckDestroy: testAccCheckGridscaleNetworkDestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckResourceGridscaleNetworkConfig_basic(name),
+				Config: testAccCheckResourceGridscaleNetworkConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscaleNetworkExists("gridscale_network.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -38,7 +38,7 @@ func TestAccResourceGridscaleNetwork_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckResourceGridscaleNetworkConfig_basic_update(),
+				Config: testAccCheckResourceGridscaleNetworkConfigBasicUpdate(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscaleNetworkExists("gridscale_network.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -115,7 +115,7 @@ func testAccCheckGridscaleNetworkDestroyCheck(s *terraform.State) error {
 	return nil
 }
 
-func testAccCheckResourceGridscaleNetworkConfig_basic(name string) string {
+func testAccCheckResourceGridscaleNetworkConfigBasic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_network" "foo" {
   name   = "%s"
@@ -128,8 +128,8 @@ resource "gridscale_network" "foo" {
 `, name)
 }
 
-func testAccCheckResourceGridscaleNetworkConfig_basic_update() string {
-	return fmt.Sprint(`
+func testAccCheckResourceGridscaleNetworkConfigBasicUpdate() string {
+	return `
 resource "gridscale_network" "foo" {
   name   = "newname"
   l2security = true
@@ -139,5 +139,5 @@ resource "gridscale_network" "foo" {
   dhcp_range = "192.168.122.0/27"
   dhcp_reserved_subnet = ["192.168.122.0/31"]
 }
-`)
+`
 }

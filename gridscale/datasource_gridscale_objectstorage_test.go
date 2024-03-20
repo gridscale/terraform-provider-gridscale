@@ -1,13 +1,12 @@
 package gridscale
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccdataSourceGridscaleObjectStorage_basic(t *testing.T) {
+func TestAccdataSourceGridscaleObjectStorageBasic(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -16,7 +15,7 @@ func TestAccdataSourceGridscaleObjectStorage_basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 
-				Config: testAccCheckDataSourceObjectStorageConfig_basic(),
+				Config: testAccCheckDataSourceObjectStorageConfigBasic(),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.gridscale_object_storage_accesskey.foo", "id"),
 					resource.TestCheckResourceAttrSet("data.gridscale_object_storage_accesskey.foo", "access_key"),
@@ -28,13 +27,13 @@ func TestAccdataSourceGridscaleObjectStorage_basic(t *testing.T) {
 
 }
 
-func testAccCheckDataSourceObjectStorageConfig_basic() string {
-	return fmt.Sprint(`
+func testAccCheckDataSourceObjectStorageConfigBasic() string {
+	return `
 resource "gridscale_object_storage_accesskey" "foo" {
 }
 
 data "gridscale_object_storage_accesskey" "foo" {
 	resource_id   = "${gridscale_object_storage_accesskey.foo.id}"
 }
-`)
+`
 }

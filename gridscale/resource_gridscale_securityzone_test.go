@@ -12,7 +12,7 @@ import (
 	"github.com/gridscale/gsclient-go/v3"
 )
 
-func TestAccDataSourceGridscaleSecurityZone_Basic(t *testing.T) {
+func TestAccDataSourceGridscaleSecurityZoneBasic(t *testing.T) {
 	var object gsclient.PaaSSecurityZone
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
@@ -22,7 +22,7 @@ func TestAccDataSourceGridscaleSecurityZone_Basic(t *testing.T) {
 		CheckDestroy: testAccCheckDataSourceGridscaleSecurityZoneDestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckDataSourceGridscaleSecurityZoneConfig_basic(name),
+				Config: testAccCheckDataSourceGridscaleSecurityZoneConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckDataSourceGridscaleSecurityZoneExists("gridscale_paas_securityzone.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -30,7 +30,7 @@ func TestAccDataSourceGridscaleSecurityZone_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckDataSourceGridscaleSecurityZoneConfig_basic_update(),
+				Config: testAccCheckDataSourceGridscaleSecurityZoneConfigBasicUpdate(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckDataSourceGridscaleSecurityZoneExists("gridscale_paas_securityzone.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -87,7 +87,7 @@ func testAccCheckDataSourceGridscaleSecurityZoneDestroyCheck(s *terraform.State)
 	return nil
 }
 
-func testAccCheckDataSourceGridscaleSecurityZoneConfig_basic(name string) string {
+func testAccCheckDataSourceGridscaleSecurityZoneConfigBasic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_paas_securityzone" "foo" {
   name = "%s"
@@ -95,10 +95,10 @@ resource "gridscale_paas_securityzone" "foo" {
 `, name)
 }
 
-func testAccCheckDataSourceGridscaleSecurityZoneConfig_basic_update() string {
-	return fmt.Sprintf(`
+func testAccCheckDataSourceGridscaleSecurityZoneConfigBasicUpdate() string {
+	return `
 resource "gridscale_paas_securityzone" "foo" {
   name = "newname"
 }
-`)
+`
 }

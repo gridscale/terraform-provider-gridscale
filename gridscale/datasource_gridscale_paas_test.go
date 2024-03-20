@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccdataSourceGridscalePaaS_basic(t *testing.T) {
+func TestAccdataSourceGridscalePaaSBasic(t *testing.T) {
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -16,7 +16,7 @@ func TestAccdataSourceGridscalePaaS_basic(t *testing.T) {
 		CheckDestroy: testAccCheckResourceGridscalePaaSDestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckDataSourcePaaSConfig_basic(name),
+				Config: testAccCheckDataSourcePaaSConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.gridscale_paas.foo", "name", name),
 					resource.TestCheckResourceAttr("data.gridscale_paas.foo", "service_template_uuid", "d7a5e8ec-fa78-4d1b-86f9-febe3e16e398"),
@@ -27,7 +27,7 @@ func TestAccdataSourceGridscalePaaS_basic(t *testing.T) {
 
 }
 
-func testAccCheckDataSourcePaaSConfig_basic(name string) string {
+func testAccCheckDataSourcePaaSConfigBasic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_paas" "foo" {
   name = "%s"

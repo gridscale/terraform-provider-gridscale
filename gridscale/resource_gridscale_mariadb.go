@@ -524,7 +524,7 @@ func getMariaDBTemplateUUID(client *gsclient.Client, release, performanceClass s
 		}
 	}
 	if !isReleaseValid {
-		return "", fmt.Errorf("%v is not a valid MariaDB release. Valid releases are: %v\n", release, strings.Join(releases, ", "))
+		return "", fmt.Errorf("%v is not a valid MariaDB release. Valid releases are: %v", release, strings.Join(releases, ", "))
 	}
 
 	return uTemplate.Properties.ObjectUUID, nil

@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccDataSourceTemplate_basic(t *testing.T) {
+func TestAccDataSourceTemplateBasic(t *testing.T) {
 	name := "Ubuntu 22.04 LTS (Jammy Jellyfish) "
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
@@ -17,7 +17,7 @@ func TestAccDataSourceTemplate_basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 
-				Config: testAccCheckDataSourceGridscaleTemplateConfig_basic(name),
+				Config: testAccCheckDataSourceGridscaleTemplateConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.gridscale_template.foo", "id"),
 				),
@@ -27,7 +27,7 @@ func TestAccDataSourceTemplate_basic(t *testing.T) {
 
 }
 
-func testAccCheckDataSourceGridscaleTemplateConfig_basic(name string) string {
+func testAccCheckDataSourceGridscaleTemplateConfigBasic(name string) string {
 	return fmt.Sprintf(`
 data "gridscale_template" "foo" {
 	name   = "%s"

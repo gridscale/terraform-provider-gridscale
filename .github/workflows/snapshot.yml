@@ -41,14 +41,14 @@ jobs:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v4
 
-      - name: Run TestAccdataSourceGridscaleSnapshot_basic
-        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccdataSourceGridscaleSnapshot_basic'
+      - name: Run TestAccdataSourceGridscaleSnapshotBasic
+        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccdataSourceGridscaleSnapshotBasic'
 
-      - name: Run TestAccdataSourceGridscaleSnapshotSchedule_basic
-        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccdataSourceGridscaleSnapshotSchedule_basic'
+      - name: Run TestAccdataSourceGridscaleSnapshotScheduleBasic
+        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccdataSourceGridscaleSnapshotScheduleBasic'
 
-      - name: Run TestAccResourceGridscaleSnapshot_Basic
-        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccResourceGridscaleSnapshot_Basic'
+      - name: Run TestAccResourceGridscaleSnapshotBasic
+        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccResourceGridscaleSnapshotBasic'
 
-      - name: Run TestAccResourceGridscaleSnapshotSchedule_Basic
-        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccResourceGridscaleSnapshotSchedule_Basic'
+      - name: Run TestAccResourceGridscaleSnapshotScheduleBasic
+        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccResourceGridscaleSnapshotScheduleBasic'

@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccdataSourceGridscaleSSHKey_basic(t *testing.T) {
+func TestAccdataSourceGridscaleSSHKeyBasic(t *testing.T) {
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -17,7 +17,7 @@ func TestAccdataSourceGridscaleSSHKey_basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 
-				Config: testAccCheckDataSourceSSHKeyConfig_basic(name),
+				Config: testAccCheckDataSourceSSHKeyConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.gridscale_sshkey.foo", "id"),
 					resource.TestCheckResourceAttr("data.gridscale_sshkey.foo", "name", name),
@@ -28,7 +28,7 @@ func TestAccdataSourceGridscaleSSHKey_basic(t *testing.T) {
 
 }
 
-func testAccCheckDataSourceSSHKeyConfig_basic(name string) string {
+func testAccCheckDataSourceSSHKeyConfigBasic(name string) string {
 	return fmt.Sprintf(`
 
 resource "gridscale_sshkey" "foo" {

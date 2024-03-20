@@ -24,7 +24,7 @@ func TestProvider(t *testing.T) {
 	}
 }
 
-func TestProvider_impl(t *testing.T) {
+func TestProviderInitialization(t *testing.T) {
 	var _ *schema.Provider = Provider()
 }
 
@@ -38,7 +38,7 @@ func testAccPreCheck(t *testing.T) {
 	}
 }
 
-func Test_convertStrToHeaderMap(t *testing.T) {
+func TestConvertStrToHeaderMap(t *testing.T) {
 	type testCase struct {
 		InputStr       string
 		ExpectedOutput map[string]string

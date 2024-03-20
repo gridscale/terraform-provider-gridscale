@@ -12,7 +12,7 @@ import (
 	"github.com/gridscale/gsclient-go/v3"
 )
 
-func TestAccResourceGridscaleMarketplaceApplication_Basic(t *testing.T) {
+func TestAccResourceGridscaleMarketplaceApplicationBasic(t *testing.T) {
 	var object gsclient.MarketplaceApplication
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
@@ -22,7 +22,7 @@ func TestAccResourceGridscaleMarketplaceApplication_Basic(t *testing.T) {
 		CheckDestroy: testAccCheckGridscaleMarketplaceApplicationDestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckResourceGridscaleMarketplaceApplicationConfig_basic(name),
+				Config: testAccCheckResourceGridscaleMarketplaceApplicationConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscaleMarketplaceApplicationExists("gridscale_marketplace_application.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -30,7 +30,7 @@ func TestAccResourceGridscaleMarketplaceApplication_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckResourceGridscaleMarketplaceApplicationConfig_basic_update(),
+				Config: testAccCheckResourceGridscaleMarketplaceApplicationConfigBasicUpdate(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscaleMarketplaceApplicationExists("gridscale_marketplace_application.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -97,7 +97,7 @@ func testAccCheckGridscaleMarketplaceApplicationDestroyCheck(s *terraform.State)
 	return nil
 }
 
-func testAccCheckResourceGridscaleMarketplaceApplicationConfig_basic(name string) string {
+func testAccCheckResourceGridscaleMarketplaceApplicationConfigBasic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_marketplace_application" "foo" {
 	name = "%s"
@@ -111,8 +111,8 @@ resource "gridscale_marketplace_application" "foo" {
 `, name)
 }
 
-func testAccCheckResourceGridscaleMarketplaceApplicationConfig_basic_update() string {
-	return fmt.Sprintf(`
+func testAccCheckResourceGridscaleMarketplaceApplicationConfigBasicUpdate() string {
+	return `
 resource "gridscale_marketplace_application" "foo" {
   	name   = "newname"
 	object_storage_path = "s3://testsnapshot/test.gz"
@@ -122,5 +122,5 @@ resource "gridscale_marketplace_application" "foo" {
 	setup_storage_capacity = 5
 	meta_components = ["test_component", "test_component1"]
 }
-`)
+`
 }

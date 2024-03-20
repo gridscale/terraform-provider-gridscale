@@ -1,20 +1,19 @@
 package gridscale
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccdataSourceGridscalePublicNetwork_basic(t *testing.T) {
+func TestAccdataSourceGridscalePublicNetworkBasic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 
-				Config: testAccCheckDataSourcePublicNetworkConfig_basic(),
+				Config: testAccCheckDataSourcePublicNetworkConfigBasic(),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.gridscale_public_network.foo", "id"),
 					resource.TestCheckResourceAttrSet("data.gridscale_public_network.foo", "name"),
@@ -25,8 +24,8 @@ func TestAccdataSourceGridscalePublicNetwork_basic(t *testing.T) {
 
 }
 
-func testAccCheckDataSourcePublicNetworkConfig_basic() string {
-	return fmt.Sprint(`
+func testAccCheckDataSourcePublicNetworkConfigBasic() string {
+	return `
 data "gridscale_public_network" "foo" {
-}`)
+}`
 }

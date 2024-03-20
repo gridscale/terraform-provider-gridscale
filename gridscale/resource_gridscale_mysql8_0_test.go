@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func TestAccResourceGridscaleMySQL8_0_Basic(t *testing.T) {
+func TestAccResourceGridscaleMySQL8_0Basic(t *testing.T) {
 	var object gsclient.PaaSService
 	name := fmt.Sprintf("MySQL-%s", acctest.RandString(10))
 
@@ -20,7 +20,7 @@ func TestAccResourceGridscaleMySQL8_0_Basic(t *testing.T) {
 		CheckDestroy: testAccCheckResourceGridscalePaaSDestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckResourceGridscaleMySQL8_0Config_basic(name),
+				Config: testAccCheckResourceGridscaleMySQL8_0ConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscalePaaSExists("gridscale_mysql8_0.test", &object),
 					resource.TestCheckResourceAttr(
@@ -28,7 +28,7 @@ func TestAccResourceGridscaleMySQL8_0_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckResourceGridscaleMySQL8_0Config_basic_update(),
+				Config: testAccCheckResourceGridscaleMySQL8_0ConfigBasicUpdate(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscalePaaSExists("gridscale_mysql8_0.test", &object),
 					resource.TestCheckResourceAttr(
@@ -39,7 +39,7 @@ func TestAccResourceGridscaleMySQL8_0_Basic(t *testing.T) {
 	})
 }
 
-func testAccCheckResourceGridscaleMySQL8_0Config_basic(name string) string {
+func testAccCheckResourceGridscaleMySQL8_0ConfigBasic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_mysql8_0" "test" {
 	name = "%s"
@@ -49,8 +49,8 @@ resource "gridscale_mysql8_0" "test" {
 `, name)
 }
 
-func testAccCheckResourceGridscaleMySQL8_0Config_basic_update() string {
-	return fmt.Sprintf(`
+func testAccCheckResourceGridscaleMySQL8_0ConfigBasicUpdate() string {
+	return `
 resource "gridscale_mysql8_0" "test" {
 	name = "newname"
 	release = "8.0"
@@ -59,5 +59,5 @@ resource "gridscale_mysql8_0" "test" {
 	mysql_max_connections = 2000
 	labels = ["test"]
 }
-`)
+`
 }

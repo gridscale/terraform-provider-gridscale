@@ -41,14 +41,14 @@ jobs:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v4
 
-      - name: Run TestAccdataSourceGridscaleIPv4_basic
-        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccdataSourceGridscaleIPv4_basic'
+      - name: Run TestAccdataSourceGridscaleIPv4Basic
+        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccdataSourceGridscaleIPv4Basic'
 
-      - name: Run TestAccdataSourceGridscaleIPv6_basic
-        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccdataSourceGridscaleIPv6_basic'
+      - name: Run TestAccdataSourceGridscaleIPv6Basic
+        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccdataSourceGridscaleIPv6Basic'
 
-      - name: Run TestAccResourceGridscaleIpv4_Basic
-        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccResourceGridscaleIpv4_Basic'
+      - name: Run TestAccResourceGridscaleIpv4Basic
+        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccResourceGridscaleIpv4Basic'
 
-      - name: Run TestAccResourceGridscaleIpv6_Basic
-        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccResourceGridscaleIpv6_Basic'
+      - name: Run TestAccResourceGridscaleIpv6Basic
+        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccResourceGridscaleIpv6Basic'

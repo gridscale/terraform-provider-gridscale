@@ -12,7 +12,7 @@ import (
 	"github.com/gridscale/gsclient-go/v3"
 )
 
-func TestAccResourceGridscaleMarketplaceApplicationImport_Basic(t *testing.T) {
+func TestAccResourceGridscaleMarketplaceApplicationImportBasic(t *testing.T) {
 	var object gsclient.MarketplaceApplication
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 
@@ -22,7 +22,7 @@ func TestAccResourceGridscaleMarketplaceApplicationImport_Basic(t *testing.T) {
 		CheckDestroy: testAccCheckGridscaleMarketplaceApplicationImportDestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckResourceGridscaleMarketplaceApplicationImportConfig_basic(name),
+				Config: testAccCheckResourceGridscaleMarketplaceApplicationImportConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscaleMarketplaceApplicationImportExists("gridscale_marketplace_application_import.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -30,7 +30,7 @@ func TestAccResourceGridscaleMarketplaceApplicationImport_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckResourceGridscaleMarketplaceApplicationImportConfig_basic_update(),
+				Config: testAccCheckResourceGridscaleMarketplaceApplicationImportConfigBasicUpdate(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscaleMarketplaceApplicationImportExists("gridscale_marketplace_application_import.foo", &object),
 					resource.TestCheckResourceAttr(
@@ -97,7 +97,7 @@ func testAccCheckGridscaleMarketplaceApplicationImportDestroyCheck(s *terraform.
 	return nil
 }
 
-func testAccCheckResourceGridscaleMarketplaceApplicationImportConfig_basic(name string) string {
+func testAccCheckResourceGridscaleMarketplaceApplicationImportConfigBasic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_marketplace_application" "foo" {
 	name = "%s"
@@ -114,8 +114,8 @@ resource "gridscale_marketplace_application_import" "foo" {
 `, name)
 }
 
-func testAccCheckResourceGridscaleMarketplaceApplicationImportConfig_basic_update() string {
-	return fmt.Sprintf(`
+func testAccCheckResourceGridscaleMarketplaceApplicationImportConfigBasicUpdate() string {
+	return `
 resource "gridscale_marketplace_application" "foonew" {
   	name   = "newname"
 	object_storage_path = "s3://testsnapshot/test.gz"
@@ -127,5 +127,5 @@ resource "gridscale_marketplace_application" "foonew" {
 resource "gridscale_marketplace_application_import" "foo" {
 	import_unique_hash = gridscale_marketplace_application.foonew.unique_hash
 }
-`)
+`
 }

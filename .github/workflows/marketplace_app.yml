@@ -41,11 +41,11 @@ jobs:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v4
 
-      - name: Run TestAccdataSourceGridscaleMarketplaceApplication_basic
-        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccdataSourceGridscaleMarketplaceApplication_basic'
+      - name: Run TestAccdataSourceGridscaleMarketplaceApplicationBasic
+        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccdataSourceGridscaleMarketplaceApplicationBasic'
 
-      - name: Run TestAccResourceGridscaleMarketplaceApplication_Basic
-        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccResourceGridscaleMarketplaceApplication_Basic'
+      - name: Run TestAccResourceGridscaleMarketplaceApplicationBasic
+        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccResourceGridscaleMarketplaceApplicationBasic'
 
-      - name: Run TestAccResourceGridscaleMarketplaceApplicationImport_Basic
-        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccResourceGridscaleMarketplaceApplicationImport_Basic'
+      - name: Run TestAccResourceGridscaleMarketplaceApplicationImportBasic
+        run: make testacc TEST=./gridscale TESTARGS='-run=TestAccResourceGridscaleMarketplaceApplicationImportBasic'

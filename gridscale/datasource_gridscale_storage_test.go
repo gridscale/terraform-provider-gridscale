@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccdataSourceGridscaleStorage_basic(t *testing.T) {
+func TestAccdataSourceGridscaleStorageBasic(t *testing.T) {
 	name := fmt.Sprintf("object-%s", acctest.RandString(10))
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -17,7 +17,7 @@ func TestAccdataSourceGridscaleStorage_basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 
-				Config: testAccCheckDataSourceStorageConfig_basic(name),
+				Config: testAccCheckDataSourceStorageConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.gridscale_storage.foo", "id"),
 					resource.TestCheckResourceAttr("data.gridscale_storage.foo", "name", name),
@@ -29,7 +29,7 @@ func TestAccdataSourceGridscaleStorage_basic(t *testing.T) {
 
 }
 
-func testAccCheckDataSourceStorageConfig_basic(name string) string {
+func testAccCheckDataSourceStorageConfigBasic(name string) string {
 	return fmt.Sprintf(`
 
 resource "gridscale_storage" "foo" {

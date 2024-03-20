@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func TestAccResourceGridscaleRedisCache_Basic(t *testing.T) {
+func TestAccResourceGridscaleRedisCacheBasic(t *testing.T) {
 	var object gsclient.PaaSService
 	name := fmt.Sprintf("redis_cache-%s", acctest.RandString(10))
 
@@ -20,7 +20,7 @@ func TestAccResourceGridscaleRedisCache_Basic(t *testing.T) {
 		CheckDestroy: testAccCheckResourceGridscalePaaSDestroyCheck,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckResourceGridscaleRedisCacheConfig_basic(name),
+				Config: testAccCheckResourceGridscaleRedisCacheConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscalePaaSExists("gridscale_redis_cache.test", &object),
 					resource.TestCheckResourceAttr(
@@ -28,7 +28,7 @@ func TestAccResourceGridscaleRedisCache_Basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckResourceGridscaleRedisCacheConfig_basic_update(),
+				Config: testAccCheckResourceGridscaleRedisCacheConfigBasicUpdate(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscalePaaSExists("gridscale_redis_cache.test", &object),
 					resource.TestCheckResourceAttr(
@@ -39,7 +39,7 @@ func TestAccResourceGridscaleRedisCache_Basic(t *testing.T) {
 	})
 }
 
-func testAccCheckResourceGridscaleRedisCacheConfig_basic(name string) string {
+func testAccCheckResourceGridscaleRedisCacheConfigBasic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_redis_cache" "test" {
 	name = "%s"
@@ -49,13 +49,13 @@ resource "gridscale_redis_cache" "test" {
 `, name)
 }
 
-func testAccCheckResourceGridscaleRedisCacheConfig_basic_update() string {
-	return fmt.Sprintf(`
+func testAccCheckResourceGridscaleRedisCacheConfigBasicUpdate() string {
+	return `
 resource "gridscale_redis_cache" "test" {
 	name = "newname"
 	release = "7"
 	performance_class = "standard"
 	labels = ["test"]
 }
-`)
+`
 }
