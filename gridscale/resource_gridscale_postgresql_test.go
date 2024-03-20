@@ -45,6 +45,11 @@ resource "gridscale_postgresql" "test" {
 	name = "%s"
 	release = "13"
 	performance_class = "standard"
+	pgaudit_log_bucket = "foo"
+	pgaudit_log_server_url = "https://gos3.io"
+	pgaudit_log_access_key = "TESTINGPOSTGRESQLRESOURCEACCESSKEY"
+	pgaudit_log_secret_key = "testing"
+	pgaudit_log_rotation_frequency = 30
 }
 `, name)
 }
@@ -57,6 +62,11 @@ resource "gridscale_postgresql" "test" {
 	performance_class = "standard"
 	max_core_count = 20
 	labels = ["test"]
+	pgaudit_log_bucket = "foo"
+	pgaudit_log_server_url = "https://gos3.io"
+	pgaudit_log_access_key = "TESTINGPOSTGRESQLRESOURCEACCESSKEY"
+	pgaudit_log_secret_key = "testing"
+	pgaudit_log_rotation_frequency = 25
 }
 `)
 }

@@ -2,13 +2,15 @@ package gridscale
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
+	"regexp"
 	"strings"
 	"time"
 
 	"github.com/gridscale/gsclient-go/v3"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/customdiff"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	errHandler "github.com/terraform-providers/terraform-provider-gridscale/gridscale/error-handler"
@@ -32,38 +34,47 @@ func resourceGridscalePostgreSQL() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-		CustomizeDiff: customdiff.All(
-			customdiff.ValidateChange("release", func(ctx context.Context, old, new, meta interface{}) error {
-				client := meta.(*gsclient.Client)
-				newReleaseVal := new.(string)
-				paasTemplates, err := client.GetPaaSTemplateList(ctx)
-				if err != nil {
-					return err
-				}
-				var isReleaseValid bool
-				var releaseList []string
-			TEMPLATELOOP:
-				for _, template := range paasTemplates {
-					if template.Properties.Flavour == postgresTemplateFlavourName {
-						// check if release already presents in the release list.
-						// If so, ignore it.
-						for _, release := range releaseList {
-							if release == template.Properties.Release {
-								continue TEMPLATELOOP
-							}
-						}
-						releaseList = append(releaseList, template.Properties.Release)
-						if template.Properties.Release == newReleaseVal {
-							isReleaseValid = true
-						}
+		CustomizeDiff: func(ctx context.Context, d *schema.ResourceDiff, meta interface{}) error {
+			requestedReleaseInterface, isReleaseSet := d.GetOk("release")
+			requestedPerformanceClassInterface, isPerformanceClassSet := d.GetOk("performance_class")
+
+			if !isReleaseSet {
+				return errors.New("\"release\" has to be defined")
+			}
+			if !isPerformanceClassSet {
+				return errors.New("\"performance_class\" has to be defined")
+			}
+
+			requestedRelease := requestedReleaseInterface.(string)
+			requestedPerformanceClass := requestedPerformanceClassInterface.(string)
+			client := meta.(*gsclient.Client)
+			paasTemplates, err := client.GetPaaSTemplateList(ctx)
+
+			if err != nil {
+				return err
+			}
+			var chosenTemplate gsclient.PaaSTemplate
+			var isReleasePerformanceClassValid bool
+			releaseSupportedPerformanceClasses := make(map[string][]string)
+			for _, template := range paasTemplates {
+				if template.Properties.Flavour == postgresTemplateFlavourName {
+					performanceClasses := releaseSupportedPerformanceClasses[template.Properties.Release]
+					releaseSupportedPerformanceClasses[template.Properties.Release] = append(performanceClasses, template.Properties.PerformanceClass)
+					if template.Properties.Release == requestedRelease && template.Properties.PerformanceClass == requestedPerformanceClass {
+						isReleasePerformanceClassValid = true
+						chosenTemplate = template
 					}
 				}
-				if !isReleaseValid {
-					return fmt.Errorf("%v is not a valid PostgreSQL release. Valid releases are: %v\n", newReleaseVal, strings.Join(releaseList, ", "))
+			}
+			if !isReleasePerformanceClassValid {
+				errMessage := fmt.Sprintf("release %v with performance class %s is not a valid PostgreSQL release/performance class. Valid releases with corresponding performance classes are:\n\t", requestedRelease, requestedPerformanceClass)
+				for release, performanceClasses := range releaseSupportedPerformanceClasses {
+					errMessage += fmt.Sprintf("release %s is compatible with following performance classes: %s\n\t", release, strings.Join(performanceClasses, ", "))
 				}
-				return nil
-			}),
-		),
+				return errors.New(errMessage)
+			}
+			return validatePostgreSQLParameters(d, chosenTemplate)
+		},
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:         schema.TypeString,
@@ -191,6 +202,32 @@ func resourceGridscalePostgreSQL() *schema.Resource {
 				Optional:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
+			"pgaudit_log_bucket": {
+				Type:        schema.TypeString,
+				Description: "Object Storage bucket to upload audit logs to. For pgAudit to be enabled these additional parameters need to be configured: pgaudit_log_server_url, pgaudit_log_access_key, pgaudit_log_secret_key.",
+				Optional:    true,
+			},
+			"pgaudit_log_server_url": {
+				Type:        schema.TypeString,
+				Description: "Object Storage server URL the bucket is located on.",
+				Optional:    true,
+			},
+			"pgaudit_log_access_key": {
+				Type:        schema.TypeString,
+				Description: "Access key used to authenticate against Object Storage server.",
+				Optional:    true,
+			},
+			"pgaudit_log_secret_key": {
+				Type:        schema.TypeString,
+				Description: "Secret key used to authenticate against Object Storage server.",
+				Optional:    true,
+			},
+			"pgaudit_log_rotation_frequency": {
+				Type:        schema.TypeInt,
+				Description: "Rotation (in minutes) for audit logs. Logs are uploaded to Object Storage once rotated.",
+				Optional:    true,
+				Default:     5,
+			},
 		},
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(15 * time.Minute),
@@ -276,6 +313,23 @@ func resourceGridscalePostgreSQLRead(d *schema.ResourceData, meta interface{}) e
 		}
 	}
 
+	// Set PostgreSQL parameters
+	if err = d.Set("pgaudit_log_bucket", props.Parameters["pgaudit_log_bucket"]); err != nil {
+		return fmt.Errorf("%s error setting pgaudit_log_bucket: %v", errorPrefix, err)
+	}
+	if err = d.Set("pgaudit_log_server_url", props.Parameters["pgaudit_log_server_url"]); err != nil {
+		return fmt.Errorf("%s error setting pgaudit_log_server_url: %v", errorPrefix, err)
+	}
+	if err = d.Set("pgaudit_log_access_key", props.Parameters["pgaudit_log_access_key"]); err != nil {
+		return fmt.Errorf("%s error setting pgaudit_log_access_key: %v", errorPrefix, err)
+	}
+	if err = d.Set("pgaudit_log_secret_key", props.Parameters["pgaudit_log_secret_key"]); err != nil {
+		return fmt.Errorf("%s error setting pgaudit_log_secret_key: %v", errorPrefix, err)
+	}
+	if err = d.Set("pgaudit_log_rotation_frequency", props.Parameters["pgaudit_log_rotation_frequency"]); err != nil {
+		return fmt.Errorf("%s error setting pgaudit_log_rotation_frequency: %v", errorPrefix, err)
+	}
+
 	//Set labels
 	if err = d.Set("labels", props.Labels); err != nil {
 		return fmt.Errorf("%s error setting labels: %v", errorPrefix, err)
@@ -339,6 +393,12 @@ func resourceGridscalePostgreSQLCreate(d *schema.ResourceData, meta interface{})
 		}
 		requestBody.ResourceLimits = limits
 	}
+	requestBody.Parameters = make(map[string]interface{})
+	requestBody.Parameters["pgaudit_log_bucket"] = d.Get("pgaudit_log_bucket")
+	requestBody.Parameters["pgaudit_log_server_url"] = d.Get("pgaudit_log_server_url")
+	requestBody.Parameters["pgaudit_log_access_key"] = d.Get("pgaudit_log_access_key")
+	requestBody.Parameters["pgaudit_log_secret_key"] = d.Get("pgaudit_log_secret_key")
+	requestBody.Parameters["pgaudit_log_rotation_frequency"] = d.Get("pgaudit_log_rotation_frequency")
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
 	defer cancel()
@@ -374,6 +434,12 @@ func resourceGridscalePostgreSQLUpdate(d *schema.ResourceData, meta interface{})
 		}
 		requestBody.PaaSServiceTemplateUUID = templateUUID
 	}
+	requestBody.Parameters = make(map[string]interface{})
+	requestBody.Parameters["pgaudit_log_bucket"] = d.Get("pgaudit_log_bucket")
+	requestBody.Parameters["pgaudit_log_server_url"] = d.Get("pgaudit_log_server_url")
+	requestBody.Parameters["pgaudit_log_access_key"] = d.Get("pgaudit_log_access_key")
+	requestBody.Parameters["pgaudit_log_secret_key"] = d.Get("pgaudit_log_secret_key")
+	requestBody.Parameters["pgaudit_log_rotation_frequency"] = d.Get("pgaudit_log_rotation_frequency")
 
 	if val, ok := d.GetOk("max_core_count"); ok {
 		limits := []gsclient.ResourceLimit{
@@ -433,4 +499,50 @@ func getPostgresTemplateUUID(client *gsclient.Client, release, performanceClass 
 	}
 
 	return uTemplate.Properties.ObjectUUID, nil
+}
+
+// validatePostgreSQLParameters validates PostgreSQL parameter taken from passed input against as well passed PaaS template.
+func validatePostgreSQLParameters(d *schema.ResourceDiff, template gsclient.PaaSTemplate) error {
+	var errorMessages []string
+	if logBucket, ok := d.GetOk("pgaudit_log_bucket"); ok {
+		if scheme, ok := template.Properties.ParametersSchema["pgaudit_log_bucket"]; ok {
+			validBucket := regexp.MustCompile(scheme.Regex)
+			if !validBucket.MatchString(logBucket.(string)) {
+				errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'pgaudit_log_bucket' value. Value needs to match RegEx: '%s'\n", scheme.Regex))
+			}
+		}
+	}
+	if logServerURL, ok := d.GetOk("pgaudit_log_server_url"); ok {
+		_, err := url.ParseRequestURI(logServerURL.(string))
+		if err != nil {
+			errorMessages = append(errorMessages, "Invalid 'pgaudit_log_bucket' value, doesn't match URL format")
+		}
+	}
+	if logAccessKey, ok := d.GetOk("pgaudit_log_access_key"); ok {
+		if scheme, ok := template.Properties.ParametersSchema["pgaudit_log_access_key"]; ok {
+			validAccessKey := regexp.MustCompile(scheme.Regex)
+			if !validAccessKey.MatchString(logAccessKey.(string)) {
+				errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'pgaudit_log_access_key' value. Value needs to match RegEx: '%s'\n", scheme.Regex))
+			}
+		}
+	}
+	if logSecretKey, ok := d.GetOk("pgaudit_log_secret_key"); ok {
+		if scheme, ok := template.Properties.ParametersSchema["pgaudit_log_secret_key"]; ok {
+			validSecretKey := regexp.MustCompile(scheme.Regex)
+			if !validSecretKey.MatchString(logSecretKey.(string)) {
+				errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'pgaudit_log_secret_key' value. Value needs to match RegEx: '%s'\n", scheme.Regex))
+			}
+		}
+	}
+	if logRotationFrequency, ok := d.GetOk("pgaudit_log_rotation_frequency"); ok {
+		if scheme, ok := template.Properties.ParametersSchema["pgaudit_log_rotation_frequency"]; ok {
+			if scheme.Min > logRotationFrequency.(int) || logRotationFrequency.(int) > scheme.Max {
+				errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'pgaudit_log_rotation_frequency' value. Value must stays between %d and %d\n", scheme.Min, scheme.Max))
+			}
+		}
+	}
+	if len(errorMessages) != 0 {
+		return errors.New(strings.Join(errorMessages, ""))
+	}
+	return nil
 }
