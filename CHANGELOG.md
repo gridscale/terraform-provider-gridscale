@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.24.0 (Apr 02, 2024)
+
+FEATURES:
+- Add pgaudit_log related fields to `gridscale_postgresql` resource. [PR #299](https://github.com/gridscale/terraform-provider-gridscale/pull/299) 
+
 ## 1.23.2 (Feb 27, 2024)
 
 BUG FIXES:
