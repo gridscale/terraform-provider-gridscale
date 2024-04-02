@@ -42,6 +42,16 @@ The following arguments are supported:
 
 * `max_core_count` - (Optional) Maximum CPU core count. The PostgreSQL instance's CPU core count will be autoscaled based on the workload. The number of cores stays between 1 and `max_core_count`.
 
+* `pgaudit_log_bucket` - (Optional) Object Storage bucket to upload audit logs to. For pgAudit to be enabled these additional parameters need to be configured: pgaudit_log_server_url, pgaudit_log_access_key, pgaudit_log_secret_key.
+
+* `pgaudit_log_server_url` - (Optional) Object Storage server URL the bucket is located on.
+
+* `pgaudit_log_access_key` - (Optional) Access key used to authenticate against Object Storage server.
+
+* `pgaudit_log_secret_key` - (Optional) Secret key used to authenticate against Object Storage server.
+
+* `pgaudit_log_rotation_frequency` - (Optional) Rotation (in minutes) for audit logs. Logs are uploaded to Object Storage once rotated. Default is 5 minutes.
+
 ## Timeouts
 
 Timeouts configuration options (in seconds):
@@ -72,4 +82,9 @@ This resource exports the following attributes:
 * `create_time` - Date time this service has been created.
 * `status` - Current status of PaaS service.
 * `max_core_count` - See Argument Reference above.
+* `pgaudit_log_bucket` - See Argument Reference above.
+* `pgaudit_log_server_url` - See Argument Reference above.
+* `pgaudit_log_access_key` - See Argument Reference above.
+* `pgaudit_log_secret_key` - See Argument Reference above.
+* `pgaudit_log_rotation_frequency` - See Argument Reference above.
 * `labels` - See Argument Reference above.
