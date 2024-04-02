@@ -201,27 +201,31 @@ func resourceGridscalePostgreSQL() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "Object Storage bucket to upload audit logs to. For pgAudit to be enabled these additional parameters need to be configured: pgaudit_log_server_url, pgaudit_log_access_key, pgaudit_log_secret_key.",
 				Optional:    true,
+				Computed:    true,
 			},
 			"pgaudit_log_server_url": {
 				Type:        schema.TypeString,
 				Description: "Object Storage server URL the bucket is located on.",
 				Optional:    true,
+				Computed:    true,
 			},
 			"pgaudit_log_access_key": {
 				Type:        schema.TypeString,
 				Description: "Access key used to authenticate against Object Storage server.",
 				Optional:    true,
+				Computed:    true,
 			},
 			"pgaudit_log_secret_key": {
 				Type:        schema.TypeString,
 				Description: "Secret key used to authenticate against Object Storage server.",
 				Optional:    true,
+				Computed:    true,
 			},
 			"pgaudit_log_rotation_frequency": {
 				Type:        schema.TypeInt,
 				Description: "Rotation (in minutes) for audit logs. Logs are uploaded to Object Storage once rotated.",
 				Optional:    true,
-				Default:     5,
+				Computed:    true,
 			},
 		},
 		Timeouts: &schema.ResourceTimeout{
@@ -389,11 +393,21 @@ func resourceGridscalePostgreSQLCreate(d *schema.ResourceData, meta interface{})
 		requestBody.ResourceLimits = limits
 	}
 	requestBody.Parameters = make(map[string]interface{})
-	requestBody.Parameters["pgaudit_log_bucket"] = d.Get("pgaudit_log_bucket")
-	requestBody.Parameters["pgaudit_log_server_url"] = d.Get("pgaudit_log_server_url")
-	requestBody.Parameters["pgaudit_log_access_key"] = d.Get("pgaudit_log_access_key")
-	requestBody.Parameters["pgaudit_log_secret_key"] = d.Get("pgaudit_log_secret_key")
-	requestBody.Parameters["pgaudit_log_rotation_frequency"] = d.Get("pgaudit_log_rotation_frequency")
+	if val, ok := d.GetOk("pgaudit_log_bucket"); ok {
+		requestBody.Parameters["pgaudit_log_bucket"] = val
+	}
+	if val, ok := d.GetOk("pgaudit_log_server_url"); ok {
+		requestBody.Parameters["pgaudit_log_server_url"] = val
+	}
+	if val, ok := d.GetOk("pgaudit_log_access_key"); ok {
+		requestBody.Parameters["pgaudit_log_access_key"] = val
+	}
+	if val, ok := d.GetOk("pgaudit_log_secret_key"); ok {
+		requestBody.Parameters["pgaudit_log_secret_key"] = val
+	}
+	if val, ok := d.GetOk("pgaudit_log_rotation_frequency"); ok {
+		requestBody.Parameters["pgaudit_log_rotation_frequency"] = val
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
 	defer cancel()
@@ -430,11 +444,21 @@ func resourceGridscalePostgreSQLUpdate(d *schema.ResourceData, meta interface{})
 		requestBody.PaaSServiceTemplateUUID = templateUUID
 	}
 	requestBody.Parameters = make(map[string]interface{})
-	requestBody.Parameters["pgaudit_log_bucket"] = d.Get("pgaudit_log_bucket")
-	requestBody.Parameters["pgaudit_log_server_url"] = d.Get("pgaudit_log_server_url")
-	requestBody.Parameters["pgaudit_log_access_key"] = d.Get("pgaudit_log_access_key")
-	requestBody.Parameters["pgaudit_log_secret_key"] = d.Get("pgaudit_log_secret_key")
-	requestBody.Parameters["pgaudit_log_rotation_frequency"] = d.Get("pgaudit_log_rotation_frequency")
+	if val, ok := d.GetOk("pgaudit_log_bucket"); ok {
+		requestBody.Parameters["pgaudit_log_bucket"] = val
+	}
+	if val, ok := d.GetOk("pgaudit_log_server_url"); ok {
+		requestBody.Parameters["pgaudit_log_server_url"] = val
+	}
+	if val, ok := d.GetOk("pgaudit_log_access_key"); ok {
+		requestBody.Parameters["pgaudit_log_access_key"] = val
+	}
+	if val, ok := d.GetOk("pgaudit_log_secret_key"); ok {
+		requestBody.Parameters["pgaudit_log_secret_key"] = val
+	}
+	if val, ok := d.GetOk("pgaudit_log_rotation_frequency"); ok {
+		requestBody.Parameters["pgaudit_log_rotation_frequency"] = val
+	}
 
 	if val, ok := d.GetOk("max_core_count"); ok {
 		limits := []gsclient.ResourceLimit{
