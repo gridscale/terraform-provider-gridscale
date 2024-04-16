@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.25.0 (Apr 16, 2024)
+
+FEATURES:
+- Add parameter `cluster_traffic_encryption` in `gridscale_k8s` resource (only available for k8s ~> 1.29). [PR #320](https://github.com/gridscale/terraform-provider-gridscale/pull/320).
+
 ## 1.24.0 (Apr 02, 2024)
 
 FEATURES:
