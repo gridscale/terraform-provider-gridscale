@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.14.2 (May 17, 2024)
+
+BUG FIXES:
+- Fix typo in usage operator interface [#232](https://github.com/gridscale/gsclient-go/pull/232).
+- Add missing location attributes on server [#233](https://github.com/gridscale/gsclient-go/pull/233).
+- Fix unhandled error when preparing HTTP request [#235](https://github.com/gridscale/gsclient-go/pull/235).
+
 ## 3.14.1 (Feb 15, 2024)
 
 IMPROVEMENTS:
