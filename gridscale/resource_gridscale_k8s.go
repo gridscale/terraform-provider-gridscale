@@ -2,10 +2,12 @@ package gridscale
 
 import (
 	"context"
+	"encoding/pem"
 	"errors"
 	"fmt"
 	"net"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 
@@ -239,6 +241,66 @@ func resourceGridscaleK8s() *schema.Resource {
 				Optional:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
+			"oidc_enabled": {
+				Type:        schema.TypeBool,
+				Description: "Disable or enable OIDC",
+				Computed:    true,
+				Optional:    true,
+			},
+			"oidc_issuer_url": {
+				Type:        schema.TypeString,
+				Description: "URL of the provider that allows the API server to discover public signing keys. Only URLs that use the https:// scheme are accepted.",
+				Computed:    true,
+				Optional:    true,
+			},
+			"oidc_client_id": {
+				Type:        schema.TypeString,
+				Description: "A client ID that all tokens must be issued for.",
+				Computed:    true,
+				Optional:    true,
+			},
+			"oidc_username_claim": {
+				Type:        schema.TypeString,
+				Description: "JWT claim to use as the user name.",
+				Computed:    true,
+				Optional:    true,
+			},
+			"oidc_groups_claim": {
+				Type:        schema.TypeString,
+				Description: "JWT claim to use as the user's group.",
+				Computed:    true,
+				Optional:    true,
+			},
+			"oidc_signing_algs": {
+				Type:        schema.TypeString,
+				Description: "The signing algorithms accepted. Default is 'RS256'. Other option is 'RS512'.",
+				Computed:    true,
+				Optional:    true,
+			},
+			"oidc_groups_prefix": {
+				Type:        schema.TypeString,
+				Description: "Prefix prepended to group claims to prevent clashes with existing names (such as system: groups). For example, the value oidc: will create group names like oidc:engineering and oidc:infra.",
+				Computed:    true,
+				Optional:    true,
+			},
+			"oidc_username_prefix": {
+				Type:        schema.TypeString,
+				Description: "Prefix prepended to username claims to prevent clashes with existing names (such as system: users). For example, the value oidc: will create usernames like oidc:jane.doe. If this flag isn't provided and --oidc-username-claim is a value other than email the prefix defaults to ( Issuer URL )# where ( Issuer URL ) is the value of --oidc-issuer-url. The value - can be used to disable all prefixing.",
+				Computed:    true,
+				Optional:    true,
+			},
+			"oidc_required_claim": {
+				Type:        schema.TypeString,
+				Description: "A key=value pair that describes a required claim in the ID Token. Multiple claims can be set like this: key1=value1,key2=value2",
+				Computed:    true,
+				Optional:    true,
+			},
+			"oidc_ca_pem": {
+				Type:        schema.TypeString,
+				Description: "Custom CA from customer in pem format as string.",
+				Computed:    true,
+				Optional:    true,
+			},
 		},
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(45 * time.Minute),
@@ -302,6 +364,76 @@ func resourceGridscaleK8sRead(d *schema.ResourceData, meta interface{}) error {
 	}
 	if err = d.Set("service_template_uuid", props.ServiceTemplateUUID); err != nil {
 		return fmt.Errorf("%s error setting service_template_uuid: %v", errorPrefix, err)
+	}
+
+	// Set flag telling if enabled or not
+	if enabled, ok := props.Parameters["k8s_oidc_enabled"].(bool); ok {
+		if err = d.Set("oidc_enabled", enabled); err != nil {
+			return fmt.Errorf("%s error setting oidc_enabled: %v", errorPrefix, err)
+		}
+	}
+
+	// Set issuer URL if it is set
+	if issuerURL, isIssuerURLSet := props.Parameters["k8s_oidc_issuer_url"]; isIssuerURLSet {
+		if err = d.Set("oidc_issuer_url", issuerURL); err != nil {
+			return fmt.Errorf("%s error setting oidc_issuer_url: %v", errorPrefix, err)
+		}
+	}
+
+	// Set client ID if it is set
+	if clientID, isClientIDSet := props.Parameters["k8s_oidc_client_id"]; isClientIDSet {
+		if err = d.Set("oidc_client_id", clientID); err != nil {
+			return fmt.Errorf("%s error setting oidc_client_id: %v", errorPrefix, err)
+		}
+	}
+
+	// Set username claim if it is set
+	if usernameClaimSet, isUsernameClaimSet := props.Parameters["k8s_oidc_username_claim"]; isUsernameClaimSet {
+		if err = d.Set("oidc_username_claim", usernameClaimSet); err != nil {
+			return fmt.Errorf("%s error setting oidc_username_claim: %v", errorPrefix, err)
+		}
+	}
+
+	// Set groups claim if it is set
+	if groupsClain, isGroupsClaimSet := props.Parameters["k8s_oidc_groups_claim"]; isGroupsClaimSet {
+		if err = d.Set("oidc_groups_claim", groupsClain); err != nil {
+			return fmt.Errorf("%s error setting oidc_groups_claim: %v", errorPrefix, err)
+		}
+	}
+
+	// Set signing algs if it is set
+	if signingAlgs, isSigningAlgsSet := props.Parameters["k8s_oidc_signing_algs"]; isSigningAlgsSet {
+		if err = d.Set("oidc_signing_algs", signingAlgs); err != nil {
+			return fmt.Errorf("%s error setting oidc_signing_algs: %v", errorPrefix, err)
+		}
+	}
+
+	// Set groups prefix if it is set
+	if groupsPrefix, isGroupsPrefixSet := props.Parameters["k8s_oidc_groups_prefix"]; isGroupsPrefixSet {
+		if err = d.Set("oidc_groups_prefix", groupsPrefix); err != nil {
+			return fmt.Errorf("%s error setting oidc_groups_prefix: %v", errorPrefix, err)
+		}
+	}
+
+	// Set username prefix if it is set
+	if usernamePrefix, isUsernamePrefixSet := props.Parameters["k8s_oidc_username_prefix"]; isUsernamePrefixSet {
+		if err = d.Set("oidc_username_prefix", usernamePrefix); err != nil {
+			return fmt.Errorf("%s error setting oidc_username_prefix: %v", errorPrefix, err)
+		}
+	}
+
+	// Set required claim if it is set
+	if requiredClain, isRequiredClaimSet := props.Parameters["k8s_oidc_required_claim"]; isRequiredClaimSet {
+		if err = d.Set("oidc_required_claim", requiredClain); err != nil {
+			return fmt.Errorf("%s error setting oidc_required_claim: %v", errorPrefix, err)
+		}
+	}
+
+	// Set CA PEM if it is set
+	if caPEM, isCAPEMSet := props.Parameters["k8s_oidc_ca_pem"]; isCAPEMSet {
+		if err = d.Set("oidc_ca_pem", caPEM); err != nil {
+			return fmt.Errorf("%s error setting oidc_ca_pem: %v", errorPrefix, err)
+		}
 	}
 
 	//Get listen ports
@@ -450,6 +582,46 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 	if clusterTrafficEncryption, isSet := d.GetOk("node_pool.0.cluster_traffic_encryption"); isSet {
 		params["k8s_cluster_traffic_encryption"] = clusterTrafficEncryption
 	}
+	// Set OIDC enabled flag if it is set
+	if oidcEnabled, isOIDCEnabledSet := d.GetOk("oidc_enabled"); isOIDCEnabledSet {
+		params["k8s_oidc_enabled"] = oidcEnabled
+	}
+	// Set OIDC issuer URL if it is set
+	if oidcIssuerURL, isOIDCIssuerURLSet := d.GetOk("oidc_issuer_url"); isOIDCIssuerURLSet {
+		params["k8s_oidc_issuer_url"] = oidcIssuerURL
+	}
+	// Set OIDC client ID if it is set
+	if oidcClientID, isOIDCClientIDSet := d.GetOk("oidc_client_id"); isOIDCClientIDSet {
+		params["k8s_oidc_client_id"] = oidcClientID
+	}
+	// Set OIDC username claim if it is set
+	if oidcUsernameClaim, isOIDCUsernameClaimSet := d.GetOk("oidc_username_claim"); isOIDCUsernameClaimSet {
+		params["k8s_oidc_username_claim"] = oidcUsernameClaim
+	}
+	// Set OIDC groups claim if it is set
+	if oidcGroupsClaim, isOIDCGroupsClaimSet := d.GetOk("oidc_groups_claim"); isOIDCGroupsClaimSet {
+		params["k8s_oidc_groups_claim"] = oidcGroupsClaim
+	}
+	// Set signing algs if it is set
+	if oidcSigningAlgs, isOIDCSigningAlgsSet := d.GetOk("oidc_signing_algs"); isOIDCSigningAlgsSet {
+		params["k8s_oidc_signing_algs"] = oidcSigningAlgs
+	}
+	// Set groups prefix if it is set
+	if oidcGroupsPrefix, isOIDCGroupsPrefixSet := d.GetOk("oidc_groups_prefix"); isOIDCGroupsPrefixSet {
+		params["k8s_oidc_groups_prefix"] = oidcGroupsPrefix
+	}
+	// Set username prefix if it is set
+	if oidcUsernamePrefix, isOIDCUsernamePrefixSet := d.GetOk("oidc_username_prefix"); isOIDCUsernamePrefixSet {
+		params["k8s_oidc_username_prefix"] = oidcUsernamePrefix
+	}
+	// Set OIDC required claim if it is set
+	if oidcRequiredClaim, isOIDCRequiredClaimSet := d.GetOk("oidc_required_claim"); isOIDCRequiredClaimSet {
+		params["k8s_oidc_required_claim"] = oidcRequiredClaim
+	}
+	// Set OIDC CA PEM if it is set
+	if oidcCAPEM, isOIDCCAPEMSet := d.GetOk("oidc_ca_pem"); isOIDCCAPEMSet {
+		params["k8s_oidc_ca_pem"] = oidcCAPEM
+	}
 	requestBody.Parameters = params
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
@@ -522,6 +694,46 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 	// Set cluster traffic encryption if it is set
 	if clusterTrafficEncryption, isSet := d.GetOk("node_pool.0.cluster_traffic_encryption"); isSet {
 		params["k8s_cluster_traffic_encryption"] = clusterTrafficEncryption
+	}
+	// Set OIDC enabled flag if it is set
+	if oidcEnabled, isOIDCEnabledSet := d.GetOk("oidc_enabled"); isOIDCEnabledSet {
+		params["k8s_oidc_enabled"] = oidcEnabled
+	}
+	// Set OIDC issuer URL if it is set
+	if oidcIssuerURL, isOIDCIssuerURLSet := d.GetOk("oidc_issuer_url"); isOIDCIssuerURLSet {
+		params["k8s_oidc_issuer_url"] = oidcIssuerURL
+	}
+	// Set OIDC client ID if it is set
+	if oidcClientID, isOIDCClientIDSet := d.GetOk("oidc_client_id"); isOIDCClientIDSet {
+		params["k8s_oidc_client_id"] = oidcClientID
+	}
+	// Set OIDC username claim if it is set
+	if oidcUsernameClaim, isOIDCUsernameClaimSet := d.GetOk("oidc_username_claim"); isOIDCUsernameClaimSet {
+		params["k8s_oidc_username_claim"] = oidcUsernameClaim
+	}
+	// Set OIDC groups claim if it is set
+	if oidcGroupsClaim, isOIDCGroupsClaimSet := d.GetOk("oidc_groups_claim"); isOIDCGroupsClaimSet {
+		params["k8s_oidc_groups_claim"] = oidcGroupsClaim
+	}
+	// Set signing algs if it is set
+	if oidcSigningAlgs, isOIDCSigningAlgsSet := d.GetOk("oidc_signing_algs"); isOIDCSigningAlgsSet {
+		params["k8s_oidc_signing_algs"] = oidcSigningAlgs
+	}
+	// Set groups prefix if it is set
+	if oidcGroupsPrefix, isOIDCGroupsPrefixSet := d.GetOk("oidc_groups_prefix"); isOIDCGroupsPrefixSet {
+		params["k8s_oidc_groups_prefix"] = oidcGroupsPrefix
+	}
+	// Set username prefix if it is set
+	if oidcUsernamePrefix, isOIDCUsernamePrefixSet := d.GetOk("oidc_username_prefix"); isOIDCUsernamePrefixSet {
+		params["k8s_oidc_username_prefix"] = oidcUsernamePrefix
+	}
+	// Set OIDC required claim if it is set
+	if oidcRequiredClaim, isOIDCRequiredClaimSet := d.GetOk("oidc_required_claim"); isOIDCRequiredClaimSet {
+		params["k8s_oidc_required_claim"] = oidcRequiredClaim
+	}
+	// Set OIDC CA PEM if it is set
+	if oidcCAPEM, isOIDCCAPEMSet := d.GetOk("oidc_ca_pem"); isOIDCCAPEMSet {
+		params["k8s_oidc_ca_pem"] = oidcCAPEM
 	}
 	requestBody.Parameters = params
 
@@ -700,6 +912,41 @@ func validateK8sParameters(d *schema.ResourceDiff, template gsclient.PaaSTemplat
 				if oldClusterCIDR != "" && d.HasChange("node_pool.0.cluster_cidr") {
 					errorMessages = append(errorMessages, "Cannot change parameter cluster_cidr, because it is immutable.\n")
 				}
+			}
+		}
+	}
+
+	if oidcIssuerURL, ok := d.GetOk("oidc_issuer_url"); ok {
+		if _, ok := template.Properties.ParametersSchema["k8s_oidc_issuer_url"]; ok {
+			validMode := regexp.MustCompile(`^https:\/\/.*`)
+			if !validMode.MatchString(oidcIssuerURL.(string)) {
+				errorMessages = append(errorMessages, fmt.Sprintf("Invalid OIDC 'issuer_url' value. Example value: '%s'\n", "https://example.io"))
+			}
+		}
+	}
+
+	oidcSigningAlgsScheme, oidcSigningAlgsOk := template.Properties.ParametersSchema["k8s_oidc_signing_algs"]
+	if oidcSigningAlgs, ok := d.GetOk("oidc_signing_algs"); ok && oidcSigningAlgsOk {
+		var isValid bool
+		for _, allowedValue := range oidcSigningAlgsScheme.Allowed {
+			if oidcSigningAlgs.(string) == allowedValue {
+				isValid = true
+			}
+		}
+		if !isValid {
+			errorMessages = append(errorMessages,
+				fmt.Sprintf("Invalid OIDC 'signing_algs' value. Value must be one of these:\n\t%s",
+					strings.Join(oidcSigningAlgsScheme.Allowed, "\n\t"),
+				),
+			)
+		}
+	}
+
+	if oidcCAPEM, ok := d.GetOk("oidc_ca_pem"); ok {
+		if _, ok := template.Properties.ParametersSchema["k8s_oidc_ca_pem"]; ok {
+			block, _ := pem.Decode([]byte(oidcCAPEM.(string)))
+			if block == nil {
+				return fmt.Errorf("invalid OIDC 'ca_pem' value, failed to parse to CA PEM")
 			}
 		}
 	}
