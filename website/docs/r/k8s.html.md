@@ -58,6 +58,27 @@ The following arguments are supported:
     * `cluster_cidr` - (Immutable) The cluster CIDR that will be used to generate the CIDR of nodes, services, and pods. The allowed CIDR prefix length is /16. If the cluster CIDR is not set, the cluster will use "10.244.0.0/16" as it default (even though the `cluster_cidr` in the k8s resource is empty).
     * `cluster_traffic_encryption` - Enables cluster encryption via wireguard if true. Only available for GSK version 1.29 and above. Default is false.
 
+* `oidc_enabled` - (Optional) Enable OIDC for the k8s cluster.
+
+* `oidc_issuer_url` - (Optional) URL of the provider that allows the API server to discover public signing keys. Only URLs that use the https:// scheme are accepted.
+
+* `oidc_client_id` - (Optional) A client ID that all tokens must be issued for.
+
+* `oidc_username_claim` - (Optional) JWT claim to use as the user name.
+
+* `oidc_groups_claim` - (Optional) JWT claim to use as the user's group.
+
+* `oidc_signing_algs` - (Optional)The signing algorithms accepted. Default is 'RS256'. Other option is 'RS512'.
+
+* `oidc_groups_prefix` - (Optional) Prefix prepended to group claims to prevent clashes with existing names (such as system: groups). For example, the value oidc: will create group names like oidc:engineering and oidc:infra.
+
+* `oidc_username_prefix` - (Optional) Prefix prepended to username claims to prevent clashes with existing names (such as system: users). For example, the value oidc: will create usernames like oidc:jane.doe. If this flag isn't provided and --oidc-username-claim is a value other than email the prefix defaults to ( Issuer URL )# where ( Issuer URL ) is the value of --oidc-issuer-url. The value - can be used to disable all prefixing.
+
+* `oidc_required_claim` - (Optional) A key=value pair that describes a required claim in the ID Token. Multiple claims can be set like this: key1=value1,key2=value2.
+
+* `oidc_ca_pem` - (Optional) Custom CA from customer in pem format as string.
+
+
 ## Timeouts
 
 Timeouts configuration options (in seconds):
@@ -92,6 +113,16 @@ This resource exports the following attributes:
     * `surge_node` - See Argument Reference above.
     * `cluster_cidr` - See Argument Reference above.
     * `cluster_traffic_encryption` - See Argument Reference above.
+* `oidc_enabled` - See Argument Reference above.
+* `oidc_issuer_url` - See Argument Reference above.
+* `oidc_client_id` - See Argument Reference above.
+* `oidc_username_claim` - See Argument Reference above.
+* `oidc_groups_claim` - See Argument Reference above.
+* `oidc_signing_algs` - See Argument Reference above.
+* `oidc_groups_prefix` - See Argument Reference above.
+* `oidc_username_prefix` - See Argument Reference above.
+* `oidc_required_claim` - See Argument Reference above.
+* `oidc_ca_pem` - See Argument Reference above.
 * `usage_in_minutes` - The amount of minutes the IP address has been in use.
 * `create_time` - The time the object was created.
 * `change_time` - Defines the date and time of the last object change.
