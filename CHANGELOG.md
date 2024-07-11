@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.26.0 (Jul 11, 2024)
+
+FEATURES:
+- Add OICD support to k8s resource. [PR #351](https://github.com/gridscale/terraform-provider-gridscale/pull/351).
+
 ## 1.25.0 (Apr 16, 2024)
 
 FEATURES:
