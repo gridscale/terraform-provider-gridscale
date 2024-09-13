@@ -16,20 +16,37 @@ Provides a k8s cluster resource. This can be used to create, modify, and delete 
 The following example shows how one might use this resource to add a k8s cluster to gridscale:
 
 ```terraform
-resource "gridscale_k8s" "k8s-test" {
-  name   = "test"
-  release = "1.26" # instead, gsk_version can be set.
-  node_pool {
-  name = "my_node_pool"
-    node_count = 2
-    cores = 1
-    memory = 2
-    storage = 10
-    storage_type = "storage_insane"
-    rocket_storage = 90
+variable "node_pools" {
+	description = "A list of node pools"
+	default = [
+	  {
+		name = "test_node_pool"
+		node_count = 2
+		cores = 1
+		memory = 2
+		storage = 30
+		storage_type = "storage_insane"
+		rocket_storage = 90
+	  }
+	]
   }
- }
 
+resource "gridscale_k8s" "k8s-test" {
+	name   = "test"
+	release = "1.30" # instead, gsk_version can be set.
+	dynamic "node_pools" {
+		for_each = var.node_pools
+		content {
+			name = node_pools.value.name
+			node_count = node_pools.value.node_count
+			cores = node_pools.value.cores
+			memory = node_pools.value.memory
+			storage = node_pools.value.storage
+			storage_type = node_pools.value.storage_type
+			rocket_storage = node_pools.value.rocket_storage
+		}
+	}
+}
 ```
 
 ## Argument Reference
@@ -40,13 +57,13 @@ The following arguments are supported:
 
 * `security_zone_uuid` -  *DEPRECATED* (Optional, Forcenew) Security zone UUID linked to the Kubernetes resource. If `security_zone_uuid` is not set, the default security zone will be created (if it doesn't exist) and linked. A change of this argument necessitates the re-creation of the resource.
 
-* `gsk_version` - (Optional) The gridscale's Kubernetes version of this instance (e.g. "1.21.14-gs1"). Define which gridscale k8s version will be used to create the cluster. For convenience, please use [gscloud](https://github.com/gridscale/gscloud) to get the list of available gridscale k8s version. **NOTE**: Either `gsk_version` or `release` is set at a time.
+* `gsk_version` - (Optional) The gridscale's Kubernetes version of this instance (e.g. "1.30.3-gs0"). Define which gridscale k8s version will be used to create the cluster. For convenience, please use [gscloud](https://github.com/gridscale/gscloud) to get the list of available gridscale k8s version. **NOTE**: Either `gsk_version` or `release` is set at a time.
 
 * `release` - (Optional) The Kubernetes release of this instance. Define which release will be used to create the cluster. For convenience, please use [gscloud](https://github.com/gridscale/gscloud) to get the list of available releases. **NOTE**: Either `gsk_version` or `release` is set at a time.
 
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
 
-* `node_pool` - (Required) Node pool's specification. **NOTE**: The node pool's specification is not yet mutable (except `node_count`).
+* `node_pools` - (Optional) The collection of node pool specifications. **NOTE**: Any node pool specification is not yet mutable (except `node_count`).
     * `name` - Name of the node pool.
     * `node_count` - Number of worker nodes.
     * `cores` - Cores per worker node.
@@ -54,9 +71,9 @@ The following arguments are supported:
     * `storage` - Storage per worker node (in GiB).
     * `storage_type` - Storage type (one of storage, storage_high, storage_insane).
     * `rocket_storage` - Rocket storage per worker node (in GiB).
-    * `surge_node` - Enable surge node to avoid resources shortage during the cluster upgrade (Default: true).
-    * `cluster_cidr` - (Immutable) The cluster CIDR that will be used to generate the CIDR of nodes, services, and pods. The allowed CIDR prefix length is /16. If the cluster CIDR is not set, the cluster will use "10.244.0.0/16" as it default (even though the `cluster_cidr` in the k8s resource is empty).
-    * `cluster_traffic_encryption` - Enables cluster encryption via wireguard if true. Only available for GSK version 1.29 and above. Default is false.
+* `surge_node` - Enable surge node to avoid resources shortage during the cluster upgrade (Default: true).
+* `cluster_cidr` - (Immutable) The cluster CIDR that will be used to generate the CIDR of nodes, services, and pods. The allowed CIDR prefix length is /16. If the cluster CIDR is not set, the cluster will use "10.244.0.0/16" as it default (even though the `cluster_cidr` in the k8s resource is empty).
+* `cluster_traffic_encryption` - Enables cluster encryption via wireguard if true. Only available for GSK version 1.29 and above. Default is false.
 
 * `oidc_enabled` - (Optional) Enable OIDC for the k8s cluster.
 
@@ -102,7 +119,7 @@ This resource exports the following attributes:
 * `kubeconfig` - The kubeconfig file content of the k8s cluster.
 * `network_uuid` - *DEPRECATED*  Network UUID containing security zone, which is linked to the k8s cluster.
 * `k8s_private_network_uuid` - Private network UUID which k8s nodes are attached to. It can be used to attach other PaaS/VMs.
-* `node_pool` - See Argument Reference above.
+* `node_pools` - See Argument Reference above.
     * `name` - See Argument Reference above.
     * `node_count` - See Argument Reference above.
     * `cores` - See Argument Reference above.
@@ -110,9 +127,9 @@ This resource exports the following attributes:
     * `storage` - See Argument Reference above.
     * `storage_type` - See Argument Reference above.
     * `rocket_storage` - See Argument Reference above.
-    * `surge_node` - See Argument Reference above.
-    * `cluster_cidr` - See Argument Reference above.
-    * `cluster_traffic_encryption` - See Argument Reference above.
+* `surge_node` - See Argument Reference above.
+* `cluster_cidr` - See Argument Reference above.
+* `cluster_traffic_encryption` - See Argument Reference above.
 * `oidc_enabled` - See Argument Reference above.
 * `oidc_issuer_url` - See Argument Reference above.
 * `oidc_client_id` - See Argument Reference above.
