@@ -279,12 +279,12 @@ func deriveK8sTemplateFromResourceDiff(client *gsclient.Client, d *schema.Resour
 	releaseInterface, isReleaseSet := d.GetOk("release")
 	release := releaseInterface.(string)
 
-	if isVersionSet && version != "" {
+	if isVersionSet {
 		derivationTypesRequested += 1
 		derivationType = "version"
 	}
 
-	if isReleaseSet && release != "" {
+	if isReleaseSet {
 		derivationTypesRequested += 1
 		derivationType = "release"
 	}
