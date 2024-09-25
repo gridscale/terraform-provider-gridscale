@@ -5,12 +5,14 @@ on:
   push:
     branches:
       - master
+      - 'v*'
     paths:
       - "**.go"
       - ".github/workflows/postgres.yml"
   pull_request:
     branches:
       - master
+      - 'v*'
     paths:
       - "**gridscale_postgresql**"
       - "gridscale/error-handler/**"

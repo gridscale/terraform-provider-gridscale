@@ -5,12 +5,14 @@ on:
   push:
     branches:
       - master
+      - 'v*'
     paths:
       - "**.go"
       - ".github/workflows/server.yml"
   pull_request:
     branches:
       - master
+      - 'v*'
     paths:
       - "**gridscale_server**"
       - "gridscale/relation-manager/**"

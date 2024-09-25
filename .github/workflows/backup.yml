@@ -5,12 +5,14 @@ on:
   push:
     branches:
       - master
+      - 'v*'
     paths:
       - "**.go"
       - ".github/workflows/backup.yml"
   pull_request:
     branches:
       - master
+      - 'v*'
     paths:
       - "**gridscale_backup**"
       - "gridscale/error-handler/**"
