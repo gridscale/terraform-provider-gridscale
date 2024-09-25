@@ -78,6 +78,24 @@ The following arguments are supported:
 
 * `oidc_ca_pem` - (Optional) Custom CA from customer in pem format as string.
 
+* `kube_apiserver_log_enabled` - (Optional) Enable kube-apiserver logs.
+
+* `audit_log_enabled` - (Optional) Enable Kubernetes audit logs.
+
+* `audit_log_level` - (Optional) Kubernetes audit log level. Possible values are: 'Metadata', 'RequestALLResponseCRUD', 'RequestALLResponseALL'.
+
+* `log_delivery` - (Optional) Enable control plane log delivery.
+
+* `log_delivery_bucket` - (Optional) Bucket to upload logs to.
+
+* `log_delivery_access_key` - (Optional) Access key used to authenticate against Object Storage endpoint.
+
+* `log_delivery_secret_key` - (Optional) Secret key used to authenticate against Object Storage endpoint.
+
+* `log_delivery_endpoint` - (Optional) Object Storage endpoint URL the bucket is located on.
+
+* `log_delivery_interval` - (Optional) Time interval (in min), at which log files will be delivered, unless file size limit is reached first.
+
 
 ## Timeouts
 
@@ -123,6 +141,15 @@ This resource exports the following attributes:
 * `oidc_username_prefix` - See Argument Reference above.
 * `oidc_required_claim` - See Argument Reference above.
 * `oidc_ca_pem` - See Argument Reference above.
+* `kube_apiserver_log_enabled` - See Argument Reference above.
+* `audit_log_enabled` - See Argument Reference above.
+* `audit_log_level` - See Argument Reference above.
+* `log_delivery` - See Argument Reference above.
+* `log_delivery_bucket` - See Argument Reference above.
+* `log_delivery_access_key` - See Argument Reference above.
+* `log_delivery_secret_key` - See Argument Reference above.
+* `log_delivery_endpoint` - See Argument Reference above.
+* `log_delivery_interval` - See Argument Reference above.
 * `usage_in_minutes` - The amount of minutes the IP address has been in use.
 * `create_time` - The time the object was created.
 * `change_time` - Defines the date and time of the last object change.
