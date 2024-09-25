@@ -2,7 +2,7 @@ module github.com/terraform-providers/terraform-provider-gridscale
 
 require (
 	github.com/aws/aws-sdk-go v1.55.5
-	github.com/gridscale/gsclient-go/v3 v3.14.1
+	github.com/gridscale/gsclient-go/v3 v3.15.0
 	github.com/hashicorp/go-version v1.7.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.34.0
 )
@@ -51,7 +51,7 @@ require (
 	golang.org/x/crypto v0.23.0 // indirect
 	golang.org/x/mod v0.16.0 // indirect
 	golang.org/x/net v0.23.0 // indirect
-	golang.org/x/sys v0.20.0 // indirect
+	golang.org/x/sys v0.25.0 // indirect
 	golang.org/x/text v0.15.0 // indirect
 	golang.org/x/tools v0.13.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect

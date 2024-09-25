@@ -28,7 +28,7 @@ func NewRelease(representation string) (*Release, error) {
 }
 
 // CheckIfFeatureIsKnown checks by a Release receiver if a passed Feature instance is known.
-func (r *Release) CheckIfFeatureIsKnown(f *Feature) *ReleaseFeatureIncompatibilityError {
+func (r *Release) CheckIfFeatureIsKnown(f *Feature) error {
 	if r.LessThan(&f.Version) {
 		return &ReleaseFeatureIncompatibilityError{
 			Detail: fmt.Sprintf("Feature '%s' is part of release %s but requested for release %s.", f.Description, f.String(), r.String()),
