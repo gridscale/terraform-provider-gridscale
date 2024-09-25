@@ -25,6 +25,8 @@ const (
 	k8sRocketStorageSupportRelease = "1.26"
 )
 
+var k8sAuditLogLevels = []string{"Metadata", "RequestALLResponseCRUD", "RequestALLResponseALL"}
+
 func resourceGridscaleK8s() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceGridscaleK8sCreate,
@@ -253,6 +255,61 @@ func resourceGridscaleK8s() *schema.Resource {
 			"oidc_ca_pem": {
 				Type:        schema.TypeString,
 				Description: "Custom CA from customer in pem format as string.",
+				Computed:    true,
+				Optional:    true,
+			},
+			"kube_apiserver_log_enabled": {
+				Type:        schema.TypeBool,
+				Description: "Enable kube-apiserver logs.",
+				Computed:    true,
+				Optional:    true,
+			},
+			"audit_log_enabled": {
+				Type:        schema.TypeBool,
+				Description: "Enable Kubernetes audit logs.",
+				Computed:    true,
+				Optional:    true,
+			},
+			"audit_log_level": {
+				Type:         schema.TypeString,
+				Description:  "Kubernetes audit log level. Possible values are: 'Metadata', 'RequestALLResponseCRUD', 'RequestALLResponseALL'.",
+				Computed:     true,
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice(k8sAuditLogLevels, false),
+			},
+			"log_delivery": {
+				Type:        schema.TypeBool,
+				Description: "Enable control plane log delivery",
+				Computed:    true,
+				Optional:    true,
+			},
+			"log_delivery_bucket": {
+				Type:        schema.TypeString,
+				Description: "Bucket to upload logs to",
+				Computed:    true,
+				Optional:    true,
+			},
+			"log_delivery_access_key": {
+				Type:        schema.TypeString,
+				Description: "Access key used to authenticate against Object Storage endpoint",
+				Computed:    true,
+				Optional:    true,
+			},
+			"log_delivery_secret_key": {
+				Type:        schema.TypeString,
+				Description: "Secret key used to authenticate against Object Storage endpoint",
+				Computed:    true,
+				Optional:    true,
+			},
+			"log_delivery_endpoint": {
+				Type:        schema.TypeString,
+				Description: "Object Storage endpoint URL the bucket is located on",
+				Computed:    true,
+				Optional:    true,
+			},
+			"log_delivery_interval": {
+				Type:        schema.TypeInt,
+				Description: "Time interval (in min), at which log files will be delivered, unless file size limit is reached first.",
 				Computed:    true,
 				Optional:    true,
 			},
@@ -568,6 +625,69 @@ func resourceGridscaleK8sRead(d *schema.ResourceData, meta interface{}) error {
 		}
 	}
 
+	// Set kube-apiserver log enabled if it is set
+	if kubeAPIServerLogEnabled, isKubeAPIServerLogEnabledSet := props.Parameters["k8s_kube_apiserver_log_enabled"]; isKubeAPIServerLogEnabledSet {
+		if err = d.Set("kube_apiserver_log_enabled", kubeAPIServerLogEnabled); err != nil {
+			return fmt.Errorf("%s error setting kube_apiserver_log_enabled: %v", errorPrefix, err)
+		}
+	}
+
+	// Set audit log enabled if it is set
+	if auditLogEnabled, isAuditLogEnabledSet := props.Parameters["k8s_audit_log_enabled"]; isAuditLogEnabledSet {
+		if err = d.Set("audit_log_enabled", auditLogEnabled); err != nil {
+			return fmt.Errorf("%s error setting audit_log_enabled: %v", errorPrefix, err)
+		}
+	}
+
+	// Set audit log level if it is set
+	if auditLogLevel, isAuditLogLevelSet := props.Parameters["k8s_audit_log_level"]; isAuditLogLevelSet {
+		if err = d.Set("audit_log_level", auditLogLevel); err != nil {
+			return fmt.Errorf("%s error setting audit_log_level: %v", errorPrefix, err)
+		}
+	}
+
+	// Set log delivery enabled if it is set
+	if logDeliveryEnabled, isLogDeliveryEnabledSet := props.Parameters["k8s_log_delivery"]; isLogDeliveryEnabledSet {
+		if err = d.Set("log_delivery", logDeliveryEnabled); err != nil {
+			return fmt.Errorf("%s error setting log_delivery: %v", errorPrefix, err)
+		}
+	}
+
+	// Set log delivery bucket if it is set
+	if logDeliveryBucket, isLogDeliveryBucketSet := props.Parameters["k8s_log_delivery_bucket"]; isLogDeliveryBucketSet {
+		if err = d.Set("log_delivery_bucket", logDeliveryBucket); err != nil {
+			return fmt.Errorf("%s error setting log_delivery_bucket: %v", errorPrefix, err)
+		}
+	}
+
+	// Set log delivery access key if it is set
+	if logDeliveryAccessKey, isLogDeliveryAccessKeySet := props.Parameters["k8s_log_delivery_access_key"]; isLogDeliveryAccessKeySet {
+		if err = d.Set("log_delivery_access_key", logDeliveryAccessKey); err != nil {
+			return fmt.Errorf("%s error setting log_delivery_access_key: %v", errorPrefix, err)
+		}
+	}
+
+	// Set log delivery secret key if it is set
+	if logDeliverySecretKey, isLogDeliverySecretKeySet := props.Parameters["k8s_log_delivery_secret_key"]; isLogDeliverySecretKeySet {
+		if err = d.Set("log_delivery_secret_key", logDeliverySecretKey); err != nil {
+			return fmt.Errorf("%s error setting log_delivery_secret_key: %v", errorPrefix, err)
+		}
+	}
+
+	// Set log delivery endpoint if it is set
+	if logDeliveryEndpoint, isLogDeliveryEndpointSet := props.Parameters["k8s_log_delivery_endpoint"]; isLogDeliveryEndpointSet {
+		if err = d.Set("log_delivery_endpoint", logDeliveryEndpoint); err != nil {
+			return fmt.Errorf("%s error setting log_delivery_endpoint: %v", errorPrefix, err)
+		}
+	}
+
+	// Set log delivery interval if it is set
+	if logDeliveryInterval, isLogDeliveryIntervalSet := props.Parameters["k8s_log_delivery_interval"]; isLogDeliveryIntervalSet {
+		if err = d.Set("log_delivery_interval", logDeliveryInterval); err != nil {
+			return fmt.Errorf("%s error setting log_delivery_interval: %v", errorPrefix, err)
+		}
+	}
+
 	//Get listen ports
 	listenPorts := make([]interface{}, 0)
 	for _, value := range props.ListenPorts {
@@ -739,6 +859,42 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 	if oidcCAPEM, isOIDCCAPEMSet := d.GetOk("oidc_ca_pem"); isOIDCCAPEMSet {
 		params["k8s_oidc_ca_pem"] = oidcCAPEM
 	}
+	// Set kube-apiserver log enabled if it is set
+	if kubeAPIServerLogEnabled, isKubeAPIServerLogEnabledSet := d.GetOk("kube_apiserver_log_enabled"); isKubeAPIServerLogEnabledSet {
+		params["k8s_kube_apiserver_log_enabled"] = kubeAPIServerLogEnabled
+	}
+	// Set audit log enabled if it is set
+	if auditLogEnabled, isAuditLogEnabledSet := d.GetOk("audit_log_enabled"); isAuditLogEnabledSet {
+		params["k8s_audit_log_enabled"] = auditLogEnabled
+	}
+	// Set audit log level if it is set
+	if auditLogLevel, isAuditLogLevelSet := d.GetOk("audit_log_level"); isAuditLogLevelSet {
+		params["k8s_audit_log_level"] = auditLogLevel
+	}
+	// Set log delivery enabled if it is set
+	if logDeliveryEnabled, isLogDeliveryEnabledSet := d.GetOk("log_delivery"); isLogDeliveryEnabledSet {
+		params["k8s_log_delivery"] = logDeliveryEnabled
+	}
+	// Set log delivery bucket if it is set
+	if logDeliveryBucket, isLogDeliveryBucketSet := d.GetOk("log_delivery_bucket"); isLogDeliveryBucketSet {
+		params["k8s_log_delivery_bucket"] = logDeliveryBucket
+	}
+	// Set log delivery access key if it is set
+	if logDeliveryAccessKey, isLogDeliveryAccessKeySet := d.GetOk("log_delivery_access_key"); isLogDeliveryAccessKeySet {
+		params["k8s_log_delivery_access_key"] = logDeliveryAccessKey
+	}
+	// Set log delivery secret key if it is set
+	if logDeliverySecretKey, isLogDeliverySecretKeySet := d.GetOk("log_delivery_secret_key"); isLogDeliverySecretKeySet {
+		params["k8s_log_delivery_secret_key"] = logDeliverySecretKey
+	}
+	// Set log delivery endpoint if it is set
+	if logDeliveryEndpoint, isLogDeliveryEndpointSet := d.GetOk("log_delivery_endpoint"); isLogDeliveryEndpointSet {
+		params["k8s_log_delivery_endpoint"] = logDeliveryEndpoint
+	}
+	// Set log delivery interval if it is set
+	if logDeliveryInterval, isLogDeliveryIntervalSet := d.GetOk("log_delivery_interval"); isLogDeliveryIntervalSet {
+		params["k8s_log_delivery_interval"] = logDeliveryInterval
+	}
 	requestBody.Parameters = params
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
@@ -836,6 +992,42 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 	// Set OIDC CA PEM if it is set
 	if oidcCAPEM, isOIDCCAPEMSet := d.GetOk("oidc_ca_pem"); isOIDCCAPEMSet {
 		params["k8s_oidc_ca_pem"] = oidcCAPEM
+	}
+	// Set kube-apiserver log enabled if it is set
+	if kubeAPIServerLogEnabled, isKubeAPIServerLogEnabledSet := d.GetOk("kube_apiserver_log_enabled"); isKubeAPIServerLogEnabledSet {
+		params["k8s_kube_apiserver_log_enabled"] = kubeAPIServerLogEnabled
+	}
+	// Set audit log enabled if it is set
+	if auditLogEnabled, isAuditLogEnabledSet := d.GetOk("audit_log_enabled"); isAuditLogEnabledSet {
+		params["k8s_audit_log_enabled"] = auditLogEnabled
+	}
+	// Set audit log level if it is set
+	if auditLogLevel, isAuditLogLevelSet := d.GetOk("audit_log_level"); isAuditLogLevelSet {
+		params["k8s_audit_log_level"] = auditLogLevel
+	}
+	// Set log delivery enabled if it is set
+	if logDeliveryEnabled, isLogDeliveryEnabledSet := d.GetOk("log_delivery"); isLogDeliveryEnabledSet {
+		params["k8s_log_delivery"] = logDeliveryEnabled
+	}
+	// Set log delivery bucket if it is set
+	if logDeliveryBucket, isLogDeliveryBucketSet := d.GetOk("log_delivery_bucket"); isLogDeliveryBucketSet {
+		params["k8s_log_delivery_bucket"] = logDeliveryBucket
+	}
+	// Set log delivery access key if it is set
+	if logDeliveryAccessKey, isLogDeliveryAccessKeySet := d.GetOk("log_delivery_access_key"); isLogDeliveryAccessKeySet {
+		params["k8s_log_delivery_access_key"] = logDeliveryAccessKey
+	}
+	// Set log delivery secret key if it is set
+	if logDeliverySecretKey, isLogDeliverySecretKeySet := d.GetOk("log_delivery_secret_key"); isLogDeliverySecretKeySet {
+		params["k8s_log_delivery_secret_key"] = logDeliverySecretKey
+	}
+	// Set log delivery endpoint if it is set
+	if logDeliveryEndpoint, isLogDeliveryEndpointSet := d.GetOk("log_delivery_endpoint"); isLogDeliveryEndpointSet {
+		params["k8s_log_delivery_endpoint"] = logDeliveryEndpoint
+	}
+	// Set log delivery interval if it is set
+	if logDeliveryInterval, isLogDeliveryIntervalSet := d.GetOk("log_delivery_interval"); isLogDeliveryIntervalSet {
+		params["k8s_log_delivery_interval"] = logDeliveryInterval
 	}
 	requestBody.Parameters = params
 
@@ -998,6 +1190,13 @@ func validateK8sParameters(d *schema.ResourceDiff, template gsclient.PaaSTemplat
 			if block == nil {
 				return fmt.Errorf("invalid OIDC 'ca_pem' value, failed to parse to CA PEM")
 			}
+		}
+	}
+
+	logDeliveryIntervalScheme, logDeliveryIntervalOk := template.Properties.ParametersSchema["k8s_log_delivery_interval"]
+	if logDeliveryInterval, ok := d.GetOk("log_delivery_interval"); ok && logDeliveryIntervalOk {
+		if logDeliveryInterval.(int) < logDeliveryIntervalScheme.Min || logDeliveryInterval.(int) > logDeliveryIntervalScheme.Max {
+			errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'log_delivery_interval' value. Value must stay between %d and %d\n", logDeliveryIntervalScheme.Min, logDeliveryIntervalScheme.Max))
 		}
 	}
 
