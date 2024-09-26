@@ -25,8 +25,6 @@ const (
 	k8sRocketStorageSupportRelease = "1.26"
 )
 
-var k8sAuditLogLevels = []string{"Metadata", "RequestALLResponseCRUD", "RequestALLResponseALL"}
-
 func resourceGridscaleK8s() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceGridscaleK8sCreate,
@@ -271,11 +269,10 @@ func resourceGridscaleK8s() *schema.Resource {
 				Optional:    true,
 			},
 			"audit_log_level": {
-				Type:         schema.TypeString,
-				Description:  "Kubernetes audit log level. Possible values are: 'Metadata', 'RequestALLResponseCRUD', 'RequestALLResponseALL'.",
-				Computed:     true,
-				Optional:     true,
-				ValidateFunc: validation.StringInSlice(k8sAuditLogLevels, false),
+				Type:        schema.TypeString,
+				Description: "Kubernetes audit log level. Possible values are: 'Metadata', 'RequestALLResponseCRUD', 'RequestALLResponseALL'.",
+				Computed:    true,
+				Optional:    true,
 			},
 			"log_delivery": {
 				Type:        schema.TypeBool,
@@ -1193,10 +1190,71 @@ func validateK8sParameters(d *schema.ResourceDiff, template gsclient.PaaSTemplat
 		}
 	}
 
-	logDeliveryIntervalScheme, logDeliveryIntervalOk := template.Properties.ParametersSchema["k8s_log_delivery_interval"]
-	if logDeliveryInterval, ok := d.GetOk("log_delivery_interval"); ok && logDeliveryIntervalOk {
-		if logDeliveryInterval.(int) < logDeliveryIntervalScheme.Min || logDeliveryInterval.(int) > logDeliveryIntervalScheme.Max {
-			errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'log_delivery_interval' value. Value must stay between %d and %d\n", logDeliveryIntervalScheme.Min, logDeliveryIntervalScheme.Max))
+	templateParameterAuditLogLevel, templateParameterFound := template.Properties.ParametersSchema["k8s_audit_log_level"]
+	if auditLogLevel, ok := d.GetOk("audit_log_level"); ok && templateParameterFound {
+		var isValid bool
+		for _, allowedValue := range templateParameterAuditLogLevel.Allowed {
+			if auditLogLevel.(string) == allowedValue {
+				isValid = true
+			}
+		}
+		if !isValid {
+			errorMessages = append(errorMessages,
+				fmt.Sprintf("Invalid 'audit_log_level' value. Value must be one of these:\n\t%s",
+					strings.Join(templateParameterAuditLogLevel.Allowed, "\n\t"),
+				),
+			)
+		}
+	}
+
+	if interfaceLogDeliveryBucket, ok := d.GetOk("log_delivery_bucket"); ok {
+		if templateParameterLogDeliveryBucket, ok := template.Properties.ParametersSchema["k8s_log_delivery_bucket"]; ok {
+			validMode := regexp.MustCompile(templateParameterLogDeliveryBucket.Regex)
+			if !validMode.MatchString(interfaceLogDeliveryBucket.(string)) {
+				errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'log_delivery_bucket' value. Example value: '%s'\n", "foo"))
+			}
+		}
+	}
+
+	if interfaceLogDeliveryAccessKey, ok := d.GetOk("log_delivery_access_key"); ok {
+		if templateParameterLogDeliveryAccessKey, ok := template.Properties.ParametersSchema["k8s_log_delivery_access_key"]; ok {
+			validMode := regexp.MustCompile(templateParameterLogDeliveryAccessKey.Regex)
+			if !validMode.MatchString(interfaceLogDeliveryAccessKey.(string)) {
+				errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'log_delivery_access_key' value. Example value: '%s'\n", "011000010110001101100011011001010111001101110011"))
+			}
+		}
+	}
+
+	if interfaceLogDeliverySecretKey, ok := d.GetOk("log_delivery_secret_key"); ok {
+		if templateParameterLogDeliverySecretKey, ok := template.Properties.ParametersSchema["k8s_log_delivery_secret_key"]; ok {
+			validMode := regexp.MustCompile(templateParameterLogDeliverySecretKey.Regex)
+			if !validMode.MatchString(interfaceLogDeliverySecretKey.(string)) {
+				errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'log_delivery_secret_key' value. Example value: '%s'\n", "011100110110010101100011011100100110010101110100"))
+			}
+		}
+	}
+
+	if interfaceLogDeliveryInterval, ok := d.GetOk("log_delivery_interval"); ok {
+		if templateParameterLogDeliveryInterval, ok := template.Properties.ParametersSchema["k8s_log_delivery_interval"]; ok {
+			if interfaceLogDeliveryInterval.(int) < templateParameterLogDeliveryInterval.Min || interfaceLogDeliveryInterval.(int) > templateParameterLogDeliveryInterval.Max {
+				errorMessages = append(
+					errorMessages,
+					fmt.Sprintf(
+						"Invalid 'log_delivery_interval' value. Value must stay between %d and %d\n",
+						templateParameterLogDeliveryInterval.Min,
+						templateParameterLogDeliveryInterval.Max,
+					),
+				)
+			}
+		}
+	}
+
+	if interfaceLogDeliveryEndpoint, ok := d.GetOk("log_delivery_endpoint"); ok {
+		if _, ok := template.Properties.ParametersSchema["k8s_log_delivery_endpoint"]; ok {
+			validMode := regexp.MustCompile(`^https:\/\/.*`)
+			if !validMode.MatchString(interfaceLogDeliveryEndpoint.(string)) {
+				errorMessages = append(errorMessages, fmt.Sprintf("Invalid 'log_delivery_endpoint' value. Example value: '%s'\n", "https://gos3.io"))
+			}
 		}
 	}
 
