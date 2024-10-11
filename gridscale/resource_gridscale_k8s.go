@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/http"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 
@@ -353,7 +354,8 @@ func deriveK8sTemplateFromResourceDiff(client *gsclient.Client, d *schema.Resour
 	case "version":
 		return deriveK8sTemplateFromGSKVersion(client, version)
 	case "release":
-		return deriveK8sTemplateFromRelease(client, release)
+		currenTemplateUUID := d.Get("service_template_uuid").(string)
+		return deriveK8sTemplateFromRelease(client, release, currenTemplateUUID)
 	}
 	return nil, nil
 }
@@ -405,7 +407,8 @@ func deriveK8sTemplateFromResourceData(client *gsclient.Client, d *schema.Resour
 	case "version":
 		return deriveK8sTemplateFromGSKVersion(client, version)
 	case "release":
-		return deriveK8sTemplateFromRelease(client, release)
+		currenTemplateUUID := d.Get("service_template_uuid").(string)
+		return deriveK8sTemplateFromRelease(client, release, currenTemplateUUID)
 	}
 	currentTemplateUUID := d.Get("service_template_uuid").(string)
 	return deriveK8sTemplateFromUUID(client, currentTemplateUUID)
@@ -469,11 +472,30 @@ func deriveK8sTemplateFromGSKVersion(client *gsclient.Client, version string) (*
 }
 
 // deriveK8sTemplateFromRelease derives the k8s service template from given release.
-func deriveK8sTemplateFromRelease(client *gsclient.Client, release string) (*gsclient.PaaSTemplate, error) {
+func deriveK8sTemplateFromRelease(client *gsclient.Client, release, currenTemplateUUID string) (*gsclient.PaaSTemplate, error) {
 	paasTemplates, err := client.GetPaaSTemplateList(context.Background())
 	if err != nil {
 		return nil, err
 	}
+
+	// Sort paasTemplates by version (ascending)
+	sort.Slice(paasTemplates, func(i, j int) bool {
+		return paasTemplates[i].Properties.Version < paasTemplates[j].Properties.Version
+	})
+
+	// if the current template's release is the same as the requested release, return the current template
+	// this is to prevent this function return a different template than the current one when the release is not changed
+	// E.g. Template of 1.29.6-gs1 and 1.29.8-gs0 have the same release 1.29. If a cluster is created with 1.29.6-gs1
+	// via setting release="1.29", the function should return the current template 1.29.6-gs1, not 1.29.8-gs0.
+	if currenTemplateUUID != "" {
+		for _, paasTemplate := range paasTemplates {
+			if paasTemplate.Properties.ObjectUUID == currenTemplateUUID &&
+				paasTemplate.Properties.Release == release {
+				return &paasTemplate, nil
+			}
+		}
+	}
+
 	var derived bool
 	var releases []string
 	var template gsclient.PaaSTemplate
