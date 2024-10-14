@@ -507,7 +507,6 @@ func deriveK8sTemplateFromRelease(client *gsclient.Client, release, currenTempla
 			if paasTemplate.Properties.Release == release {
 				derived = true
 				template = paasTemplate
-				break
 			}
 		}
 	}
