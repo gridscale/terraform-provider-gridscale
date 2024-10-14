@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.27.0 (Oct 14, 2024)
+
+FEATURES:
+- Add log-related parameters in k8s resource.
+
+BUG FIXES:
+- Fix cluster using deprecated gsk version causes wrong chosen version in k8s resource. [PR #398](https://github.com/gridscale/terraform-provider-gridscale/pull/398).
+
 ## 1.26.0 (Jul 11, 2024)
 
 FEATURES:
