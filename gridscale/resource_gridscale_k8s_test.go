@@ -45,7 +45,7 @@ variable "node_pools" {
 	description = "A list of node pools"
 	default = [
 	  {
-		name = "my_node_pool"
+		name = "my-node-pool"
 		node_count = 2
 		cores = 1
 		memory = 2
@@ -91,7 +91,7 @@ variable "node_pools" {
 	description = "A list of node pools"
 	default = [
 	  {
-		name = "my_node_pool"
+		name = "my-node-pool"
 		node_count = 2
 		cores = 1
 		memory = 2
