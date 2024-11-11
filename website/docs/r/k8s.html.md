@@ -95,6 +95,8 @@ The following arguments are supported:
 
 * `oidc_ca_pem` - (Optional) Custom CA from customer in pem format as string.
 
+* `k8s_hubble` - (Optional) Enable Hubble for the k8s cluster.
+
 
 ## Timeouts
 
@@ -140,6 +142,7 @@ This resource exports the following attributes:
 * `oidc_username_prefix` - See Argument Reference above.
 * `oidc_required_claim` - See Argument Reference above.
 * `oidc_ca_pem` - See Argument Reference above.
+* `k8s_hubble` - See Argument Reference above.
 * `usage_in_minutes` - The amount of minutes the IP address has been in use.
 * `create_time` - The time the object was created.
 * `change_time` - Defines the date and time of the last object change.
