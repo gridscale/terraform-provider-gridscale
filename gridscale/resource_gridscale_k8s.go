@@ -365,6 +365,12 @@ func (rgk8sm *ResourceGridscaleK8sModeler) buildInputSchema() map[string]*schema
 			Computed:    true,
 			Optional:    true,
 		},
+		"k8s_hubble": {
+			Type:        schema.TypeBool,
+			Description: "Enables Hubble Integration.",
+			Computed:    true,
+			Optional:    true,
+		},
 	}
 }
 
@@ -754,6 +760,13 @@ func resourceGridscaleK8sRead(d *schema.ResourceData, meta interface{}) error {
 		}
 	}
 
+	// Set hubble if it is set
+	if hubble, isHubbleSet := props.Parameters["k8s_hubble"].(bool); isHubbleSet {
+		if err = d.Set("k8s_hubble", hubble); err != nil {
+			return fmt.Errorf("%s error setting k8s_hubble: %v", errorPrefix, err)
+		}
+	}
+
 	//Get listen ports
 	listenPorts := make([]interface{}, 0)
 	for _, value := range props.ListenPorts {
@@ -1010,6 +1023,12 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 	if logDeliveryEndpoint, isLogDeliveryEndpointSet := d.GetOk("log_delivery_endpoint"); isLogDeliveryEndpointSet {
 		parameters["k8s_log_delivery_endpoint"] = logDeliveryEndpoint
 	}
+
+	// Set hubble if it is set
+	if hubble, isHubbleSet := d.GetOk("hubble"); isHubbleSet {
+		parameters["k8s_hubble"] = hubble.(bool)
+	}
+
 	requestBody.Parameters = parameters
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
@@ -1175,6 +1194,11 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 	// Set log delivery endpoint if it is set
 	if logDeliveryEndpoint, isLogDeliveryEndpointSet := d.GetOk("log_delivery_endpoint"); isLogDeliveryEndpointSet {
 		parameters["k8s_log_delivery_endpoint"] = logDeliveryEndpoint
+	}
+
+	// Set hubble if it is set
+	if hubble, isHubbleSet := d.GetOk("hubble"); isHubbleSet {
+		parameters["k8s_hubble"] = hubble
 	}
 	requestBody.Parameters = parameters
 
