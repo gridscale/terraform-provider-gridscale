@@ -553,7 +553,6 @@ func deriveK8sTemplateFromRelease(client *gsclient.Client, release string) (*gsc
 
 func resourceGridscaleK8sRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	validator := &ResourceGridscaleK8sValidator{}
 	errorPrefix := fmt.Sprintf("read k8s (%s) resource -", d.Id())
 	paas, err := client.GetPaaSService(context.Background(), d.Id())
 
@@ -566,17 +565,6 @@ func resourceGridscaleK8sRead(d *schema.ResourceData, meta interface{}) error {
 		}
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
-	template, err := deriveK8sTemplateFromUUID(client, paas.Properties.ServiceTemplateUUID)
-
-	if err != nil {
-		return fmt.Errorf("%s error: %v", errorPrefix, err)
-	}
-	err = validator.checkIfTemplateSupportsMultiNodePools(*template)
-
-	if err != nil {
-		return fmt.Errorf("%s error: %v", errorPrefix, err)
-	}
-
 	props := paas.Properties
 	creds := props.Credentials
 	if err = d.Set("name", props.Name); err != nil {
@@ -1044,7 +1032,6 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 
 func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	validator := &ResourceGridscaleK8sValidator{}
 	errorPrefix := fmt.Sprintf("update k8s (%s) resource -", d.Id())
 
 	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
@@ -1054,15 +1041,10 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 	}
 	currentTemplateUUID := d.Get("service_template_uuid")
 	templateRequested, err := deriveK8sTemplateFromResourceData(client, d)
-
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
-	err = validator.checkIfTemplateSupportsMultiNodePools(*templateRequested)
 
-	if err != nil {
-		return fmt.Errorf("%s error: %v", errorPrefix, err)
-	}
 	if templateRequested.Properties.ObjectUUID != currentTemplateUUID.(string) {
 		requestBody.PaaSServiceTemplateUUID = templateRequested.Properties.ObjectUUID
 	}
