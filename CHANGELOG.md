@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0.0 (Jan 02, 2025)
+BREAKING CHANGES:
+- Support multiple node pools in k8s resource. The `node_pools` block is now a list of objects. [PR #394](https://github.com/gridscale/terraform-provider-gridscale/pull/394)
+
+FEATURES:
+- Add hubble support to k8s resource. [PR #402](https://github.com/gridscale/terraform-provider-gridscale/pull/402)
+
 ## 1.26.0 (Jul 11, 2024)
 
 FEATURES:
