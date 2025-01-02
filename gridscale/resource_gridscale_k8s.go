@@ -1027,7 +1027,7 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 	}
 	d.SetId(response.ObjectUUID)
 	log.Printf("The id for PaaS service %s has been set to %v", requestBody.Name, response.ObjectUUID)
-	return nil //resourceGridscaleK8sRead(d, meta)
+	return resourceGridscaleK8sRead(d, meta)
 }
 
 func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error {
