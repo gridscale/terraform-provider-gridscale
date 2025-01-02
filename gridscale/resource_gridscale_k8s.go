@@ -1032,7 +1032,6 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 
 func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gsclient.Client)
-	validator := &ResourceGridscaleK8sValidator{}
 	errorPrefix := fmt.Sprintf("update k8s (%s) resource -", d.Id())
 
 	labels := convSOStrings(d.Get("labels").(*schema.Set).List())
@@ -1042,15 +1041,10 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 	}
 	currentTemplateUUID := d.Get("service_template_uuid")
 	templateRequested, err := deriveK8sTemplateFromResourceData(client, d)
-
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
-	err = validator.checkIfTemplateSupportsMultiNodePools(*templateRequested)
 
-	if err != nil {
-		return fmt.Errorf("%s error: %v", errorPrefix, err)
-	}
 	if templateRequested.Properties.ObjectUUID != currentTemplateUUID.(string) {
 		requestBody.PaaSServiceTemplateUUID = templateRequested.Properties.ObjectUUID
 	}
