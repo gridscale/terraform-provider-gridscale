@@ -17,10 +17,10 @@ The following example shows how one might use this resource to add a k8s cluster
 
 ```terraform
 resource "gridscale_k8s" "k8s-test" {
-	name   = "test"
-	release = "1.30" # instead, gsk_version can be set.
+  name   = "test"
+  release = "1.30" # instead, gsk_version can be set.
 
-	node_pool {
+  node_pool {
     name = "pool-0"
     node_count = 2
     cores = 2
@@ -29,7 +29,7 @@ resource "gridscale_k8s" "k8s-test" {
     storage_type = "storage_insane"
   }
 
-	node_pool {
+  node_pool {
     name = "pool-1"
     node_count = 3
     cores = 1
