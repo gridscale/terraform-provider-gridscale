@@ -195,7 +195,7 @@ func (rgk8sm *ResourceGridscaleK8sModeler) buildInputSchema() map[string]*schema
 		},
 		"node_pool": {
 			Type:        schema.TypeList,
-			Optional:    true,
+			Required:    true,
 			Description: `Define a node pool and its attributes.`,
 			Elem: &schema.Resource{
 				Schema: nodePoolSchema,
