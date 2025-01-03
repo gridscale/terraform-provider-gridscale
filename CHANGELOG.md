@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0.1 (Jan 03, 2025)
+HOT FIXES:
+- Fix typo `node_pools` in k8s resource. Rename parameter `node_pools` to `node_pool` in k8s resource. [PR #407](https://github.com/gridscale/terraform-provider-gridscale/pull/407)
+
+IMPROVEMENTS:
+- Update k8s resource docs. [PR #407](https://github.com/gridscale/terraform-provider-gridscale/pull/407)
+- Make error message regarding non-supported k8s release in v2 clearer. [PR #408](https://github.com/gridscale/terraform-provider-gridscale/pull/408)
+
 ## 2.0.0 (Jan 02, 2025)
 BREAKING CHANGES:
 - Support multiple node pools in k8s resource. The `node_pools` block is now a list of objects. [PR #394](https://github.com/gridscale/terraform-provider-gridscale/pull/394)
