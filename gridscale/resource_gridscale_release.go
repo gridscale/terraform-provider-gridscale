@@ -17,6 +17,8 @@ type Feature struct {
 	Release
 }
 
+const supportedK8SRelease = "1.30"
+
 // NewRelease creates a new Release instance.
 func NewRelease(representation string) (*Release, error) {
 	version, err := goVersion.NewVersion(representation)
@@ -32,6 +34,16 @@ func (r *Release) CheckIfFeatureIsKnown(f *Feature) error {
 	if r.LessThan(&f.Version) {
 		return &ReleaseFeatureIncompatibilityError{
 			Detail: fmt.Sprintf("Feature '%s' is part of release %s but requested for release %s.", f.Description, f.String(), r.String()),
+		}
+	}
+	return nil
+}
+
+// CheckIfK8SReleaseIsSupported checks if the Kubernetes release is supported by this gridscale terraform provider.
+func (r *Release) CheckIfK8SReleaseIsSupported() error {
+	if r.LessThan(goVersion.Must(goVersion.NewVersion(supportedK8SRelease))) {
+		return &ReleaseFeatureIncompatibilityError{
+			Detail: fmt.Sprintf("this gridscale terraform provider version v2 supports only Kubernetes release >= %s, for Kubernetes release %s please use gridscale terraform provider version v1", supportedK8SRelease, r.String()),
 		}
 	}
 	return nil

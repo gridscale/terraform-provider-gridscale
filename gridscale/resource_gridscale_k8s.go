@@ -71,22 +71,10 @@ func (rgk8sv *ResourceGridscaleK8sValidator) checkIfTemplateSupportsMultiNodePoo
 		k8sMultiNodePoolSupportRelease,
 	)
 	templateRelease, err := NewRelease(template.Properties.Release)
-
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
-	multiNodePoolSupportRelease, err := NewRelease(k8sMultiNodePoolSupportRelease)
-
-	if err != nil {
-		return fmt.Errorf("%s error: %v", errorPrefix, err)
-	}
-	err = templateRelease.CheckIfFeatureIsKnown(
-		&Feature{
-			Description: "multi node pool support",
-			Release:     *multiNodePoolSupportRelease,
-		},
-	)
-	return err
+	return templateRelease.CheckIfK8SReleaseIsSupported()
 }
 
 // buildInputSchema models the k8s resource's input schema by ResourceGridscaleK8sModeler receiver.
