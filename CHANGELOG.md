@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.27.1 (Jan 01, 2025)
+
+IMPROVEMENTS:
+- Return error when try to provision/upgrade to a k8s release >= 1.30 with gridscale terraform provider v1. [PR #409](https://github.com/gridscale/terraform-provider-gridscale/pull/409)
+
+BUG FIXES:
+- Fix cannot retry upgrade gsk when previous upgrade fails. [PR #410](https://github.com/gridscale/terraform-provider-gridscale/pull/410)
+
 ## 1.27.0 (Oct 14, 2024)
 
 FEATURES:
