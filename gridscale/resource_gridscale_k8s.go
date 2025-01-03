@@ -801,9 +801,17 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 	client := meta.(*gsclient.Client)
 	errorPrefix := fmt.Sprintf("create k8s (%s) resource -", d.Id())
 	template, err := deriveK8sTemplateFromResourceData(client, d)
-
 	if err != nil {
 		return err
+	}
+	// check if the k8s release is supported by gs tf provider v1
+	templateRelease, err := NewRelease(template.Properties.Release)
+	if err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
+	}
+	err = templateRelease.CheckIfK8SReleaseIsSupported()
+	if err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 	requestBody := gsclient.PaaSServiceCreateRequest{
 		Name:                    d.Get("name").(string),
@@ -1075,8 +1083,17 @@ func resourceGridscaleK8sDelete(d *schema.ResourceData, meta interface{}) error 
 }
 
 func validateK8sParameters(d *schema.ResourceDiff, template gsclient.PaaSTemplate) error {
-	var errorMessages []string
+	// check if the k8s release is supported by gs tf provider v1
+	templateRelease, err := NewRelease(template.Properties.Release)
+	if err != nil {
+		return err
+	}
+	err = templateRelease.CheckIfK8SReleaseIsSupported()
+	if err != nil {
+		return err
+	}
 
+	var errorMessages []string
 	worker_memory_scheme, mem_ok := template.Properties.ParametersSchema["k8s_worker_node_ram"]
 	// TODO: The API scheme will be CHANGED in the future. There will be multiple node pools.
 	if memory, ok := d.GetOk("node_pool.0.memory"); ok && mem_ok {
