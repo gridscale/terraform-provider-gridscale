@@ -16,36 +16,27 @@ Provides a k8s cluster resource. This can be used to create, modify, and delete 
 The following example shows how one might use this resource to add a k8s cluster to gridscale:
 
 ```terraform
-variable "node_pools" {
-	description = "A list of node pools"
-	default = [
-	  {
-		name = "test_node_pool"
-		node_count = 2
-		cores = 1
-		memory = 2
-		storage = 30
-		storage_type = "storage_insane"
-		rocket_storage = 90
-	  }
-	]
+resource "gridscale_k8s" "k8s-test" {
+  name   = "test"
+  release = "1.30" # instead, gsk_version can be set.
+
+  node_pool {
+    name = "pool-0"
+    node_count = 2
+    cores = 2
+    memory = 4
+    storage = 30
+    storage_type = "storage_insane"
   }
 
-resource "gridscale_k8s" "k8s-test" {
-	name   = "test"
-	release = "1.30" # instead, gsk_version can be set.
-	dynamic "node_pools" {
-		for_each = var.node_pools
-		content {
-			name = node_pools.value.name
-			node_count = node_pools.value.node_count
-			cores = node_pools.value.cores
-			memory = node_pools.value.memory
-			storage = node_pools.value.storage
-			storage_type = node_pools.value.storage_type
-			rocket_storage = node_pools.value.rocket_storage
-		}
-	}
+  node_pool {
+    name = "pool-1"
+    node_count = 3
+    cores = 1
+    memory = 3
+    storage = 30
+    storage_type = "storage_insane"
+  }
 }
 ```
 
@@ -63,7 +54,7 @@ The following arguments are supported:
 
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
 
-* `node_pools` - (Optional) The collection of node pool specifications. **NOTE**: Any node pool specification is not yet mutable (except `node_count`).
+* `node_pool` - (Required) The collection of node pool specifications. Mutiple node pools can be defined with multiple `node_pool` blocks. The node pool block supports the following arguments:
     * `name` - Name of the node pool.
     * `node_count` - Number of worker nodes.
     * `cores` - Cores per worker node.
@@ -121,7 +112,7 @@ This resource exports the following attributes:
 * `kubeconfig` - The kubeconfig file content of the k8s cluster.
 * `network_uuid` - *DEPRECATED*  Network UUID containing security zone, which is linked to the k8s cluster.
 * `k8s_private_network_uuid` - Private network UUID which k8s nodes are attached to. It can be used to attach other PaaS/VMs.
-* `node_pools` - See Argument Reference above.
+* `node_pool` - See Argument Reference above.
     * `name` - See Argument Reference above.
     * `node_count` - See Argument Reference above.
     * `cores` - See Argument Reference above.
