@@ -16,36 +16,27 @@ Provides a k8s cluster resource. This can be used to create, modify, and delete 
 The following example shows how one might use this resource to add a k8s cluster to gridscale:
 
 ```terraform
-variable "node_pool" {
-	description = "A list of node pools"
-	default = [
-	  {
-		name = "test_node_pool"
-		node_count = 2
-		cores = 1
-		memory = 2
-		storage = 30
-		storage_type = "storage_insane"
-		rocket_storage = 90
-	  }
-	]
-  }
-
 resource "gridscale_k8s" "k8s-test" {
 	name   = "test"
 	release = "1.30" # instead, gsk_version can be set.
-	dynamic "node_pool" {
-		for_each = var.node_pool
-		content {
-			name = node_pool.value.name
-			node_count = node_pool.value.node_count
-			cores = node_pool.value.cores
-			memory = node_pool.value.memory
-			storage = node_pool.value.storage
-			storage_type = node_pool.value.storage_type
-			rocket_storage = node_pool.value.rocket_storage
-		}
-	}
+
+	node_pool {
+    name = "pool-0"
+    node_count = 2
+    cores = 2
+    memory = 4
+    storage = 30
+    storage_type = "storage_insane"
+  }
+
+	node_pool {
+    name = "pool-1"
+    node_count = 3
+    cores = 1
+    memory = 3
+    storage = 30
+    storage_type = "storage_insane"
+  }
 }
 ```
 

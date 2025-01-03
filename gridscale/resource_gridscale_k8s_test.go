@@ -41,10 +41,10 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 
 func testAccCheckResourceGridscaleK8sConfigBasic(name string) string {
 	return fmt.Sprintf(`
-variable "node_pool" {
-	description = "A list of node pools"
-	default = [
-	  {
+resource "gridscale_k8s" "foopaas" {
+	name   = "%s"
+	release = "1.30"
+	node_pool {
 		name = "my-node-pool"
 		node_count = 2
 		cores = 1
@@ -52,25 +52,8 @@ variable "node_pool" {
 		storage = 30
 		storage_type = "storage_insane"
 		rocket_storage = 90
-	  }
-	]
-  }
-
-resource "gridscale_k8s" "foopaas" {
-	name   = "%s"
-	release = "1.30"
-	dynamic "node_pool" {
-		for_each = var.node_pool
-		content {
-			name = node_pool.value.name
-			node_count = node_pool.value.node_count
-			cores = node_pool.value.cores
-			memory = node_pool.value.memory
-			storage = node_pool.value.storage
-			storage_type = node_pool.value.storage_type
-			rocket_storage = node_pool.value.rocket_storage
-		}
 	}
+	
 	surge_node = false
 	oidc_enabled = true
 	oidc_issuer_url = "https://sts.windows.net/fe4ac456-23a7-4841-a404-01fcb695412c/"
@@ -87,10 +70,10 @@ resource "gridscale_k8s" "foopaas" {
 
 func testAccCheckResourceGridscaleK8sConfigBasicUpdate() string {
 	return `
-variable "node_pool" {
-	description = "A list of node pools"
-	default = [
-	  {
+resource "gridscale_k8s" "foopaas" {
+	name   = "newname"
+	release = "1.30"
+	node_pool {
 		name = "my-node-pool"
 		node_count = 2
 		cores = 1
@@ -98,24 +81,6 @@ variable "node_pool" {
 		storage = 30
 		storage_type = "storage_insane"
 		rocket_storage = 90
-	  }
-	]
-  }
-
-resource "gridscale_k8s" "foopaas" {
-	name   = "newname"
-	release = "1.30"
-	dynamic "node_pool" {
-		for_each = var.node_pool
-		content {
-			name   = node_pool.value.name
-			node_count = node_pool.value.node_count
-			cores = node_pool.value.cores
-			memory = node_pool.value.memory
-			storage = node_pool.value.storage
-			storage_type = node_pool.value.storage_type
-			rocket_storage = node_pool.value.rocket_storage
-		}
 	}
 	surge_node = false
 }
