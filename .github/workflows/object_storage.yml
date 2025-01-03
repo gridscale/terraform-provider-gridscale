@@ -5,14 +5,14 @@ on:
   push:
     branches:
       - master
-      - 'v*'
+      - 'legacy/version-*'
     paths:
       - "**.go"
       - ".github/workflows/object_storage.yml"
   pull_request:
     branches:
       - master
-      - 'v*'
+      - 'legacy/version-*'
     paths:
       - "**gridscale_objectstorage**"
       - "gridscale/error-handler/**"

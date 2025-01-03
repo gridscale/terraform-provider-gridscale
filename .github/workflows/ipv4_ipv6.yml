@@ -5,14 +5,14 @@ on:
   push:
     branches:
       - master
-      - 'v*'
+      - 'legacy/version-*'
     paths:
       - "**.go"
       - ".github/workflows/ipv4_ipv6.yml"
   pull_request:
     branches:
       - master
-      - 'v*'
+      - 'legacy/version-*'
     paths:
       - "**gridscale_ipv**"
       - "gridscale/error-handler/**"

@@ -5,14 +5,14 @@ on:
   push:
     branches:
       - master
-      - 'v*'
+      - 'legacy/version-*'
     paths:
       - "**.go"
       - ".github/workflows/memcached.yml"
   pull_request:
     branches:
       - master
-      - 'v*'
+      - 'legacy/version-*'
     paths:
       - "**gridscale_memcached**"
       - "gridscale/error-handler/**"

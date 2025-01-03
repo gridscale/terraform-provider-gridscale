@@ -5,14 +5,14 @@ on:
   push:
     branches:
       - master
-      - 'v*'
+      - 'legacy/version-*'
     paths:
       - "**.go"
       - ".github/workflows/isoimage.yml"
   pull_request:
     branches:
       - master
-      - 'v*'
+      - 'legacy/version-*'
     paths:
       - "**gridscale_isoimage**"
       - "gridscale/error-handler/**"

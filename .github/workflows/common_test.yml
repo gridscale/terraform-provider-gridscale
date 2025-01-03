@@ -4,11 +4,11 @@ on:
   push:
     branches:
       - master
-      - 'v*'
+      - 'legacy/version-*'
   pull_request:
     branches:
       - master
-      - 'v*'
+      - 'legacy/version-*'
 
 jobs:
   build:
