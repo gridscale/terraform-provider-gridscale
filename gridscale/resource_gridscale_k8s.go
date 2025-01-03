@@ -193,7 +193,7 @@ func (rgk8sm *ResourceGridscaleK8sModeler) buildInputSchema() map[string]*schema
 			Description: "PaaS service template identifier for this service.",
 			Computed:    true,
 		},
-		"node_pools": {
+		"node_pool": {
 			Type:        schema.TypeList,
 			Optional:    true,
 			Description: `Define a list of pools and their attributes.`,
@@ -794,7 +794,7 @@ func resourceGridscaleK8sRead(d *schema.ResourceData, meta interface{}) error {
 		}
 	}
 	// Set node pools
-	if err = d.Set("node_pools", nodePools); err != nil {
+	if err = d.Set("node_pool", nodePools); err != nil {
 		return fmt.Errorf("%s error setting node_pool: %v", errorPrefix, err)
 	}
 	// Set cluster CIDR if it is set
@@ -872,21 +872,21 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 	parameters := make(map[string]interface{})
 
 	// Iterate over requested node pools to set them
-	if nodePoolsRequestedInterface, ok := d.GetOk("node_pools"); ok {
+	if nodePoolsRequestedInterface, ok := d.GetOk("node_pool"); ok {
 		nodePoolsRequested := nodePoolsRequestedInterface.([]interface{})
 		nodePools := make([]map[string]interface{}, 0)
 
 		for index, _ := range nodePoolsRequested {
 			nodePool := make(map[string]interface{}, 0)
-			nodePool["name"] = d.Get(fmt.Sprintf("node_pools.%d.name", index))
-			nodePool["count"] = d.Get(fmt.Sprintf("node_pools.%d.node_count", index))
-			nodePool["ram"] = d.Get(fmt.Sprintf("node_pools.%d.memory", index))
-			nodePool["cores"] = d.Get(fmt.Sprintf("node_pools.%d.cores", index))
-			nodePool["storage"] = d.Get(fmt.Sprintf("node_pools.%d.storage", index))
-			nodePool["storage_type"] = d.Get(fmt.Sprintf("node_pools.%d.storage_type", index))
+			nodePool["name"] = d.Get(fmt.Sprintf("node_pool.%d.name", index))
+			nodePool["count"] = d.Get(fmt.Sprintf("node_pool.%d.node_count", index))
+			nodePool["ram"] = d.Get(fmt.Sprintf("node_pool.%d.memory", index))
+			nodePool["cores"] = d.Get(fmt.Sprintf("node_pool.%d.cores", index))
+			nodePool["storage"] = d.Get(fmt.Sprintf("node_pool.%d.storage", index))
+			nodePool["storage_type"] = d.Get(fmt.Sprintf("node_pool.%d.storage_type", index))
 
 			// Set rocket storage if it is set
-			if rocketStorage, isRocketStorageSet := d.GetOk(fmt.Sprintf("node_pools.%d.rocket_storage", index)); isRocketStorageSet {
+			if rocketStorage, isRocketStorageSet := d.GetOk(fmt.Sprintf("node_pool.%d.rocket_storage", index)); isRocketStorageSet {
 				nodePool["rocket_storage"] = rocketStorage
 			}
 			nodePools = append(nodePools, nodePool)
@@ -1039,21 +1039,21 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 	parameters := make(map[string]interface{})
 
 	// Iterate over requested node pools to set them
-	if nodePoolsRequestedInterface, ok := d.GetOk("node_pools"); ok {
+	if nodePoolsRequestedInterface, ok := d.GetOk("node_pool"); ok {
 		nodePoolsRequested := nodePoolsRequestedInterface.([]interface{})
 		nodePools := make([]map[string]interface{}, 0)
 
 		for index, _ := range nodePoolsRequested {
 			nodePool := make(map[string]interface{}, 0)
-			nodePool["name"] = d.Get(fmt.Sprintf("node_pools.%d.name", index))
-			nodePool["count"] = d.Get(fmt.Sprintf("node_pools.%d.node_count", index))
-			nodePool["ram"] = d.Get(fmt.Sprintf("node_pools.%d.memory", index))
-			nodePool["cores"] = d.Get(fmt.Sprintf("node_pools.%d.cores", index))
-			nodePool["storage"] = d.Get(fmt.Sprintf("node_pools.%d.storage", index))
-			nodePool["storage_type"] = d.Get(fmt.Sprintf("node_pools.%d.storage_type", index))
+			nodePool["name"] = d.Get(fmt.Sprintf("node_pool.%d.name", index))
+			nodePool["count"] = d.Get(fmt.Sprintf("node_pool.%d.node_count", index))
+			nodePool["ram"] = d.Get(fmt.Sprintf("node_pool.%d.memory", index))
+			nodePool["cores"] = d.Get(fmt.Sprintf("node_pool.%d.cores", index))
+			nodePool["storage"] = d.Get(fmt.Sprintf("node_pool.%d.storage", index))
+			nodePool["storage_type"] = d.Get(fmt.Sprintf("node_pool.%d.storage_type", index))
 
 			// Set rocket storage if it is set
-			if rocketStorage, isRocketStorageSet := d.GetOk(fmt.Sprintf("node_pools.%d.rocket_storage", index)); isRocketStorageSet {
+			if rocketStorage, isRocketStorageSet := d.GetOk(fmt.Sprintf("node_pool.%d.rocket_storage", index)); isRocketStorageSet {
 				nodePool["rocket_storage"] = rocketStorage
 			}
 			nodePools = append(nodePools, nodePool)
@@ -1206,7 +1206,7 @@ func validateK8sParameters(d *schema.ResourceDiff, template gsclient.PaaSTemplat
 		return err
 	}
 	templateParameterNodePools, templateParameterNodePoolsFound := template.Properties.ParametersSchema["pools"]
-	nodePoolsRequestedInterface, isNodePoolsRequested := d.GetOk("node_pools")
+	nodePoolsRequestedInterface, isNodePoolsRequested := d.GetOk("node_pool")
 
 	if templateParameterNodePoolsFound && isNodePoolsRequested {
 		nodePoolsRequested := nodePoolsRequestedInterface.([]interface{})

@@ -41,7 +41,7 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 
 func testAccCheckResourceGridscaleK8sConfigBasic(name string) string {
 	return fmt.Sprintf(`
-variable "node_pools" {
+variable "node_pool" {
 	description = "A list of node pools"
 	default = [
 	  {
@@ -59,16 +59,16 @@ variable "node_pools" {
 resource "gridscale_k8s" "foopaas" {
 	name   = "%s"
 	release = "1.30"
-	dynamic "node_pools" {
-		for_each = var.node_pools
+	dynamic "node_pool" {
+		for_each = var.node_pool
 		content {
-			name = node_pools.value.name
-			node_count = node_pools.value.node_count
-			cores = node_pools.value.cores
-			memory = node_pools.value.memory
-			storage = node_pools.value.storage
-			storage_type = node_pools.value.storage_type
-			rocket_storage = node_pools.value.rocket_storage
+			name = node_pool.value.name
+			node_count = node_pool.value.node_count
+			cores = node_pool.value.cores
+			memory = node_pool.value.memory
+			storage = node_pool.value.storage
+			storage_type = node_pool.value.storage_type
+			rocket_storage = node_pool.value.rocket_storage
 		}
 	}
 	surge_node = false
@@ -87,7 +87,7 @@ resource "gridscale_k8s" "foopaas" {
 
 func testAccCheckResourceGridscaleK8sConfigBasicUpdate() string {
 	return `
-variable "node_pools" {
+variable "node_pool" {
 	description = "A list of node pools"
 	default = [
 	  {
@@ -105,16 +105,16 @@ variable "node_pools" {
 resource "gridscale_k8s" "foopaas" {
 	name   = "newname"
 	release = "1.30"
-	dynamic "node_pools" {
-		for_each = var.node_pools
+	dynamic "node_pool" {
+		for_each = var.node_pool
 		content {
-			name   = node_pools.value.name
-			node_count = node_pools.value.node_count
-			cores = node_pools.value.cores
-			memory = node_pools.value.memory
-			storage = node_pools.value.storage
-			storage_type = node_pools.value.storage_type
-			rocket_storage = node_pools.value.rocket_storage
+			name   = node_pool.value.name
+			node_count = node_pool.value.node_count
+			cores = node_pool.value.cores
+			memory = node_pool.value.memory
+			storage = node_pool.value.storage
+			storage_type = node_pool.value.storage_type
+			rocket_storage = node_pool.value.rocket_storage
 		}
 	}
 	surge_node = false
