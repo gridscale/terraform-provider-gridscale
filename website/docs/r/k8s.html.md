@@ -54,7 +54,7 @@ The following arguments are supported:
 
 * `labels` - (Optional) List of labels in the format [ "label1", "label2" ].
 
-* `node_pool` - (Optional) The collection of node pool specifications. **NOTE**: Any node pool specification is not yet mutable (except `node_count`).
+* `node_pool` - (Optional) The collection of node pool specifications. Mutiple node pools can be defined with multiple `node_pool` blocks. The node pool block supports the following arguments:
     * `name` - Name of the node pool.
     * `node_count` - Number of worker nodes.
     * `cores` - Cores per worker node.
