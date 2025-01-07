@@ -415,18 +415,30 @@ func deriveK8sTemplateFromResourceData(client *gsclient.Client, d *schema.Resour
 	releaseInterface, isReleaseSet := d.GetOk("release")
 	release := releaseInterface.(string)
 
-	if isVersionSet {
-		derivationTypesRequested += 1
-		derivationType = "version"
-	}
+	if !d.IsNewResource() { // case if update of resource is requested
+		if isVersionSet && d.HasChange("version") {
+			derivationTypesRequested += 1
+			derivationType = "version"
+		}
 
-	if isReleaseSet {
-		derivationTypesRequested += 1
-		derivationType = "release"
-	}
+		if isReleaseSet && d.HasChange("release") {
+			derivationTypesRequested += 1
+			derivationType = "release"
+		}
+	} else { // case if creation of resource is requested
+		if isVersionSet {
+			derivationTypesRequested += 1
+			derivationType = "version"
+		}
 
-	if derivationTypesRequested == 0 {
-		return nil, errors.New("either \"release\" or \"gsk_version\" has to be defined")
+		if isReleaseSet {
+			derivationTypesRequested += 1
+			derivationType = "release"
+		}
+
+		if derivationTypesRequested == 0 {
+			return nil, errors.New("either \"release\" or \"gsk_version\" has to be defined")
+		}
 	}
 
 	if derivationTypesRequested > 1 {
@@ -1003,7 +1015,7 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 	}
 	d.SetId(response.ObjectUUID)
 	log.Printf("The id for PaaS service %s has been set to %v", requestBody.Name, response.ObjectUUID)
-	return resourceGridscaleK8sRead(d, meta)
+	return nil //resourceGridscaleK8sRead(d, meta)
 }
 
 func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error {
