@@ -450,14 +450,18 @@ func deriveK8sTemplateFromGSKVersion(client *gsclient.Client, version string) (*
 	}
 
 	var derived bool
+	var isActive bool
 	var versions []string
 	var template gsclient.PaaSTemplate
 
 	for _, paasTemplate := range paasTemplates {
 		if paasTemplate.Properties.Flavour == k8sTemplateFlavourName {
-			versions = append(versions, template.Properties.Version)
+			if paasTemplate.Properties.Active {
+				versions = append(versions, template.Properties.Version)
+			}
 
 			if paasTemplate.Properties.Version == version {
+				isActive = paasTemplate.Properties.Active
 				derived = true
 				template = paasTemplate
 				break
@@ -467,6 +471,9 @@ func deriveK8sTemplateFromGSKVersion(client *gsclient.Client, version string) (*
 
 	if !derived {
 		return nil, fmt.Errorf("%v is an invalid gridscale Kubernetes (GSK) version. Valid GSK versions are: %v", version, strings.Join(versions, ", "))
+	}
+	if !isActive {
+		return nil, fmt.Errorf("%v is a deprecated gridscale Kubernetes (GSK) version. Valid GSK versions are: %v", version, strings.Join(versions, ", "))
 	}
 	return &template, nil
 }
@@ -501,7 +508,7 @@ func deriveK8sTemplateFromRelease(client *gsclient.Client, release, currenTempla
 	var template gsclient.PaaSTemplate
 
 	for _, paasTemplate := range paasTemplates {
-		if paasTemplate.Properties.Flavour == k8sTemplateFlavourName {
+		if paasTemplate.Properties.Flavour == k8sTemplateFlavourName && paasTemplate.Properties.Active {
 			releases = append(releases, paasTemplate.Properties.Release)
 
 			if paasTemplate.Properties.Release == release {

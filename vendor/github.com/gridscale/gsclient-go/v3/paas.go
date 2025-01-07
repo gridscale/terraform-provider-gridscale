@@ -240,6 +240,9 @@ type PaaSTemplateProperties struct {
 
 	// Values of the autoscaling resources.
 	Autoscaling AutoscalingProperties `json:"autoscaling"`
+
+	// Is the service template active.
+	Active bool `json:"active"`
 }
 
 // AutoscalingProperties holds properties of resource autoscalings.
@@ -295,6 +298,18 @@ type Parameter struct {
 
 	// Immutable.
 	Immutable bool `json:"immutable"`
+
+	// Nested schema
+	Schema Schema `json:"schema"`
+}
+
+// Schema represents the structure of a nested parameter.
+type Schema struct {
+	// Type of the schema.
+	Type string `json:"type"`
+
+	// If the type is "dict", this defines the schema of the dictionary fields.
+	Schema map[string]Parameter `json:"schema"`
 }
 
 // Resource represents the amount of concurrent connections for the service.
