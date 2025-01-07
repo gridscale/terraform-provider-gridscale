@@ -240,6 +240,9 @@ type PaaSTemplateProperties struct {
 
 	// Values of the autoscaling resources.
 	Autoscaling AutoscalingProperties `json:"autoscaling"`
+
+	// Is the service template active.
+	Active bool `json:"active"`
 }
 
 // AutoscalingProperties holds properties of resource autoscalings.
