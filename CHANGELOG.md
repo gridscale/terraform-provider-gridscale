@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.27.2 (Jan 07, 2025)
+
+IMPROVEMENTS:
+- Return error when using inactive k8s paas template in k8s resource. [PR #414](https://github.com/gridscale/terraform-provider-gridscale/pull/414)
+
+BUG FIXES:
+- Fix update k8s resource always trigger upgrade even there is no changes in `gsk_version`/`release`. [PR #412](https://github.com/gridscale/terraform-provider-gridscale/pull/412)
+
 ## 1.27.1 (Jan 01, 2025)
 
 IMPROVEMENTS:
