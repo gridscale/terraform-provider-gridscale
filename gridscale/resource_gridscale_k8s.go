@@ -506,7 +506,7 @@ func deriveK8sTemplateFromRelease(client *gsclient.Client, release, currenTempla
 	var template gsclient.PaaSTemplate
 
 	for _, paasTemplate := range paasTemplates {
-		if paasTemplate.Properties.Flavour == k8sTemplateFlavourName {
+		if paasTemplate.Properties.Flavour == k8sTemplateFlavourName && paasTemplate.Properties.Active {
 			releases = append(releases, paasTemplate.Properties.Release)
 
 			if paasTemplate.Properties.Release == release {
