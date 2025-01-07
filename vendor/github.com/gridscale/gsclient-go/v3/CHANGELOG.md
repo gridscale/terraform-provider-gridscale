@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.16.0 (Jan 07, 2025)
+
+FEATURES:
+- Add bool property active to paas template properties [#237](https://github.com/gridscale/gsclient-go/pull/237).
+
 ## 3.15.0 (Sep 18, 2024)
 
 FEATURES:
