@@ -553,6 +553,22 @@ func resourceGridscaleK8sRead(d *schema.ResourceData, meta interface{}) error {
 			return fmt.Errorf("%s error setting kubeconfig: %v", errorPrefix, err)
 		}
 	}
+	template, err := deriveK8sTemplateFromUUID(client, props.ServiceTemplateUUID)
+	if err != nil {
+		return fmt.Errorf("%s error: %v", errorPrefix, err)
+	}
+	// if version is set, set it with the version of the template
+	if _, isVersionSet := d.GetOk("gsk_version"); isVersionSet {
+		if err = d.Set("gsk_version", template.Properties.Version); err != nil {
+			return fmt.Errorf("%s error setting gsk_version: %v", errorPrefix, err)
+		}
+	}
+	// if release is set, set it with the release of the template
+	if _, isReleaseSet := d.GetOk("release"); isReleaseSet {
+		if err = d.Set("release", template.Properties.Release); err != nil {
+			return fmt.Errorf("%s error setting release: %v", errorPrefix, err)
+		}
+	}
 	if err = d.Set("security_zone_uuid", props.SecurityZoneUUID); err != nil {
 		return fmt.Errorf("%s error setting security_zone_uuid: %v", errorPrefix, err)
 	}
