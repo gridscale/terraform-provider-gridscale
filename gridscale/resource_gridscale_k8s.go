@@ -114,6 +114,7 @@ func (rgk8sm *ResourceGridscaleK8sModeler) buildInputSchema() map[string]*schema
 		"rocket_storage": {
 			Type:        schema.TypeInt,
 			Optional:    true,
+			Default:     0,
 			Description: "Rocket storage per worker node (in GiB).",
 		},
 	}
