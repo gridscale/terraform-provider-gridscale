@@ -143,3 +143,4 @@ The following issues are known to us:
 - Changing the name attribute in a template datasource will not trigger storages using this template to be recreated.
 - If a storage has snapshots, Terraform cannot delete it.
 - The autorecovery value of a server can't be changed with Terraform.
+- Fail when update k8s resource when upgrading from terraform provider gridscale v2.0.2 to v2.0.3. In order to solve this issue, you will need to change the one of nodepool's `cores`, `memory`, `storage`, or `storage_type` value in the k8s resource, and then apply the changes via `terraform apply`. After that, you need to change it back to the original value and `terraform apply` again. This will fix the inconsistency between the provider and the gridscale API.
