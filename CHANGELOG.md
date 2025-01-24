@@ -1,11 +1,8 @@
 # Changelog
 
-## 2.0.2 (Jan 07, 2025)
-IMPROVEMENTS:
-- Return error when using inactive k8s paas template in k8s resource. [PR #413](https://github.com/gridscale/terraform-provider-gridscale/pull/413)
-
+## 2.0.3 (Jan 24, 2025)
 BUG FIXES:
-- Fix update k8s resource always trigger upgrade even there is no changes in `gsk_version`/`release`. [PR #411](https://github.com/gridscale/terraform-provider-gridscale/pull/411)
+- Fix cannot update k8s nodepool's resources when the k8s cluster is managed by terraform and gridscale panel. [PR #422](https://github.com/gridscale/terraform-provider-gridscale/pull/422)
 
 
 ## 2.0.1 (Jan 03, 2025)
