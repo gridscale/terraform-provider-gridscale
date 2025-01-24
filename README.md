@@ -1,5 +1,7 @@
 # Terraform gridscale Provider
 
+**NOTE**: Terraform provider gridscale v2 only supports k8s resource with release >= 1.30. If you are using release < 1.30, please use terraform provider gridscale v1.
+
 [Build status](https://github.com/gridscale/terraform-provider-gridscale#available-features)
 [![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/gridscale/terraform-provider-gridscale?label=release)](https://github.com/gridscale/terraform-provider-gridscale/releases)
 [![Gitter chat](https://badges.gitter.im/hashicorp-terraform/Lobby.png)](https://gitter.im/hashicorp-terraform/Lobby)
