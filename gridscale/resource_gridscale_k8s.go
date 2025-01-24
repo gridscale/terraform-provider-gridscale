@@ -929,11 +929,8 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 			nodePool["cores"] = d.Get(fmt.Sprintf("node_pool.%d.cores", index))
 			nodePool["storage"] = d.Get(fmt.Sprintf("node_pool.%d.storage", index))
 			nodePool["storage_type"] = d.Get(fmt.Sprintf("node_pool.%d.storage_type", index))
+			nodePool["rocket_storage"] = d.Get(fmt.Sprintf("node_pool.%d.rocket_storage", index))
 
-			// Set rocket storage if it is set
-			if rocketStorage, isRocketStorageSet := d.GetOk(fmt.Sprintf("node_pool.%d.rocket_storage", index)); isRocketStorageSet {
-				nodePool["rocket_storage"] = rocketStorage
-			}
 			nodePools = append(nodePools, nodePool)
 		}
 		parameters["pools"] = nodePools
@@ -1096,11 +1093,8 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 			nodePool["cores"] = d.Get(fmt.Sprintf("node_pool.%d.cores", index))
 			nodePool["storage"] = d.Get(fmt.Sprintf("node_pool.%d.storage", index))
 			nodePool["storage_type"] = d.Get(fmt.Sprintf("node_pool.%d.storage_type", index))
+			nodePool["rocket_storage"] = d.Get(fmt.Sprintf("node_pool.%d.rocket_storage", index))
 
-			// Set rocket storage if it is set
-			if rocketStorage, isRocketStorageSet := d.GetOk(fmt.Sprintf("node_pool.%d.rocket_storage", index)); isRocketStorageSet {
-				nodePool["rocket_storage"] = rocketStorage
-			}
 			nodePools = append(nodePools, nodePool)
 		}
 		parameters["pools"] = nodePools
