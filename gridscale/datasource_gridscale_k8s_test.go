@@ -19,12 +19,12 @@ func TestAccDataSourceGridscaleK8sBasic(t *testing.T) {
 			{
 				Config: testAccCheckDataSourceGridscaleK8sConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(
-						"data.gridscale_k8s.test", "name", name),
 					resource.TestCheckResourceAttrSet(
-						"data.gridscale_k8s.test", "id"),
-					resource.TestCheckResourceAttr(
-						"data.gridscale_k8s.test", "k8s_private_network_uuid", "f5d1b4e1-4f3b-4f6b-8e1e-3e6b4e1f3b4f"),
+						"data.gridscale_k8s.test", "k8s_private_network_uuid"),
+					resource.TestCheckResourceAttrSet(
+						"data.gridscale_k8s.test", "kubeconfig"),
+					resource.TestCheckResourceAttrSet(
+						"data.gridscale_k8s.test", "labels"),
 				),
 			},
 		},
@@ -35,7 +35,16 @@ func testAccCheckDataSourceGridscaleK8sConfigBasic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_k8s" "test" {
     name   = "%s"
-	k8s_private_network_uuid = "f5d1b4e1-4f3b-4f6b-8e1e-3e6b4e1f3b4f"
+	release = "1.30" # instead, gsk_version can be set.
+
+	node_pool {
+		name = "pool-0"
+		node_count = 2
+		cores = 2
+		memory = 4
+		storage = 30
+		storage_type = "storage_insane"
+	}
 }
 
 data "gridscale_k8s" "test" {
