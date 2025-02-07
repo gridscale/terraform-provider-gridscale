@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.0 (Feb 07, 2025)
+FEATURES:
+- Add datasource `gridscale_k8s`. [PR #425](https://github.com/gridscale/terraform-provider-gridscale/pull/425)
+
 ## 2.0.3 (Jan 24, 2025)
 BUG FIXES:
 - Fix cannot update k8s nodepool's resources when the k8s cluster is managed by terraform and gridscale panel. [PR #422](https://github.com/gridscale/terraform-provider-gridscale/pull/422)
