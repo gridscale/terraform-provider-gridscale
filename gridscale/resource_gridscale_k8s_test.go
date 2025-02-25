@@ -32,7 +32,7 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.0.name", "my-node-pool"),
 					resource.TestCheckResourceAttr(
-						"gridscale_k8s.foopaas", "node_pool.0.node_count", "2"),
+						"gridscale_k8s.foopaas", "node_pool.0.node_count", "1"),
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.0.cores", "1"),
 					resource.TestCheckResourceAttr(
@@ -76,7 +76,7 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.0.name", "my-node-pool"),
 					resource.TestCheckResourceAttr(
-						"gridscale_k8s.foopaas", "node_pool.0.node_count", "2"),
+						"gridscale_k8s.foopaas", "node_pool.0.node_count", "1"),
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.0.cores", "1"),
 					resource.TestCheckResourceAttr(
@@ -96,6 +96,26 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.0.name", "my-node-pool"),
 					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.node_count", "1"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.cores", "2"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.memory", "4"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.storage", "50"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.storage_type", "storage_insane"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.rocket_storage", "90"),
+				),
+			},
+			{
+				Config: testAccCheckResourceGridscaleK8sConfigNodeCountIncrease(),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckResourceGridscalePaaSExists("gridscale_k8s.foopaas", &object),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.name", "my-node-pool"),
+					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.0.node_count", "2"),
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.0.cores", "2"),
@@ -110,13 +130,13 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCheckResourceGridscaleK8sConfigNodeCountUpdate(),
+				Config: testAccCheckResourceGridscaleK8sConfigNodeCountDecrease(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscalePaaSExists("gridscale_k8s.foopaas", &object),
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.0.name", "my-node-pool"),
 					resource.TestCheckResourceAttr(
-						"gridscale_k8s.foopaas", "node_pool.0.node_count", "3"),
+						"gridscale_k8s.foopaas", "node_pool.0.node_count", "1"),
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.0.cores", "2"),
 					resource.TestCheckResourceAttr(
@@ -136,7 +156,7 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.0.name", "my-node-pool"),
 					resource.TestCheckResourceAttr(
-						"gridscale_k8s.foopaas", "node_pool.0.node_count", "3"),
+						"gridscale_k8s.foopaas", "node_pool.0.node_count", "1"),
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.0.cores", "2"),
 					resource.TestCheckResourceAttr(
@@ -166,7 +186,7 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.0.name", "my-node-pool"),
 					resource.TestCheckResourceAttr(
-						"gridscale_k8s.foopaas", "node_pool.0.node_count", "3"),
+						"gridscale_k8s.foopaas", "node_pool.0.node_count", "1"),
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.0.cores", "2"),
 					resource.TestCheckResourceAttr(
@@ -193,7 +213,7 @@ resource "gridscale_k8s" "foopaas" {
 	release = "1.30"
 	node_pool {
 		name = "my-node-pool"
-		node_count = 2
+		node_count = 1
 		cores = 1
 		memory = 2
 		storage = 30
@@ -222,7 +242,7 @@ resource "gridscale_k8s" "foopaas" {
 	release = "1.30"
 	node_pool {
 		name = "my-node-pool"
-		node_count = 2
+		node_count = 1
 		cores = 1
 		memory = 2
 		storage = 30
@@ -240,6 +260,24 @@ func testAccCheckResourceGridscaleK8sConfigNodePoolSpecsUpdate() string {
 		release = "1.30"
 		node_pool {
 			name = "my-node-pool"
+			node_count = 1
+			cores = 2
+			memory = 4
+			storage = 50
+			storage_type = "storage_insane"
+			rocket_storage = 90
+		}
+	}
+	`
+}
+
+func testAccCheckResourceGridscaleK8sConfigNodeCountIncrease() string {
+	return `
+	resource "gridscale_k8s" "foopaas" {
+		name   = "newname"
+		release = "1.30"
+		node_pool {
+			name = "my-node-pool"
 			node_count = 2
 			cores = 2
 			memory = 4
@@ -251,14 +289,14 @@ func testAccCheckResourceGridscaleK8sConfigNodePoolSpecsUpdate() string {
 	`
 }
 
-func testAccCheckResourceGridscaleK8sConfigNodeCountUpdate() string {
+func testAccCheckResourceGridscaleK8sConfigNodeCountDecrease() string {
 	return `
 	resource "gridscale_k8s" "foopaas" {
 		name   = "newname"
 		release = "1.30"
 		node_pool {
 			name = "my-node-pool"
-			node_count = 3
+			node_count = 1
 			cores = 2
 			memory = 4
 			storage = 50
@@ -276,7 +314,7 @@ func testAccCheckResourceGridscaleK8sConfigAddNodePool() string {
 		release = "1.30"
 		node_pool {
 			name = "my-node-pool"
-			node_count = 3
+			node_count = 2
 			cores = 2
 			memory = 4
 			storage = 50
@@ -301,7 +339,7 @@ func testAccCheckResourceGridscaleK8sConfigRemoveNodePool() string {
 		release = "1.30"
 		node_pool {
 			name = "my-node-pool"
-			node_count = 3
+			node_count = 2
 			cores = 2
 			memory = 4
 			storage = 50
