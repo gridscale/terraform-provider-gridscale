@@ -177,6 +177,8 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 						"gridscale_k8s.foopaas", "node_pool.1.memory", "2"),
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.1.storage", "30"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.1.storage_type", "storage_insane"),
 				),
 			},
 			{
@@ -327,6 +329,7 @@ func testAccCheckResourceGridscaleK8sConfigAddNodePool() string {
 			cores = 1
 			memory = 2
 			storage = 30
+			storage_type = "storage_insane"
 		}
 	}
 	`
