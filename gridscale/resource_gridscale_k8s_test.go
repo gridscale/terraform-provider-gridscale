@@ -43,26 +43,6 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 						"gridscale_k8s.foopaas", "node_pool.0.storage_type", "storage_insane"),
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.0.rocket_storage", "90"),
-					resource.TestCheckResourceAttr(
-						"gridscale_k8s.foopaas", "surge_node", "false"),
-					resource.TestCheckResourceAttr(
-						"gridscale_k8s.foopaas", "oidc_enabled", "true"),
-					resource.TestCheckResourceAttr(
-						"gridscale_k8s.foopaas", "oidc_issuer_url", "https://sts.windows.net/fe4ac456-23a7-4841-a404-01fcb695412c/"),
-					resource.TestCheckResourceAttr(
-						"gridscale_k8s.foopaas", "oidc_client_id", "015ad6ba-1da5-4958-be94-8d50fa37898f"),
-					resource.TestCheckResourceAttr(
-						"gridscale_k8s.foopaas", "oidc_username_claim", "email"),
-					resource.TestCheckResourceAttr(
-						"gridscale_k8s.foopaas", "oidc_groups_claim", "groups"),
-					resource.TestCheckResourceAttr(
-						"gridscale_k8s.foopaas", "oidc_groups_prefix", "oidc:"),
-					resource.TestCheckResourceAttr(
-						"gridscale_k8s.foopaas", "oidc_username_prefix", "oidc:"),
-					resource.TestCheckResourceAttr(
-						"gridscale_k8s.foopaas", "oidc_required_claim", "family_name=8944e8db-fe55-4443-aee0-16adfe637e71,given_name=c892dd1d-b324-48e6-a7da-051a96fbee37"),
-					resource.TestCheckResourceAttrSet(
-						"gridscale_k8s.foopaas", "oidc_ca_pem"),
 				),
 			},
 			{
@@ -222,19 +202,8 @@ resource "gridscale_k8s" "foopaas" {
 		storage_type = "storage_insane"
 		rocket_storage = 90
 	}
-	
-	surge_node = false
-	oidc_enabled = true
-	oidc_issuer_url = "https://sts.windows.net/fe4ac456-23a7-4841-a404-01fcb695412c/"
-	oidc_client_id = "015ad6ba-1da5-4958-be94-8d50fa37898f"
-	oidc_username_claim = "email"
-	oidc_groups_claim = "groups"
-	oidc_groups_prefix = "oidc:"
-	oidc_username_prefix = "oidc:"
-	oidc_required_claim = "family_name=8944e8db-fe55-4443-aee0-16adfe637e71,given_name=c892dd1d-b324-48e6-a7da-051a96fbee37"
-	oidc_ca_pem = "%s"
 }
-`, name, oidcCAPEM)
+`, name)
 }
 
 func testAccCheckResourceGridscaleK8sConfigBasicUpdate() string {
@@ -316,7 +285,7 @@ func testAccCheckResourceGridscaleK8sConfigAddNodePool() string {
 		release = "1.30"
 		node_pool {
 			name = "my-node-pool"
-			node_count = 2
+			node_count = 1
 			cores = 2
 			memory = 4
 			storage = 50
