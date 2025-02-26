@@ -311,7 +311,7 @@ func testAccCheckResourceGridscaleK8sConfigRemoveNodePool() string {
 		release = "1.30"
 		node_pool {
 			name = "my-node-pool"
-			node_count = 2
+			node_count = 1
 			cores = 2
 			memory = 4
 			storage = 50
