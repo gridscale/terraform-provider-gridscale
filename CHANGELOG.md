@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.27.3 (Feb 27, 2025)
+
+BUG FIXES:
+- Fix cannot upgrade k8s resource via parameter `gsk_version`. [PR #427](https://github.com/gridscale/terraform-provider-gridscale/pull/427)
+
 ## 1.27.2 (Jan 07, 2025)
 
 IMPROVEMENTS:
