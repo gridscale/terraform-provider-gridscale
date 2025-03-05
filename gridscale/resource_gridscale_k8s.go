@@ -295,12 +295,6 @@ func (rgk8sm *ResourceGridscaleK8sModeler) buildInputSchema() map[string]*schema
 			Computed:    true,
 			Optional:    true,
 		},
-		"hubble": {
-			Type:        schema.TypeBool,
-			Description: "Enable hubble integration.",
-			Computed:    true,
-			Optional:    true,
-		},
 		"kube_apiserver_log_enabled": {
 			Type:        schema.TypeBool,
 			Description: "Enable kube-apiserver logs.",
@@ -711,13 +705,6 @@ func resourceGridscaleK8sRead(d *schema.ResourceData, meta interface{}) error {
 		}
 	}
 
-	// Set hubble if it is set
-	if hubble, isHubbleSet := props.Parameters["k8s_hubble"].(bool); isHubbleSet {
-		if err = d.Set("hubble", hubble); err != nil {
-			return fmt.Errorf("%s error setting hubble: %v", errorPrefix, err)
-		}
-	}
-
 	// Set kube API server enabling if it is set
 	if kubeAPIServerLogEnabled, isKubeAPIServerLogEnabledSet := props.Parameters["k8s_kube_apiserver_log_enabled"].(bool); isKubeAPIServerLogEnabledSet {
 		if err = d.Set("kube_apiserver_log_enabled", kubeAPIServerLogEnabled); err != nil {
@@ -992,11 +979,6 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 		parameters["k8s_oidc_ca_pem"] = oidcCAPEM
 	}
 
-	// Set hubble if it is set
-	if hubble, isHubbleSet := d.GetOk("hubble"); isHubbleSet {
-		parameters["k8s_hubble"] = hubble.(bool)
-	}
-
 	// Set kube API server enabling if it is set
 	if kubeAPIServerLogEnabled, isKubeAPIServerLogEnabledSet := d.GetOk("kube_apiserver_log_enabled"); isKubeAPIServerLogEnabledSet {
 		parameters["k8s_kube_apiserver_log_enabled"] = kubeAPIServerLogEnabled.(bool)
@@ -1043,7 +1025,7 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 	}
 
 	// Set hubble if it is set
-	if hubble, isHubbleSet := d.GetOk("hubble"); isHubbleSet {
+	if hubble, isHubbleSet := d.GetOk("k8s_hubble"); isHubbleSet {
 		parameters["k8s_hubble"] = hubble.(bool)
 	}
 
@@ -1155,10 +1137,6 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 	if oidcCAPEM, isOIDCCAPEMSet := d.GetOk("oidc_ca_pem"); isOIDCCAPEMSet {
 		parameters["k8s_oidc_ca_pem"] = oidcCAPEM
 	}
-	// Set hubble if it is set
-	if hubble, isHubbleSet := d.GetOk("hubble"); isHubbleSet {
-		parameters["k8s_hubble"] = hubble
-	}
 
 	// Set kube API server enabling if it is set
 	if kubeAPIServerLogEnabled, isKubeAPIServerLogEnabledSet := d.GetOk("kube_apiserver_log_enabled"); isKubeAPIServerLogEnabledSet {
@@ -1206,7 +1184,7 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 	}
 
 	// Set hubble if it is set
-	if hubble, isHubbleSet := d.GetOk("hubble"); isHubbleSet {
+	if hubble, isHubbleSet := d.GetOk("k8s_hubble"); isHubbleSet {
 		parameters["k8s_hubble"] = hubble
 	}
 	requestBody.Parameters = parameters
