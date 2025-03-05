@@ -928,11 +928,13 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 		parameters["k8s_cluster_cidr"] = clusterCIDR
 	}
 	// Set surge node count
-	isSurgeNodeEnabled := d.Get("surge_node").(bool)
-	if isSurgeNodeEnabled {
-		parameters["k8s_surge_node_count"] = 1
-	} else {
-		parameters["k8s_surge_node_count"] = 0
+	isSurgeNodeEnabled, isSurgeNodeSet := d.GetOk("surge_node")
+	if isSurgeNodeSet {
+		if isSurgeNodeEnabled.(bool) {
+			parameters["k8s_surge_node_count"] = 1
+		} else {
+			parameters["k8s_surge_node_count"] = 0
+		}
 	}
 	// Set cluster traffic encryption if it is set
 	if clusterTrafficEncryption, isSet := d.GetOk("cluster_traffic_encryption"); isSet {
@@ -1087,11 +1089,13 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 		parameters["k8s_cluster_cidr"] = clusterCIDR
 	}
 	// Set surge node count
-	isSurgeNodeEnabled := d.Get("surge_node").(bool)
-	if isSurgeNodeEnabled {
-		parameters["k8s_surge_node_count"] = 1
-	} else {
-		parameters["k8s_surge_node_count"] = 0
+	isSurgeNodeEnabled, isSurgeNodeSet := d.GetOk("surge_node")
+	if isSurgeNodeSet {
+		if isSurgeNodeEnabled.(bool) {
+			parameters["k8s_surge_node_count"] = 1
+		} else {
+			parameters["k8s_surge_node_count"] = 0
+		}
 	}
 	// Set cluster traffic encryption if it is set
 	if clusterTrafficEncryption, isSet := d.GetOk("cluster_traffic_encryption"); isSet {
