@@ -858,11 +858,13 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 	if clusterCIDR, isClusterCIDRSet := d.GetOk("node_pool.0.cluster_cidr"); isClusterCIDRSet {
 		params["k8s_cluster_cidr"] = clusterCIDR
 	}
-	isSurgeNodeEnabled := d.Get("node_pool.0.surge_node").(bool)
-	if isSurgeNodeEnabled {
-		params["k8s_surge_node_count"] = 1
-	} else {
-		params["k8s_surge_node_count"] = 0
+	isSurgeNodeEnabled, isSurgeNodeSet := d.GetOk("node_pool.0.surge_node")
+	if isSurgeNodeSet {
+		if isSurgeNodeEnabled.(bool) {
+			params["k8s_surge_node_count"] = 1
+		} else {
+			params["k8s_surge_node_count"] = 0
+		}
 	}
 	// Set cluster traffic encryption if it is set
 	if clusterTrafficEncryption, isSet := d.GetOk("node_pool.0.cluster_traffic_encryption"); isSet {
