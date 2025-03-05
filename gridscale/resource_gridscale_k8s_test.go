@@ -43,6 +43,8 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 						"gridscale_k8s.foopaas", "node_pool.0.storage_type", "storage_insane"),
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.0.rocket_storage", "10"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "k8s_hubble", "true"),
 				),
 			},
 			{
@@ -67,6 +69,8 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 						"gridscale_k8s.foopaas", "node_pool.0.storage_type", "storage_insane"),
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.0.rocket_storage", "10"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "k8s_hubble", "true"),
 				),
 			},
 			{
@@ -87,6 +91,8 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 						"gridscale_k8s.foopaas", "node_pool.0.storage_type", "storage_insane"),
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.0.rocket_storage", "10"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "k8s_hubble", "true"),
 				),
 			},
 			{
@@ -107,6 +113,8 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 						"gridscale_k8s.foopaas", "node_pool.0.storage_type", "storage_insane"),
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.0.rocket_storage", "10"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "k8s_hubble", "true"),
 				),
 			},
 			{
@@ -127,6 +135,8 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 						"gridscale_k8s.foopaas", "node_pool.0.storage_type", "storage_insane"),
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.0.rocket_storage", "10"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "k8s_hubble", "true"),
 				),
 			},
 			{
@@ -159,6 +169,8 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 						"gridscale_k8s.foopaas", "node_pool.1.storage", "30"),
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.1.storage_type", "storage_insane"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "k8s_hubble", "true"),
 				),
 			},
 			{
@@ -182,6 +194,8 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 					resource.TestCheckNoResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.1",
 					),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "k8s_hubble", "true"),
 				),
 			},
 		},
@@ -202,6 +216,7 @@ resource "gridscale_k8s" "foopaas" {
 		storage_type = "storage_insane"
 		rocket_storage = 10
 	}
+	k8s_hubble = true
 }
 `, name)
 }
@@ -220,6 +235,7 @@ resource "gridscale_k8s" "foopaas" {
 		storage_type = "storage_insane"
 		rocket_storage = 10
 	}
+	k8s_hubble = true
 }
 `
 }
@@ -238,6 +254,7 @@ func testAccCheckResourceGridscaleK8sConfigNodePoolSpecsUpdate() string {
 			storage_type = "storage_insane"
 			rocket_storage = 10
 		}
+		k8s_hubble = true
 	}
 	`
 }
@@ -256,6 +273,7 @@ func testAccCheckResourceGridscaleK8sConfigNodeCountIncrease() string {
 			storage_type = "storage_insane"
 			rocket_storage = 10
 		}
+		k8s_hubble = true
 	}
 	`
 }
@@ -274,6 +292,7 @@ func testAccCheckResourceGridscaleK8sConfigNodeCountDecrease() string {
 			storage_type = "storage_insane"
 			rocket_storage = 10
 		}
+		k8s_hubble = true
 	}
 	`
 }
@@ -300,6 +319,7 @@ func testAccCheckResourceGridscaleK8sConfigAddNodePool() string {
 			storage = 30
 			storage_type = "storage_insane"
 		}
+		k8s_hubble = true
 	}
 	`
 }
@@ -318,6 +338,7 @@ func testAccCheckResourceGridscaleK8sConfigRemoveNodePool() string {
 			storage_type = "storage_insane"
 			rocket_storage = 10
 		}
+		k8s_hubble = true
 	}
 	`
 }
