@@ -42,7 +42,7 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.0.storage_type", "storage_insane"),
 					resource.TestCheckResourceAttr(
-						"gridscale_k8s.foopaas", "node_pool.0.rocket_storage", "90"),
+						"gridscale_k8s.foopaas", "node_pool.0.rocket_storage", "10"),
 				),
 			},
 			{
@@ -66,7 +66,7 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.0.storage_type", "storage_insane"),
 					resource.TestCheckResourceAttr(
-						"gridscale_k8s.foopaas", "node_pool.0.rocket_storage", "90"),
+						"gridscale_k8s.foopaas", "node_pool.0.rocket_storage", "10"),
 				),
 			},
 			{
@@ -86,7 +86,7 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.0.storage_type", "storage_insane"),
 					resource.TestCheckResourceAttr(
-						"gridscale_k8s.foopaas", "node_pool.0.rocket_storage", "90"),
+						"gridscale_k8s.foopaas", "node_pool.0.rocket_storage", "10"),
 				),
 			},
 			{
@@ -106,7 +106,7 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.0.storage_type", "storage_insane"),
 					resource.TestCheckResourceAttr(
-						"gridscale_k8s.foopaas", "node_pool.0.rocket_storage", "90"),
+						"gridscale_k8s.foopaas", "node_pool.0.rocket_storage", "10"),
 				),
 			},
 			{
@@ -126,7 +126,7 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.0.storage_type", "storage_insane"),
 					resource.TestCheckResourceAttr(
-						"gridscale_k8s.foopaas", "node_pool.0.rocket_storage", "90"),
+						"gridscale_k8s.foopaas", "node_pool.0.rocket_storage", "10"),
 				),
 			},
 			{
@@ -146,7 +146,7 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.0.storage_type", "storage_insane"),
 					resource.TestCheckResourceAttr(
-						"gridscale_k8s.foopaas", "node_pool.0.rocket_storage", "90"),
+						"gridscale_k8s.foopaas", "node_pool.0.rocket_storage", "10"),
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.1.name", "my-node-pool-2"),
 					resource.TestCheckResourceAttr(
@@ -178,7 +178,7 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.0.storage_type", "storage_insane"),
 					resource.TestCheckResourceAttr(
-						"gridscale_k8s.foopaas", "node_pool.0.rocket_storage", "90"),
+						"gridscale_k8s.foopaas", "node_pool.0.rocket_storage", "10"),
 					resource.TestCheckNoResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.1",
 					),
@@ -200,7 +200,7 @@ resource "gridscale_k8s" "foopaas" {
 		memory = 2
 		storage = 30
 		storage_type = "storage_insane"
-		rocket_storage = 90
+		rocket_storage = 10
 	}
 }
 `, name)
@@ -218,7 +218,7 @@ resource "gridscale_k8s" "foopaas" {
 		memory = 2
 		storage = 30
 		storage_type = "storage_insane"
-		rocket_storage = 90
+		rocket_storage = 10
 	}
 }
 `
@@ -236,7 +236,7 @@ func testAccCheckResourceGridscaleK8sConfigNodePoolSpecsUpdate() string {
 			memory = 4
 			storage = 50
 			storage_type = "storage_insane"
-			rocket_storage = 90
+			rocket_storage = 10
 		}
 	}
 	`
@@ -254,7 +254,7 @@ func testAccCheckResourceGridscaleK8sConfigNodeCountIncrease() string {
 			memory = 4
 			storage = 50
 			storage_type = "storage_insane"
-			rocket_storage = 90
+			rocket_storage = 10
 		}
 	}
 	`
@@ -272,7 +272,7 @@ func testAccCheckResourceGridscaleK8sConfigNodeCountDecrease() string {
 			memory = 4
 			storage = 50
 			storage_type = "storage_insane"
-			rocket_storage = 90
+			rocket_storage = 10
 		}
 	}
 	`
@@ -290,7 +290,7 @@ func testAccCheckResourceGridscaleK8sConfigAddNodePool() string {
 			memory = 4
 			storage = 50
 			storage_type = "storage_insane"
-			rocket_storage = 90
+			rocket_storage = 10
 		}
 		node_pool {
 			name = "my-node-pool-2"
@@ -316,7 +316,7 @@ func testAccCheckResourceGridscaleK8sConfigRemoveNodePool() string {
 			memory = 4
 			storage = 50
 			storage_type = "storage_insane"
-			rocket_storage = 90
+			rocket_storage = 10
 		}
 	}
 	`
