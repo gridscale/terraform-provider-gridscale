@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.27.4 (Mar 06, 2025)
+
+BUG FIXES:
+- Fix surge node is not enabled by default when the parameter `surge_node` is not set. [PR #432](https://github.com/gridscale/terraform-provider-gridscale/pull/432)
+
+
 ## 1.27.3 (Feb 27, 2025)
 
 BUG FIXES:
