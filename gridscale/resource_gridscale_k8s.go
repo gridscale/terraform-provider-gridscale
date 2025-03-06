@@ -195,7 +195,7 @@ func (rgk8sm *ResourceGridscaleK8sModeler) buildInputSchema() map[string]*schema
 			Type:        schema.TypeBool,
 			Description: "Enable surge node to avoid resources shortage during the cluster upgrade.",
 			Optional:    true,
-			Computed:    true,
+			Default:     true,
 		},
 		"cluster_cidr": {
 			Type:        schema.TypeString,
@@ -837,11 +837,15 @@ func resourceGridscaleK8sRead(d *schema.ResourceData, meta interface{}) error {
 	}
 	// Surge node feature is enable if k8s_surge_node_count > 0
 	if surgeNodeCount, ok := props.Parameters["k8s_surge_node_count"].(float64); ok {
-		d.Set("surge_node", surgeNodeCount > 0)
+		if err = d.Set("surge_node", surgeNodeCount > 0); err != nil {
+			return fmt.Errorf("%s error setting surge_node: %v", errorPrefix, err)
+		}
 	}
 	// Cluster traffic encryption feature is enabled if k8s_cluster_traffic_encryption is true
 	if clusterTrafficEncryption, ok := props.Parameters["k8s_cluster_traffic_encryption"].(bool); ok {
-		d.Set("cluster_traffic_encryption", clusterTrafficEncryption)
+		if err = d.Set("cluster_traffic_encryption", clusterTrafficEncryption); err != nil {
+			return fmt.Errorf("%s error setting cluster_traffic_encryption: %v", errorPrefix, err)
+		}
 	}
 	//Set labels
 	if err = d.Set("labels", props.Labels); err != nil {
@@ -928,11 +932,13 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 		parameters["k8s_cluster_cidr"] = clusterCIDR
 	}
 	// Set surge node count
-	isSurgeNodeEnabled := d.Get("surge_node").(bool)
-	if isSurgeNodeEnabled {
-		parameters["k8s_surge_node_count"] = 1
-	} else {
-		parameters["k8s_surge_node_count"] = 0
+	isSurgeNodeEnabled, isSurgeNodeSet := d.GetOk("surge_node")
+	if isSurgeNodeSet {
+		if isSurgeNodeEnabled.(bool) {
+			parameters["k8s_surge_node_count"] = 1
+		} else {
+			parameters["k8s_surge_node_count"] = 0
+		}
 	}
 	// Set cluster traffic encryption if it is set
 	if clusterTrafficEncryption, isSet := d.GetOk("cluster_traffic_encryption"); isSet {
@@ -1087,11 +1093,13 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 		parameters["k8s_cluster_cidr"] = clusterCIDR
 	}
 	// Set surge node count
-	isSurgeNodeEnabled := d.Get("surge_node").(bool)
-	if isSurgeNodeEnabled {
-		parameters["k8s_surge_node_count"] = 1
-	} else {
-		parameters["k8s_surge_node_count"] = 0
+	isSurgeNodeEnabled, isSurgeNodeSet := d.GetOk("surge_node")
+	if isSurgeNodeSet {
+		if isSurgeNodeEnabled.(bool) {
+			parameters["k8s_surge_node_count"] = 1
+		} else {
+			parameters["k8s_surge_node_count"] = 0
+		}
 	}
 	// Set cluster traffic encryption if it is set
 	if clusterTrafficEncryption, isSet := d.GetOk("cluster_traffic_encryption"); isSet {

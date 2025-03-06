@@ -45,6 +45,8 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 						"gridscale_k8s.foopaas", "node_pool.0.rocket_storage", "10"),
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "k8s_hubble", "true"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "surge_node", "true"),
 				),
 			},
 			{
@@ -71,6 +73,8 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 						"gridscale_k8s.foopaas", "node_pool.0.rocket_storage", "10"),
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "k8s_hubble", "true"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "surge_node", "true"),
 				),
 			},
 			{
@@ -93,6 +97,8 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 						"gridscale_k8s.foopaas", "node_pool.0.rocket_storage", "10"),
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "k8s_hubble", "true"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "surge_node", "true"),
 				),
 			},
 			{
@@ -115,6 +121,8 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 						"gridscale_k8s.foopaas", "node_pool.0.rocket_storage", "10"),
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "k8s_hubble", "true"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "surge_node", "true"),
 				),
 			},
 			{
@@ -137,6 +145,8 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 						"gridscale_k8s.foopaas", "node_pool.0.rocket_storage", "10"),
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "k8s_hubble", "true"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "surge_node", "true"),
 				),
 			},
 			{
@@ -171,6 +181,8 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 						"gridscale_k8s.foopaas", "node_pool.1.storage_type", "storage_insane"),
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "k8s_hubble", "true"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "surge_node", "true"),
 				),
 			},
 			{
@@ -196,6 +208,8 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 					),
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "k8s_hubble", "true"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "surge_node", "true"),
 				),
 			},
 		},
