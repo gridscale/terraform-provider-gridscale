@@ -837,11 +837,15 @@ func resourceGridscaleK8sRead(d *schema.ResourceData, meta interface{}) error {
 	}
 	// Surge node feature is enable if k8s_surge_node_count > 0
 	if surgeNodeCount, ok := props.Parameters["k8s_surge_node_count"].(float64); ok {
-		d.Set("surge_node", surgeNodeCount > 0)
+		if err = d.Set("surge_node", surgeNodeCount > 0); err != nil {
+			return fmt.Errorf("%s error setting surge_node: %v", errorPrefix, err)
+		}
 	}
 	// Cluster traffic encryption feature is enabled if k8s_cluster_traffic_encryption is true
 	if clusterTrafficEncryption, ok := props.Parameters["k8s_cluster_traffic_encryption"].(bool); ok {
-		d.Set("cluster_traffic_encryption", clusterTrafficEncryption)
+		if err = d.Set("cluster_traffic_encryption", clusterTrafficEncryption); err != nil {
+			return fmt.Errorf("%s error setting cluster_traffic_encryption: %v", errorPrefix, err)
+		}
 	}
 	//Set labels
 	if err = d.Set("labels", props.Labels); err != nil {
