@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.1.1 (Mar 06, 2025)
+
+BUG FIXES:
+- Fix surge node is not enabled by default when the parameter surge_node is not set. [PR #431](https://github.com/gridscale/terraform-provider-gridscale/pull/431)
+- Fix `k8s_hubble` does not enable hubble feature of k8s cluster. [PR #430](https://github.com/gridscale/terraform-provider-gridscale/pull/430)
+
 ## 2.1.0 (Feb 07, 2025)
 FEATURES:
 - Add datasource `gridscale_k8s`. [PR #425](https://github.com/gridscale/terraform-provider-gridscale/pull/425)
