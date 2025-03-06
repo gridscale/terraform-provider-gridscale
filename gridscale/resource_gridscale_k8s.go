@@ -195,7 +195,7 @@ func (rgk8sm *ResourceGridscaleK8sModeler) buildInputSchema() map[string]*schema
 			Type:        schema.TypeBool,
 			Description: "Enable surge node to avoid resources shortage during the cluster upgrade.",
 			Optional:    true,
-			Computed:    true,
+			Default:     true,
 		},
 		"cluster_cidr": {
 			Type:        schema.TypeString,
