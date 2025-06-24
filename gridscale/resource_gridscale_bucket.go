@@ -86,14 +86,10 @@ func resourceGridscaleBucketCreate(d *schema.ResourceData, meta interface{}) err
 		SecretKey: secretKey.(string),
 	}, s3HostStr)
 
-	locStr := ""
 	bucketName := d.Get("bucket_name")
 	bucketNameStr := bucketName.(string)
 	bucketInput := s3.CreateBucketInput{
 		Bucket: &bucketNameStr,
-		CreateBucketConfiguration: &s3.CreateBucketConfiguration{
-			LocationConstraint: &locStr,
-		},
 	}
 
 	errorPrefix := fmt.Sprintf("Create bucket %s resource at s3host %s-", bucketNameStr, s3HostStr)
