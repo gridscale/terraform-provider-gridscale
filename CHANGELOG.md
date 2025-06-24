@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1.2 (June 24, 2025)
+
+BUG FIXES:
+- Fix bucket creation and deletion for non-default bucket locations. [PR #435](https://github.com/gridscale/terraform-provider-gridscale/pull/435)
+
 ## 2.1.1 (Mar 06, 2025)
 
 BUG FIXES:
