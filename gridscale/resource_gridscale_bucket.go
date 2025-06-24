@@ -139,7 +139,7 @@ func initS3Client(provider credentials.Provider, s3host string) *s3.S3 {
 	forcePathStyle := true
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		Config: aws.Config{
-			Region:           aws.String("default"),
+			Region:           aws.String("us-east-1"),
 			Endpoint:         &s3host,
 			S3ForcePathStyle: &forcePathStyle,
 			Credentials:      credentials.NewCredentials(provider),
