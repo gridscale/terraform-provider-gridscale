@@ -268,51 +268,63 @@ func resourceGridscaleBucketUpdate(d *schema.ResourceData, meta interface{}) err
 
 	if d.HasChange("lifecycle_rule") {
 		lifecycleRules := d.Get("lifecycle_rule").([]interface{})
-		lifecycleConfig := &s3.BucketLifecycleConfiguration{
-			Rules: []*s3.LifecycleRule{},
-		}
 
-		for _, rule := range lifecycleRules {
-			r := rule.(map[string]interface{})
-			lifecycleRule := &s3.LifecycleRule{
-				ID: aws.String(r["id"].(string)),
-				Filter: &s3.LifecycleRuleFilter{
-					Prefix: aws.String(r["prefix"].(string)),
-				},
-				Status: aws.String("Enabled"),
+		if len(lifecycleRules) == 0 {
+			// If no lifecycle rules are provided, clear the lifecycle configuration
+			_, err := s3Client.DeleteBucketLifecycleWithContext(ctx, &s3.DeleteBucketLifecycleInput{
+				Bucket: aws.String(bucketName),
+			})
+			if err != nil {
+				return fmt.Errorf("error clearing lifecycle configuration for bucket %s using DeleteBucketLifecycle: %v", bucketName, err)
+			}
+			return resourceGridscaleBucketRead(d, meta)
+		} else {
+			lifecycleConfig := &s3.BucketLifecycleConfiguration{
+				Rules: []*s3.LifecycleRule{},
 			}
 
-			if !r["enabled"].(bool) {
-				lifecycleRule.Status = aws.String("Disabled")
-			}
-
-			if v, ok := r["expiration_days"].(int); ok && v > 0 {
-				lifecycleRule.Expiration = &s3.LifecycleExpiration{
-					Days: aws.Int64(int64(v)),
+			for _, rule := range lifecycleRules {
+				r := rule.(map[string]interface{})
+				lifecycleRule := &s3.LifecycleRule{
+					ID: aws.String(r["id"].(string)),
+					Filter: &s3.LifecycleRuleFilter{
+						Prefix: aws.String(r["prefix"].(string)),
+					},
+					Status: aws.String("Enabled"),
 				}
-			}
 
-			if v, ok := r["noncurrent_version_expiration_days"].(int); ok && v > 0 {
-				lifecycleRule.NoncurrentVersionExpiration = &s3.NoncurrentVersionExpiration{
-					NoncurrentDays: aws.Int64(int64(v)),
+				if !r["enabled"].(bool) {
+					lifecycleRule.Status = aws.String("Disabled")
 				}
-			}
 
-			if v, ok := r["incomplete_upload_expiration_days"].(int); ok && v > 0 {
-				lifecycleRule.AbortIncompleteMultipartUpload = &s3.AbortIncompleteMultipartUpload{
-					DaysAfterInitiation: aws.Int64(int64(v)),
+				if v, ok := r["expiration_days"].(int); ok && v > 0 {
+					lifecycleRule.Expiration = &s3.LifecycleExpiration{
+						Days: aws.Int64(int64(v)),
+					}
 				}
+
+				if v, ok := r["noncurrent_version_expiration_days"].(int); ok && v > 0 {
+					lifecycleRule.NoncurrentVersionExpiration = &s3.NoncurrentVersionExpiration{
+						NoncurrentDays: aws.Int64(int64(v)),
+					}
+				}
+
+				if v, ok := r["incomplete_upload_expiration_days"].(int); ok && v > 0 {
+					lifecycleRule.AbortIncompleteMultipartUpload = &s3.AbortIncompleteMultipartUpload{
+						DaysAfterInitiation: aws.Int64(int64(v)),
+					}
+				}
+
+				lifecycleConfig.Rules = append(lifecycleConfig.Rules, lifecycleRule)
 			}
 
-			lifecycleConfig.Rules = append(lifecycleConfig.Rules, lifecycleRule)
-		}
-
-		_, err := s3Client.PutBucketLifecycleConfigurationWithContext(ctx, &s3.PutBucketLifecycleConfigurationInput{
-			Bucket:                 aws.String(bucketName),
-			LifecycleConfiguration: lifecycleConfig,
-		})
-		if err != nil {
-			return fmt.Errorf("error updating lifecycle configuration for bucket %s: %v", bucketName, err)
+			_, err := s3Client.PutBucketLifecycleConfigurationWithContext(ctx, &s3.PutBucketLifecycleConfigurationInput{
+				Bucket:                 aws.String(bucketName),
+				LifecycleConfiguration: lifecycleConfig,
+			})
+			if err != nil {
+				return fmt.Errorf("error updating lifecycle configuration for bucket %s: %v", bucketName, err)
+			}
 		}
 	}
 
