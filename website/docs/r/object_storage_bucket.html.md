@@ -42,3 +42,10 @@ The following arguments are supported:
 * `secret_key` - (Required, Force New) Secret key.
 * `s3_host` - (Required, Force New) Host of the s3. Default: "gos3.io".
 * `bucket_name` - (Required, Force New) Name of the bucket.
+* `lifecycle_rule` - (Optional) A list of lifecycle rules for the bucket. Each rule supports the following:
+  * `id` - (Required) Unique identifier for the rule.
+  * `enabled` - (Required) Whether the rule is enabled.
+  * `prefix` - (Optional) Object key prefix identifying one or more objects to which the rule applies.
+  * `expiration_days` - (Optional) Number of days after which objects are deleted. Default: `365`.
+  * `noncurrent_version_expiration_days` - (Optional) Number of days after which noncurrent object versions are deleted. Default: `365`.
+  * `incomplete_upload_expiration_days` - (Optional) Number of days after which incomplete multipart uploads are deleted. Default: `3`.
