@@ -69,6 +69,7 @@ func Provider() *schema.Provider {
 			"gridscale_backupschedule":           dataSourceGridscaleStorageBackupSchedule(),
 			"gridscale_paas":                     dataSourceGridscalePaaS(),
 			"gridscale_paas_securityzone":        dataSourceGridscalePaaSSecurityZone(),
+			"gridscale_k8s":                      dataSourceGridscaleK8s(),
 			"gridscale_object_storage_accesskey": dataSourceGridscaleObjectStorage(),
 			"gridscale_isoimage":                 dataSourceGridscaleISOImage(),
 			"gridscale_firewall":                 dataSourceGridscaleFirewall(),

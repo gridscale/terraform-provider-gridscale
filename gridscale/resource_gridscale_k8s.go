@@ -195,7 +195,7 @@ func (rgk8sm *ResourceGridscaleK8sModeler) buildInputSchema() map[string]*schema
 			Type:        schema.TypeBool,
 			Description: "Enable surge node to avoid resources shortage during the cluster upgrade.",
 			Optional:    true,
-			Computed:    true,
+			Default:     true,
 		},
 		"cluster_cidr": {
 			Type:        schema.TypeString,
@@ -292,12 +292,6 @@ func (rgk8sm *ResourceGridscaleK8sModeler) buildInputSchema() map[string]*schema
 		"oidc_ca_pem": {
 			Type:        schema.TypeString,
 			Description: "Custom CA from customer in pem format as string.",
-			Computed:    true,
-			Optional:    true,
-		},
-		"hubble": {
-			Type:        schema.TypeBool,
-			Description: "Enable hubble integration.",
 			Computed:    true,
 			Optional:    true,
 		},
@@ -419,7 +413,7 @@ func deriveK8sTemplateFromResourceData(client *gsclient.Client, d *schema.Resour
 	release := releaseInterface.(string)
 
 	if !d.IsNewResource() { // case if update of resource is requested
-		if isVersionSet && d.HasChange("version") {
+		if isVersionSet && d.HasChange("gsk_version") {
 			derivationTypesRequested += 1
 			derivationType = "version"
 		}
@@ -711,13 +705,6 @@ func resourceGridscaleK8sRead(d *schema.ResourceData, meta interface{}) error {
 		}
 	}
 
-	// Set hubble if it is set
-	if hubble, isHubbleSet := props.Parameters["k8s_hubble"].(bool); isHubbleSet {
-		if err = d.Set("hubble", hubble); err != nil {
-			return fmt.Errorf("%s error setting hubble: %v", errorPrefix, err)
-		}
-	}
-
 	// Set kube API server enabling if it is set
 	if kubeAPIServerLogEnabled, isKubeAPIServerLogEnabledSet := props.Parameters["k8s_kube_apiserver_log_enabled"].(bool); isKubeAPIServerLogEnabledSet {
 		if err = d.Set("kube_apiserver_log_enabled", kubeAPIServerLogEnabled); err != nil {
@@ -850,11 +837,15 @@ func resourceGridscaleK8sRead(d *schema.ResourceData, meta interface{}) error {
 	}
 	// Surge node feature is enable if k8s_surge_node_count > 0
 	if surgeNodeCount, ok := props.Parameters["k8s_surge_node_count"].(float64); ok {
-		d.Set("surge_node", surgeNodeCount > 0)
+		if err = d.Set("surge_node", surgeNodeCount > 0); err != nil {
+			return fmt.Errorf("%s error setting surge_node: %v", errorPrefix, err)
+		}
 	}
 	// Cluster traffic encryption feature is enabled if k8s_cluster_traffic_encryption is true
 	if clusterTrafficEncryption, ok := props.Parameters["k8s_cluster_traffic_encryption"].(bool); ok {
-		d.Set("cluster_traffic_encryption", clusterTrafficEncryption)
+		if err = d.Set("cluster_traffic_encryption", clusterTrafficEncryption); err != nil {
+			return fmt.Errorf("%s error setting cluster_traffic_encryption: %v", errorPrefix, err)
+		}
 	}
 	//Set labels
 	if err = d.Set("labels", props.Labels); err != nil {
@@ -941,11 +932,13 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 		parameters["k8s_cluster_cidr"] = clusterCIDR
 	}
 	// Set surge node count
-	isSurgeNodeEnabled := d.Get("surge_node").(bool)
-	if isSurgeNodeEnabled {
-		parameters["k8s_surge_node_count"] = 1
-	} else {
-		parameters["k8s_surge_node_count"] = 0
+	isSurgeNodeEnabled, isSurgeNodeSet := d.GetOk("surge_node")
+	if isSurgeNodeSet {
+		if isSurgeNodeEnabled.(bool) {
+			parameters["k8s_surge_node_count"] = 1
+		} else {
+			parameters["k8s_surge_node_count"] = 0
+		}
 	}
 	// Set cluster traffic encryption if it is set
 	if clusterTrafficEncryption, isSet := d.GetOk("cluster_traffic_encryption"); isSet {
@@ -990,11 +983,6 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 	// Set OIDC CA PEM if it is set
 	if oidcCAPEM, isOIDCCAPEMSet := d.GetOk("oidc_ca_pem"); isOIDCCAPEMSet {
 		parameters["k8s_oidc_ca_pem"] = oidcCAPEM
-	}
-
-	// Set hubble if it is set
-	if hubble, isHubbleSet := d.GetOk("hubble"); isHubbleSet {
-		parameters["k8s_hubble"] = hubble.(bool)
 	}
 
 	// Set kube API server enabling if it is set
@@ -1043,7 +1031,7 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 	}
 
 	// Set hubble if it is set
-	if hubble, isHubbleSet := d.GetOk("hubble"); isHubbleSet {
+	if hubble, isHubbleSet := d.GetOk("k8s_hubble"); isHubbleSet {
 		parameters["k8s_hubble"] = hubble.(bool)
 	}
 
@@ -1105,11 +1093,13 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 		parameters["k8s_cluster_cidr"] = clusterCIDR
 	}
 	// Set surge node count
-	isSurgeNodeEnabled := d.Get("surge_node").(bool)
-	if isSurgeNodeEnabled {
-		parameters["k8s_surge_node_count"] = 1
-	} else {
-		parameters["k8s_surge_node_count"] = 0
+	isSurgeNodeEnabled, isSurgeNodeSet := d.GetOk("surge_node")
+	if isSurgeNodeSet {
+		if isSurgeNodeEnabled.(bool) {
+			parameters["k8s_surge_node_count"] = 1
+		} else {
+			parameters["k8s_surge_node_count"] = 0
+		}
 	}
 	// Set cluster traffic encryption if it is set
 	if clusterTrafficEncryption, isSet := d.GetOk("cluster_traffic_encryption"); isSet {
@@ -1154,10 +1144,6 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 	// Set OIDC CA PEM if it is set
 	if oidcCAPEM, isOIDCCAPEMSet := d.GetOk("oidc_ca_pem"); isOIDCCAPEMSet {
 		parameters["k8s_oidc_ca_pem"] = oidcCAPEM
-	}
-	// Set hubble if it is set
-	if hubble, isHubbleSet := d.GetOk("hubble"); isHubbleSet {
-		parameters["k8s_hubble"] = hubble
 	}
 
 	// Set kube API server enabling if it is set
@@ -1206,7 +1192,7 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 	}
 
 	// Set hubble if it is set
-	if hubble, isHubbleSet := d.GetOk("hubble"); isHubbleSet {
+	if hubble, isHubbleSet := d.GetOk("k8s_hubble"); isHubbleSet {
 		parameters["k8s_hubble"] = hubble
 	}
 	requestBody.Parameters = parameters

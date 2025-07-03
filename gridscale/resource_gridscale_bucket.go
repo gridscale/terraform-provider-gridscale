@@ -180,14 +180,10 @@ func resourceGridscaleBucketCreate(d *schema.ResourceData, meta interface{}) err
 		SecretKey: secretKey.(string),
 	}, s3HostStr)
 
-	locStr := ""
 	bucketName := d.Get("bucket_name")
 	bucketNameStr := bucketName.(string)
 	bucketInput := s3.CreateBucketInput{
 		Bucket: &bucketNameStr,
-		CreateBucketConfiguration: &s3.CreateBucketConfiguration{
-			LocationConstraint: &locStr,
-		},
 	}
 
 	errorPrefix := fmt.Sprintf("Create bucket %s resource at s3host %s-", bucketNameStr, s3HostStr)
@@ -354,7 +350,7 @@ func initS3Client(provider credentials.Provider, s3host string) *s3.S3 {
 	forcePathStyle := true
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		Config: aws.Config{
-			Region:           aws.String("default"),
+			Region:           aws.String("us-east-1"),
 			Endpoint:         &s3host,
 			S3ForcePathStyle: &forcePathStyle,
 			Credentials:      credentials.NewCredentials(provider),

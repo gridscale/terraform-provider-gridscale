@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.1.2 (June 24, 2025)
+
+BUG FIXES:
+- Fix bucket creation and deletion for non-default bucket locations. [PR #435](https://github.com/gridscale/terraform-provider-gridscale/pull/435)
+
+## 2.1.1 (Mar 06, 2025)
+
+BUG FIXES:
+- Fix surge node is not enabled by default when the parameter surge_node is not set. [PR #431](https://github.com/gridscale/terraform-provider-gridscale/pull/431)
+- Fix `k8s_hubble` does not enable hubble feature of k8s cluster. [PR #430](https://github.com/gridscale/terraform-provider-gridscale/pull/430)
+
+## 2.1.0 (Feb 07, 2025)
+FEATURES:
+- Add datasource `gridscale_k8s`. [PR #425](https://github.com/gridscale/terraform-provider-gridscale/pull/425)
+
 ## 2.0.3 (Jan 24, 2025)
 BUG FIXES:
 - Fix cannot update k8s nodepool's resources when the k8s cluster is managed by terraform and gridscale panel. [PR #422](https://github.com/gridscale/terraform-provider-gridscale/pull/422)
