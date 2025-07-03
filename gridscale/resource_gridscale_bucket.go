@@ -65,30 +65,37 @@ func resourceGridscaleBucket() *schema.Resource {
 				ForceNew:    true,
 				Default:     "gos3.io",
 			},
-			"lifecycle_rules": {
+			"lifecycle_rule": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"id": {
 							Type:     schema.TypeString,
-							Optional: true,
-						},
-						"prefix": {
-							Type:     schema.TypeString,
-							Optional: true,
+							Required: true,
 						},
 						"enabled": {
 							Type:     schema.TypeBool,
 							Required: true,
 						},
+						"prefix": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
 						"expiration_days": {
 							Type:     schema.TypeInt,
 							Optional: true,
+							Default:  365,
 						},
 						"noncurrent_version_expiration_days": {
 							Type:     schema.TypeInt,
 							Optional: true,
+							Default:  365,
+						},
+						"incomplete_upload_expiration_days": {
+							Type:     schema.TypeInt,
+							Optional: true,
+							Default:  3,
 						},
 					},
 				},
@@ -122,8 +129,8 @@ func resourceGridscaleBucketRead(d *schema.ResourceData, meta interface{}) error
 	if err != nil {
 		// Check if the error is an AWS-specific error
 		if aerr, ok := err.(awserr.Error); ok && aerr.Code() == "NoSuchLifecycleConfiguration" {
-			// If the error indicates no lifecycle configuration exists, set the lifecycle_rules attribute to nil
-			d.Set("lifecycle_rules", nil)
+			// If the error indicates no lifecycle configuration exists, set the lifecycle_rule attribute to nil
+			d.Set("lifecycle_rule", nil)
 		} else {
 			// For any other error, return a formatted error message with context
 			return fmt.Errorf("error reading lifecycle configuration for bucket %s: %v", bucketName, err)
@@ -150,9 +157,13 @@ func resourceGridscaleBucketRead(d *schema.ResourceData, meta interface{}) error
 			if rule.NoncurrentVersionExpiration != nil && rule.NoncurrentVersionExpiration.NoncurrentDays != nil {
 				r["noncurrent_version_expiration_days"] = int(*rule.NoncurrentVersionExpiration.NoncurrentDays)
 			}
+			// Check if the rule has incomplete upload expiration days set
+			if rule.AbortIncompleteMultipartUpload != nil && rule.AbortIncompleteMultipartUpload.DaysAfterInitiation != nil {
+				r["incomplete_upload_expiration_days"] = int(*rule.AbortIncompleteMultipartUpload.DaysAfterInitiation)
+			}
 			rules = append(rules, r)
 		}
-		d.Set("lifecycle_rules", rules)
+		d.Set("lifecycle_rule", rules)
 	}
 
 	return nil
@@ -188,7 +199,7 @@ func resourceGridscaleBucketCreate(d *schema.ResourceData, meta interface{}) err
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
-	lifecycleRules := d.Get("lifecycle_rules").([]interface{})
+	lifecycleRules := d.Get("lifecycle_rule").([]interface{})
 	if len(lifecycleRules) > 0 {
 		lifecycleConfig := &s3.BucketLifecycleConfiguration{
 			Rules: []*s3.LifecycleRule{},
@@ -217,6 +228,12 @@ func resourceGridscaleBucketCreate(d *schema.ResourceData, meta interface{}) err
 			if v, ok := r["noncurrent_version_expiration_days"].(int); ok && v > 0 {
 				lifecycleRule.NoncurrentVersionExpiration = &s3.NoncurrentVersionExpiration{
 					NoncurrentDays: aws.Int64(int64(v)),
+				}
+			}
+			// Set incomplete upload expiration days if provided
+			if v, ok := r["incomplete_upload_expiration_days"].(int); ok && v > 0 {
+				lifecycleRule.AbortIncompleteMultipartUpload = &s3.AbortIncompleteMultipartUpload{
+					DaysAfterInitiation: aws.Int64(int64(v)),
 				}
 			}
 
@@ -253,8 +270,8 @@ func resourceGridscaleBucketUpdate(d *schema.ResourceData, meta interface{}) err
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutUpdate))
 	defer cancel()
 
-	if d.HasChange("lifecycle_rules") {
-		lifecycleRules := d.Get("lifecycle_rules").([]interface{})
+	if d.HasChange("lifecycle_rule") {
+		lifecycleRules := d.Get("lifecycle_rule").([]interface{})
 		lifecycleConfig := &s3.BucketLifecycleConfiguration{
 			Rules: []*s3.LifecycleRule{},
 		}
@@ -282,6 +299,12 @@ func resourceGridscaleBucketUpdate(d *schema.ResourceData, meta interface{}) err
 			if v, ok := r["noncurrent_version_expiration_days"].(int); ok && v > 0 {
 				lifecycleRule.NoncurrentVersionExpiration = &s3.NoncurrentVersionExpiration{
 					NoncurrentDays: aws.Int64(int64(v)),
+				}
+			}
+
+			if v, ok := r["incomplete_upload_expiration_days"].(int); ok && v > 0 {
+				lifecycleRule.AbortIncompleteMultipartUpload = &s3.AbortIncompleteMultipartUpload{
+					DaysAfterInitiation: aws.Int64(int64(v)),
 				}
 			}
 
