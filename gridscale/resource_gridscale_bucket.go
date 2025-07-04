@@ -2,6 +2,7 @@ package gridscale
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -128,13 +129,13 @@ func resourceGridscaleBucketRead(d *schema.ResourceData, meta interface{}) error
 		Bucket: aws.String(bucketName),
 	})
 	if err != nil {
-		// Check if the error is an AWS-specific error
-		if aerr, ok := err.(awserr.Error); ok && aerr.Code() == "NoSuchLifecycleConfiguration" {
+		var aerr awserr.Error
+		if errors.As(err, &aerr) && aerr.Code() == "NoSuchLifecycleConfiguration" {
 			// If the error indicates no lifecycle configuration exists, set the lifecycle_rule attribute to nil
 			d.Set("lifecycle_rule", nil)
 		} else {
 			// For any other error, return a formatted error message with context
-			return fmt.Errorf("error reading lifecycle configuration for bucket %s: %v", bucketName, err)
+			return fmt.Errorf("error reading lifecycle configuration for bucket %s: %w", bucketName, err)
 		}
 	} else {
 		rules := []map[string]interface{}{}
