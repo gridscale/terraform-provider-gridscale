@@ -243,7 +243,8 @@ func resourceGridscaleBucketCreate(d *schema.ResourceData, meta interface{}) err
 			LifecycleConfiguration: lifecycleConfig,
 		})
 		if err != nil {
-			return fmt.Errorf("%s error setting lifecycle configuration: %v", errorPrefix, err)
+			// Delete the bucket if lifecycle configuration fails to set
+			return resourceGridscaleBucketDelete(d, meta)
 		}
 	}
 
