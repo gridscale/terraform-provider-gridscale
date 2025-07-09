@@ -5,11 +5,25 @@
 
 version: 2
 updates:
+  # Master branch (v2) - Go modules
   - package-ecosystem: "gomod" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
       interval: "daily"
+  # Master branch (v2) - GitHub Actions
   - package-ecosystem: "github-actions" # See documentation for possible values
     directory: "/" # Location of package manifests
+    schedule:
+      interval: "daily"
+  # Legacy version-1 branch (v1) - Go modules
+  - package-ecosystem: "gomod"
+    directory: "/"
+    target-branch: "legacy/version-1"
+    schedule:
+      interval: "daily"
+  # Legacy version-1 branch (v1) - GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: "legacy/version-1"
     schedule:
       interval: "daily"
