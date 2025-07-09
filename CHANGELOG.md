@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.0 (July 09, 2025)
+
+FEATURES:
+- Add lifecycle config to s3 resource. [PR #437](https://github.com/gridscale/terraform-provider-gridscale/pull/437)
+
 ## 2.1.2 (June 24, 2025)
 
 BUG FIXES:
