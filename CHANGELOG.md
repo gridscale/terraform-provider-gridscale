@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2.1 (July 10, 2025)
+
+IMPROVEMENTS:
+- Upgrade various go dependencies.
+- Add Dependabot config to watch deps of v1 too.
+
 ## 2.2.0 (July 09, 2025)
 
 FEATURES:
