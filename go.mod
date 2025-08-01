@@ -1,7 +1,7 @@
 module github.com/terraform-providers/terraform-provider-gridscale
 
 require (
-	github.com/aws/aws-sdk-go v1.55.7
+	github.com/aws/aws-sdk-go v1.55.8
 	github.com/gridscale/gsclient-go/v3 v3.16.0
 	github.com/hashicorp/go-version v1.7.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.37.0
