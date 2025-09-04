@@ -13,7 +13,7 @@ jobs:
       GOPATH: /home/runner/go
     steps:
       - name: Set up Go 1.21
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version: ^1.21
         id: go
