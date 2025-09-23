@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	originalGSKVersion = "1.28.15-gs1"
-	updatedGSKVersion  = "1.29.13-gs0"
+	originalGSKVersion = "1.28.15-gs4"
+	updatedGSKVersion  = "1.29.15-gs1"
 	originalGSKRelease = "1.28"
 	updatedGSKRelease  = "1.29"
 )
