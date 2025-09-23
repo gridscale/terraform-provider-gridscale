@@ -495,7 +495,7 @@ func deriveK8sTemplateFromGSKVersion(client *gsclient.Client, version string) (*
 	for _, paasTemplate := range paasTemplates {
 		if paasTemplate.Properties.Flavour == k8sTemplateFlavourName {
 			if paasTemplate.Properties.Active {
-				versions = append(versions, template.Properties.Version)
+				versions = append(versions, paasTemplate.Properties.Version)
 			}
 
 			if paasTemplate.Properties.Version == version {
