@@ -480,7 +480,11 @@ func deriveK8sTemplateFromUUID(client *gsclient.Client, templateUUID string) (*g
 }
 
 // deriveK8sTemplateFromGSKVersion derives the k8s service template from given GSK version.
-func deriveK8sTemplateFromGSKVersion(client *gsclient.Client, version string) (*gsclient.PaaSTemplate, error) {
+//
+// The checkActive parameter defines if the active state of the template should be checked. If true,
+// the function will return an error if the matched template is not active. If false, it will not check that
+// and return even on inactive templates.
+func deriveK8sTemplateFromGSKVersion(client *gsclient.Client, version string, checkActive bool) (*gsclient.PaaSTemplate, error) {
 	paasTemplates, err := client.GetPaaSTemplateList(context.Background())
 
 	if err != nil {
@@ -510,14 +514,18 @@ func deriveK8sTemplateFromGSKVersion(client *gsclient.Client, version string) (*
 	if !derived {
 		return nil, fmt.Errorf("%v is an invalid gridscale Kubernetes (GSK) version. Valid GSK versions are: %v", version, strings.Join(versions, ", "))
 	}
-	if !isActive {
+	if checkActive && !isActive {
 		return nil, fmt.Errorf("%v is a deprecated gridscale Kubernetes (GSK) version. Valid GSK versions are: %v", version, strings.Join(versions, ", "))
 	}
 	return &template, nil
 }
 
 // deriveK8sTemplateFromRelease derives the k8s service template from given release.
-func deriveK8sTemplateFromRelease(client *gsclient.Client, release, currenTemplateUUID string) (*gsclient.PaaSTemplate, error) {
+//
+// The checkActive parameter defines if the active state of the template should be checked. If true,
+// the function will return an error if the matched template is not active. If false, it will not check that
+// and return even on inactive templates.
+func deriveK8sTemplateFromRelease(client *gsclient.Client, release, currenTemplateUUID string, checkActive bool) (*gsclient.PaaSTemplate, error) {
 	paasTemplates, err := client.GetPaaSTemplateList(context.Background())
 	if err != nil {
 		return nil, err
@@ -542,21 +550,27 @@ func deriveK8sTemplateFromRelease(client *gsclient.Client, release, currenTempla
 	}
 
 	var derived bool
+	var isActive bool
 	var releases []string
 	var template gsclient.PaaSTemplate
 
 	for _, paasTemplate := range paasTemplates {
-		if paasTemplate.Properties.Flavour == k8sTemplateFlavourName && paasTemplate.Properties.Active {
+		if paasTemplate.Properties.Flavour == k8sTemplateFlavourName {
 			releases = append(releases, paasTemplate.Properties.Release)
 
 			if paasTemplate.Properties.Release == release {
+				isActive = paasTemplate.Properties.Active
 				derived = true
 				template = paasTemplate
+				break
 			}
 		}
 	}
 	if !derived {
 		return nil, fmt.Errorf("%v is an invalid Kubernetes release. Valid releases are: %v", release, strings.Join(releases, ", "))
+	}
+	if checkActive && !isActive {
+		return nil, fmt.Errorf("%v is a deprecated gridscale Kubernetes (GSK) release. Valid GSK releases are: %v", version, strings.Join(releases, ", "))
 	}
 
 	return &template, nil
