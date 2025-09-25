@@ -388,12 +388,19 @@ func deriveK8sTemplateFromResourceDiff(client *gsclient.Client, d *schema.Resour
 	if derivationTypesRequested > 1 {
 		return nil, errors.New("\"release\" and \"gsk_version\" are not intended to be set at once.")
 	}
+
+	// When deriving the template, we want to validate it's active state only if the gsk version is changed.
+	// That is to prevent errors for users, where an old version is still in use and they just want to do some
+	// operation like scaling, enabling huddle etc.
+	checkActive := d.HasChange("gsk_version") || d.HasChange("release") || d.HasChange("service_template_uuid")
+
+	// Derive the template based on our chosen strategy
 	switch derivationType {
 	case "version":
-		return deriveK8sTemplateFromGSKVersion(client, version)
+		return deriveK8sTemplateFromGSKVersion(client, version, checkActive)
 	case "release":
 		currenTemplateUUID := d.Get("service_template_uuid").(string)
-		return deriveK8sTemplateFromRelease(client, release, currenTemplateUUID)
+		return deriveK8sTemplateFromRelease(client, release, currenTemplateUUID, checkActive)
 	}
 	return nil, nil
 }
@@ -441,12 +448,19 @@ func deriveK8sTemplateFromResourceData(client *gsclient.Client, d *schema.Resour
 	if derivationTypesRequested > 1 {
 		return nil, errors.New("\"release\" and/or \"gsk_version\" are not intended to be set at once.")
 	}
+
+	// When deriving the template, we want to validate it's active state only if the gsk version is changed.
+	// That is to prevent errors for users, where an old version is still in use and they just want to do some
+	// operation like scaling, enabling huddle etc.
+	checkActive := d.HasChange("gsk_version") || d.HasChange("release") || d.HasChange("service_template_uuid")
+
+	// Derive the template based on our chosen strategy
 	switch derivationType {
 	case "version":
-		return deriveK8sTemplateFromGSKVersion(client, version)
+		return deriveK8sTemplateFromGSKVersion(client, version, checkActive)
 	case "release":
 		currenTemplateUUID := d.Get("service_template_uuid").(string)
-		return deriveK8sTemplateFromRelease(client, release, currenTemplateUUID)
+		return deriveK8sTemplateFromRelease(client, release, currenTemplateUUID, checkActive)
 	}
 	currentTemplateUUID := d.Get("service_template_uuid").(string)
 	return deriveK8sTemplateFromUUID(client, currentTemplateUUID)
