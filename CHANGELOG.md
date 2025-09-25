@@ -1,5 +1,10 @@
 # Changelog
 
+## UNRELEASED
+
+IMPROVEMENTS:
+- Upgrade `aws/aws-sdk-go` dependency from v1 to v2 
+
 ## 2.2.2 (Sept 29, 2025)
 
 IMPROVEMENTS:
