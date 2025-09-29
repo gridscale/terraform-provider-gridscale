@@ -472,17 +472,18 @@ func deriveK8sTemplateFromGSKVersion(client *gsclient.Client, version string, ch
 	var versions []string
 	var template gsclient.PaaSTemplate
 
+	// This loop does two things: Gather all valid verions and find the one which matches the requested version
 	for _, paasTemplate := range paasTemplates {
 		if paasTemplate.Properties.Flavour == k8sTemplateFlavourName {
 			if paasTemplate.Properties.Active {
 				versions = append(versions, paasTemplate.Properties.Version)
 			}
 
-			if paasTemplate.Properties.Version == version {
+			// Check if the version matches and we haven't derived a template yet
+			if !derived && paasTemplate.Properties.Version == version {
 				isActive = paasTemplate.Properties.Active
 				derived = true
 				template = paasTemplate
-				break
 			}
 		}
 	}
@@ -530,15 +531,16 @@ func deriveK8sTemplateFromRelease(client *gsclient.Client, release, currenTempla
 	var releases []string
 	var template gsclient.PaaSTemplate
 
+	// This loop does two things: Gather all valid releases and find the one which matches the requested release
 	for _, paasTemplate := range paasTemplates {
 		if paasTemplate.Properties.Flavour == k8sTemplateFlavourName {
 			releases = append(releases, paasTemplate.Properties.Release)
 
+			// Check if the release matches and we haven't derived a template yet
 			if paasTemplate.Properties.Release == release {
 				isActive = paasTemplate.Properties.Active
 				derived = true
 				template = paasTemplate
-				break
 			}
 		}
 	}
