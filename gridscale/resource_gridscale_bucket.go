@@ -140,7 +140,7 @@ func resourceGridscaleBucketRead(d *schema.ResourceData, meta interface{}) error
 		for _, rule := range output.Rules {
 			r := map[string]interface{}{
 				"id":                                 aws.ToString(rule.ID),
-				"enabled":                            string(rule.Status) == "Enabled",
+				"enabled":                            rule.Status == types.ExpirationStatusEnabled,
 				"expiration_days":                    0,
 				"noncurrent_version_expiration_days": 0,
 			}
@@ -152,14 +152,14 @@ func resourceGridscaleBucketRead(d *schema.ResourceData, meta interface{}) error
 			}
 			// Check if the rule has expiration or noncurrent version expiration days set
 			if rule.Expiration != nil && rule.Expiration.Days != nil {
-				r["expiration_days"] = int(*rule.Expiration.Days)
+				r["expiration_days"] = aws.ToInt32(rule.Expiration.Days)
 			}
 			if rule.NoncurrentVersionExpiration != nil && rule.NoncurrentVersionExpiration.NoncurrentDays != nil {
-				r["noncurrent_version_expiration_days"] = int(*rule.NoncurrentVersionExpiration.NoncurrentDays)
+				r["noncurrent_version_expiration_days"] = aws.ToInt32(rule.NoncurrentVersionExpiration.NoncurrentDays)
 			}
 			// Check if the rule has incomplete upload expiration days set
 			if rule.AbortIncompleteMultipartUpload != nil && rule.AbortIncompleteMultipartUpload.DaysAfterInitiation != nil {
-				r["incomplete_upload_expiration_days"] = int(*rule.AbortIncompleteMultipartUpload.DaysAfterInitiation)
+				r["incomplete_upload_expiration_days"] = aws.ToInt32(rule.AbortIncompleteMultipartUpload.DaysAfterInitiation)
 			}
 			rules = append(rules, r)
 		}
