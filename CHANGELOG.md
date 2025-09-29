@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.2.2 (Sept 29, 2025)
+
+IMPROVEMENTS:
+- Upgrade various go dependencies.
+
+BUG FIXES:
+- Fix inactive GSK versions breaking commands for existing clusters. [PR #464](https://github.com/gridscale/terraform-provider-gridscale/pull/464)
+
 ## 2.2.1 (July 10, 2025)
 
 IMPROVEMENTS:
