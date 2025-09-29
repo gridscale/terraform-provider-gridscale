@@ -7,11 +7,12 @@ import (
 	"log"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3/types"
+	"github.com/aws/smithy-go"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
@@ -19,15 +20,12 @@ type gridscaleS3Provider struct {
 	AccessKey, SecretKey string
 }
 
-func (m *gridscaleS3Provider) Retrieve() (credentials.Value, error) {
-
-	return credentials.Value{
+func (m *gridscaleS3Provider) Retrieve(ctx context.Context) (aws.Credentials, error) {
+	return aws.Credentials{
 		AccessKeyID:     m.AccessKey,
 		SecretAccessKey: m.SecretKey,
 	}, nil
 }
-
-func (m *gridscaleS3Provider) IsExpired() bool { return false }
 
 func resourceGridscaleBucket() *schema.Resource {
 	return &schema.Resource{
@@ -125,12 +123,12 @@ func resourceGridscaleBucketRead(d *schema.ResourceData, meta interface{}) error
 	defer cancel()
 
 	// Fetch lifecycle configuration
-	output, err := s3Client.GetBucketLifecycleConfigurationWithContext(ctx, &s3.GetBucketLifecycleConfigurationInput{
+	output, err := s3Client.GetBucketLifecycleConfiguration(ctx, &s3.GetBucketLifecycleConfigurationInput{
 		Bucket: aws.String(bucketName),
 	})
 	if err != nil {
-		var aerr awserr.Error
-		if errors.As(err, &aerr) && aerr.Code() == "NoSuchLifecycleConfiguration" {
+		var apiErr *smithy.GenericAPIError
+		if errors.As(err, &apiErr) && apiErr.Code == "NoSuchLifecycleConfiguration" {
 			// If the error indicates no lifecycle configuration exists, set the lifecycle_rule attribute to nil
 			d.Set("lifecycle_rule", nil)
 		} else {
@@ -141,27 +139,27 @@ func resourceGridscaleBucketRead(d *schema.ResourceData, meta interface{}) error
 		rules := []map[string]interface{}{}
 		for _, rule := range output.Rules {
 			r := map[string]interface{}{
-				"id":                                 aws.StringValue(rule.ID),
-				"enabled":                            aws.StringValue(rule.Status) == "Enabled",
+				"id":                                 aws.ToString(rule.ID),
+				"enabled":                            rule.Status == types.ExpirationStatusEnabled,
 				"expiration_days":                    0,
 				"noncurrent_version_expiration_days": 0,
 			}
 			// Check if the rule has a filter and set the prefix accordingly
 			if rule.Filter != nil && rule.Filter.Prefix != nil {
-				r["prefix"] = aws.StringValue(rule.Filter.Prefix)
+				r["prefix"] = aws.ToString(rule.Filter.Prefix)
 			} else {
 				r["prefix"] = ""
 			}
 			// Check if the rule has expiration or noncurrent version expiration days set
 			if rule.Expiration != nil && rule.Expiration.Days != nil {
-				r["expiration_days"] = int(*rule.Expiration.Days)
+				r["expiration_days"] = aws.ToInt32(rule.Expiration.Days)
 			}
 			if rule.NoncurrentVersionExpiration != nil && rule.NoncurrentVersionExpiration.NoncurrentDays != nil {
-				r["noncurrent_version_expiration_days"] = int(*rule.NoncurrentVersionExpiration.NoncurrentDays)
+				r["noncurrent_version_expiration_days"] = aws.ToInt32(rule.NoncurrentVersionExpiration.NoncurrentDays)
 			}
 			// Check if the rule has incomplete upload expiration days set
 			if rule.AbortIncompleteMultipartUpload != nil && rule.AbortIncompleteMultipartUpload.DaysAfterInitiation != nil {
-				r["incomplete_upload_expiration_days"] = int(*rule.AbortIncompleteMultipartUpload.DaysAfterInitiation)
+				r["incomplete_upload_expiration_days"] = aws.ToInt32(rule.AbortIncompleteMultipartUpload.DaysAfterInitiation)
 			}
 			rules = append(rules, r)
 		}
@@ -192,53 +190,53 @@ func resourceGridscaleBucketCreate(d *schema.ResourceData, meta interface{}) err
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutCreate))
 	defer cancel()
 
-	_, err := s3Client.CreateBucketWithContext(ctx, &bucketInput)
+	_, err := s3Client.CreateBucket(ctx, &bucketInput)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
 	lifecycleRules := d.Get("lifecycle_rule").([]interface{})
 	if len(lifecycleRules) > 0 {
-		lifecycleConfig := &s3.BucketLifecycleConfiguration{
-			Rules: []*s3.LifecycleRule{},
+		lifecycleConfig := &types.BucketLifecycleConfiguration{
+			Rules: []types.LifecycleRule{},
 		}
 
 		for _, rule := range lifecycleRules {
 			r := rule.(map[string]interface{})
-			lifecycleRule := &s3.LifecycleRule{
+			lifecycleRule := types.LifecycleRule{
 				ID: aws.String(r["id"].(string)),
-				Filter: &s3.LifecycleRuleFilter{
+				Filter: &types.LifecycleRuleFilter{
 					Prefix: aws.String(r["prefix"].(string)),
 				},
-				Status: aws.String("Enabled"),
+				Status: types.ExpirationStatusEnabled,
 			}
 			// Check if the rule is enabled
 			if !r["enabled"].(bool) {
-				lifecycleRule.Status = aws.String("Disabled")
+				lifecycleRule.Status = types.ExpirationStatusDisabled
 			}
 			// Set expiration days if provided
 			if v, ok := r["expiration_days"].(int); ok && v > 0 {
-				lifecycleRule.Expiration = &s3.LifecycleExpiration{
-					Days: aws.Int64(int64(v)),
+				lifecycleRule.Expiration = &types.LifecycleExpiration{
+					Days: aws.Int32(int32(v)),
 				}
 			}
 			// Set noncurrent version expiration days if provided
 			if v, ok := r["noncurrent_version_expiration_days"].(int); ok && v > 0 {
-				lifecycleRule.NoncurrentVersionExpiration = &s3.NoncurrentVersionExpiration{
-					NoncurrentDays: aws.Int64(int64(v)),
+				lifecycleRule.NoncurrentVersionExpiration = &types.NoncurrentVersionExpiration{
+					NoncurrentDays: aws.Int32(int32(v)),
 				}
 			}
 			// Set incomplete upload expiration days if provided
 			if v, ok := r["incomplete_upload_expiration_days"].(int); ok && v > 0 {
-				lifecycleRule.AbortIncompleteMultipartUpload = &s3.AbortIncompleteMultipartUpload{
-					DaysAfterInitiation: aws.Int64(int64(v)),
+				lifecycleRule.AbortIncompleteMultipartUpload = &types.AbortIncompleteMultipartUpload{
+					DaysAfterInitiation: aws.Int32(int32(v)),
 				}
 			}
 
 			lifecycleConfig.Rules = append(lifecycleConfig.Rules, lifecycleRule)
 		}
 
-		_, err := s3Client.PutBucketLifecycleConfigurationWithContext(ctx, &s3.PutBucketLifecycleConfigurationInput{
+		_, err := s3Client.PutBucketLifecycleConfiguration(ctx, &s3.PutBucketLifecycleConfigurationInput{
 			Bucket:                 &bucketNameStr,
 			LifecycleConfiguration: lifecycleConfig,
 		})
@@ -274,7 +272,7 @@ func resourceGridscaleBucketUpdate(d *schema.ResourceData, meta interface{}) err
 
 		if len(lifecycleRules) == 0 {
 			// If no lifecycle rules are provided, clear the lifecycle configuration
-			_, err := s3Client.DeleteBucketLifecycleWithContext(ctx, &s3.DeleteBucketLifecycleInput{
+			_, err := s3Client.DeleteBucketLifecycle(ctx, &s3.DeleteBucketLifecycleInput{
 				Bucket: aws.String(bucketName),
 			})
 			if err != nil {
@@ -282,46 +280,46 @@ func resourceGridscaleBucketUpdate(d *schema.ResourceData, meta interface{}) err
 			}
 			return resourceGridscaleBucketRead(d, meta)
 		} else {
-			lifecycleConfig := &s3.BucketLifecycleConfiguration{
-				Rules: []*s3.LifecycleRule{},
+			lifecycleConfig := &types.BucketLifecycleConfiguration{
+				Rules: []types.LifecycleRule{},
 			}
 
 			for _, rule := range lifecycleRules {
 				r := rule.(map[string]interface{})
-				lifecycleRule := &s3.LifecycleRule{
+				lifecycleRule := types.LifecycleRule{
 					ID: aws.String(r["id"].(string)),
-					Filter: &s3.LifecycleRuleFilter{
+					Filter: &types.LifecycleRuleFilter{
 						Prefix: aws.String(r["prefix"].(string)),
 					},
-					Status: aws.String("Enabled"),
+					Status: types.ExpirationStatusEnabled,
 				}
 
 				if !r["enabled"].(bool) {
-					lifecycleRule.Status = aws.String("Disabled")
+					lifecycleRule.Status = types.ExpirationStatusDisabled
 				}
 
 				if v, ok := r["expiration_days"].(int); ok && v > 0 {
-					lifecycleRule.Expiration = &s3.LifecycleExpiration{
-						Days: aws.Int64(int64(v)),
+					lifecycleRule.Expiration = &types.LifecycleExpiration{
+						Days: aws.Int32(int32(v)),
 					}
 				}
 
 				if v, ok := r["noncurrent_version_expiration_days"].(int); ok && v > 0 {
-					lifecycleRule.NoncurrentVersionExpiration = &s3.NoncurrentVersionExpiration{
-						NoncurrentDays: aws.Int64(int64(v)),
+					lifecycleRule.NoncurrentVersionExpiration = &types.NoncurrentVersionExpiration{
+						NoncurrentDays: aws.Int32(int32(v)),
 					}
 				}
 
 				if v, ok := r["incomplete_upload_expiration_days"].(int); ok && v > 0 {
-					lifecycleRule.AbortIncompleteMultipartUpload = &s3.AbortIncompleteMultipartUpload{
-						DaysAfterInitiation: aws.Int64(int64(v)),
+					lifecycleRule.AbortIncompleteMultipartUpload = &types.AbortIncompleteMultipartUpload{
+						DaysAfterInitiation: aws.Int32(int32(v)),
 					}
 				}
 
 				lifecycleConfig.Rules = append(lifecycleConfig.Rules, lifecycleRule)
 			}
 
-			_, err := s3Client.PutBucketLifecycleConfigurationWithContext(ctx, &s3.PutBucketLifecycleConfigurationInput{
+			_, err := s3Client.PutBucketLifecycleConfiguration(ctx, &s3.PutBucketLifecycleConfigurationInput{
 				Bucket:                 aws.String(bucketName),
 				LifecycleConfiguration: lifecycleConfig,
 			})
@@ -354,22 +352,31 @@ func resourceGridscaleBucketDelete(d *schema.ResourceData, meta interface{}) err
 	errorPrefix := fmt.Sprintf("delete bucket %s resource at s3host %s-", bucketNameStr, s3HostStr)
 	ctx, cancel := context.WithTimeout(context.Background(), d.Timeout(schema.TimeoutDelete))
 	defer cancel()
-	_, err := s3Client.DeleteBucketWithContext(ctx, &bucketInput)
+	_, err := s3Client.DeleteBucket(ctx, &bucketInput)
 	if err != nil {
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 	return nil
 }
 
-func initS3Client(provider credentials.Provider, s3host string) *s3.S3 {
-	forcePathStyle := true
-	sess := session.Must(session.NewSessionWithOptions(session.Options{
-		Config: aws.Config{
-			Region:           aws.String("us-east-1"),
-			Endpoint:         &s3host,
-			S3ForcePathStyle: &forcePathStyle,
-			Credentials:      credentials.NewCredentials(provider),
-		},
-	}))
-	return s3.New(sess)
+func initS3Client(provider *gridscaleS3Provider, s3host string) *s3.Client {
+	cfg, err := config.LoadDefaultConfig(context.TODO(),
+		config.WithRegion("us-east-1"),
+		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(
+			provider.AccessKey,
+			provider.SecretKey,
+			"",
+		)),
+	)
+	if err != nil {
+		log.Fatalf("unable to load SDK config, %v", err)
+	}
+
+	// Configure custom endpoint and path style
+	client := s3.NewFromConfig(cfg, func(o *s3.Options) {
+		o.BaseEndpoint = aws.String("https://" + s3host)
+		o.UsePathStyle = true
+	})
+
+	return client
 }
