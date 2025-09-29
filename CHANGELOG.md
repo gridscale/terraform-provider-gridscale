@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.28.2 (Sept 29, 2025)
+
+BUG FIXES:
+- Fix inactive GSK versions breaking commands for existing clusters. [PR #466](https://github.com/gridscale/terraform-provider-gridscale/pull/466)
+
 ## 1.28.1 (July 10, 2025)
 
 IMPROVEMENTS:
