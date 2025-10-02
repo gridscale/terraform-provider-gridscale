@@ -1,7 +1,7 @@
 ---
 layout: "gridscale"
 page_title: "gridscale: securityzone"
-sidebar_current: "docs-gridscale-resource-securityzone"
+sidebar_current: "docs-gridscale-resource-paas-securityzone"
 description: |-
   Manages a security zone in gridscale.
 ---
