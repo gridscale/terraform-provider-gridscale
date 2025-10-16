@@ -219,12 +219,12 @@ func dataSourceGridscalePaaSRead(d *schema.ResourceData, meta interface{}) error
 	for k, value := range props.Parameters {
 		paramValType, err := getInterfaceType(value)
 		if err != nil {
-			return fmt.Errorf("%s error: %v", errorPrefix, err)
+			return fmt.Errorf("%s error on parameter with key %q and type %T: %w", errorPrefix, k, value, err)
 		}
 		valueInString, err := convInterfaceToString(paramValType, value)
 
 		if err != nil {
-			return err
+			return fmt.Errorf("%s error on parameter with key %q: %w", errorPrefix, k, err)
 		}
 		param := map[string]interface{}{
 			"param": k,
