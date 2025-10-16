@@ -1,9 +1,13 @@
 # Changelog
 
-## UNRELEASED
+## 2.2.3 (Oct 16, 2025)
 
 IMPROVEMENTS:
 - Upgrade `aws/aws-sdk-go` dependency from v1 to v2 
+- Upgrade various related dependencies.
+
+BUG FIXES:
+- Fix gridscale_paas data source when used on GSK >= 1.30 [PR #478](https://github.com/gridscale/terraform-provider-gridscale/pull/478)
 
 ## 2.2.2 (Sept 29, 2025)
 
