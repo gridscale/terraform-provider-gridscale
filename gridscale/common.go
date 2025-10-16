@@ -40,8 +40,8 @@ func convStrToTypeInterface(interfaceType, str string) (interface{}, error) {
 	}
 }
 
-// getInterfaceType gets interface type
-func getInterfaceType(value interface{}) (string, error) {
+// getPrimitiveInterfaceType gets interface type
+func getPrimitiveInterfaceType(value interface{}) (string, error) {
 	switch value.(type) {
 	case bool:
 		return boolInterfaceType, nil

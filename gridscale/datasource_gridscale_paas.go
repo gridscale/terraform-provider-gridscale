@@ -222,7 +222,7 @@ func dataSourceGridscalePaaSRead(d *schema.ResourceData, meta interface{}) error
 			continue
 		}
 
-		paramValType, err := getInterfaceType(value)
+		paramValType, err := getPrimitiveInterfaceType(value)
 		if err != nil {
 			return fmt.Errorf("%s error on parameter with key %q and type %T: %w", errorPrefix, k, value, err)
 		}

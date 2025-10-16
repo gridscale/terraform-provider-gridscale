@@ -267,7 +267,7 @@ func resourceGridscalePaaSServiceRead(d *schema.ResourceData, meta interface{}) 
 	//Get parameters
 	parameters := make([]interface{}, 0)
 	for k, value := range props.Parameters {
-		paramValType, err := getInterfaceType(value)
+		paramValType, err := getPrimitiveInterfaceType(value)
 		if err != nil {
 			return fmt.Errorf("%s error: %v", errorPrefix, err)
 		}
