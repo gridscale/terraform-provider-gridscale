@@ -217,6 +217,11 @@ func dataSourceGridscalePaaSRead(d *schema.ResourceData, meta interface{}) error
 	//Get parameters
 	parameters := make([]interface{}, 0)
 	for k, value := range props.Parameters {
+		// Skip node pool parameter on k8s data source.
+		if props.ServiceTemplateCategory == k8sTemplateFlavourName && k == "pools" {
+			continue
+		}
+
 		paramValType, err := getInterfaceType(value)
 		if err != nil {
 			return fmt.Errorf("%s error on parameter with key %q and type %T: %w", errorPrefix, k, value, err)
