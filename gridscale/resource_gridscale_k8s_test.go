@@ -166,6 +166,66 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 				),
 			},
 			{
+				Config: testAccCheckResourceGridscaleK8sConfigAddLabel(),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckResourceGridscalePaaSExists("gridscale_k8s.foopaas", &object),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.name", "my-node-pool"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.node_count", "1"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.cores", "2"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.memory", "4"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.storage", "50"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.storage_type", "storage_insane"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.rocket_storage", "10"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.labels.#", "2"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.labels.0.key", "example-key"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.labels.0.value", "example-value"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.labels.1.key", "another-key"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.labels.1.value", "another-value"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "k8s_hubble", "true"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "surge_node", "true"),
+				),
+			},
+			{
+				Config: testAccCheckResourceGridscaleK8sConfigRemoveLabel(),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckResourceGridscalePaaSExists("gridscale_k8s.foopaas", &object),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.name", "my-node-pool"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.node_count", "1"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.cores", "2"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.memory", "4"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.storage", "50"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.storage_type", "storage_insane"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.rocket_storage", "10"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.labels.#", "0"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "k8s_hubble", "true"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "surge_node", "true"),
+				),
+			},
+			{
 				Config: testAccCheckResourceGridscaleK8sConfigNodeCountIncrease(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscalePaaSExists("gridscale_k8s.foopaas", &object),
@@ -399,6 +459,53 @@ func testAccCheckResourceGridscaleK8sConfigRemoveTaint() string {
 			storage_type = "storage_insane"
 			rocket_storage = 10
 			taints = []
+		}
+		k8s_hubble = true
+	}
+	`
+}
+
+func testAccCheckResourceGridscaleK8sConfigAddLabel() string {
+	return `
+	resource "gridscale_k8s" "foopaas" {
+		name   = "newname"
+		release = "1.32"
+		node_pool {
+			name = "my-node-pool"
+			node_count = 1
+			cores = 2
+			memory = 4
+			storage = 50
+			storage_type = "storage_insane"
+			rocket_storage = 10
+			labels {
+				key = "example-key"
+				value = "example-value"
+			}
+			labels {
+				key = "another-key"
+				value = "another-value"
+			}
+		}
+		k8s_hubble = true
+	}
+	`
+}
+
+func testAccCheckResourceGridscaleK8sConfigRemoveLabel() string {
+	return `
+	resource "gridscale_k8s" "foopaas" {
+		name   = "newname"
+		release = "1.32"
+		node_pool {
+			name = "my-node-pool"
+			node_count = 1
+			cores = 2
+			memory = 4
+			storage = 50
+			storage_type = "storage_insane"
+			rocket_storage = 10
+			labels = []
 		}
 		k8s_hubble = true
 	}

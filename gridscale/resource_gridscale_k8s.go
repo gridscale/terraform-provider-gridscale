@@ -26,6 +26,7 @@ const (
 	k8sRocketStorageSupportRelease = "1.26"
 	k8sMultiNodePoolSupportRelease = "1.30"
 	k8sTaintKeyValueRegex          = `^[a-zA-Z0-9-]+$`
+	k8sLabelKeyValueRegex          = `^[a-zA-Z0-9-]+$`
 )
 
 // ResourceGridscaleK8sModeler struct represents a modeler of the gridscale k8s resource.
@@ -141,6 +142,27 @@ func (rgk8sm *ResourceGridscaleK8sModeler) buildInputSchema() map[string]*schema
 						Required:     true,
 						Description:  "The effect of the taint.",
 						ValidateFunc: validation.StringInSlice([]string{"NoExecute", "NoSchedule", "PreferNoSchedule"}, false),
+					},
+				},
+			},
+		},
+		"labels": {
+			Type:        schema.TypeList,
+			Optional:    true,
+			Description: "List of labels to be applied to the nodes of this pool.",
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"key": {
+						Type:         schema.TypeString,
+						Required:     true,
+						Description:  "The key of the label.",
+						ValidateFunc: validation.StringMatch(regexp.MustCompile(k8sLabelKeyValueRegex), "key must match Kubernetes label key format"),
+					},
+					"value": {
+						Type:         schema.TypeString,
+						Required:     true,
+						Description:  "The value of the label.",
+						ValidateFunc: validation.StringMatch(regexp.MustCompile(k8sLabelKeyValueRegex), "value must match Kubernetes label value format"),
 					},
 				},
 			},
@@ -906,6 +928,28 @@ func resourceGridscaleK8sRead(d *schema.ResourceData, meta interface{}) error {
 				nodePoolRead["taints"] = taintsRead
 			}
 
+			// Handle labels
+			if labels, isLabelsSet := nodePoolSet["labels"]; isLabelsSet {
+				labelsList := labels.([]any)
+				labelsRead := make([]map[string]any, 0)
+
+				for _, labelInterface := range labelsList {
+					label := labelInterface.(map[string]any)
+					labelRead := make(map[string]any)
+
+					if key, isKeySet := label["key"]; isKeySet {
+						labelRead["key"] = key
+					}
+					if value, isValueSet := label["value"]; isValueSet {
+						labelRead["value"] = value
+					}
+
+					labelsRead = append(labelsRead, labelRead)
+				}
+
+				nodePoolRead["labels"] = labelsRead
+			}
+
 			nodePools = append(nodePools, nodePoolRead)
 		}
 	}
@@ -1029,6 +1073,28 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 				}
 
 				nodePool["taints"] = taintsRequest
+			}
+
+			// Handle labels
+			if labelsInterface, isLabelsSet := d.GetOk(fmt.Sprintf("node_pool.%d.labels", index)); isLabelsSet {
+				labelsList := labelsInterface.([]any)
+				labelsRequest := make([]map[string]any, 0)
+
+				for _, labelInterface := range labelsList {
+					label := labelInterface.(map[string]any)
+					labelRequest := make(map[string]any)
+
+					if key, isKeySet := label["key"]; isKeySet {
+						labelRequest["key"] = key
+					}
+					if value, isValueSet := label["value"]; isValueSet {
+						labelRequest["value"] = value
+					}
+
+					labelsRequest = append(labelsRequest, labelRequest)
+				}
+
+				nodePool["labels"] = labelsRequest
 			}
 
 			nodePools = append(nodePools, nodePool)
@@ -1215,6 +1281,28 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 				}
 
 				nodePool["taints"] = taintsRequest
+			}
+
+			// Handle labels
+			if labelsInterface, isLabelsSet := d.GetOk(fmt.Sprintf("node_pool.%d.labels", index)); isLabelsSet {
+				labelsList := labelsInterface.([]any)
+				labelsRequest := make([]map[string]any, 0)
+
+				for _, labelInterface := range labelsList {
+					label := labelInterface.(map[string]any)
+					labelRequest := make(map[string]any)
+
+					if key, isKeySet := label["key"]; isKeySet {
+						labelRequest["key"] = key
+					}
+					if value, isValueSet := label["value"]; isValueSet {
+						labelRequest["value"] = value
+					}
+
+					labelsRequest = append(labelsRequest, labelRequest)
+				}
+
+				nodePool["labels"] = labelsRequest
 			}
 
 			nodePools = append(nodePools, nodePool)
@@ -1554,6 +1642,59 @@ func validateK8sParameters(d *schema.ResourceDiff, template gsclient.PaaSTemplat
 							errorMessages = append(
 								errorMessages,
 								fmt.Sprintf("Invalid 'node_pool.%d.taints' value. Effect is required.\n", index),
+							)
+						}
+					}
+				}
+			}
+
+			// Validate labels
+			nodePoolParameterLabels, labels_ok := templateParameterNodePools.Schema.Schema["labels"]
+			if labels_ok {
+				if labelsInterface, isLabelsSet := d.GetOk(fmt.Sprintf("node_pool.%d.labels", index)); isLabelsSet {
+					labelsList := labelsInterface.([]any)
+
+					// Check if labels list is empty when it's allowed to be
+					if len(labelsList) == 0 && !nodePoolParameterLabels.Empty {
+						errorMessages = append(
+							errorMessages,
+							fmt.Sprintf("Invalid 'node_pool.%d.labels' value. Labels list cannot be empty.\n", index),
+						)
+					}
+
+					// Validate each label
+					for _, labelInterface := range labelsList {
+						label := labelInterface.(map[string]any)
+
+						// Validate key
+						if key, isKeySet := label["key"]; isKeySet {
+							keyStr := key.(string)
+							if !regexp.MustCompile(k8sLabelKeyValueRegex).MatchString(keyStr) {
+								errorMessages = append(
+									errorMessages,
+									fmt.Sprintf("Invalid 'node_pool.%d.labels.key' value. Key must match Kubernetes label key format.\n", index),
+								)
+							}
+						} else {
+							errorMessages = append(
+								errorMessages,
+								fmt.Sprintf("Invalid 'node_pool.%d.labels' value. Key is required.\n", index),
+							)
+						}
+
+						// Validate value
+						if value, isValueSet := label["value"]; isValueSet {
+							valueStr := value.(string)
+							if !regexp.MustCompile(k8sLabelKeyValueRegex).MatchString(valueStr) {
+								errorMessages = append(
+									errorMessages,
+									fmt.Sprintf("Invalid 'node_pool.%d.labels.value' value. Value must match Kubernetes label value format.\n", index),
+								)
+							}
+						} else {
+							errorMessages = append(
+								errorMessages,
+								fmt.Sprintf("Invalid 'node_pool.%d.labels' value. Value is required.\n", index),
 							)
 						}
 					}
