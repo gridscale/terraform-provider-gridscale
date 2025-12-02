@@ -22,6 +22,7 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 		CheckDestroy: testAccCheckResourceGridscalePaaSDestroyCheck,
 		Steps: []resource.TestStep{
 			{
+				// Provision the cluster
 				Config: testAccCheckResourceGridscaleK8sConfigBasic(name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscalePaaSExists("gridscale_k8s.foopaas", &object),
@@ -50,6 +51,7 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 				),
 			},
 			{
+				// Update the cluster name
 				Config: testAccCheckResourceGridscaleK8sConfigBasicUpdate(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscalePaaSExists("gridscale_k8s.foopaas", &object),
@@ -78,6 +80,7 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 				),
 			},
 			{
+				// Change node pools vm spec - triggers a recycle
 				Config: testAccCheckResourceGridscaleK8sConfigNodePoolSpecsUpdate(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscalePaaSExists("gridscale_k8s.foopaas", &object),
@@ -102,6 +105,7 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 				),
 			},
 			{
+				// Add a taint to the node pool
 				Config: testAccCheckResourceGridscaleK8sConfigAddTaint(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscalePaaSExists("gridscale_k8s.foopaas", &object),
@@ -140,6 +144,7 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 				),
 			},
 			{
+				// Remove the taint
 				Config: testAccCheckResourceGridscaleK8sConfigRemoveTaint(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscalePaaSExists("gridscale_k8s.foopaas", &object),
@@ -166,6 +171,7 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 				),
 			},
 			{
+				// Add a label to the node pool
 				Config: testAccCheckResourceGridscaleK8sConfigAddLabel(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscalePaaSExists("gridscale_k8s.foopaas", &object),
@@ -200,6 +206,7 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 				),
 			},
 			{
+				// Remove the label
 				Config: testAccCheckResourceGridscaleK8sConfigRemoveLabel(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscalePaaSExists("gridscale_k8s.foopaas", &object),
@@ -226,6 +233,7 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 				),
 			},
 			{
+				// Add another node to the pool
 				Config: testAccCheckResourceGridscaleK8sConfigNodeCountIncrease(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscalePaaSExists("gridscale_k8s.foopaas", &object),
@@ -250,6 +258,7 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 				),
 			},
 			{
+				// Remove a node from the pool
 				Config: testAccCheckResourceGridscaleK8sConfigNodeCountDecrease(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscalePaaSExists("gridscale_k8s.foopaas", &object),
@@ -274,6 +283,7 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 				),
 			},
 			{
+				// Add a node pool
 				Config: testAccCheckResourceGridscaleK8sConfigAddNodePool(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscalePaaSExists("gridscale_k8s.foopaas", &object),
@@ -310,6 +320,7 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 				),
 			},
 			{
+				// Remove the node pool
 				Config: testAccCheckResourceGridscaleK8sConfigRemoveNodePool(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscalePaaSExists("gridscale_k8s.foopaas", &object),
