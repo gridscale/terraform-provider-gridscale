@@ -25,8 +25,6 @@ const (
 	k8sLabelPrefix                 = "#gsk#"
 	k8sRocketStorageSupportRelease = "1.26"
 	k8sMultiNodePoolSupportRelease = "1.30"
-	k8sTaintKeyValueRegex          = `^[a-zA-Z0-9-]+$`
-	k8sLabelKeyValueRegex          = `^[a-zA-Z0-9-]+$`
 )
 
 // ResourceGridscaleK8sModeler struct represents a modeler of the gridscale k8s resource.
@@ -126,16 +124,14 @@ func (rgk8sm *ResourceGridscaleK8sModeler) buildInputSchema() map[string]*schema
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 					"key": {
-						Type:         schema.TypeString,
-						Required:     true,
-						Description:  "The key of the taint.",
-						ValidateFunc: validation.StringMatch(regexp.MustCompile(k8sTaintKeyValueRegex), "key must consist of alphanumeric characters and hyphens only"),
+						Type:        schema.TypeString,
+						Required:    true,
+						Description: "The key of the taint.",
 					},
 					"value": {
-						Type:         schema.TypeString,
-						Required:     true,
-						Description:  "The value of the taint.",
-						ValidateFunc: validation.StringMatch(regexp.MustCompile(k8sTaintKeyValueRegex), "value must consist of alphanumeric characters and hyphens only"),
+						Type:        schema.TypeString,
+						Required:    true,
+						Description: "The value of the taint.",
 					},
 					"effect": {
 						Type:         schema.TypeString,
@@ -153,16 +149,14 @@ func (rgk8sm *ResourceGridscaleK8sModeler) buildInputSchema() map[string]*schema
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 					"key": {
-						Type:         schema.TypeString,
-						Required:     true,
-						Description:  "The key of the label.",
-						ValidateFunc: validation.StringMatch(regexp.MustCompile(k8sLabelKeyValueRegex), "key must match Kubernetes label key format"),
+						Type:        schema.TypeString,
+						Required:    true,
+						Description: "The key of the label.",
 					},
 					"value": {
-						Type:         schema.TypeString,
-						Required:     true,
-						Description:  "The value of the label.",
-						ValidateFunc: validation.StringMatch(regexp.MustCompile(k8sLabelKeyValueRegex), "value must match Kubernetes label value format"),
+						Type:        schema.TypeString,
+						Required:    true,
+						Description: "The value of the label.",
 					},
 				},
 			},
@@ -1590,14 +1584,8 @@ func validateK8sParameters(d *schema.ResourceDiff, template gsclient.PaaSTemplat
 						taint := taintInterface.(map[string]any)
 
 						// Validate key
-						if key, isKeySet := taint["key"]; isKeySet {
-							keyStr := key.(string)
-							if !regexp.MustCompile(k8sTaintKeyValueRegex).MatchString(keyStr) {
-								errorMessages = append(
-									errorMessages,
-									fmt.Sprintf("Invalid 'node_pool.%d.taints.key' value. Key must consist of alphanumeric characters and hyphens only.\n", index),
-								)
-							}
+						if _, isKeySet := taint["key"]; isKeySet {
+							// Key validation removed
 						} else {
 							errorMessages = append(
 								errorMessages,
@@ -1606,14 +1594,8 @@ func validateK8sParameters(d *schema.ResourceDiff, template gsclient.PaaSTemplat
 						}
 
 						// Validate value
-						if value, isValueSet := taint["value"]; isValueSet {
-							valueStr := value.(string)
-							if !regexp.MustCompile(k8sTaintKeyValueRegex).MatchString(valueStr) {
-								errorMessages = append(
-									errorMessages,
-									fmt.Sprintf("Invalid 'node_pool.%d.taints.value' value. Value must consist of alphanumeric characters and hyphens only.\n", index),
-								)
-							}
+						if _, isValueSet := taint["value"]; isValueSet {
+							// Value validation removed
 						} else {
 							errorMessages = append(
 								errorMessages,
@@ -1667,14 +1649,8 @@ func validateK8sParameters(d *schema.ResourceDiff, template gsclient.PaaSTemplat
 						label := labelInterface.(map[string]any)
 
 						// Validate key
-						if key, isKeySet := label["key"]; isKeySet {
-							keyStr := key.(string)
-							if !regexp.MustCompile(k8sLabelKeyValueRegex).MatchString(keyStr) {
-								errorMessages = append(
-									errorMessages,
-									fmt.Sprintf("Invalid 'node_pool.%d.labels.key' value. Key must match Kubernetes label key format.\n", index),
-								)
-							}
+						if _, isKeySet := label["key"]; isKeySet {
+							// Key validation removed
 						} else {
 							errorMessages = append(
 								errorMessages,
@@ -1683,14 +1659,8 @@ func validateK8sParameters(d *schema.ResourceDiff, template gsclient.PaaSTemplat
 						}
 
 						// Validate value
-						if value, isValueSet := label["value"]; isValueSet {
-							valueStr := value.(string)
-							if !regexp.MustCompile(k8sLabelKeyValueRegex).MatchString(valueStr) {
-								errorMessages = append(
-									errorMessages,
-									fmt.Sprintf("Invalid 'node_pool.%d.labels.value' value. Value must match Kubernetes label value format.\n", index),
-								)
-							}
+						if _, isValueSet := label["value"]; isValueSet {
+							// Value validation removed
 						} else {
 							errorMessages = append(
 								errorMessages,
