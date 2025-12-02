@@ -469,7 +469,6 @@ func testAccCheckResourceGridscaleK8sConfigRemoveTaint() string {
 			storage = 50
 			storage_type = "storage_insane"
 			rocket_storage = 10
-			taints = []
 		}
 		k8s_hubble = true
 	}
@@ -516,7 +515,6 @@ func testAccCheckResourceGridscaleK8sConfigRemoveLabel() string {
 			storage = 50
 			storage_type = "storage_insane"
 			rocket_storage = 10
-			labels = []
 		}
 		k8s_hubble = true
 	}
