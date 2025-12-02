@@ -102,6 +102,70 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 				),
 			},
 			{
+				Config: testAccCheckResourceGridscaleK8sConfigAddTaint(),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckResourceGridscalePaaSExists("gridscale_k8s.foopaas", &object),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.name", "my-node-pool"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.node_count", "1"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.cores", "2"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.memory", "4"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.storage", "50"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.storage_type", "storage_insane"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.rocket_storage", "10"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.taints.#", "2"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.taints.0.key", "example-key"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.taints.0.value", "example-value"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.taints.0.effect", "NoSchedule"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.taints.1.key", "another-key"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.taints.1.value", "another-value"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.taints.1.effect", "NoExecute"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "k8s_hubble", "true"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "surge_node", "true"),
+				),
+			},
+			{
+				Config: testAccCheckResourceGridscaleK8sConfigRemoveTaint(),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckResourceGridscalePaaSExists("gridscale_k8s.foopaas", &object),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.name", "my-node-pool"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.node_count", "1"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.cores", "2"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.memory", "4"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.storage", "50"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.storage_type", "storage_insane"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.rocket_storage", "10"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "node_pool.0.taints.#", "0"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "k8s_hubble", "true"),
+					resource.TestCheckResourceAttr(
+						"gridscale_k8s.foopaas", "surge_node", "true"),
+				),
+			},
+			{
 				Config: testAccCheckResourceGridscaleK8sConfigNodeCountIncrease(),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckResourceGridscalePaaSExists("gridscale_k8s.foopaas", &object),
@@ -286,6 +350,55 @@ func testAccCheckResourceGridscaleK8sConfigNodeCountIncrease() string {
 			storage = 50
 			storage_type = "storage_insane"
 			rocket_storage = 10
+		}
+		k8s_hubble = true
+	}
+	`
+}
+
+func testAccCheckResourceGridscaleK8sConfigAddTaint() string {
+	return `
+	resource "gridscale_k8s" "foopaas" {
+		name   = "newname"
+		release = "1.32"
+		node_pool {
+			name = "my-node-pool"
+			node_count = 1
+			cores = 2
+			memory = 4
+			storage = 50
+			storage_type = "storage_insane"
+			rocket_storage = 10
+			taints {
+				key = "example-key"
+				value = "example-value"
+				effect = "NoSchedule"
+			}
+			taints {
+				key = "another-key"
+				value = "another-value"
+				effect = "NoExecute"
+			}
+		}
+		k8s_hubble = true
+	}
+	`
+}
+
+func testAccCheckResourceGridscaleK8sConfigRemoveTaint() string {
+	return `
+	resource "gridscale_k8s" "foopaas" {
+		name   = "newname"
+		release = "1.32"
+		node_pool {
+			name = "my-node-pool"
+			node_count = 1
+			cores = 2
+			memory = 4
+			storage = 50
+			storage_type = "storage_insane"
+			rocket_storage = 10
+			taints = []
 		}
 		k8s_hubble = true
 	}

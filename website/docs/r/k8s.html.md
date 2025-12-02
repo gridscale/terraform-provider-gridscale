@@ -62,6 +62,7 @@ The following arguments are supported:
     * `storage` - Storage per worker node (in GiB).
     * `storage_type` - Storage type (one of storage, storage_high, storage_insane).
     * `rocket_storage` - Rocket storage per worker node (in GiB).
+    * `taints` - List of taints to be applied to the nodes of this pool.
 * `surge_node` - Enable surge node to avoid resources shortage during the cluster upgrade (Default: true).
 * `cluster_cidr` - (Immutable) The cluster CIDR that will be used to generate the CIDR of nodes, services, and pods. The allowed CIDR prefix length is /16. If the cluster CIDR is not set, the cluster will use "10.244.0.0/16" as it default (even though the `cluster_cidr` in the k8s resource is empty).
 * `cluster_traffic_encryption` - Enables cluster encryption via wireguard if true. Only available for GSK version 1.29 and above. Default is false.
@@ -88,6 +89,36 @@ The following arguments are supported:
 
 * `k8s_hubble` - (Optional) Enable Hubble for the k8s cluster.
 
+### Examples
+
+#### Pool Taints
+
+```terraform
+resource "gridscale_k8s" "k8s-test" {
+  name   = "test"
+  release = "1.30" # instead, gsk_version can be set.
+
+  node_pool {
+    name = "pool-0"
+    node_count = 2
+    cores = 2
+    memory = 4
+    storage = 30
+    storage_type = "storage_insane"
+
+    taints {
+      key    = "example-key"
+      value  = "example-value"
+      effect = "NoSchedule"
+    }
+    taints {
+      key    = "another-key"
+      value  = "another-value"
+      effect = "NoExecute"
+    }
+  }
+}
+```
 
 ## Timeouts
 
@@ -120,6 +151,7 @@ This resource exports the following attributes:
     * `storage` - See Argument Reference above.
     * `storage_type` - See Argument Reference above.
     * `rocket_storage` - See Argument Reference above.
+    * `taints` - See Argument Reference above.
 * `surge_node` - See Argument Reference above.
 * `cluster_cidr` - See Argument Reference above.
 * `cluster_traffic_encryption` - See Argument Reference above.
