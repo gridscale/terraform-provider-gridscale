@@ -62,8 +62,8 @@ The following arguments are supported:
     * `storage` - Storage per worker node (in GiB).
     * `storage_type` - Storage type (one of storage, storage_high, storage_insane).
     * `rocket_storage` - Rocket storage per worker node (in GiB).
-    * `taints` - List of taints to be applied to the nodes of this pool.
-    * `labels` - List of labels to be applied to the nodes of this pool.
+    * `taints` - List of taints to be applied to the nodes of this pool. Check the [product documentation](https://my.gridscale.io/product-documentation/cloud-computing/products/paas/kubernetes/node-pools/introduction/#support-for-taints-and-labels) for details
+    * `labels` - List of labels to be applied to the nodes of this pool. Check the [product documentation](https://my.gridscale.io/product-documentation/cloud-computing/products/paas/kubernetes/node-pools/introduction/#support-for-taints-and-labels) for details
 * `surge_node` - Enable surge node to avoid resources shortage during the cluster upgrade (Default: true).
 * `cluster_cidr` - (Immutable) The cluster CIDR that will be used to generate the CIDR of nodes, services, and pods. The allowed CIDR prefix length is /16. If the cluster CIDR is not set, the cluster will use "10.244.0.0/16" as it default (even though the `cluster_cidr` in the k8s resource is empty).
 * `cluster_traffic_encryption` - Enables cluster encryption via wireguard if true. Only available for GSK version 1.29 and above. Default is false.
@@ -97,7 +97,7 @@ The following arguments are supported:
 ```terraform
 resource "gridscale_k8s" "k8s-test" {
   name   = "test"
-  release = "1.30" # instead, gsk_version can be set.
+  release = "1.32" # instead, gsk_version can be set.
 
   node_pool {
     name = "pool-0"
@@ -126,7 +126,7 @@ resource "gridscale_k8s" "k8s-test" {
 ```terraform
 resource "gridscale_k8s" "k8s-test" {
   name   = "test"
-  release = "1.30" # instead, gsk_version can be set.
+  release = "1.32" # instead, gsk_version can be set.
 
   node_pool {
     name = "pool-0"
