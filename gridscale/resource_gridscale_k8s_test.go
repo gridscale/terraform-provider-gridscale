@@ -28,7 +28,7 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "name", name),
 					resource.TestCheckResourceAttr(
-						"gridscale_k8s.foopaas", "release", "1.30"),
+						"gridscale_k8s.foopaas", "release", "1.32"),
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.0.name", "my-node-pool"),
 					resource.TestCheckResourceAttr(
@@ -56,7 +56,7 @@ func TestAccResourceGridscaleK8sBasic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "name", "newname"),
 					resource.TestCheckResourceAttr(
-						"gridscale_k8s.foopaas", "release", "1.30"),
+						"gridscale_k8s.foopaas", "release", "1.32"),
 					resource.TestCheckResourceAttr(
 						"gridscale_k8s.foopaas", "node_pool.0.name", "my-node-pool"),
 					resource.TestCheckResourceAttr(
@@ -344,7 +344,7 @@ func testAccCheckResourceGridscaleK8sConfigBasic(name string) string {
 	return fmt.Sprintf(`
 resource "gridscale_k8s" "foopaas" {
 	name   = "%s"
-	release = "1.30"
+	release = "1.32"
 	node_pool {
 		name = "my-node-pool"
 		node_count = 1
@@ -363,7 +363,7 @@ func testAccCheckResourceGridscaleK8sConfigBasicUpdate() string {
 	return `
 resource "gridscale_k8s" "foopaas" {
 	name   = "newname"
-	release = "1.30"
+	release = "1.32"
 	node_pool {
 		name = "my-node-pool"
 		node_count = 1
@@ -382,7 +382,7 @@ func testAccCheckResourceGridscaleK8sConfigNodePoolSpecsUpdate() string {
 	return `
 	resource "gridscale_k8s" "foopaas" {
 		name   = "newname"
-		release = "1.30"
+		release = "1.32"
 		node_pool {
 			name = "my-node-pool"
 			node_count = 1
@@ -401,7 +401,7 @@ func testAccCheckResourceGridscaleK8sConfigNodeCountIncrease() string {
 	return `
 	resource "gridscale_k8s" "foopaas" {
 		name   = "newname"
-		release = "1.30"
+		release = "1.32"
 		node_pool {
 			name = "my-node-pool"
 			node_count = 2
@@ -516,7 +516,7 @@ func testAccCheckResourceGridscaleK8sConfigNodeCountDecrease() string {
 	return `
 	resource "gridscale_k8s" "foopaas" {
 		name   = "newname"
-		release = "1.30"
+		release = "1.32"
 		node_pool {
 			name = "my-node-pool"
 			node_count = 1
@@ -535,7 +535,7 @@ func testAccCheckResourceGridscaleK8sConfigAddNodePool() string {
 	return `
 	resource "gridscale_k8s" "foopaas" {
 		name   = "newname"
-		release = "1.30"
+		release = "1.32"
 		node_pool {
 			name = "my-node-pool"
 			node_count = 1
@@ -562,7 +562,7 @@ func testAccCheckResourceGridscaleK8sConfigRemoveNodePool() string {
 	return `
 	resource "gridscale_k8s" "foopaas" {
 		name   = "newname"
-		release = "1.30"
+		release = "1.32"
 		node_pool {
 			name = "my-node-pool"
 			node_count = 1
