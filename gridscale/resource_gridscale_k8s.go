@@ -117,6 +117,50 @@ func (rgk8sm *ResourceGridscaleK8sModeler) buildInputSchema() map[string]*schema
 			Default:     0,
 			Description: "Rocket storage per worker node (in GiB).",
 		},
+		"taints": {
+			Type:        schema.TypeList,
+			Optional:    true,
+			Description: "List of taints to be applied to the nodes of this pool.",
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"key": {
+						Type:        schema.TypeString,
+						Required:    true,
+						Description: "The key of the taint.",
+					},
+					"value": {
+						Type:        schema.TypeString,
+						Required:    true,
+						Description: "The value of the taint.",
+					},
+					"effect": {
+						Type:         schema.TypeString,
+						Required:     true,
+						Description:  "The effect of the taint.",
+						ValidateFunc: validation.StringInSlice([]string{"NoExecute", "NoSchedule", "PreferNoSchedule"}, false),
+					},
+				},
+			},
+		},
+		"labels": {
+			Type:        schema.TypeList,
+			Optional:    true,
+			Description: "List of labels to be applied to the nodes of this pool.",
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+					"key": {
+						Type:        schema.TypeString,
+						Required:    true,
+						Description: "The key of the label.",
+					},
+					"value": {
+						Type:        schema.TypeString,
+						Required:    true,
+						Description: "The value of the label.",
+					},
+				},
+			},
+		},
 	}
 	return map[string]*schema.Schema{
 		"name": {
@@ -852,6 +896,54 @@ func resourceGridscaleK8sRead(d *schema.ResourceData, meta interface{}) error {
 			if rocketStorage, isRocketStorageSet := nodePoolSet["rocket_storage"]; isRocketStorageSet {
 				nodePoolRead["rocket_storage"] = rocketStorage
 			}
+
+			// Handle taints
+			if taints, isTaintsSet := nodePoolSet["taints"]; isTaintsSet {
+				taintsList := taints.([]any)
+				taintsRead := make([]map[string]any, 0)
+
+				for _, taintInterface := range taintsList {
+					taint := taintInterface.(map[string]any)
+					taintRead := make(map[string]any)
+
+					if key, isKeySet := taint["key"]; isKeySet {
+						taintRead["key"] = key
+					}
+					if value, isValueSet := taint["value"]; isValueSet {
+						taintRead["value"] = value
+					}
+					if effect, isEffectSet := taint["effect"]; isEffectSet {
+						taintRead["effect"] = effect
+					}
+
+					taintsRead = append(taintsRead, taintRead)
+				}
+
+				nodePoolRead["taints"] = taintsRead
+			}
+
+			// Handle labels
+			if labels, isLabelsSet := nodePoolSet["labels"]; isLabelsSet {
+				labelsList := labels.([]any)
+				labelsRead := make([]map[string]any, 0)
+
+				for _, labelInterface := range labelsList {
+					label := labelInterface.(map[string]any)
+					labelRead := make(map[string]any)
+
+					if key, isKeySet := label["key"]; isKeySet {
+						labelRead["key"] = key
+					}
+					if value, isValueSet := label["value"]; isValueSet {
+						labelRead["value"] = value
+					}
+
+					labelsRead = append(labelsRead, labelRead)
+				}
+
+				nodePoolRead["labels"] = labelsRead
+			}
+
 			nodePools = append(nodePools, nodePoolRead)
 		}
 	}
@@ -951,6 +1043,53 @@ func resourceGridscaleK8sCreate(d *schema.ResourceData, meta interface{}) error 
 			nodePool["storage"] = d.Get(fmt.Sprintf("node_pool.%d.storage", index))
 			nodePool["storage_type"] = d.Get(fmt.Sprintf("node_pool.%d.storage_type", index))
 			nodePool["rocket_storage"] = d.Get(fmt.Sprintf("node_pool.%d.rocket_storage", index))
+
+			// Handle taints
+			if taintsInterface, isTaintsSet := d.GetOk(fmt.Sprintf("node_pool.%d.taints", index)); isTaintsSet {
+				taintsList := taintsInterface.([]any)
+				taintsRequest := make([]map[string]any, 0)
+
+				for _, taintInterface := range taintsList {
+					taint := taintInterface.(map[string]any)
+					taintRequest := make(map[string]any)
+
+					if key, isKeySet := taint["key"]; isKeySet {
+						taintRequest["key"] = key
+					}
+					if value, isValueSet := taint["value"]; isValueSet {
+						taintRequest["value"] = value
+					}
+					if effect, isEffectSet := taint["effect"]; isEffectSet {
+						taintRequest["effect"] = effect
+					}
+
+					taintsRequest = append(taintsRequest, taintRequest)
+				}
+
+				nodePool["taints"] = taintsRequest
+			}
+
+			// Handle labels
+			if labelsInterface, isLabelsSet := d.GetOk(fmt.Sprintf("node_pool.%d.labels", index)); isLabelsSet {
+				labelsList := labelsInterface.([]any)
+				labelsRequest := make([]map[string]any, 0)
+
+				for _, labelInterface := range labelsList {
+					label := labelInterface.(map[string]any)
+					labelRequest := make(map[string]any)
+
+					if key, isKeySet := label["key"]; isKeySet {
+						labelRequest["key"] = key
+					}
+					if value, isValueSet := label["value"]; isValueSet {
+						labelRequest["value"] = value
+					}
+
+					labelsRequest = append(labelsRequest, labelRequest)
+				}
+
+				nodePool["labels"] = labelsRequest
+			}
 
 			nodePools = append(nodePools, nodePool)
 		}
@@ -1112,6 +1251,53 @@ func resourceGridscaleK8sUpdate(d *schema.ResourceData, meta interface{}) error 
 			nodePool["storage"] = d.Get(fmt.Sprintf("node_pool.%d.storage", index))
 			nodePool["storage_type"] = d.Get(fmt.Sprintf("node_pool.%d.storage_type", index))
 			nodePool["rocket_storage"] = d.Get(fmt.Sprintf("node_pool.%d.rocket_storage", index))
+
+			// Handle taints
+			if taintsInterface, isTaintsSet := d.GetOk(fmt.Sprintf("node_pool.%d.taints", index)); isTaintsSet {
+				taintsList := taintsInterface.([]any)
+				taintsRequest := make([]map[string]any, 0)
+
+				for _, taintInterface := range taintsList {
+					taint := taintInterface.(map[string]any)
+					taintRequest := make(map[string]any)
+
+					if key, isKeySet := taint["key"]; isKeySet {
+						taintRequest["key"] = key
+					}
+					if value, isValueSet := taint["value"]; isValueSet {
+						taintRequest["value"] = value
+					}
+					if effect, isEffectSet := taint["effect"]; isEffectSet {
+						taintRequest["effect"] = effect
+					}
+
+					taintsRequest = append(taintsRequest, taintRequest)
+				}
+
+				nodePool["taints"] = taintsRequest
+			}
+
+			// Handle labels
+			if labelsInterface, isLabelsSet := d.GetOk(fmt.Sprintf("node_pool.%d.labels", index)); isLabelsSet {
+				labelsList := labelsInterface.([]any)
+				labelsRequest := make([]map[string]any, 0)
+
+				for _, labelInterface := range labelsList {
+					label := labelInterface.(map[string]any)
+					labelRequest := make(map[string]any)
+
+					if key, isKeySet := label["key"]; isKeySet {
+						labelRequest["key"] = key
+					}
+					if value, isValueSet := label["value"]; isValueSet {
+						labelRequest["value"] = value
+					}
+
+					labelsRequest = append(labelsRequest, labelRequest)
+				}
+
+				nodePool["labels"] = labelsRequest
+			}
 
 			nodePools = append(nodePools, nodePool)
 		}
@@ -1376,6 +1562,112 @@ func validateK8sParameters(d *schema.ResourceDiff, template gsclient.PaaSTemplat
 							strings.Join(nodePoolParameterStorageType.Allowed, "\n\t"),
 						),
 					)
+				}
+			}
+
+			// Validate taints
+			nodePoolParameterTaints, taints_ok := templateParameterNodePools.Schema.Schema["taints"]
+			if taints_ok {
+				if taintsInterface, isTaintsSet := d.GetOk(fmt.Sprintf("node_pool.%d.taints", index)); isTaintsSet {
+					taintsList := taintsInterface.([]any)
+
+					// Check if taints list is empty when it's allowed to be
+					if len(taintsList) == 0 && !nodePoolParameterTaints.Empty {
+						errorMessages = append(
+							errorMessages,
+							fmt.Sprintf("Invalid 'node_pool.%d.taints' value. Taints list cannot be empty.\n", index),
+						)
+					}
+
+					// Validate each taint
+					for _, taintInterface := range taintsList {
+						taint := taintInterface.(map[string]any)
+
+						// Validate key
+						if _, isKeySet := taint["key"]; isKeySet {
+							// Key validation removed
+						} else {
+							errorMessages = append(
+								errorMessages,
+								fmt.Sprintf("Invalid 'node_pool.%d.taints' value. Key is required.\n", index),
+							)
+						}
+
+						// Validate value
+						if _, isValueSet := taint["value"]; isValueSet {
+							// Value validation removed
+						} else {
+							errorMessages = append(
+								errorMessages,
+								fmt.Sprintf("Invalid 'node_pool.%d.taints' value. Value is required.\n", index),
+							)
+						}
+
+						// Validate effect
+						if effect, isEffectSet := taint["effect"]; isEffectSet {
+							effectStr := effect.(string)
+							validEffects := []string{"NoExecute", "NoSchedule", "PreferNoSchedule"}
+							isValidEffect := false
+							for _, validEffect := range validEffects {
+								if effectStr == validEffect {
+									isValidEffect = true
+									break
+								}
+							}
+							if !isValidEffect {
+								errorMessages = append(
+									errorMessages,
+									fmt.Sprintf("Invalid 'node_pool.%d.taints.effect' value. Effect must be one of: %s.\n", index, strings.Join(validEffects, ", ")),
+								)
+							}
+						} else {
+							errorMessages = append(
+								errorMessages,
+								fmt.Sprintf("Invalid 'node_pool.%d.taints' value. Effect is required.\n", index),
+							)
+						}
+					}
+				}
+			}
+
+			// Validate labels
+			nodePoolParameterLabels, labels_ok := templateParameterNodePools.Schema.Schema["labels"]
+			if labels_ok {
+				if labelsInterface, isLabelsSet := d.GetOk(fmt.Sprintf("node_pool.%d.labels", index)); isLabelsSet {
+					labelsList := labelsInterface.([]any)
+
+					// Check if labels list is empty when it's allowed to be
+					if len(labelsList) == 0 && !nodePoolParameterLabels.Empty {
+						errorMessages = append(
+							errorMessages,
+							fmt.Sprintf("Invalid 'node_pool.%d.labels' value. Labels list cannot be empty.\n", index),
+						)
+					}
+
+					// Validate each label
+					for _, labelInterface := range labelsList {
+						label := labelInterface.(map[string]any)
+
+						// Validate key
+						if _, isKeySet := label["key"]; isKeySet {
+							// Key validation removed
+						} else {
+							errorMessages = append(
+								errorMessages,
+								fmt.Sprintf("Invalid 'node_pool.%d.labels' value. Key is required.\n", index),
+							)
+						}
+
+						// Validate value
+						if _, isValueSet := label["value"]; isValueSet {
+							// Value validation removed
+						} else {
+							errorMessages = append(
+								errorMessages,
+								fmt.Sprintf("Invalid 'node_pool.%d.labels' value. Value is required.\n", index),
+							)
+						}
+					}
 				}
 			}
 		}
