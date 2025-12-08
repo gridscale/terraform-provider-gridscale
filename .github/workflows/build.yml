@@ -29,7 +29,7 @@ jobs:
           passphrase: ${{ secrets.RELEASE_SIGNING_KEY_PASSPHRASE }}
 
       - name: Install goreleaser
-        run: go install github.com/goreleaser/goreleaser@v1.23.0
+        run: go install github.com/goreleaser/goreleaser/v2@v2.13.1
 
       - name: Build executable files
         env:
