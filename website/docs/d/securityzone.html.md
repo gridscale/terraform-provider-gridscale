@@ -1,7 +1,7 @@
 ---
 layout: "gridscale"
 page_title: "gridscale: securityzone"
-sidebar_current: "docs-gridscale-datasource-securityzone"
+sidebar_current: "docs-gridscale-datasource-paas-securityzone"
 description: |-
   Get data of a security zone.
 ---
