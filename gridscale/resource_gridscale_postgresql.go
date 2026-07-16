@@ -211,12 +211,14 @@ func resourceGridscalePostgreSQL() *schema.Resource {
 			},
 			"pgaudit_log_access_key": {
 				Type:        schema.TypeString,
+				Sensitive:   true,
 				Description: "Access key used to authenticate against Object Storage server.",
 				Optional:    true,
 				Computed:    true,
 			},
 			"pgaudit_log_secret_key": {
 				Type:        schema.TypeString,
+				Sensitive:   true,
 				Description: "Secret key used to authenticate against Object Storage server.",
 				Optional:    true,
 				Computed:    true,
