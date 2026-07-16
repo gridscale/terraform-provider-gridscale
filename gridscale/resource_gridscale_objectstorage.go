@@ -125,7 +125,7 @@ func resourceGridscaleObjectStorageUpdate(d *schema.ResourceData, meta interface
 		return fmt.Errorf("%s error: %v", errorPrefix, err)
 	}
 
-	return resourceGridscaleSshkeyRead(d, meta)
+	return resourceGridscaleObjectStorageRead(d, meta)
 }
 
 func resourceGridscaleObjectStorageDelete(d *schema.ResourceData, meta interface{}) error {
