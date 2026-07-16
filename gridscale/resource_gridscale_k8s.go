@@ -371,12 +371,14 @@ func (rgk8sm *ResourceGridscaleK8sModeler) buildInputSchema() map[string]*schema
 		},
 		"log_delivery_access_key": {
 			Type:        schema.TypeString,
+			Sensitive:   true,
 			Description: "Access key used to authenticate against Object Storage endpoint.",
 			Computed:    true,
 			Optional:    true,
 		},
 		"log_delivery_secret_key": {
 			Type:        schema.TypeString,
+			Sensitive:   true,
 			Description: "Secret key used to authenticate against Object Storage endpoint.",
 			Computed:    true,
 			Optional:    true,

@@ -364,6 +364,7 @@ func resourceGridscaleServer() *schema.Resource {
 			},
 			"console_token": {
 				Type:        schema.TypeString,
+				Sensitive:   true,
 				Description: "The token used by the panel to open the websocket VNC connection to the server console.",
 				Computed:    true,
 			},
