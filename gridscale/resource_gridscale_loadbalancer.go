@@ -112,8 +112,7 @@ func resourceGridscaleLoadBalancer() *schema.Resource {
 			"status": {
 				Type:        schema.TypeString,
 				Description: "Status indicates the status of the object.",
-				Optional:    true,
-				Default:     "active",
+				Computed:    true,
 			},
 			"redirect_http_to_https": {
 				Type:        schema.TypeBool,
